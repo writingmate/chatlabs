@@ -114,7 +114,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
             display={<div>Start chat with {contentType.slice(0, -1)}</div>}
             trigger={
               <IconSquarePlus
-                className="cursor-pointer hover:text-blue-500"
+                className="cursor-pointer hover:text-violet-500"
                 size={20}
                 onClick={handleClickAction}
               />

@@ -163,7 +163,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                   key={index}
                   className="relative flex h-[64px] items-center space-x-4 rounded-xl border-2 px-4 py-3"
                 >
-                  <div className="rounded bg-blue-500 p-2">
+                  <div className="rounded bg-violet-500 p-2">
                     <IconLoader2 className="animate-spin" />
                   </div>
 
@@ -178,7 +178,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                   className="relative flex h-[64px] cursor-pointer items-center space-x-4 rounded-xl border-2 px-4 py-3 hover:opacity-50"
                   onClick={() => getLinkAndView(file)}
                 >
-                  <div className="rounded bg-blue-500 p-2">
+                  <div className="rounded bg-violet-500 p-2">
                     {(() => {
                       let fileExtension = file.type.includes("/")
                         ? file.type.split("/")[1]
