@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase/browser-client"
 import { GoogleSVG } from "@/components/icons/google-svg"
 import { MicrosoftSVG } from "@/components/icons/microsoft-svg"
 import { useEffect, useState } from "react"
+import { useTheme } from "next-themes"
 
 // export const metadata: Metadata = {
 //   title: "Login"
@@ -20,6 +21,8 @@ export default async function Login({
   const router = useRouter()
 
   const [session, setSession] = useState<any>(null)
+
+  const { theme } = useTheme()
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -49,7 +52,10 @@ export default async function Login({
 
   const handleOAuthLogin = async (provider: "azure" | "google") => {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
     })
 
     if (error) {
@@ -62,10 +68,10 @@ export default async function Login({
   return (
     <div className="flex w-full flex-1 flex-col justify-center gap-2 px-8 sm:max-w-md">
       <form className="animate-in text-foreground flex w-full flex-1 flex-col justify-center gap-2">
-        <Brand />
+        <Brand theme={theme === "dark" ? "dark" : "light"} />
 
         <Button
-          formAction={() => handleOAuthLogin("google")}
+          onClick={() => handleOAuthLogin("google")}
           className="text-md mb-1 mt-4 rounded-lg bg-violet-700 px-4 py-2 text-white"
         >
           <GoogleSVG height={20} width={20} className="mr-2" /> Continue with
@@ -73,7 +79,7 @@ export default async function Login({
         </Button>
 
         <Button
-          formAction={() => handleOAuthLogin("azure")}
+          onClick={() => handleOAuthLogin("azure")}
           className="border-foreground/20 text-md mb-1 rounded-lg border px-4 py-2"
         >
           <MicrosoftSVG height={20} width={20} className="mr-2" />
