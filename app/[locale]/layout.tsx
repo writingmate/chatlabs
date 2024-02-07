@@ -12,11 +12,11 @@ import { ReactNode } from "react"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
-const APP_NAME = "Writingmate Lab"
-const APP_DEFAULT_TITLE = "Writingmate Lab"
-const APP_TITLE_TEMPLATE = "%s - Writingmate Lab"
+const APP_NAME = "Writingmate Labs"
+const APP_DEFAULT_TITLE = "Writingmate Labs"
+const APP_TITLE_TEMPLATE = "%s - Writingmate Labs"
 const APP_DESCRIPTION =
-  "Writingmate Lab is a platform for LLM and AI tinkerers."
+  "Writingmate Labs is a platform for LLM and AI tinkerers."
 
 interface RootLayoutProps {
   children: ReactNode

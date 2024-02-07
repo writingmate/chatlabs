@@ -715,7 +715,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
             <WithTooltip
               display={
                 <div>
-                  Download Writingmate Lab 1.0 data as JSON. Import coming soon!
+                  Download Writingmate Labs 1.0 data as JSON. Import coming
+                  soon!
                 </div>
               }
               trigger={
