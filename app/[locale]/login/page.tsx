@@ -2,16 +2,11 @@
 
 import { Brand } from "@/components/ui/brand"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { createClient } from "@/lib/supabase/server"
-import { Database } from "@/supabase/types"
-import { createServerClient } from "@supabase/ssr"
-import { get } from "@vercel/edge-config"
-import { redirect } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase/browser-client"
 import { GoogleSVG } from "@/components/icons/google-svg"
 import { MicrosoftSVG } from "@/components/icons/microsoft-svg"
+import { useEffect, useState } from "react"
 
 // export const metadata: Metadata = {
 //   title: "Login"
@@ -22,46 +17,43 @@ export default async function Login({
 }: {
   searchParams: { message: string }
 }) {
-  // const cookieStore = cookies()
-  // const supabase = createServerClient<Database>(
-  //   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  //   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  //   {
-  //     cookies: {
-  //       get(name: string) {
-  //         return cookieStore.get(name)?.value
-  //       }
-  //     }
-  //   }
-  // )
+  const router = useRouter()
 
-  const session = (await supabase.auth.getSession()).data.session
+  const [session, setSession] = useState<any>(null)
 
-  if (session) {
-    const { data: homeWorkspace, error } = await supabase
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!session) {
+      return
+    }
+    supabase
       .from("workspaces")
       .select("*")
       .eq("user_id", session.user.id)
       .eq("is_home", true)
       .single()
+      .then(({ data: homeWorkspace, error }) => {
+        if (!homeWorkspace) {
+          throw new Error(error.message)
+        }
+        console.log(homeWorkspace)
 
-    if (!homeWorkspace) {
-      throw new Error(error.message)
-    }
-
-    return redirect(`/${homeWorkspace.id}/chat`)
-  }
+        return router.push(`/${homeWorkspace.id}/chat`)
+      })
+  }, [session])
 
   const handleOAuthLogin = async (provider: "azure" | "google") => {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: "/where-to-redirect-after-successful-login"
-      }
+      provider
     })
 
     if (error) {
-      return redirect(`/login?message=${error.message}`)
+      return router.push(`/login?message=${error.message}`)
     }
 
     // Add any additional logic needed after successful login
