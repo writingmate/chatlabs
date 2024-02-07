@@ -8,6 +8,7 @@ import { GoogleSVG } from "@/components/icons/google-svg"
 import { MicrosoftSVG } from "@/components/icons/microsoft-svg"
 import { useEffect, useState } from "react"
 import { useTheme } from "next-themes"
+import Loading from "../loading"
 
 // export const metadata: Metadata = {
 //   title: "Login"
@@ -19,36 +20,33 @@ export default async function Login({
   searchParams: { message: string }
 }) {
   const router = useRouter()
-
-  const [session, setSession] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   const { theme } = useTheme()
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
+      if (!data.session) {
+        setLoading(false)
+        return
+      }
+      supabase
+        .from("workspaces")
+        .select("*")
+        .eq("user_id", data.session.user.id)
+        .eq("is_home", true)
+        .single()
+        .then(({ data: homeWorkspace, error }) => {
+          if (!homeWorkspace) {
+            setLoading(false)
+            throw new Error(error.message)
+          }
+          console.log(homeWorkspace)
+
+          return router.push(`/${homeWorkspace.id}/chat`)
+        })
     })
   }, [])
-
-  useEffect(() => {
-    if (!session) {
-      return
-    }
-    supabase
-      .from("workspaces")
-      .select("*")
-      .eq("user_id", session.user.id)
-      .eq("is_home", true)
-      .single()
-      .then(({ data: homeWorkspace, error }) => {
-        if (!homeWorkspace) {
-          throw new Error(error.message)
-        }
-        console.log(homeWorkspace)
-
-        return router.push(`/${homeWorkspace.id}/chat`)
-      })
-  }, [session])
 
   const handleOAuthLogin = async (provider: "azure" | "google") => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -63,6 +61,10 @@ export default async function Login({
     }
 
     // Add any additional logic needed after successful login
+  }
+
+  if (loading) {
+    return <Loading />
   }
 
   return (
