@@ -5,21 +5,35 @@ import { IconArrowRight } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { Brand } from "@/components/ui/brand"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { supabase } from "@/lib/supabase/browser-client"
+import Loading from "@/app/[locale]/loading"
 
 export default function HomePage() {
-  const { theme } = useTheme()
+  const router = useRouter()
 
-  return (
-    <div className="flex size-full flex-col items-center justify-center">
-      <Brand theme={theme === "dark" ? "dark" : "light"} />
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        return router.push("/login")
+      }
+      supabase
+        .from("workspaces")
+        .select("*")
+        .eq("user_id", data.session.user.id)
+        .eq("is_home", true)
+        .single()
+        .then(({ data: homeWorkspace, error }) => {
+          if (!homeWorkspace) {
+            throw new Error(error.message)
+          }
+          console.log(homeWorkspace)
 
-      <Link
-        className="mt-4 flex w-[200px] items-center justify-center rounded-md bg-violet-500 p-2 font-semibold text-white"
-        href="/login"
-      >
-        Start Chatting
-        <IconArrowRight className="ml-1" size={20} />
-      </Link>
-    </div>
-  )
+          return router.push(`/${homeWorkspace.id}/chat`)
+        })
+    })
+  }, [])
+
+  return <Loading />
 }
