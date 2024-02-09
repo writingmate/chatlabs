@@ -3,6 +3,7 @@ import type { Stripe } from "stripe"
 import { NextResponse } from "next/server"
 
 import { stripe } from "@/lib/stripe"
+import { updateProfile } from "@/db/profile"
 
 export async function POST(req: Request) {
   let event: Stripe.Event
@@ -28,9 +29,9 @@ export async function POST(req: Request) {
   console.log("✅ Success:", event.id)
 
   const permittedEvents: string[] = [
-    "checkout.session.completed",
-    "payment_intent.succeeded",
-    "payment_intent.payment_failed"
+    "customer.subscription.deleted",
+    "customer.subscription.updated",
+    "customer.subscription.created"
   ]
 
   if (permittedEvents.includes(event.type)) {
@@ -38,20 +39,27 @@ export async function POST(req: Request) {
 
     try {
       switch (event.type) {
-        case "checkout.session.completed":
-          data = event.data.object as Stripe.Checkout.Session
-          console.log(`💰 CheckoutSession status: ${data.payment_status}`)
+        case "customer.subscription.deleted":
+          subscription = event.data.object as Stripe.Subscription
+          await updateProfile()
           break
-        case "payment_intent.payment_failed":
-          data = event.data.object as Stripe.PaymentIntent
-          console.log(`❌ Payment failed: ${data.last_payment_error?.message}`)
+        case "customer.subscription.created":
+        case "customer.subscription.updated":
+          subscription = event.data.object as Stripe.Subscription
+          status = subscription.status
+          plan = getPlanFromPriceId(subscription.items.data?.[0]?.price?.id)
+          customer = await ensureCustomerWithEmail(subscription)
+          const subscriptionActive = !!plan
+          plan = plan || "free"
+          if (["active", "trialing"].indexOf(status) > -1) {
+            await upsertUserAndPlan(
+              customer.email as string,
+              customer.id,
+              subscriptionActive,
+              plan
+            )
+          }
           break
-        case "payment_intent.succeeded":
-          data = event.data.object as Stripe.PaymentIntent
-          console.log(`💰 PaymentIntent status: ${data.status}`)
-          break
-        default:
-          throw new Error(`Unhandled event: ${event.type}`)
       }
     } catch (error) {
       console.log(error)

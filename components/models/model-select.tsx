@@ -27,7 +27,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     models,
     availableHostedModels,
     availableLocalModels,
-    availableOpenRouterModels
+    availableOpenRouterModels,
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -64,7 +65,14 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   // }, [profile])
 
   const handleSelectModel = (modelId: LLMID) => {
-    onSelectModel(modelId)
+    if (
+      profile?.plan == "free" &&
+      allModels.find(x => x.modelId == modelId).paid == true
+    ) {
+      setIsPaywallOpen(true)
+    } else {
+      onSelectModel(modelId)
+    }
     setIsOpen(false)
   }
 

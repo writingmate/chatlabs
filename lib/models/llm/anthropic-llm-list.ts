@@ -1,6 +1,6 @@
 import { LLM } from "@/types"
 
-const ANTHROPIC_PLATORM_LINK =
+const ANTHROPIC_PLATFORM_LINK =
   "https://docs.anthropic.com/claude/reference/getting-started-with-the-api"
 
 // Anthropic Models (UPDATED 12/21/23) -----------------------------
@@ -11,8 +11,9 @@ const CLAUDE_2: LLM = {
   modelName: "Claude 2",
   provider: "anthropic",
   hostedId: "claude-2.1",
-  platformLink: ANTHROPIC_PLATORM_LINK,
-  imageInput: false
+  platformLink: ANTHROPIC_PLATFORM_LINK,
+  imageInput: false,
+  paid: true
 }
 
 // Claude Instant (UPDATED 12/21/23)
@@ -21,8 +22,9 @@ const CLAUDE_INSTANT: LLM = {
   modelName: "Claude Instant",
   provider: "anthropic",
   hostedId: "claude-instant-1.2",
-  platformLink: ANTHROPIC_PLATORM_LINK,
-  imageInput: false
+  platformLink: ANTHROPIC_PLATFORM_LINK,
+  imageInput: false,
+  paid: true
 }
 
 export const ANTHROPIC_LLM_LIST: LLM[] = [CLAUDE_2, CLAUDE_INSTANT]

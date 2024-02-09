@@ -16,7 +16,7 @@ export async function createCheckoutSession(
 
   const origin: string = headers().get("origin") as string;
 
-  const prices: string = await stripe.prices.list({
+  const prices = await stripe.prices.list({
     lookup_keys: [plan],
   })
 

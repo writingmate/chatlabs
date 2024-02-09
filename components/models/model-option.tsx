@@ -17,6 +17,9 @@ export const ModelOption: FC<ModelOptionProps> = ({ model, onSelect }) => {
         <ModelIcon provider={model.provider} width={28} height={28} />
 
         <div className="text-sm font-semibold">{model.modelName}</div>
+        {model.paid && (
+          <div className="text-xs font-normal opacity-50">Pro</div>
+        )}
       </div>
     </div>
   )

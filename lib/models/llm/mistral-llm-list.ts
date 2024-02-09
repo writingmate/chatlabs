@@ -21,7 +21,8 @@ const MIXTRAL: LLM = {
   provider: "mistral",
   hostedId: "mistral-small",
   platformLink: MISTRAL_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  paid: true
 }
 
 // Mistral Medium (UPDATED 12/21/23)
@@ -31,7 +32,8 @@ const MISTRAL_MEDIUM: LLM = {
   provider: "mistral",
   hostedId: "mistral-medium",
   platformLink: MISTRAL_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  paid: true
 }
 
 export const MISTRAL_LLM_LIST: LLM[] = [MISTRAL_7B, MIXTRAL, MISTRAL_MEDIUM]

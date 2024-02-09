@@ -49,29 +49,33 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
     "yearly"
   )
 
-  const [isOpen, setIsOpen] = useState(false)
+  const { isPaywallOpen, setIsPaywallOpen } = useContext(ChatbotUIContext)
 
   const formAction = async (data: FormData): Promise<void> => {
     const user = (await supabase.auth.getUser()).data.user
 
-    data.set("email", user?.email)
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    data.set("email", user?.email as string)
     const { url } = await createCheckoutSession(data)
 
     window.location.assign(url as string)
   }
 
-  const formActionPremium = async data => {
+  const formActionPremium = async (data: FormData) => {
     data.set("plan", "premium_" + data.get("billingCycle"))
     return formAction(data)
   }
 
-  const formActionPro = async data => {
+  const formActionPro = async (data: FormData) => {
     data.set("plan", "pro_" + data.get("billingCycle"))
     return formAction(data)
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isPaywallOpen} onOpenChange={setIsPaywallOpen}>
       <DialogTrigger>
         <WithTooltip
           delayDuration={0}
@@ -160,7 +164,7 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
                         className="text-token-text-tertiary text-base font-light"
                         data-testid="Pro-pricing-column-cost"
                       >
-                        {billingCycle === "annual"
+                        {billingCycle === "yearly"
                           ? "$9.99/month"
                           : "$14.99/year"}
                       </p>
@@ -169,9 +173,9 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
                           "text-token-text-tertiary text-xs font-light"
                         }
                       >
-                        after free trial
-                        {billingCycle === "annual" &&
-                          ", billed yearly $119.88/year"}
+                        after free trial <br />
+                        {billingCycle === "yearly" &&
+                          "billed yearly $119.88/year"}
                       </p>
                     </div>
                   </div>
@@ -222,9 +226,9 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
                     <p
                       className={"text-token-text-tertiary text-xs font-light"}
                     >
-                      after free trial
-                      {billingCycle === "annual" &&
-                        ", billed yearly $239.88/year"}
+                      after free trial <br />
+                      {billingCycle === "yearly" &&
+                        "billed yearly $239.88/year"}
                     </p>
                   </div>
                 </div>

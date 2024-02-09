@@ -49,6 +49,7 @@ export interface LLM {
   hostedId: string
   platformLink: string
   imageInput: boolean
+  paid?: boolean
 }
 
 export interface OpenRouterLLM extends LLM {

@@ -11,7 +11,8 @@ const GEMINI_PRO: LLM = {
   provider: "google",
   hostedId: "gemini-pro",
   platformLink: GOOGLE_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  paid: true
 }
 
 // Gemini Pro Vision (UPDATED 12/22/23)
@@ -21,7 +22,8 @@ const GEMINI_PRO_VISION: LLM = {
   provider: "google",
   hostedId: "gemini-pro-vision",
   platformLink: GOOGLE_PLATORM_LINK,
-  imageInput: true
+  imageInput: true,
+  paid: true
 }
 
 export const GOOGLE_LLM_LIST: LLM[] = [GEMINI_PRO, GEMINI_PRO_VISION]

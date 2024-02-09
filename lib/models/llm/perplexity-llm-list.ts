@@ -22,7 +22,8 @@ const PERPLEXITY_ONLINE_70B: LLM = {
   provider: "perplexity",
   hostedId: "pplx-70b-online",
   platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  paid: true
 }
 
 // Perplexity Chat 7B (UPDATED 1/31/24)
@@ -42,7 +43,8 @@ const PERPLEXITY_CHAT_70B: LLM = {
   provider: "perplexity",
   hostedId: "pplx-70b-chat",
   platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  paid: true
 }
 
 // Mixtral 8x7B Instruct (UPDATED 1/31/24)
@@ -52,7 +54,8 @@ const MIXTRAL_8X7B_INSTRUCT: LLM = {
   provider: "perplexity",
   hostedId: "mixtral-8x7b-instruct",
   platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  paid: true
 }
 
 // Mistral 7B Instruct (UPDATED 1/31/24)
@@ -72,7 +75,8 @@ const LLAMA_2_70B_CHAT: LLM = {
   provider: "perplexity",
   hostedId: "llama-2-70b-chat",
   platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  paid: true
 }
 
 // CodeLlama 34B Instruct (UPDATED 1/31/24)
@@ -82,7 +86,8 @@ const CODELLAMA_34B_INSTRUCT: LLM = {
   provider: "perplexity",
   hostedId: "codellama-34b-instruct",
   platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  paid: true
 }
 
 // CodeLlama 70B Instruct (UPDATED 1/31/24)
@@ -92,7 +97,8 @@ const CODELLAMA_70B_INSTRUCT: LLM = {
   provider: "perplexity",
   hostedId: "codellama-70b-instruct",
   platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  paid: true
 }
 
 export const PERPLEXITY_LLM_LIST: LLM[] = [
