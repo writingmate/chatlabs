@@ -9,11 +9,13 @@ import {
   IconRobotFace,
   IconSparkles
 } from "@tabler/icons-react"
-import { FC } from "react"
+import { FC, useContext } from "react"
 import { TabsList } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "../utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
+import { PlanPicker } from "@/components/upgrade/plan-picker"
+import { ChatbotUIContext } from "@/context/context"
 
 export const SIDEBAR_ICON_SIZE = 28
 
@@ -24,6 +26,8 @@ interface SidebarSwitcherProps {
 export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   onContentTypeChange
 }) => {
+  const { profile } = useContext(ChatbotUIContext)
+
   return (
     <div className="flex flex-col justify-between border-r-2 pb-5">
       <TabsList className="bg-background grid h-[440px] grid-rows-7">
@@ -82,6 +86,8 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 
         {/* TODO */}
         {/* <Alerts /> */}
+
+        {profile?.plan == "free" && <PlanPicker />}
 
         <WithTooltip
           display={<div>Profile Settings</div>}
