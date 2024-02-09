@@ -21,6 +21,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { createCheckoutSession } from "@/actions/stripe"
 import { Tables } from "@/supabase/types"
 import { supabase } from "@/lib/supabase/browser-client"
+import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
 
 interface PlanPickerProps {}
 
@@ -59,6 +60,8 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
     }
 
     data.set("email", user?.email as string)
+    data.set("userId", user?.id)
+
     const { url } = await createCheckoutSession(data)
 
     window.location.assign(url as string)

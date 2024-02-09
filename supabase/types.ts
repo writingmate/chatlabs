@@ -1112,6 +1112,7 @@ export interface Database {
           perplexity_api_key: string | null
           plan: string
           profile_context: string
+          stripe_customer_id: string | null
           updated_at: string | null
           use_azure_openai: boolean
           user_id: string
@@ -1140,6 +1141,7 @@ export interface Database {
           perplexity_api_key?: string | null
           plan?: string
           profile_context: string
+          stripe_customer_id?: string | null
           updated_at?: string | null
           use_azure_openai: boolean
           user_id: string
@@ -1168,6 +1170,7 @@ export interface Database {
           perplexity_api_key?: string | null
           plan?: string
           profile_context?: string
+          stripe_customer_id?: string | null
           updated_at?: string | null
           use_azure_openai?: boolean
           user_id?: string

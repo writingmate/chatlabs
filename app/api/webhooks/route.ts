@@ -3,10 +3,18 @@ import type { Stripe } from "stripe"
 import { NextResponse } from "next/server"
 
 import { stripe } from "@/lib/stripe"
-import { updateProfile } from "@/db/profile"
+import { Database } from "@/supabase/types"
+import { createClient } from "@supabase/supabase-js"
+import { ACTIVE_PLAN_STATUSES, PLAN_FREE, PLANS } from "@/lib/stripe/config"
 
 export async function POST(req: Request) {
   let event: Stripe.Event
+  let subscription: Stripe.Subscription
+
+  const supabaseAdmin = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
   try {
     event = stripe.webhooks.constructEvent(
@@ -16,8 +24,6 @@ export async function POST(req: Request) {
     )
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error"
-    // On error, log and return the error message.
-    if (err! instanceof Error) console.log(err)
     console.log(`❌ Error message: ${errorMessage}`)
     return NextResponse.json(
       { message: `Webhook Error: ${errorMessage}` },
@@ -25,7 +31,6 @@ export async function POST(req: Request) {
     )
   }
 
-  // Successfully constructed event.
   console.log("✅ Success:", event.id)
 
   const permittedEvents: string[] = [
@@ -34,30 +39,39 @@ export async function POST(req: Request) {
     "customer.subscription.created"
   ]
 
+  async function updateProfileByStripeCustomerId(
+    stripeCustomerId: string,
+    profile: Database["public"]["Tables"]["profiles"]["Update"]
+  ) {
+    return supabaseAdmin
+      .from("profiles")
+      .update(profile)
+      .eq("stripe_customer_id", stripeCustomerId)
+      .select("*")
+      .single()
+  }
+
   if (permittedEvents.includes(event.type)) {
-    let data
+    const subscription = event.data.object as Stripe.Subscription
+
+    const stripeCustomerId = subscription.customer as string
 
     try {
       switch (event.type) {
         case "customer.subscription.deleted":
-          subscription = event.data.object as Stripe.Subscription
-          await updateProfile()
+          await updateProfileByStripeCustomerId(stripeCustomerId, {
+            plan: PLAN_FREE
+          })
           break
         case "customer.subscription.created":
         case "customer.subscription.updated":
-          subscription = event.data.object as Stripe.Subscription
-          status = subscription.status
-          plan = getPlanFromPriceId(subscription.items.data?.[0]?.price?.id)
-          customer = await ensureCustomerWithEmail(subscription)
-          const subscriptionActive = !!plan
-          plan = plan || "free"
-          if (["active", "trialing"].indexOf(status) > -1) {
-            await upsertUserAndPlan(
-              customer.email as string,
-              customer.id,
-              subscriptionActive,
-              plan
-            )
+          const status = subscription.status
+          let plan = subscription.items.data?.[0]?.price?.lookup_key
+          if (!plan || !PLANS.includes(plan)) {
+            plan = PLAN_FREE
+          }
+          if (ACTIVE_PLAN_STATUSES.includes(status)) {
+            await updateProfileByStripeCustomerId(stripeCustomerId, { plan })
           }
           break
       }
@@ -69,6 +83,5 @@ export async function POST(req: Request) {
       )
     }
   }
-  // Return a response to acknowledge receipt of the event.
   return NextResponse.json({ message: "Received" }, { status: 200 })
 }
