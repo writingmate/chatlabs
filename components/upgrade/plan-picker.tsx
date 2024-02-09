@@ -22,6 +22,7 @@ import { createCheckoutSession } from "@/actions/stripe"
 import { Tables } from "@/supabase/types"
 import { supabase } from "@/lib/supabase/browser-client"
 import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
+import { useTheme } from "next-themes"
 
 interface PlanPickerProps {}
 
@@ -49,6 +50,8 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
   const [billingCycle, setBillingCycle] = useState<"yearly" | "monthly">(
     "yearly"
   )
+
+  const { theme } = useTheme()
 
   const { isPaywallOpen, setIsPaywallOpen } = useContext(ChatbotUIContext)
 
@@ -216,7 +219,9 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
               <div className="bg-token-main-surface-primary relative flex flex-col">
                 <div className="flex flex-col gap-1">
                   <p className="flex items-center gap-2 text-xl font-medium">
-                    <IconSparkles className={"text-black"} />
+                    <IconSparkles
+                      className={theme === "dark" ? "text-white" : "text-black"}
+                    />
                     Pro
                   </p>
                   <div className="min-h-[56px] flex-col items-baseline gap-[6px]">
