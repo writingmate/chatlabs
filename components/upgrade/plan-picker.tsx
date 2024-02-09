@@ -199,7 +199,7 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
                 <div className="bg-token-main-surface-primary relative flex flex-col">
                   <p className="text-l font-medium">Everything in Free, and:</p>
                 </div>
-                <PlanFeature title={"Unlimited GPT-3.5 queries"} />
+                <PlanFeature title={"Unlimited GPT-3.5 messages"} />
                 <PlanFeature
                   title={"150 queries per month for Image generation"}
                 />
@@ -255,7 +255,6 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
                     Everything in Premium, and:
                   </p>
                 </div>
-                <PlanFeature title={"Unlimited GPT-3.5 messages"} />
                 <PlanFeature title={"Unlimited GPT-4 Turbo messages"} />
                 <PlanFeature
                   title={"Access to Mistral, Claude, Gemini and LLaMa 2 models"}
