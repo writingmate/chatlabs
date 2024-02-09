@@ -97,7 +97,7 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
           }
         />
       </DialogTrigger>
-      <DialogContent className={"w-full max-w-4xl"}>
+      <DialogContent>
         <form method={"POST"}>
           <input type={"hidden"} value={billingCycle} name={"billingCycle"} />
           <DialogHeader>
