@@ -87,7 +87,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         {/* TODO */}
         {/* <Alerts /> */}
 
-        {profile?.plan == "free" && <PlanPicker />}
+        {profile?.plan == "free" && <PlanPicker currentPlan={profile?.plan!} />}
 
         <WithTooltip
           display={<div>Profile Settings</div>}
