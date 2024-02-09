@@ -148,70 +148,73 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
                     For people just getting started with Writingmate
                   </p>
                 </div>
-                <PlanFeature title={"Access to GPT-3.5 model"} />
-                <PlanFeature title={"30 messages per day limit"} />
+                <PlanFeature
+                  title={
+                    "Unlimited access to GPT-3.5 Turbo, Mistral Tiny, Perplexity 7B"
+                  }
+                />
                 <PlanFeature title={"Access to Writingmate Labs"} />
                 <PlanFeature title={"Access to Chrome Extension"} />
               </div>
             </div>
-            <div
-              className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t px-6 py-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
-              data-testid="Premium-pricing-modal-column"
-            >
-              <div className="bg-token-main-surface-primary relative flex flex-col">
-                <div className="flex flex-col gap-1">
-                  <p className="flex items-center gap-2 text-xl font-medium">
-                    <IconSparkles className={"text-violet-700"} />
-                    Premium
-                  </p>
-                  <div className="flex items-baseline gap-[6px]">
-                    <div className="min-h-[56px] flex-col items-baseline gap-[6px]">
-                      <p
-                        className="text-token-text-tertiary text-base font-light"
-                        data-testid="Pro-pricing-column-cost"
-                      >
-                        {billingCycle === "yearly"
-                          ? "$9.99/month"
-                          : "$14.99/year"}
-                      </p>
-                      <p
-                        className={
-                          "text-token-text-tertiary text-xs font-light"
-                        }
-                      >
-                        after free trial <br />
-                        {billingCycle === "yearly" &&
-                          "billed yearly $119.88/year"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-token-main-surface-primary relative flex flex-col">
-                <Button
-                  formAction={formActionPremium}
-                  className={"bg-violet-700"}
-                >
-                  Try Premium for free
-                </Button>
-              </div>
-              <div className="flex grow flex-col gap-2">
-                <div className="bg-token-main-surface-primary relative flex flex-col">
-                  <p className="text-l font-medium">Everything in Free, and:</p>
-                </div>
-                <PlanFeature title={"Unlimited GPT-3.5 messages"} />
-                <PlanFeature
-                  title={"150 queries per month for Image generation"}
-                />
-                <PlanFeature title={"300 queries per month for Web Chat"} />
-                <PlanFeature
-                  title={
-                    "Summarize, explain, translate, extract information from any web page"
-                  }
-                />
-                <PlanFeature title={"Priority feature requests"} />
-              </div>
-            </div>
+            {/*<div*/}
+            {/*  className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t px-6 py-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"*/}
+            {/*  data-testid="Premium-pricing-modal-column"*/}
+            {/*>*/}
+            {/*  <div className="bg-token-main-surface-primary relative flex flex-col">*/}
+            {/*    <div className="flex flex-col gap-1">*/}
+            {/*      <p className="flex items-center gap-2 text-xl font-medium">*/}
+            {/*        <IconSparkles className={"text-violet-700"} />*/}
+            {/*        Premium*/}
+            {/*      </p>*/}
+            {/*      <div className="flex items-baseline gap-[6px]">*/}
+            {/*        <div className="min-h-[56px] flex-col items-baseline gap-[6px]">*/}
+            {/*          <p*/}
+            {/*            className="text-token-text-tertiary text-base font-light"*/}
+            {/*            data-testid="Pro-pricing-column-cost"*/}
+            {/*          >*/}
+            {/*            {billingCycle === "yearly"*/}
+            {/*              ? "$9.99/month"*/}
+            {/*              : "$14.99/year"}*/}
+            {/*          </p>*/}
+            {/*          <p*/}
+            {/*            className={*/}
+            {/*              "text-token-text-tertiary text-xs font-light"*/}
+            {/*            }*/}
+            {/*          >*/}
+            {/*            after free trial <br />*/}
+            {/*            {billingCycle === "yearly" &&*/}
+            {/*              "billed yearly $119.88/year"}*/}
+            {/*          </p>*/}
+            {/*        </div>*/}
+            {/*      </div>*/}
+            {/*    </div>*/}
+            {/*  </div>*/}
+            {/*  <div className="bg-token-main-surface-primary relative flex flex-col">*/}
+            {/*    <Button*/}
+            {/*      formAction={formActionPremium}*/}
+            {/*      className={"bg-violet-700"}*/}
+            {/*    >*/}
+            {/*      Try Premium for free*/}
+            {/*    </Button>*/}
+            {/*  </div>*/}
+            {/*  <div className="flex grow flex-col gap-2">*/}
+            {/*    <div className="bg-token-main-surface-primary relative flex flex-col">*/}
+            {/*      <p className="text-l font-medium">Everything in Free, and:</p>*/}
+            {/*    </div>*/}
+            {/*    <PlanFeature title={"Unlimited GPT-3.5 messages"} />*/}
+            {/*    <PlanFeature*/}
+            {/*      title={"150 queries per month for Image generation"}*/}
+            {/*    />*/}
+            {/*    <PlanFeature title={"300 queries per month for Web Chat"} />*/}
+            {/*    <PlanFeature*/}
+            {/*      title={*/}
+            {/*        "Summarize, explain, translate, extract information from any web page"*/}
+            {/*      }*/}
+            {/*    />*/}
+            {/*    <PlanFeature title={"Priority feature requests"} />*/}
+            {/*  </div>*/}
+            {/*</div>*/}
             <div
               className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t px-6 py-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
               data-testid="Pro-pricing-modal-column"
@@ -257,7 +260,9 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
                 </div>
                 <PlanFeature title={"Unlimited GPT-4 Turbo messages"} />
                 <PlanFeature
-                  title={"Access to Mistral, Claude, Gemini and LLaMa 2 models"}
+                  title={
+                    "Unlimited access to Mistral, Claude, Gemini and LLaMa 2 models"
+                  }
                 />
                 <PlanFeature title={"Unlimited image generations"} />
                 <PlanFeature
