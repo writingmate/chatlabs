@@ -47,9 +47,6 @@ export async function createCheckoutSession(
     await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
-      automatic_tax: {
-        enabled: true,
-      },
       subscription_data: {
         trial_period_days: STRIPE_TRIAL_PERIOD_DAYS,
       },
