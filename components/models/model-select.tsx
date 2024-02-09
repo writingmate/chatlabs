@@ -67,7 +67,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   const handleSelectModel = (modelId: LLMID) => {
     if (
       profile?.plan == "free" &&
-      allModels.find(x => x.modelId == modelId).paid == true
+      allModels?.find(x => x.modelId == modelId)?.paid == true
     ) {
       setIsPaywallOpen(true)
     } else {
@@ -83,7 +83,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       provider: "custom" as ModelProvider,
       hostedId: model.id,
       platformLink: "",
-      imageInput: false
+      imageInput: false,
+      paid: "paid" in model ? !!model.paid : false
     })),
     ...availableHostedModels,
     ...availableLocalModels,
