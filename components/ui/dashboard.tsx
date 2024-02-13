@@ -89,12 +89,15 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
       </Button>
 
       <div
-        className={cn("border-r-2 duration-200 dark:border-none")}
+        className={cn(
+          "absolute h-full border-r-2 bg-white duration-200 md:relative dark:border-none"
+        )}
         style={{
           // Sidebar
           minWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
           maxWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
-          width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"
+          width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
+          zIndex: showSidebar ? "100" : "0"
         }}
       >
         {showSidebar && (
