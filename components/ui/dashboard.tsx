@@ -92,7 +92,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
       <div
         className={cn(
-          "absolute z-50 h-full border-r-2 bg-white duration-200 lg:relative dark:border-none dark:bg-black"
+          "bg-background absolute z-50 h-full border-r-2 bg-white duration-200 lg:relative"
         )}
         style={{
           // Sidebar
