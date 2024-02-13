@@ -6,6 +6,10 @@ import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe";
 import { getOrCreateCustomer } from "@/lib/stripe/get-or-create-customer";
 import { STRIPE_TRIAL_PERIOD_DAYS, PLANS } from "@/lib/stripe/config";
+import { redirect } from "next/navigation";
+import { getProfileByUserId } from "@/db/profile";
+import { supabase } from "@/lib/supabase/browser-client";
+import { getServerProfile } from "@/lib/server/server-chat-helpers";
 
 export async function createCheckoutSession(
   data: FormData,
@@ -32,7 +36,7 @@ export async function createCheckoutSession(
     lookup_keys: [plan],
   })
 
-  if(prices.data.length === 0) {
+  if (prices.data.length === 0) {
     throw new Error("Invalid plan")
   }
 
@@ -57,11 +61,35 @@ export async function createCheckoutSession(
         },
       ],
       success_url: `${origin}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/subscription/success`,
+      cancel_url: `${origin}/subscription/cancel`,
     });
 
   return {
     client_secret: checkoutSession.client_secret,
     url: checkoutSession.url,
   };
+}
+
+export async function createBillingPortalSession(customerId: string) {
+
+  const origin: string = headers().get("origin") as string;
+
+  const billingPortalSession = await stripe.billingPortal.sessions.create({
+    customer: customerId,
+    return_url: origin,
+  });
+
+  return {
+    url: billingPortalSession.url,
+  }
+}
+
+export async function redirectToBillingPortal() {
+  const profile = await getServerProfile()
+  if (!profile?.stripe_customer_id) {
+    return
+  }
+  const { url } = await createBillingPortalSession(profile?.stripe_customer_id)
+
+  redirect(url);
 }

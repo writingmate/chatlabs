@@ -12,6 +12,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
+import { PlanPicker } from "@/components/upgrade/plan-picker"
 
 export const SIDEBAR_WIDTH = 350
 
@@ -70,6 +71,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
   return (
     <div className="flex size-full">
       <CommandK />
+      <PlanPicker />
 
       <Button
         className={cn(

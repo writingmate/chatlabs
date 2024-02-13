@@ -22,7 +22,7 @@ import {
   IconUser
 } from "@tabler/icons-react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useRouter, redirect } from "next/navigation"
 import { FC, useCallback, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
@@ -42,6 +42,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ThemeSwitcher } from "./theme-switcher"
+import {
+  createBillingPortalSession,
+  redirectToBillingPortal
+} from "@/actions/stripe"
+import { PLAN_FREE } from "@/lib/stripe/config"
 
 interface ProfileSettingsProps {}
 
@@ -52,7 +57,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     envKeyMap,
     setAvailableHostedModels,
     setAvailableOpenRouterModels,
-    availableOpenRouterModels
+    availableOpenRouterModels,
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
@@ -337,96 +343,119 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
             {/*</TabsList>*/}
 
             <TabsContent className="mt-4 space-y-4" value="profile">
-              <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <Label>Username</Label>
+              <form>
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <Label>Username</Label>
 
-                  <div className="text-xs">
+                    <div className="text-xs">
+                      {username !== profile.username ? (
+                        usernameAvailable ? (
+                          <div className="text-green-500">AVAILABLE</div>
+                        ) : (
+                          <div className="text-red-500">UNAVAILABLE</div>
+                        )
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <Input
+                      className="pr-10"
+                      placeholder="Username..."
+                      value={username}
+                      onChange={e => {
+                        setUsername(e.target.value)
+                        checkUsernameAvailability(e.target.value)
+                      }}
+                      minLength={PROFILE_USERNAME_MIN}
+                      maxLength={PROFILE_USERNAME_MAX}
+                    />
+
                     {username !== profile.username ? (
-                      usernameAvailable ? (
-                        <div className="text-green-500">AVAILABLE</div>
-                      ) : (
-                        <div className="text-red-500">UNAVAILABLE</div>
-                      )
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        {loadingUsername ? (
+                          <IconLoader2 className="animate-spin" />
+                        ) : usernameAvailable ? (
+                          <IconCircleCheckFilled className="text-green-500" />
+                        ) : (
+                          <IconCircleXFilled className="text-red-500" />
+                        )}
+                      </div>
                     ) : null}
                   </div>
+
+                  <LimitDisplay
+                    used={username.length}
+                    limit={PROFILE_USERNAME_MAX}
+                  />
                 </div>
 
-                <div className="relative">
+                <div className="space-y-1">
+                  <Label>Profile Image</Label>
+
+                  <ImagePicker
+                    src={profileImageSrc}
+                    image={profileImageFile}
+                    height={50}
+                    width={50}
+                    onSrcChange={setProfileImageSrc}
+                    onImageChange={setProfileImageFile}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label>Chat Display Name</Label>
+
                   <Input
-                    className="pr-10"
-                    placeholder="Username..."
-                    value={username}
-                    onChange={e => {
-                      setUsername(e.target.value)
-                      checkUsernameAvailability(e.target.value)
-                    }}
-                    minLength={PROFILE_USERNAME_MIN}
-                    maxLength={PROFILE_USERNAME_MAX}
+                    placeholder="Chat display name..."
+                    value={displayName}
+                    onChange={e => setDisplayName(e.target.value)}
+                    maxLength={PROFILE_DISPLAY_NAME_MAX}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-sm">
+                    What would you like the AI to know about you to provide
+                    better responses?
+                  </Label>
+
+                  <TextareaAutosize
+                    value={profileInstructions}
+                    onValueChange={setProfileInstructions}
+                    placeholder="Profile context... (optional)"
+                    minRows={6}
+                    maxRows={10}
                   />
 
-                  {username !== profile.username ? (
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      {loadingUsername ? (
-                        <IconLoader2 className="animate-spin" />
-                      ) : usernameAvailable ? (
-                        <IconCircleCheckFilled className="text-green-500" />
-                      ) : (
-                        <IconCircleXFilled className="text-red-500" />
-                      )}
-                    </div>
-                  ) : null}
+                  <LimitDisplay
+                    used={profileInstructions.length}
+                    limit={PROFILE_CONTEXT_MAX}
+                  />
                 </div>
-
-                <LimitDisplay
-                  used={username.length}
-                  limit={PROFILE_USERNAME_MAX}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <Label>Profile Image</Label>
-
-                <ImagePicker
-                  src={profileImageSrc}
-                  image={profileImageFile}
-                  height={50}
-                  width={50}
-                  onSrcChange={setProfileImageSrc}
-                  onImageChange={setProfileImageFile}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <Label>Chat Display Name</Label>
-
-                <Input
-                  placeholder="Chat display name..."
-                  value={displayName}
-                  onChange={e => setDisplayName(e.target.value)}
-                  maxLength={PROFILE_DISPLAY_NAME_MAX}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <Label className="text-sm">
-                  What would you like the AI to know about you to provide better
-                  responses?
-                </Label>
-
-                <TextareaAutosize
-                  value={profileInstructions}
-                  onValueChange={setProfileInstructions}
-                  placeholder="Profile context... (optional)"
-                  minRows={6}
-                  maxRows={10}
-                />
-
-                <LimitDisplay
-                  used={profileInstructions.length}
-                  limit={PROFILE_CONTEXT_MAX}
-                />
-              </div>
+                <div className={"space-y-1"}>
+                  {profile.plan != PLAN_FREE ? (
+                    <Button
+                      className={"w-full"}
+                      formAction={redirectToBillingPortal}
+                    >
+                      Manage subscription
+                    </Button>
+                  ) : (
+                    <Button
+                      className="w-full bg-violet-700"
+                      onClick={event => {
+                        event.stopPropagation()
+                        event.preventDefault()
+                        setIsPaywallOpen(true)
+                      }}
+                    >
+                      Subscribe to Pro
+                    </Button>
+                  )}
+                </div>
+              </form>
             </TabsContent>
 
             <TabsContent className="mt-4 space-y-4" value="keys">

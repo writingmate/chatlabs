@@ -16,6 +16,7 @@ import { ProfileSettings } from "../utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
 import { PlanPicker } from "@/components/upgrade/plan-picker"
 import { ChatbotUIContext } from "@/context/context"
+import { DialogTrigger } from "@/components/ui/dialog"
 
 export const SIDEBAR_ICON_SIZE = 28
 
@@ -26,7 +27,7 @@ interface SidebarSwitcherProps {
 export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   onContentTypeChange
 }) => {
-  const { profile } = useContext(ChatbotUIContext)
+  const { profile, setIsPaywallOpen } = useContext(ChatbotUIContext)
 
   return (
     <div className="flex flex-col justify-between border-r-2 pb-5">
@@ -86,8 +87,22 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 
         {/* TODO */}
         {/* <Alerts /> */}
-
-        {profile?.plan == "free" && <PlanPicker currentPlan={profile?.plan!} />}
+        {profile?.plan == "free" && (
+          <WithTooltip
+            delayDuration={0}
+            side="top"
+            display={
+              <div>Upgrade to paid plans to get access to all features.</div>
+            }
+            trigger={
+              <IconSparkles
+                onClick={() => setIsPaywallOpen(true)}
+                className="cursor-pointer pt-[4px] text-violet-700 hover:opacity-50"
+                size={24}
+              />
+            }
+          />
+        )}
 
         <WithTooltip
           display={<div>Profile Settings</div>}

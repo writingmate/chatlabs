@@ -2,7 +2,8 @@ import { ChatbotUIContext } from "@/context/context"
 import {
   IconAdjustmentsHorizontal,
   IconCheck,
-  IconSparkles
+  IconSparkles,
+  IconX
 } from "@tabler/icons-react"
 import { FC, useContext, useState } from "react"
 import { Button } from "../ui/button"
@@ -15,18 +16,13 @@ import {
   DialogClose,
   DialogTitle
 } from "../ui/dialog"
-import { WithTooltip } from "../ui/with-tooltip"
-import { Switch } from "@/components/ui/switch"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { createCheckoutSession } from "@/actions/stripe"
-import { Tables } from "@/supabase/types"
 import { supabase } from "@/lib/supabase/browser-client"
-import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
 import { useTheme } from "next-themes"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
-interface PlanPickerProps {
-  currentPlan: string
-}
+interface PlanPickerProps {}
 
 function PlanFeature({ title }: { title: string }) {
   return (
@@ -41,14 +37,15 @@ function PlanFeature({ title }: { title: string }) {
   )
 }
 
-export const PlanPicker: FC<PlanPickerProps> = ({ currentPlan }) => {
+export const PlanPicker: FC<PlanPickerProps> = () => {
   const [billingCycle, setBillingCycle] = useState<"yearly" | "monthly">(
     "yearly"
   )
 
   const { theme } = useTheme()
 
-  const { isPaywallOpen, setIsPaywallOpen } = useContext(ChatbotUIContext)
+  const { isPaywallOpen, setIsPaywallOpen, profile } =
+    useContext(ChatbotUIContext)
 
   const formAction = async (data: FormData): Promise<void> => {
     const user = (await supabase.auth.getUser()).data.user
@@ -77,28 +74,21 @@ export const PlanPicker: FC<PlanPickerProps> = ({ currentPlan }) => {
 
   return (
     <Dialog open={isPaywallOpen} onOpenChange={setIsPaywallOpen}>
-      <DialogTrigger>
-        <WithTooltip
-          delayDuration={0}
-          side="top"
-          display={
-            <div>Upgrade to paid plans to get access to all features.</div>
-          }
-          trigger={
-            <IconSparkles
-              className="cursor-pointer pt-[4px] text-violet-700 hover:opacity-50"
-              size={24}
-            />
-          }
-        />
-      </DialogTrigger>
-      <DialogContent className="w-full max-w-2xl">
+      <DialogContent className="h-full max-h-[calc(100vh-32px)] w-[calc(100vw-32px)] rounded-lg sm:h-auto sm:max-h-[calc(100%-60px)] sm:max-w-2xl">
         <form method={"POST"}>
           <input type={"hidden"} value={billingCycle} name={"billingCycle"} />
           <DialogHeader>
-            <DialogTitle>Upgrade your plan</DialogTitle>
+            <DialogTitle className={"flex justify-between"}>
+              <div>Upgrade your plan</div>
+              <DialogClose>
+                <IconX
+                  className="text-token-text-primary cursor-pointer"
+                  size={18}
+                />
+              </DialogClose>
+            </DialogTitle>
           </DialogHeader>
-          <div>
+          <div className="my-2">
             <ToggleGroup
               type={"single"}
               value={billingCycle}
@@ -110,172 +100,181 @@ export const PlanPicker: FC<PlanPickerProps> = ({ currentPlan }) => {
               <ToggleGroupItem value={"monthly"}>Monthly</ToggleGroupItem>
             </ToggleGroup>
           </div>
-          <div className="flex flex-col md:flex-row">
-            {currentPlan == "free" && (
+          <ScrollArea>
+            <div className="flex flex-col md:flex-row">
+              {profile?.plan == "free" && (
+                <div
+                  className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t px-6 py-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
+                  data-testid="free-pricing-modal-column"
+                >
+                  <div className="bg-token-main-surface-primary relative flex flex-col">
+                    <div className="flex flex-col gap-1">
+                      <p className="flex items-center gap-2 text-xl font-medium">
+                        Free
+                      </p>
+                      <div className="min-h-[56px] flex-col items-baseline gap-[6px]">
+                        <p
+                          className="text-token-text-tertiary text-base font-light"
+                          data-testid="free-pricing-column-cost"
+                        >
+                          $0/month
+                        </p>
+                        <div className="text-token-text-tertiary text-xs font-light">
+                          Forever free, <br />
+                          no credit card required
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-token-main-surface-primary relative flex flex-col">
+                    <Button disabled={true}>Your current plan</Button>
+                  </div>
+                  <div className="flex grow flex-col gap-2">
+                    <div className="bg-token-main-surface-primary relative flex flex-col">
+                      <p className="text-l font-medium">
+                        For people just getting started with Writingmate
+                      </p>
+                    </div>
+                    <PlanFeature
+                      title={
+                        "Unlimited access to GPT-3.5 Turbo, Mistral Tiny, Perplexity 7B"
+                      }
+                    />
+                    <PlanFeature title={"Access to Writingmate Labs"} />
+                    <PlanFeature title={"Access to Chrome Extension"} />
+                  </div>
+                </div>
+              )}
+              {profile?.plan.startsWith("premium_") && (
+                <div
+                  className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t px-6 py-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
+                  data-testid="Premium-pricing-modal-column"
+                >
+                  <div className="bg-token-main-surface-primary relative flex flex-col">
+                    <div className="flex flex-col gap-1">
+                      <p className="flex items-center gap-2 text-xl font-medium">
+                        <IconSparkles className={"text-violet-700"} />
+                        Premium
+                      </p>
+                      <div className="flex items-baseline gap-[6px]">
+                        <div className="min-h-[56px] flex-col items-baseline gap-[6px]">
+                          <p
+                            className="text-token-text-tertiary text-base font-light"
+                            data-testid="Pro-pricing-column-cost"
+                          >
+                            {billingCycle === "yearly"
+                              ? "$9.99/month"
+                              : "$14.99/year"}
+                          </p>
+                          <p
+                            className={
+                              "text-token-text-tertiary text-xs font-light"
+                            }
+                          >
+                            after free trial <br />
+                            {billingCycle === "yearly" &&
+                              "billed yearly $119.88/year"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-token-main-surface-primary relative flex flex-col">
+                    <Button
+                      formAction={formActionPremium}
+                      className={"bg-violet-700"}
+                    >
+                      Try Premium for free
+                    </Button>
+                  </div>
+                  <div className="flex grow flex-col gap-2">
+                    <div className="bg-token-main-surface-primary relative flex flex-col">
+                      <p className="text-l font-medium">
+                        Everything in {profile?.plan}, and:
+                      </p>
+                    </div>
+                    <PlanFeature title={"Unlimited GPT-3.5 messages"} />
+                    <PlanFeature
+                      title={"150 queries per month for Image generation"}
+                    />
+                    <PlanFeature title={"300 queries per month for Web Chat"} />
+                    <PlanFeature
+                      title={
+                        "Summarize, explain, translate, extract information from any web page"
+                      }
+                    />
+                    <PlanFeature title={"Priority feature requests"} />
+                  </div>
+                </div>
+              )}
               <div
                 className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t px-6 py-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
-                data-testid="free-pricing-modal-column"
+                data-testid="Pro-pricing-modal-column"
               >
                 <div className="bg-token-main-surface-primary relative flex flex-col">
                   <div className="flex flex-col gap-1">
                     <p className="flex items-center gap-2 text-xl font-medium">
-                      Free
+                      <IconSparkles
+                        className={
+                          theme === "dark" ? "text-white" : "text-black"
+                        }
+                      />
+                      Pro
                     </p>
                     <div className="min-h-[56px] flex-col items-baseline gap-[6px]">
                       <p
                         className="text-token-text-tertiary text-base font-light"
-                        data-testid="free-pricing-column-cost"
+                        data-testid="Pro-pricing-column-cost"
                       >
-                        $0/month
+                        {billingCycle === "yearly"
+                          ? "$19.99/month"
+                          : "$29.99/month"}
                       </p>
-                      <div className="text-token-text-tertiary text-xs font-light">
-                        Forever free, <br />
-                        no credit card required
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-token-main-surface-primary relative flex flex-col">
-                  <Button disabled={true}>Your current plan</Button>
-                </div>
-                <div className="flex grow flex-col gap-2">
-                  <div className="bg-token-main-surface-primary relative flex flex-col">
-                    <p className="text-l font-medium">
-                      For people just getting started with Writingmate
-                    </p>
-                  </div>
-                  <PlanFeature
-                    title={
-                      "Unlimited access to GPT-3.5 Turbo, Mistral Tiny, Perplexity 7B"
-                    }
-                  />
-                  <PlanFeature title={"Access to Writingmate Labs"} />
-                  <PlanFeature title={"Access to Chrome Extension"} />
-                </div>
-              </div>
-            )}
-            {currentPlan.startsWith("premium_") && (
-              <div
-                className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t px-6 py-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
-                data-testid="Premium-pricing-modal-column"
-              >
-                <div className="bg-token-main-surface-primary relative flex flex-col">
-                  <div className="flex flex-col gap-1">
-                    <p className="flex items-center gap-2 text-xl font-medium">
-                      <IconSparkles className={"text-violet-700"} />
-                      Premium
-                    </p>
-                    <div className="flex items-baseline gap-[6px]">
-                      <div className="min-h-[56px] flex-col items-baseline gap-[6px]">
-                        <p
-                          className="text-token-text-tertiary text-base font-light"
-                          data-testid="Pro-pricing-column-cost"
-                        >
-                          {billingCycle === "yearly"
-                            ? "$9.99/month"
-                            : "$14.99/year"}
-                        </p>
-                        <p
-                          className={
-                            "text-token-text-tertiary text-xs font-light"
-                          }
-                        >
-                          after free trial <br />
-                          {billingCycle === "yearly" &&
-                            "billed yearly $119.88/year"}
-                        </p>
-                      </div>
+                      <p
+                        className={
+                          "text-token-text-tertiary text-xs font-light"
+                        }
+                      >
+                        after free trial <br />
+                        {billingCycle === "yearly" &&
+                          "billed yearly $239.88/year"}
+                      </p>
                     </div>
                   </div>
                 </div>
                 <div className="bg-token-main-surface-primary relative flex flex-col">
                   <Button
-                    formAction={formActionPremium}
+                    formAction={formActionPro}
                     className={"bg-violet-700"}
+                    data-testid="select-plan-button-Pros-create"
                   >
-                    Try Premium for free
+                    Try Pro for free
                   </Button>
                 </div>
                 <div className="flex grow flex-col gap-2">
                   <div className="bg-token-main-surface-primary relative flex flex-col">
                     <p className="text-l font-medium">
-                      Everything in {currentPlan}, and:
+                      Everything in{" "}
+                      <span className="capitalize">{profile?.plan}</span>, and:
                     </p>
                   </div>
-                  <PlanFeature title={"Unlimited GPT-3.5 messages"} />
-                  <PlanFeature
-                    title={"150 queries per month for Image generation"}
-                  />
-                  <PlanFeature title={"300 queries per month for Web Chat"} />
+                  <PlanFeature title={"Unlimited GPT-4 Turbo messages"} />
                   <PlanFeature
                     title={
-                      "Summarize, explain, translate, extract information from any web page"
+                      "Unlimited access to Mistral, Claude, Gemini and LLaMa 2 models"
                     }
                   />
-                  <PlanFeature title={"Priority feature requests"} />
+                  <PlanFeature title={"Unlimited image generations"} />
+                  <PlanFeature
+                    title={"Different rendering models for AI images"}
+                  />
+                  <PlanFeature title={"Several images in one request"} />
+                  <PlanFeature title={"Highest-priority support"} />
+                  <PlanFeature title={"Advanced privacy and security"} />
                 </div>
-              </div>
-            )}
-            <div
-              className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t px-6 py-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
-              data-testid="Pro-pricing-modal-column"
-            >
-              <div className="bg-token-main-surface-primary relative flex flex-col">
-                <div className="flex flex-col gap-1">
-                  <p className="flex items-center gap-2 text-xl font-medium">
-                    <IconSparkles
-                      className={theme === "dark" ? "text-white" : "text-black"}
-                    />
-                    Pro
-                  </p>
-                  <div className="min-h-[56px] flex-col items-baseline gap-[6px]">
-                    <p
-                      className="text-token-text-tertiary text-base font-light"
-                      data-testid="Pro-pricing-column-cost"
-                    >
-                      $19.99/month
-                    </p>
-                    <p
-                      className={"text-token-text-tertiary text-xs font-light"}
-                    >
-                      after free trial <br />
-                      {billingCycle === "yearly" &&
-                        "billed yearly $239.88/year"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-token-main-surface-primary relative flex flex-col">
-                <Button
-                  formAction={formActionPro}
-                  className={"bg-violet-700"}
-                  data-testid="select-plan-button-Pros-create"
-                >
-                  Try Pro for free
-                </Button>
-              </div>
-              <div className="flex grow flex-col gap-2">
-                <div className="bg-token-main-surface-primary relative flex flex-col">
-                  <p className="text-l font-medium">
-                    Everything in {currentPlan}, and:
-                  </p>
-                </div>
-                <PlanFeature title={"Unlimited GPT-4 Turbo messages"} />
-                <PlanFeature
-                  title={
-                    "Unlimited access to Mistral, Claude, Gemini and LLaMa 2 models"
-                  }
-                />
-                <PlanFeature title={"Unlimited image generations"} />
-                <PlanFeature
-                  title={"Different rendering models for AI images"}
-                />
-                <PlanFeature title={"Several images in one request"} />
-                <PlanFeature title={"Highest-priority support"} />
-                <PlanFeature title={"Advanced privacy and security"} />
               </div>
             </div>
-          </div>
+          </ScrollArea>
         </form>
       </DialogContent>
     </Dialog>
