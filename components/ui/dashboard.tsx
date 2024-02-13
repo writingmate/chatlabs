@@ -13,6 +13,7 @@ import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
 import { PlanPicker } from "@/components/upgrade/plan-picker"
+import { useTheme } from "next-themes"
 
 export const SIDEBAR_WIDTH = 350
 
@@ -27,6 +28,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const tabValue = searchParams.get("tab") || "chats"
+  const { theme } = useTheme()
 
   const { handleSelectDeviceFile } = useSelectFileHandler()
 
@@ -90,14 +92,14 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
       <div
         className={cn(
-          "absolute h-full border-r-2 bg-white duration-200 md:relative dark:border-none"
+          "absolute z-50 h-full border-r-2 bg-white duration-200 md:relative dark:border-none dark:bg-black"
         )}
         style={{
           // Sidebar
           minWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
           maxWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
-          width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
-          zIndex: showSidebar ? "100" : "0"
+          width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"
+          // zIndex: showSidebar ? "100" : "0"
         }}
       >
         {showSidebar && (
