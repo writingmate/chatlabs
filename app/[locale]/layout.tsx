@@ -9,6 +9,7 @@ import { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import { cookies } from "next/headers"
 import { ReactNode } from "react"
+import { GoogleAnalytics } from "@next/third-parties/google"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -103,6 +104,7 @@ export default async function RootLayout({
           </TranslationsProvider>
         </Providers>
       </body>
+      <GoogleAnalytics gaId="G-Y14R2TP0QH" />
     </html>
   )
 }

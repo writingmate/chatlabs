@@ -1,17 +1,11 @@
 import { ChatbotUIContext } from "@/context/context"
-import {
-  IconAdjustmentsHorizontal,
-  IconCheck,
-  IconSparkles,
-  IconX
-} from "@tabler/icons-react"
+import { sendGTMEvent } from "@next/third-parties/google"
+import { IconCheck, IconSparkles, IconX } from "@tabler/icons-react"
 import { FC, useContext, useState } from "react"
 import { Button } from "../ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
-  DialogTrigger,
   DialogHeader,
   DialogClose,
   DialogTitle
@@ -20,7 +14,6 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { createCheckoutSession } from "@/actions/stripe"
 import { supabase } from "@/lib/supabase/browser-client"
 import { useTheme } from "next-themes"
-import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface PlanPickerProps {}
 
@@ -179,12 +172,7 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
                   </div>
                 </div>
                 <div className="bg-token-main-surface-primary relative flex flex-col">
-                  <Button
-                    formAction={formActionPremium}
-                    className={"bg-violet-700"}
-                  >
-                    Try Premium for free
-                  </Button>
+                  <Button disabled={true}>Your current plan</Button>
                 </div>
                 <div className="flex grow flex-col gap-2">
                   <div className="bg-token-main-surface-primary relative flex flex-col">
@@ -239,6 +227,7 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
               </div>
               <div className="bg-token-main-surface-primary relative flex flex-col">
                 <Button
+                  onClick={() => sendGTMEvent("click_plan_pro")}
                   formAction={formActionPro}
                   className={"bg-violet-700"}
                   data-testid="select-plan-button-Pros-create"
