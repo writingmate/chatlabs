@@ -74,7 +74,7 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
 
   return (
     <Dialog open={isPaywallOpen} onOpenChange={setIsPaywallOpen}>
-      <DialogContent className="rounded-0 size-full h-auto max-h-full w-full border-0 sm:max-h-[calc(100%-60px)] sm:max-w-2xl sm:rounded-lg sm:border md:w-[calc(100%-32px)]">
+      <DialogContent className="sm:max-w-2xl sm:border">
         <form method={"POST"}>
           <input type={"hidden"} value={billingCycle} name={"billingCycle"} />
           <DialogHeader>
