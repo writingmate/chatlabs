@@ -89,8 +89,6 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         {/* <Alerts /> */}
         {profile?.plan == "free" && (
           <WithTooltip
-            delayDuration={0}
-            side="top"
             display={
               <div>Upgrade to paid plans to get access to all features.</div>
             }
