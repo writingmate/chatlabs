@@ -10,17 +10,20 @@ interface BrandProps {
 
 export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
   return (
-    <Link
-      className="flex cursor-pointer flex-col items-center hover:opacity-50"
-      href="https://www.writingmate.ai"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <div className="flex cursor-pointer flex-col items-center">
       <div className="mb-2">
         <ChatbotUISVG theme={theme === "dark" ? "dark" : "light"} scale={0.3} />
       </div>
 
-      <div className="text-4xl font-bold tracking-wide">Writingmate Labs</div>
-    </Link>
+      <div className="text-4xl font-semibold tracking-wide">
+        Writingmate Labs
+      </div>
+      <div className="flex flex-col items-center py-2">
+        <div className="text-sm">More than 20 AI models in one place.</div>
+        <div className="text-sm">
+          Featuring GPT-4, Claude, Gemini and LLaMa.
+        </div>
+      </div>
+    </div>
   )
 }

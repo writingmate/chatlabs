@@ -17,7 +17,7 @@ import Loading from "../loading"
 export default async function Login({
   searchParams
 }: {
-  searchParams: { message: string }
+  searchParams: { message: string; error_description: string }
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
@@ -52,6 +52,7 @@ export default async function Login({
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
+        scopes: "email",
         redirectTo: `${window.location.origin}/auth/callback`
       }
     })
@@ -91,6 +92,12 @@ export default async function Login({
         {searchParams?.message && (
           <p className="bg-foreground/10 text-foreground mt-4 p-4 text-center">
             {searchParams.message}
+          </p>
+        )}
+
+        {searchParams?.error_description && (
+          <p className="bg-foreground/10 text-foreground mt-4 p-4 text-center">
+            {searchParams.error_description}
           </p>
         )}
       </form>
