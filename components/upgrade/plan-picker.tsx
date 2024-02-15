@@ -1,7 +1,7 @@
 import { ChatbotUIContext } from "@/context/context"
 import { sendGTMEvent } from "@next/third-parties/google"
 import { IconCheck, IconSparkles, IconX } from "@tabler/icons-react"
-import { FC, useContext, useState } from "react"
+import { FC, useContext, useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import {
   Dialog,
@@ -17,7 +17,7 @@ import { useTheme } from "next-themes"
 
 interface PlanPickerProps {}
 
-function PlanFeature({ title }: { title: string }) {
+export function PlanFeature({ title }: { title: string }) {
   return (
     <div className="bg-token-main-surface-primary relative">
       <div className="text-l flex justify-start gap-2">
@@ -55,10 +55,10 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
     window.location.assign(url as string)
   }
 
-  const formActionPremium = async (data: FormData) => {
-    data.set("plan", "premium_" + data.get("billingCycle"))
-    return formAction(data)
-  }
+  // const formActionPremium = async (data: FormData) => {
+  //   data.set("plan", "premium_" + data.get("billingCycle"))
+  //   return formAction(data)
+  // }
 
   const formActionPro = async (data: FormData) => {
     data.set("plan", "pro_" + data.get("billingCycle"))
