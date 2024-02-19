@@ -119,7 +119,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
             {messageImages.map((image, index) => (
               <div
                 key={index}
-                className="relative flex h-[64px] cursor-pointer items-center space-x-4 rounded-xl hover:opacity-50"
+                className="relative flex h-[64px] max-w-[calc(100vw-40px)] cursor-pointer items-center space-x-4 rounded-xl hover:opacity-50 sm:max-w-[calc(100%-10px)]"
               >
                 <Image
                   className="rounded"
@@ -141,7 +141,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                 />
 
                 <IconX
-                  className="bg-muted-foreground border-primary absolute right-[-6px] top-[-2px] flex size-5 cursor-pointer items-center justify-center rounded-full border-[1px] text-[10px] hover:border-red-500 hover:bg-white hover:text-red-500"
+                  className="bg-muted-foreground border-primary absolute right-[-6px] top-[-2px] flex size-5 max-w-[calc(100vw-40px)] cursor-pointer items-center justify-center rounded-full border-[1px] text-[10px] hover:border-red-500 hover:bg-white hover:text-red-500 sm:max-w-[calc(100%-10px)]"
                   onClick={e => {
                     e.stopPropagation()
                     setNewMessageImages(
