@@ -127,6 +127,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   const [isPaywallOpen, setIsPaywallOpen] = useState<boolean>(false)
 
+  // SIDEBAR
+
+  const [showSidebar, setShowSidebar] = useState<boolean>(false)
+
   useEffect(() => {
     ;(async () => {
       const profile = await fetchStartingData()
@@ -330,7 +334,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
         // PAYWALL
         isPaywallOpen,
-        setIsPaywallOpen
+        setIsPaywallOpen,
+
+        showSidebar,
+        setShowSidebar
       }}
     >
       {children}

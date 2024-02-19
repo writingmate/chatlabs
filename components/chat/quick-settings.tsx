@@ -213,7 +213,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
 
                 {selectedPreset?.name ||
                   selectedAssistant?.name ||
-                  t("Quick Settings")}
+                  t("Assistants")}
               </div>
 
               <IconChevronDown className="ml-1" />

@@ -17,6 +17,7 @@ import {
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
+import { isMobileScreen } from "@/lib/mobile"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -140,10 +141,6 @@ export const useChatHandler = () => {
     }
 
     return router.push(`/${selectedWorkspace.id}/chat`)
-  }
-
-  function isMobileScreen() {
-    return "ontouchstart" in window || navigator.maxTouchPoints > 0
   }
 
   const handleFocusChatInput = () => {
