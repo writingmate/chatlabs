@@ -46,13 +46,21 @@ export async function POST(request: Request) {
 
         allRouteMaps = { ...allRouteMaps, ...routeMap }
 
+        const requestInBodyMap = convertedSchema.routes.reduce(
+          (previousValue: { [key: string]: boolean }, currentValue) => {
+            previousValue[currentValue.path] = !!currentValue.requestInBody
+            return previousValue
+          },
+          {}
+        )
+
         schemaDetails.push({
           title: convertedSchema.info.title,
           description: convertedSchema.info.description,
           url: convertedSchema.info.server,
           headers: selectedTool.custom_headers,
           routeMap,
-          requestInBody: convertedSchema.routes[0].requestInBody
+          requestInBodyMap
         })
       } catch (error: any) {
         console.error("Error converting schema", error)
@@ -108,7 +116,7 @@ export async function POST(request: Request) {
         }
 
         // Determine if the request should be in the body or as a query
-        const isRequestInBody = schemaDetail.requestInBody
+        const isRequestInBody = schemaDetail.requestInBodyMap[path]
         let data = {}
 
         if (isRequestInBody) {
