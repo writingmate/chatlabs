@@ -115,7 +115,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
         </div>
 
         <div className="overflow-auto">
-          <div className="flex gap-2 overflow-auto pt-2">
+          <div className="flex flex-col gap-2 overflow-auto pt-2">
             {messageImages.map((image, index) => (
               <div
                 key={index}
@@ -161,7 +161,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
               file.id === "loading" ? (
                 <div
                   key={index}
-                  className="relative flex h-[64px] items-center space-x-4 rounded-xl border-2 px-4 py-3"
+                  className="relative flex h-[64px] w-[calc(100vw-40px)] items-center space-x-4 rounded-xl border-2 px-4 py-3 sm:w-[calc(100%-10px)]"
                 >
                   <div className="rounded bg-violet-500 p-2">
                     <IconLoader2 className="animate-spin" />
@@ -175,7 +175,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
               ) : (
                 <div
                   key={file.id}
-                  className="relative flex h-[64px] cursor-pointer items-center space-x-4 rounded-xl border-2 px-4 py-3 hover:opacity-50"
+                  className="relative flex h-[64px] w-[calc(100vw-40px)] cursor-pointer items-center space-x-4 rounded-xl border-2 px-4 py-3 hover:opacity-50 sm:w-[calc(100%-10px)]"
                   onClick={() => getLinkAndView(file)}
                 >
                   <div className="rounded bg-violet-500 p-2">

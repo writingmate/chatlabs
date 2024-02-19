@@ -176,7 +176,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
         setSearch("")
       }}
     >
-      <DropdownMenuTrigger asChild className="max-w-[400px]" disabled={loading}>
+      <DropdownMenuTrigger asChild className="max-w-1/2" disabled={loading}>
         <Button variant="ghost" className="flex space-x-3 text-lg">
           {selectedPreset && (
             <ModelIcon
