@@ -143,7 +143,7 @@ export const useChatHandler = () => {
   }
 
   function isMobileScreen() {
-    return window.innerWidth < 768
+    return "ontouchstart" in window || navigator.maxTouchPoints > 0
   }
 
   const handleFocusChatInput = () => {
