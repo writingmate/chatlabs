@@ -218,7 +218,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent
-        className="flex min-w-[450px] flex-col justify-between overflow-auto"
+        className="min-w-3/4 flex flex-col justify-between overflow-auto sm:min-w-[450px]"
         side="left"
         onKeyDown={handleKeyDown}
       >
