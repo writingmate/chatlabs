@@ -100,6 +100,12 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
     // const publicAssistantData = await getPublicAssistants()
 
+    // function to fetch unique values from array by id
+
+    function onlyUniqueById(value: any, index: any, self: any) {
+      return self.findIndex((item: any) => item.id === value.id) === index
+    }
+
     const [
       workspaceData,
       assistantData,
@@ -129,14 +135,18 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     ])
 
     setSelectedWorkspace(workspaceData)
-    setAssistants([...assistantData.assistants, ...publicAssistantData])
+    setAssistants(
+      [...assistantData.assistants, ...publicAssistantData].filter(
+        onlyUniqueById
+      )
+    )
     setChats(chats)
     setCollections(collectionData.collections)
     setFolders(folders)
     setFiles(fileData.files)
     setPresets(presetData.presets)
     setPrompts(promptData.prompts)
-    setTools([...toolData.tools, ...publicToolData])
+    setTools([...toolData.tools, ...publicToolData].filter(onlyUniqueById))
     setModels(modelData.models)
 
     const parallelize = async (array: any, callback: any) => {
