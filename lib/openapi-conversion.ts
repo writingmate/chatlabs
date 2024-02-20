@@ -1,4 +1,4 @@
-import $RefParser from "@apidevtools/json-schema-ref-parser"
+// import $RefParser from "@apidevtools/json-schema-ref-parser"
 
 interface OpenAPIData {
   info: {
@@ -108,7 +108,7 @@ export const openapiToFunctions = async (
     for (const [method, specWithRef] of Object.entries(
       methods as Record<string, any>
     )) {
-      const spec: any = await $RefParser.dereference(specWithRef)
+      const spec: any = specWithRef
       const functionName = spec.operationId
       const desc = spec.description || spec.summary || ""
 
