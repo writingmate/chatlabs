@@ -6,6 +6,8 @@ import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 
+export const runtime = "edge"
+
 export async function POST(request: Request) {
   const json = await request.json()
   const { chatSettings, messages, selectedTools } = json as {

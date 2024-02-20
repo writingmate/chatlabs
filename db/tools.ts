@@ -35,6 +35,19 @@ export const getToolWorkspacesByWorkspaceId = async (workspaceId: string) => {
   return workspace
 }
 
+export const getPublicTools = async () => {
+  const { data: tools, error } = await supabase
+    .from("tools")
+    .select("*")
+    .neq("sharing", "private")
+
+  if (!tools) {
+    throw new Error(error.message)
+  }
+
+  return tools
+}
+
 export const getToolWorkspacesByToolId = async (toolId: string) => {
   const { data: tool, error } = await supabase
     .from("tools")

@@ -2,7 +2,10 @@
 
 import { Dashboard } from "@/components/ui/dashboard"
 import { ChatbotUIContext } from "@/context/context"
-import { getAssistantWorkspacesByWorkspaceId } from "@/db/assistants"
+import {
+  getAssistantWorkspacesByWorkspaceId,
+  getPublicAssistants
+} from "@/db/assistants"
 import { getChatsByWorkspaceId } from "@/db/chats"
 import { getCollectionWorkspacesByWorkspaceId } from "@/db/collections"
 import { getFileWorkspacesByWorkspaceId } from "@/db/files"
@@ -11,7 +14,7 @@ import { getModelWorkspacesByWorkspaceId } from "@/db/models"
 import { getPresetWorkspacesByWorkspaceId } from "@/db/presets"
 import { getPromptWorkspacesByWorkspaceId } from "@/db/prompts"
 import { getAssistantImageFromStorage } from "@/db/storage/assistant-images"
-import { getToolWorkspacesByWorkspaceId } from "@/db/tools"
+import { getPublicTools, getToolWorkspacesByWorkspaceId } from "@/db/tools"
 import { getWorkspaceById } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { supabase } from "@/lib/supabase/browser-client"
@@ -94,9 +97,13 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setSelectedWorkspace(workspace)
 
     const assistantData = await getAssistantWorkspacesByWorkspaceId(workspaceId)
-    setAssistants(assistantData.assistants)
 
-    for (const assistant of assistantData.assistants) {
+    const publicAssistantData = await getPublicAssistants()
+
+    for (const assistant of [
+      ...assistantData.assistants,
+      ...publicAssistantData
+    ]) {
       let url = ""
 
       if (assistant.image_path) {
@@ -150,7 +157,10 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setPrompts(promptData.prompts)
 
     const toolData = await getToolWorkspacesByWorkspaceId(workspaceId)
-    setTools(toolData.tools)
+
+    const publicTools = await getPublicTools()
+
+    setTools([...toolData.tools, ...publicTools])
 
     const modelData = await getModelWorkspacesByWorkspaceId(workspaceId)
     setModels(modelData.models)

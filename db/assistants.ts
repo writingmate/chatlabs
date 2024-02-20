@@ -37,6 +37,19 @@ export const getAssistantWorkspacesByWorkspaceId = async (
   return workspace
 }
 
+export const getPublicAssistants = async () => {
+  const { data: assistants, error } = await supabase
+    .from("assistants")
+    .select("*")
+    .neq("sharing", "private")
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return assistants
+}
+
 export const getAssistantWorkspacesByAssistantId = async (
   assistantId: string
 ) => {
