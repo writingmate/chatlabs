@@ -96,74 +96,119 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     const workspace = await getWorkspaceById(workspaceId)
     setSelectedWorkspace(workspace)
 
-    const assistantData = await getAssistantWorkspacesByWorkspaceId(workspaceId)
+    // const assistantData = await getAssistantWorkspacesByWorkspaceId(workspaceId)
 
-    const publicAssistantData = await getPublicAssistants()
+    // const publicAssistantData = await getPublicAssistants()
 
-    for (const assistant of [
-      ...assistantData.assistants,
-      ...publicAssistantData
-    ]) {
-      let url = ""
+    const [
+      workspaceData,
+      assistantData,
+      publicAssistantData,
+      chats,
+      collectionData,
+      folders,
+      fileData,
+      presetData,
+      promptData,
+      toolData,
+      publicToolData,
+      modelData
+    ] = await Promise.all([
+      getWorkspaceById(workspaceId),
+      getAssistantWorkspacesByWorkspaceId(workspaceId),
+      getPublicAssistants(),
+      getChatsByWorkspaceId(workspaceId),
+      getCollectionWorkspacesByWorkspaceId(workspaceId),
+      getFoldersByWorkspaceId(workspaceId),
+      getFileWorkspacesByWorkspaceId(workspaceId),
+      getPresetWorkspacesByWorkspaceId(workspaceId),
+      getPromptWorkspacesByWorkspaceId(workspaceId),
+      getToolWorkspacesByWorkspaceId(workspaceId),
+      getPublicTools(),
+      getModelWorkspacesByWorkspaceId(workspaceId)
+    ])
 
-      if (assistant.image_path) {
-        url = (await getAssistantImageFromStorage(assistant.image_path)) || ""
-      }
+    setSelectedWorkspace(workspaceData)
+    setAssistants([...assistantData.assistants, ...publicAssistantData])
+    setChats(chats)
+    setCollections(collectionData.collections)
+    setFolders(folders)
+    setFiles(fileData.files)
+    setPresets(presetData.presets)
+    setPrompts(promptData.prompts)
+    setTools([...toolData.tools, ...publicToolData])
+    setModels(modelData.models)
 
-      if (url) {
-        const response = await fetch(url)
-        const blob = await response.blob()
-        const base64 = await convertBlobToBase64(blob)
-
-        setAssistantImages(prev => [
-          ...prev,
-          {
-            assistantId: assistant.id,
-            path: assistant.image_path,
-            base64,
-            url
-          }
-        ])
-      } else {
-        setAssistantImages(prev => [
-          ...prev,
-          {
-            assistantId: assistant.id,
-            path: assistant.image_path,
-            base64: "",
-            url
-          }
-        ])
-      }
+    const parallelize = async (array: any, callback: any) => {
+      const promises = array.map((item: any) => callback(item))
+      return Promise.all(promises)
     }
 
-    const chats = await getChatsByWorkspaceId(workspaceId)
-    setChats(chats)
+    await parallelize(
+      [...assistantData.assistants, ...publicAssistantData],
+      async (assistant: any) => {
+        let url = ""
 
-    const collectionData =
-      await getCollectionWorkspacesByWorkspaceId(workspaceId)
-    setCollections(collectionData.collections)
+        if (assistant.image_path) {
+          url = (await getAssistantImageFromStorage(assistant.image_path)) || ""
+        }
 
-    const folders = await getFoldersByWorkspaceId(workspaceId)
-    setFolders(folders)
+        if (url) {
+          const response = await fetch(url)
+          const blob = await response.blob()
+          const base64 = await convertBlobToBase64(blob)
 
-    const fileData = await getFileWorkspacesByWorkspaceId(workspaceId)
-    setFiles(fileData.files)
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: assistant.id,
+              path: assistant.image_path,
+              base64,
+              url
+            }
+          ])
+        } else {
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: assistant.id,
+              path: assistant.image_path,
+              base64: "",
+              url
+            }
+          ])
+        }
+      }
+    )
 
-    const presetData = await getPresetWorkspacesByWorkspaceId(workspaceId)
-    setPresets(presetData.presets)
+    setLoading(false)
+    // const chats = await getChatsByWorkspaceId(workspaceId)
+    // setChats(chats)
 
-    const promptData = await getPromptWorkspacesByWorkspaceId(workspaceId)
-    setPrompts(promptData.prompts)
+    // const collectionData =
+    //   await getCollectionWorkspacesByWorkspaceId(workspaceId)
+    // setCollections(collectionData.collections)
 
-    const toolData = await getToolWorkspacesByWorkspaceId(workspaceId)
+    // const folders = await getFoldersByWorkspaceId(workspaceId)
+    // setFolders(folders)
+    //
+    // const fileData = await getFileWorkspacesByWorkspaceId(workspaceId)
+    // setFiles(fileData.files)
+    //
+    // const presetData = await getPresetWorkspacesByWorkspaceId(workspaceId)
+    // setPresets(presetData.presets)
+    //
+    // const promptData = await getPromptWorkspacesByWorkspaceId(workspaceId)
+    // setPrompts(promptData.prompts)
+    //
+    // const toolData = await getToolWorkspacesByWorkspaceId(workspaceId)
 
-    const publicTools = await getPublicTools()
+    // const publicTools = await getPublicTools()
 
-    setTools([...toolData.tools, ...publicTools])
+    // setTools([...toolData.tools, ...publicTools])
 
-    const modelData = await getModelWorkspacesByWorkspaceId(workspaceId)
-    setModels(modelData.models)
+    // const modelData = await getModelWorkspacesByWorkspaceId(workspaceId)
+    // setModels(modelData.models)
 
     setChatSettings({
       model: (workspace?.default_model || "gpt-3.5-turbo") as LLMID,
