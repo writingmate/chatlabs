@@ -6,6 +6,7 @@ import { stripe } from "@/lib/stripe"
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 import { ACTIVE_PLAN_STATUSES, PLAN_FREE, PLANS } from "@/lib/stripe/config"
+import { buffer } from "node:stream/consumers"
 
 export async function POST(req: Request) {
   let event: Stripe.Event
@@ -17,8 +18,10 @@ export async function POST(req: Request) {
   )
 
   try {
+    // @ts-ignore
+    const rawBody = await buffer(req.body)
     event = stripe.webhooks.constructEvent(
-      await (await req.blob()).text(),
+      rawBody,
       req.headers.get("stripe-signature") as string,
       process.env.STRIPE_WEBHOOK_SECRET as string
     )
@@ -52,7 +55,7 @@ export async function POST(req: Request) {
   }
 
   if (permittedEvents.includes(event.type)) {
-    const subscription = event.data.object as Stripe.Subscription
+    subscription = event.data.object as Stripe.Subscription
 
     const stripeCustomerId = subscription.customer as string
 
