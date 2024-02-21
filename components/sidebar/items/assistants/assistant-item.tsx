@@ -36,8 +36,8 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
 
   useEffect(() => {
     const assistantImage =
-      assistantImages.find(image => image.path === assistant.image_path)
-        ?.base64 || ""
+      assistantImages.find(image => image.path === assistant.image_path)?.url ||
+      ""
     setImageLink(assistantImage)
   }, [assistant, assistantImages])
 

@@ -160,7 +160,11 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     await parallelize(
       [...assistantData.assistants, ...publicAssistantData],
       async (assistant: any) => {
-        let url = getAssistantPublicImageUrl(assistant.image_path) || ""
+        let url = assistant.image_path
+          ? getAssistantPublicImageUrl(assistant.image_path)
+          : ""
+
+        console.log("url", url)
 
         if (url) {
           // const response = await fetch(url)
