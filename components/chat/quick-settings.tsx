@@ -151,7 +151,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
   const isModified = checkIfModified()
 
   const items = [
-    ...presets.map(preset => ({ ...preset, contentType: "presets" })),
+    // ...presets.map(preset => ({ ...preset, contentType: "presets" })),
     ...assistants.map(assistant => ({
       ...assistant,
       contentType: "assistants"
@@ -223,7 +223,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="min-w-[300px] max-w-[500px] space-y-4"
+        className="max-w-[calc(100vw-12px)] space-y-4 sm:min-w-[300px] sm:max-w-[500px]"
         align="start"
       >
         {presets.length === 0 && assistants.length === 0 ? (
@@ -282,7 +282,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
                           image =>
                             image.path ===
                             (item as Tables<"assistants">).image_path
-                        )?.base64 || ""
+                        )?.url || ""
                       : ""
                   }
                 />

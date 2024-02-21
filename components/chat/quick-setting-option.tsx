@@ -57,7 +57,9 @@ export const QuickSettingOption: FC<QuickSettingOptionProps> = ({
         <div className="text-md font-bold">{item.name}</div>
 
         {item.description && (
-          <div className="text-sm font-light">{item.description}</div>
+          <div className="line-clamp-2 text-ellipsis text-sm font-light">
+            {item.description}
+          </div>
         )}
       </div>
 
