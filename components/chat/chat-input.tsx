@@ -190,7 +190,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 src={
                   assistantImages.find(
                     img => img.path === selectedAssistant.image_path
-                  )?.base64
+                  )?.url || ""
                 }
                 width={28}
                 height={28}

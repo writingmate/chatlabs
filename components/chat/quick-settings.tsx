@@ -162,7 +162,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     ? ""
     : assistantImages.find(
         image => image.path === selectedAssistant?.image_path
-      )?.base64 || ""
+      )?.url || ""
 
   const modelDetails = LLM_LIST.find(
     model => model.modelId === selectedPreset?.model

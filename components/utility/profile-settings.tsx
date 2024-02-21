@@ -302,10 +302,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         {profile.image_url ? (
           <Image
             className="mt-2 size-[34px] cursor-pointer rounded hover:opacity-50"
-            src={profile.image_url + "?" + new Date().getTime()}
+            src={profile.image_url}
             height={34}
             width={34}
-            alt={"Image"}
+            alt={profile.display_name || "Profile image"}
           />
         ) : (
           <Button size="icon" variant="ghost">

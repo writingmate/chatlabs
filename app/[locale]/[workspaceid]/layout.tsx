@@ -13,7 +13,10 @@ import { getFoldersByWorkspaceId } from "@/db/folders"
 import { getModelWorkspacesByWorkspaceId } from "@/db/models"
 import { getPresetWorkspacesByWorkspaceId } from "@/db/presets"
 import { getPromptWorkspacesByWorkspaceId } from "@/db/prompts"
-import { getAssistantImageFromStorage } from "@/db/storage/assistant-images"
+import {
+  getAssistantImageFromStorage,
+  getAssistantPublicImageUrl
+} from "@/db/storage/assistant-images"
 import { getPublicTools, getToolWorkspacesByWorkspaceId } from "@/db/tools"
 import { getWorkspaceById } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
@@ -157,23 +160,19 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     await parallelize(
       [...assistantData.assistants, ...publicAssistantData],
       async (assistant: any) => {
-        let url = ""
-
-        if (assistant.image_path) {
-          url = (await getAssistantImageFromStorage(assistant.image_path)) || ""
-        }
+        let url = getAssistantPublicImageUrl(assistant.image_path) || ""
 
         if (url) {
-          const response = await fetch(url)
-          const blob = await response.blob()
-          const base64 = await convertBlobToBase64(blob)
+          // const response = await fetch(url)
+          // const blob = await response.blob()
+          // const base64 = await convertBlobToBase64(blob)
 
           setAssistantImages(prev => [
             ...prev,
             {
               assistantId: assistant.id,
               path: assistant.image_path,
-              base64,
+              base64: "",
               url
             }
           ])

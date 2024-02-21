@@ -54,3 +54,11 @@ export const getAssistantImageFromStorage = async (filePath: string) => {
     console.error(error)
   }
 }
+
+export const getAssistantPublicImageUrl = (filePath: string) => {
+  const { data } = supabase.storage
+    .from("assistant_images")
+    .getPublicUrl(filePath)
+
+  return data.publicUrl
+}
