@@ -6,6 +6,6 @@ AS $$
     SELECT EXISTS (
         SELECT 1
         FROM assistants
-        WHERE (id::text = (storage.foldername(p_name)[2])) AND sharing <> 'private'
+        WHERE (id::text = (storage.foldername(p_name))[2]) AND sharing <> 'private'
     );
 $$;
