@@ -29,8 +29,10 @@ export type MistralLLMID =
   | "mistral-tiny" // Mistral Tiny
   | "mistral-small" // Mistral Small
   | "mistral-medium" // Mistral Medium
+  | "mistral-large-latest" // Mistral Large
 
 // Perplexity Models (UPDATED 1/31/24)
+
 export type PerplexityLLMID =
   | "pplx-7b-online" // Perplexity Online 7B
   | "pplx-70b-online" // Perplexity Online 70B
@@ -41,6 +43,15 @@ export type PerplexityLLMID =
   | "llama-2-70b-chat" // Llama2 70B Chat
   | "codellama-34b-instruct" // CodeLlama 34B Instruct
   | "codellama-70b-instruct" // CodeLlama 70B Instruct
+// | "llava-v1.5-7b" // LLava 1.5 7B
+// | "llava-v1.6-34b" // LLava 1.6 34B
+// | "gemma-2b-it" // Gemma 2B IT
+// | "gemma-7b-it" // Gemma 7B IT
+// | "mistral-medium" // Mistral Medium
+// | "sonar-small-online" // Sonar Small Online
+// | "sonar-medium-online" // Sonar Medium Online
+// | "sonar-small-chat" // Sonar Small Chat
+// | "sonar-medium-chat" // Sonar Medium Chat
 
 export interface LLM {
   modelId: LLMID
