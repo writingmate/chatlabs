@@ -352,7 +352,7 @@ export default function SetupPage() {
                   </div>
                   <div className="bg-token-main-surface-primary relative flex flex-col">
                     <Button
-                      onClick={() => sendGTMEvent("click_plan_pro")}
+                      onClick={() => sendGTMEvent("click_plan_pro_onboarding")}
                       // formAction={formActionPro}
                       className={"bg-violet-700"}
                       data-testid="select-plan-button-Pros-create"
