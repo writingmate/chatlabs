@@ -1,0 +1,13 @@
+diff --git a/node_modules/ai/dist/index.mjs b/node_modules/ai/dist/index.mjs
+index b3d1e29..d53c04a 100644
+--- a/node_modules/ai/dist/index.mjs
++++ b/node_modules/ai/dist/index.mjs
+@@ -841,7 +841,7 @@ function chunkToText() {
+         }
+       } else if ((_h = delta.function_call) == null ? void 0 : _h.arguments) {
+         return cleanupArguments((_i = delta.function_call) == null ? void 0 : _i.arguments);
+-      } else if ((_k = (_j = delta.tool_calls) == null ? void 0 : _j[0].function) == null ? void 0 : _k.arguments) {
++      } else if (((_n = (_m = (_l = delta.tool_calls) == null ? void 0 : _l[0]) == null ? void 0 : _m.function) == null ? void 0 : _n.arguments)) {
+         return cleanupArguments((_n = (_m = (_l = delta.tool_calls) == null ? void 0 : _l[0]) == null ? void 0 : _m.function) == null ? void 0 : _n.arguments);
+       } else if (isFunctionStreamingIn && (((_o = json.choices[0]) == null ? void 0 : _o.finish_reason) === "function_call" || ((_p = json.choices[0]) == null ? void 0 : _p.finish_reason) === "stop")) {
+         isFunctionStreamingIn = false;
