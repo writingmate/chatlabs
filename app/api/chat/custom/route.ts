@@ -5,6 +5,7 @@ import { OpenAIStream, StreamingTextResponse } from "ai"
 import { ServerRuntime } from "next"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
+import { validateModelAndMessageCount } from "@/lib/server/server-chat-helpers"
 
 export const runtime: ServerRuntime = "edge"
 
@@ -21,6 +22,8 @@ export async function POST(request: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
+
+    await validateModelAndMessageCount(chatSettings.model, new Date())
 
     const { data: customModel, error } = await supabaseAdmin
       .from("models")

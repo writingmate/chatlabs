@@ -1,4 +1,8 @@
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import {
+  checkApiKey,
+  getServerProfile,
+  validateModelAndMessageCount
+} from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import { ServerRuntime } from "next"
@@ -18,6 +22,8 @@ export async function POST(request: Request) {
     const profile = await getServerProfile()
 
     checkApiKey(profile.openrouter_api_key, "OpenRouter")
+
+    await validateModelAndMessageCount(chatSettings.model, new Date())
 
     const openai = new OpenAI({
       apiKey: profile.openrouter_api_key || "",

@@ -1,4 +1,8 @@
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import {
+  checkApiKey,
+  getServerProfile,
+  validateModelAndMessageCount
+} from "@/lib/server/server-chat-helpers"
 import { ChatAPIPayload } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
@@ -14,6 +18,8 @@ export async function POST(request: Request) {
     const profile = await getServerProfile()
 
     checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
+
+    await validateModelAndMessageCount(chatSettings.model, new Date())
 
     const ENDPOINT = profile.azure_openai_endpoint
     const KEY = profile.azure_openai_api_key

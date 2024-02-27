@@ -1,5 +1,9 @@
 import { openapiToFunctions } from "@/lib/openapi-conversion"
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import {
+  checkApiKey,
+  getServerProfile,
+  validateModelAndMessageCount
+} from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
@@ -20,6 +24,8 @@ export async function POST(request: Request) {
     const profile = await getServerProfile()
 
     checkApiKey(profile.openai_api_key, "OpenAI")
+
+    await validateModelAndMessageCount(chatSettings.model, new Date())
 
     const openai = new OpenAI({
       apiKey: profile.openai_api_key || "",

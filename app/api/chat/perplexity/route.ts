@@ -1,4 +1,8 @@
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import {
+  checkApiKey,
+  getServerProfile,
+  validateModelAndMessageCount
+} from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
@@ -16,6 +20,8 @@ export async function POST(request: Request) {
     const profile = await getServerProfile()
 
     checkApiKey(profile.perplexity_api_key, "Perplexity")
+
+    await validateModelAndMessageCount(chatSettings.model, new Date())
 
     // Perplexity is compatible the OpenAI SDK
     const perplexity = new OpenAI({

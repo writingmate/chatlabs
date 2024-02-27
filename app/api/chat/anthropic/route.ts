@@ -1,5 +1,9 @@
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import {
+  checkApiKey,
+  getServerProfile,
+  validateModelAndMessageCount
+} from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
 import Anthropic from "@anthropic-ai/sdk"
 import { AnthropicStream, StreamingTextResponse } from "ai"
@@ -17,6 +21,8 @@ export async function POST(request: Request) {
     const profile = await getServerProfile()
 
     checkApiKey(profile.anthropic_api_key, "Anthropic")
+
+    await validateModelAndMessageCount(chatSettings.model, new Date())
 
     let ANTHROPIC_FORMATTED_MESSAGES: any = messages.slice(1)
 
@@ -47,6 +53,8 @@ export async function POST(request: Request) {
     } else if (errorCode === 401) {
       errorMessage =
         "Anthropic API Key is incorrect. Please fix it in your profile settings."
+    } else if (errorCode === 429) {
+      errorMessage = error.message
     }
 
     return new Response(JSON.stringify({ message: errorMessage }), {

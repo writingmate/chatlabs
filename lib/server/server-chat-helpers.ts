@@ -2,20 +2,28 @@ import { Database, Tables } from "@/supabase/types"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { LLMID } from "@/types"
+import { SupabaseClient } from "@supabase/supabase-js"
+import { getProfileByUserId } from "@/db/profile"
 
-export async function getServerProfile() {
-  const cookieStore = cookies()
-  const supabase = createServerClient<Database>(
+function createClient() {
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value
+          return cookies().get(name)?.value
         }
       }
     }
   )
+}
+
+export async function getServerProfile() {
+  const cookieStore = cookies()
+  const supabase = createClient()
 
   const user = (await supabase.auth.getUser()).data.user
   if (!user) {
@@ -69,4 +77,64 @@ export function checkApiKey(apiKey: string | null, keyName: string) {
   if (apiKey === null || apiKey === "") {
     throw new Error(`${keyName} API Key not found`)
   }
+}
+
+export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
+  const { plan } = profile
+
+  if (plan.startsWith("pro_")) {
+    return
+  }
+
+  const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
+
+  if (paidLLMS.includes(model)) {
+    throw new LimitError("Pro plan required to use this model")
+  }
+}
+
+class LimitError extends Error {
+  status: number
+
+  constructor(message: string) {
+    super(message)
+    this.name = "LimitError"
+    this.status = 429
+  }
+}
+
+export async function validateMessageCount(
+  profile: Tables<"profiles">,
+  date: Date,
+  supabase: SupabaseClient
+) {
+  const { plan } = profile
+
+  if (plan.startsWith("pro_")) {
+    return
+  }
+
+  const { count, data, error } = await supabase
+    .from("messages")
+    .select("*", {
+      count: "exact"
+    })
+    .gte("created_at", date.toISOString())
+
+  if (count === null) {
+    throw new Error("Could not fetch message count")
+  }
+
+  if (count > 30) {
+    throw new LimitError(
+      "You have reached daily message limit. Upgrade to Pro plan to continue come back tomorrow."
+    )
+  }
+}
+
+export async function validateModelAndMessageCount(model: LLMID, date: Date) {
+  const client = createClient()
+  const profile = await getServerProfile()
+  await validateModel(profile, model)
+  await validateMessageCount(profile, date, client)
 }
