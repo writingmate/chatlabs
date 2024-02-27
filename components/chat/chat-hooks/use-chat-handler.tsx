@@ -124,17 +124,31 @@ export const useChatHandler = () => {
       })
     } else if (selectedWorkspace) {
       setChatSettings({
-        model: (selectedWorkspace.default_model || "gpt-3.5-turbo") as LLMID,
+        model: (chatSettings?.model ||
+          selectedWorkspace.default_model ||
+          "gpt-3.5-turbo") as LLMID,
         prompt:
+          chatSettings?.prompt ||
           selectedWorkspace.default_prompt ||
           "You are a friendly, helpful AI assistant.",
-        temperature: selectedWorkspace.default_temperature || 0.5,
-        contextLength: selectedWorkspace.default_context_length || 4096,
+        temperature:
+          chatSettings?.temperature ||
+          selectedWorkspace.default_temperature ||
+          0.5,
+        contextLength:
+          chatSettings?.contextLength ||
+          selectedWorkspace.default_context_length ||
+          4096,
         includeProfileContext:
-          selectedWorkspace.include_profile_context || true,
+          chatSettings?.includeProfileContext ||
+          selectedWorkspace.include_profile_context ||
+          true,
         includeWorkspaceInstructions:
-          selectedWorkspace.include_workspace_instructions || true,
+          chatSettings?.includeWorkspaceInstructions ||
+          selectedWorkspace.include_workspace_instructions ||
+          true,
         embeddingsProvider:
+          chatSettings?.embeddingsProvider ||
           (selectedWorkspace.embeddings_provider as "openai" | "local") ||
           "openai"
       })
