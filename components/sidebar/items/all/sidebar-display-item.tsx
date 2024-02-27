@@ -6,6 +6,9 @@ import { ContentType, DataItemType } from "@/types"
 import { useRouter } from "next/navigation"
 import { FC, useContext, useRef, useState } from "react"
 import { SidebarUpdateItem } from "./sidebar-update-item"
+import { IconLock, IconLockAccess, IconSquarePlus } from "@tabler/icons-react"
+import { WithTooltip } from "@/components/ui/with-tooltip"
+import { unique } from "next/dist/build/utils"
 
 interface SidebarItemProps {
   item: DataItemType
@@ -24,8 +27,16 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   icon,
   isTyping
 }) => {
-  const { selectedWorkspace, setChats, setSelectedAssistant } =
-    useContext(ChatbotUIContext)
+  const {
+    selectedWorkspace,
+    profile,
+    setChats,
+    setSelectedAssistant,
+    selectedTools,
+    setSelectedTools,
+    chatFiles,
+    setChatFiles
+  } = useContext(ChatbotUIContext)
 
   const router = useRouter()
 
@@ -37,13 +48,15 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     chats: async (item: any) => {},
     presets: async (item: any) => {},
     prompts: async (item: any) => {},
-    files: async (item: any) => {},
+    files: async (item: any) => {
+      setChatFiles([...new Set([...chatFiles, item])])
+    },
     collections: async (item: any) => {},
     assistants: async (assistant: Tables<"assistants">) => {
       if (!selectedWorkspace) return
 
       const createdChat = await createChat({
-        user_id: assistant.user_id,
+        user_id: profile!.user_id,
         workspace_id: selectedWorkspace.id,
         assistant_id: assistant.id,
         context_length: assistant.context_length,
@@ -57,12 +70,13 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         embeddings_provider: assistant.embeddings_provider
       })
 
-      setChats(prevState => [createdChat, ...prevState])
       setSelectedAssistant(assistant)
 
       return router.push(`/${selectedWorkspace.id}/chat/${createdChat.id}`)
     },
-    tools: async (item: any) => {},
+    tools: async (item: any) => {
+      setSelectedTools([...new Set([...selectedTools, item])])
+    },
     models: async (item: any) => {}
   }
 
@@ -73,15 +87,25 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     }
   }
 
-  // const handleClickAction = async (
-  //   e: React.MouseEvent<SVGSVGElement, MouseEvent>
-  // ) => {
-  //   e.stopPropagation()
+  const handleClickAction = async (
+    e: React.MouseEvent<SVGSVGElement, MouseEvent>
+  ) => {
+    e.stopPropagation()
 
-  //   const action = actionMap[contentType]
+    const action = actionMap[contentType]
 
-  //   await action(item as any)
-  // }
+    await action(item as any)
+  }
+
+  const readOnly =
+    item.sharing === "public" || item.user_id !== profile?.user_id
+
+  function readOnlyClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    if (readOnly) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  }
 
   return (
     <SidebarUpdateItem
@@ -94,21 +118,35 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       <div
         ref={itemRef}
         className={cn(
-          "hover:bg-accent flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none"
+          "hover:bg-accent relative flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none"
         )}
         tabIndex={0}
         onKeyDown={handleKeyDown}
+        onClick={readOnlyClick}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
         {icon}
 
-        <div className="ml-3 flex-1 truncate text-sm font-semibold">
+        {readOnly && (
+          <WithTooltip
+            display={
+              <div>
+                This {contentType} is created by Writingmate team and cannot be
+                edited
+              </div>
+            }
+            trigger={
+              <IconLock size={16} className="absolute bottom-1 left-6" />
+            }
+          />
+        )}
+
+        <div className="ml-3 flex-1 justify-items-center truncate text-sm font-semibold">
           {item.name}
         </div>
 
-        {/* TODO */}
-        {/* {isHovering && (
+        {isHovering && (
           <WithTooltip
             delayDuration={1000}
             display={<div>Start chat with {contentType.slice(0, -1)}</div>}
@@ -120,7 +158,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
               />
             }
           />
-        )} */}
+        )}
       </div>
     </SidebarUpdateItem>
   )
