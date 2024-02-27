@@ -14,6 +14,9 @@ interface QuickSettingOptionProps {
   image: string
 }
 
+const PLACEHOLDER_IMAGE =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAHJJREFUKFOdkCEOwCAMRT8GBQ7DBbj/QTgBCgUGBwoD6RayLploVvXz+/qbVsUYl3MOWmt81ZwTrTWonPMiEUKAtfbF9t6RUgIFqVLKMsZcBocPRN4Y4wa99+ANiuWDtdYHpOaBSfP0f6BotegY8XukD9/UXoQ13hkK+gAAAABJRU5ErkJggg=="
+
 export const QuickSettingOption: FC<QuickSettingOptionProps> = ({
   contentType,
   isSelected,
@@ -38,10 +41,12 @@ export const QuickSettingOption: FC<QuickSettingOptionProps> = ({
           />
         ) : image ? (
           <Image
-            style={{ width: "32px", height: "32px" }}
+            style={{ width: "32px", height: "32px", maxWidth: "none" }}
             className="rounded"
             src={image}
-            alt="Assistant"
+            placeholder="blur"
+            blurDataURL={PLACEHOLDER_IMAGE}
+            alt={item.name}
             width={32}
             height={32}
           />
