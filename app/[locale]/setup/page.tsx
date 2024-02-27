@@ -172,7 +172,7 @@ export default function SetupPage() {
           <StepContainer
             stepDescription="Let's create your profile."
             stepNum={currentStep}
-            stepTitle="Welcome to Writingmate Labs"
+            stepTitle="Welcome to ChatLabs"
             onShouldProceed={handleShouldProceed}
             showNextButton={!!(username && usernameAvailable)}
             showBackButton={false}
@@ -254,7 +254,7 @@ export default function SetupPage() {
                         "Unlimited access to GPT-3.5 Turbo, Mistral Tiny, Perplexity 7B"
                       }
                     />
-                    <PlanFeature title={"Access to Writingmate Labs"} />
+                    <PlanFeature title={"Access to ChatLabs"} />
                     <PlanFeature title={"Access to Chrome Extension"} />
                   </div>
                 </div>

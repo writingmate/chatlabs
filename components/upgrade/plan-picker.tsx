@@ -132,7 +132,7 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
                       "Unlimited access to GPT-3.5 Turbo, Mistral Tiny, Perplexity 7B"
                     }
                   />
-                  <PlanFeature title={"Access to Writingmate Labs"} />
+                  <PlanFeature title={"Access to ChatLabs"} />
                   <PlanFeature title={"Access to Chrome Extension"} />
                 </div>
               </div>

@@ -15,9 +15,7 @@ export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
         <ChatbotUISVG theme={theme === "dark" ? "dark" : "light"} scale={0.3} />
       </div>
 
-      <div className="text-4xl font-semibold tracking-wide">
-        Writingmate Labs
-      </div>
+      <div className="text-4xl font-semibold tracking-wide">ChatLabs</div>
       <div className="flex flex-col items-center py-2">
         <div className="text-sm">More than 20 AI models in one place.</div>
         <div className="text-sm">

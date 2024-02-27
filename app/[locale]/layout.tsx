@@ -14,11 +14,10 @@ import { Analytics } from "@vercel/analytics/react"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
-const APP_NAME = "Writingmate Labs"
-const APP_DEFAULT_TITLE = "Writingmate Labs"
-const APP_TITLE_TEMPLATE = "%s - Writingmate Labs"
-const APP_DESCRIPTION =
-  "Writingmate Labs is a platform for LLM and AI tinkerers."
+const APP_NAME = "ChatLabs"
+const APP_DEFAULT_TITLE = "ChatLabs"
+const APP_TITLE_TEMPLATE = "%s - ChatLabs"
+const APP_DESCRIPTION = "ChatLabs is a platform for LLM and AI tinkerers."
 
 interface RootLayoutProps {
   children: ReactNode
