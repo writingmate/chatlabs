@@ -112,6 +112,22 @@ interface ChatbotUIContext {
   setAtCommand: Dispatch<SetStateAction<string>>
   isAssistantPickerOpen: boolean
   setIsAssistantPickerOpen: Dispatch<SetStateAction<boolean>>
+  promptVariables: {
+    promptId: string
+    name: string
+    value: string
+  }[]
+  setPromptVariables: Dispatch<
+    SetStateAction<
+      {
+        promptId: string
+        name: string
+        value: string
+      }[]
+    >
+  >
+  showPromptVariables: boolean
+  setShowPromptVariables: Dispatch<SetStateAction<boolean>>
 
   // ATTACHMENTS STORE
   chatFiles: ChatFile[]
@@ -246,6 +262,10 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setAtCommand: () => {},
   isAssistantPickerOpen: false,
   setIsAssistantPickerOpen: () => {},
+  promptVariables: [],
+  setPromptVariables: () => {},
+  showPromptVariables: false,
+  setShowPromptVariables: () => {},
 
   // ATTACHMENTS STORE
   chatFiles: [],

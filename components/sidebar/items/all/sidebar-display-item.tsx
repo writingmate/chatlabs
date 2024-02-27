@@ -9,6 +9,7 @@ import { SidebarUpdateItem } from "./sidebar-update-item"
 import { IconLock, IconLockAccess, IconSquarePlus } from "@tabler/icons-react"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { unique } from "next/dist/build/utils"
+import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
 
 interface SidebarItemProps {
   item: DataItemType
@@ -35,19 +36,24 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     selectedTools,
     setSelectedTools,
     chatFiles,
-    setChatFiles
+    setChatFiles,
+    setFocusPrompt
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
 
   const itemRef = useRef<HTMLDivElement>(null)
 
+  const { handleSelectPromptWithVariables } = usePromptAndCommand()
+
   const [isHovering, setIsHovering] = useState(false)
 
   const actionMap = {
     chats: async (item: any) => {},
     presets: async (item: any) => {},
-    prompts: async (item: any) => {},
+    prompts: async (item: any) => {
+      handleSelectPromptWithVariables(item)
+    },
     files: async (item: any) => {
       setChatFiles([...new Set([...chatFiles, item])])
     },

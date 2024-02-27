@@ -26,7 +26,9 @@ export const usePromptAndCommand = () => {
     setIsAssistantPickerOpen,
     setSelectedAssistant,
     setChatSettings,
-    setChatFiles
+    setChatFiles,
+    setPromptVariables,
+    setShowPromptVariables
   } = useContext(ChatbotUIContext)
 
   const handleInputChange = (value: string) => {
@@ -63,6 +65,25 @@ export const usePromptAndCommand = () => {
     }
 
     setUserInput(value)
+  }
+
+  const handleSelectPromptWithVariables = (prompt: Tables<"prompts">) => {
+    const regex = /\{\{.*?\}\}/g
+    const matches = prompt.content.match(regex)
+
+    if (matches) {
+      const newPromptVariables = matches.map(match => ({
+        promptId: prompt.id,
+        name: match.replace(/\{\{|\}\}/g, ""),
+        value: ""
+      }))
+
+      setPromptVariables(newPromptVariables)
+      setShowPromptVariables(true)
+    } else {
+      handleSelectPrompt(prompt)
+      setIsPromptPickerOpen(false)
+    }
   }
 
   const handleSelectPrompt = (prompt: Tables<"prompts">) => {
@@ -185,6 +206,7 @@ export const usePromptAndCommand = () => {
     handleSelectUserFile,
     handleSelectUserCollection,
     handleSelectTool,
-    handleSelectAssistant
+    handleSelectAssistant,
+    handleSelectPromptWithVariables
   }
 }
