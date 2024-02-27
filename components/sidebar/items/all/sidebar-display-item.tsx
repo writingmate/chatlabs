@@ -143,7 +143,13 @@ export const SidebarItem: FC<SidebarItemProps> = ({
               </div>
             }
             trigger={
-              <IconLock size={16} className="absolute bottom-1 left-6" />
+              <div
+                className={
+                  "bg-background/50 absolute bottom-1 left-6 rounded-xl"
+                }
+              >
+                <IconLock size={16} />
+              </div>
             }
           />
         )}
