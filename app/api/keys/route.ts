@@ -30,11 +30,14 @@ export async function GET() {
   >((acc, provider) => {
     const key = envKeyMap[provider]
 
-    if (key) {
-      if (profile.plan.startsWith("pro_") || profile.plan.startsWith("free")) {
-        acc[provider] = isUsingEnvironmentKey(key as EnvKey)
-      }
+    if (profile.plan.startsWith("byok_")) {
+      return acc
     }
+
+    if (key) {
+      acc[provider] = isUsingEnvironmentKey(key as EnvKey)
+    }
+
     return acc
   }, {})
 

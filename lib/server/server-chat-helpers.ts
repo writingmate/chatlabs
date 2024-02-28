@@ -82,7 +82,7 @@ export function checkApiKey(apiKey: string | null, keyName: string) {
 export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
   const { plan } = profile
 
-  if (plan.startsWith("pro_")) {
+  if (plan !== "free") {
     return
   }
 
@@ -110,7 +110,7 @@ export async function validateMessageCount(
 ) {
   const { plan } = profile
 
-  if (plan.startsWith("pro_")) {
+  if (plan !== "free") {
     return
   }
 
