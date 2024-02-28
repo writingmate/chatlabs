@@ -1,5 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
-import { sendGTMEvent } from "@next/third-parties/google"
+import { sendGAEvent } from "@next/third-parties/google"
 import { IconCheck, IconSparkles, IconX } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { Button } from "../ui/button"
@@ -227,7 +227,7 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
               </div>
               <div className="bg-token-main-surface-primary relative flex flex-col">
                 <Button
-                  onClick={() => sendGTMEvent("click_plan_pro")}
+                  onClick={() => sendGAEvent("click_plan_pro")}
                   formAction={formActionPro}
                   className={"bg-violet-700"}
                   data-testid="select-plan-button-Pros-create"

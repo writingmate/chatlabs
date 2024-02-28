@@ -24,7 +24,7 @@ import { DialogClose, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { IconSparkles, IconX } from "@tabler/icons-react"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Button } from "@/components/ui/button"
-import { sendGTMEvent } from "@next/third-parties/google"
+import { sendGAEvent } from "@next/third-parties/google"
 import { useTheme } from "next-themes"
 import { PlanFeature } from "@/components/upgrade/plan-picker"
 
@@ -352,7 +352,7 @@ export default function SetupPage() {
                   </div>
                   <div className="bg-token-main-surface-primary relative flex flex-col">
                     <Button
-                      onClick={() => sendGTMEvent("click_plan_pro_onboarding")}
+                      onClick={() => sendGAEvent("click_plan_pro_onboarding")}
                       // formAction={formActionPro}
                       className={"bg-violet-700"}
                       data-testid="select-plan-button-Pros-create"
