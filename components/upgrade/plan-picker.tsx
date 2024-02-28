@@ -227,7 +227,13 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
               </div>
               <div className="bg-token-main-surface-primary relative flex flex-col">
                 <Button
-                  onClick={() => sendGAEvent("click_plan_pro")}
+                  onClick={() =>
+                    sendGAEvent("event", "click_plan_pro", {
+                      plan: profile?.plan,
+                      userId: profile?.user_id,
+                      location: window.location.href
+                    })
+                  }
                   formAction={formActionPro}
                   className={"bg-violet-700"}
                   data-testid="select-plan-button-Pros-create"

@@ -352,7 +352,13 @@ export default function SetupPage() {
                   </div>
                   <div className="bg-token-main-surface-primary relative flex flex-col">
                     <Button
-                      onClick={() => sendGAEvent("click_plan_pro_onboarding")}
+                      onClick={() =>
+                        sendGAEvent("event", "click_plan_pro_onboarding", {
+                          plan: profile?.plan,
+                          userId: profile?.user_id,
+                          location: window.location.href
+                        })
+                      }
                       // formAction={formActionPro}
                       className={"bg-violet-700"}
                       data-testid="select-plan-button-Pros-create"
