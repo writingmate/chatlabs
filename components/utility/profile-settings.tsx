@@ -337,10 +337,12 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="profile">
-            {/*<TabsList className="mt-4 grid w-full grid-cols-2">*/}
-            {/*  <TabsTrigger value="profile">Profile</TabsTrigger>*/}
-            {/*  <TabsTrigger value="keys">API Keys</TabsTrigger>*/}
-            {/*</TabsList>*/}
+            {profile?.plan.startsWith("byok_") && (
+              <TabsList className="mt-4 grid w-full grid-cols-2">
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="keys">API Keys</TabsTrigger>
+              </TabsList>
+            )}
 
             <TabsContent className="mt-4 space-y-4" value="profile">
               <form>
