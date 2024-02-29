@@ -104,7 +104,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   }
 
   const readOnly =
-    item.sharing === "public" || item.user_id !== profile?.user_id
+    item.sharing === "public" && item.user_id !== profile?.user_id
 
   function readOnlyClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (readOnly) {

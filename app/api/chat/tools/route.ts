@@ -9,8 +9,32 @@ import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
+import { LLM_LIST, LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 
 export const runtime = "edge"
+
+function getProviderClient(model: string, profile: Tables<"profiles">) {
+  const provider = LLM_LIST.find(llm => llm.modelId === model)?.provider
+
+  if (provider === "openai") {
+    checkApiKey(profile.openai_api_key, "OpenAI")
+
+    return new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY || "",
+      organization: process.env.OPENAI_ORGANIZATION_ID
+    })
+  }
+
+  if (provider === "mistral") {
+    checkApiKey(profile.mistral_api_key, "Mistral")
+    return new OpenAI({
+      apiKey: profile.mistral_api_key || "",
+      baseURL: "https://api.mistral.ai/v1"
+    })
+  }
+
+  throw new Error(`Provider not supported: ${provider}`)
+}
 
 export async function POST(request: Request) {
   const json = await request.json()
@@ -27,10 +51,7 @@ export async function POST(request: Request) {
 
     await validateModelAndMessageCount(chatSettings.model, new Date())
 
-    const openai = new OpenAI({
-      apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id
-    })
+    const openai = getProviderClient(chatSettings.model, profile)
 
     let allTools: OpenAI.Chat.Completions.ChatCompletionTool[] = []
     let allRouteMaps = {}
