@@ -189,6 +189,7 @@ export async function POST(request: Request) {
           })
 
           if (!response.ok) {
+            console.error("Error:", response.statusText, response.status)
             data = {
               error: response.statusText
             }
