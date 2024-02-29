@@ -54,7 +54,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     chatSettings,
     selectedTools,
     setSelectedTools,
-    assistantImages
+    assistantImages,
+    profile
   } = useContext(ChatbotUIContext)
 
   const {
@@ -81,8 +82,17 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }, 200) // FIX: hacky
   }, [selectedPreset, selectedAssistant])
 
+  function isSendShortcut(event: React.KeyboardEvent) {
+    let shortcutPressed = event.key === "Enter" && !event.shiftKey
+    if (!profile?.send_message_on_enter) {
+      shortcutPressed =
+        event.key === "Enter" && (event.ctrlKey || event.metaKey)
+    }
+    return shortcutPressed
+  }
+
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (!isTyping && event.key === "Enter" && !event.shiftKey) {
+    if (!isTyping && isSendShortcut(event)) {
       event.preventDefault()
       setIsPromptPickerOpen(false)
       handleSendMessage(userInput, chatMessages, false)
@@ -240,7 +250,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={t(
-            `Ask anything. Type "@" for assistants, "/" for prompts, "#" for files, and "!" for tools.`
+            `Ask anything. Type "${profile?.assistant_command}" for assistants, "${profile?.prompt_command}" for prompts, "${profile?.files_command}" for files, and "${profile?.tools_command}" for tools.`
           )}
           onValueChange={handleInputChange}
           value={userInput}

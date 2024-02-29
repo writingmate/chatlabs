@@ -28,28 +28,31 @@ export const usePromptAndCommand = () => {
     setChatSettings,
     setChatFiles,
     setPromptVariables,
-    setShowPromptVariables
+    setShowPromptVariables,
+    profile
   } = useContext(ChatbotUIContext)
 
   const handleInputChange = (value: string) => {
-    const atTextRegex = /@([^ ]*)$/
-    const slashTextRegex = /\/([^ ]*)$/
-    const hashtagTextRegex = /#([^ ]*)$/
-    const toolTextRegex = /!([^ ]*)$/
-    const atMatch = value.match(atTextRegex)
-    const slashMatch = value.match(slashTextRegex)
-    const hashtagMatch = value.match(hashtagTextRegex)
+    const assistantTextRegex = new RegExp(
+      `${profile?.assistant_command}([^ ]*)$`
+    )
+    const promptTextRegex = new RegExp(`${profile?.prompt_command}([^ ]*)$`)
+    const filesTextRegex = new RegExp(`${profile?.files_command}([^ ]*)$`)
+    const toolTextRegex = new RegExp(`${profile?.tools_command}([^ ]*)$`)
+    const assistantMatch = value.match(assistantTextRegex)
+    const promptMatch = value.match(promptTextRegex)
+    const filesMatch = value.match(filesTextRegex)
     const toolMatch = value.match(toolTextRegex)
 
-    if (atMatch) {
+    if (assistantMatch) {
       setIsAssistantPickerOpen(true)
-      setAtCommand(atMatch[1])
-    } else if (slashMatch) {
+      setAtCommand(assistantMatch[1])
+    } else if (promptMatch) {
       setIsPromptPickerOpen(true)
-      setSlashCommand(slashMatch[1])
-    } else if (hashtagMatch) {
+      setSlashCommand(promptMatch[1])
+    } else if (filesMatch) {
       setIsFilePickerOpen(true)
-      setHashtagCommand(hashtagMatch[1])
+      setHashtagCommand(filesMatch[1])
     } else if (toolMatch) {
       setIsToolPickerOpen(true)
       setToolCommand(toolMatch[1])

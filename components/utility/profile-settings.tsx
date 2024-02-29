@@ -47,6 +47,9 @@ import {
   redirectToBillingPortal
 } from "@/actions/stripe"
 import { PLAN_FREE } from "@/lib/stripe/config"
+import { Divide } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
 
 interface ProfileSettingsProps {}
 
@@ -123,6 +126,26 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     profile?.openrouter_api_key || ""
   )
 
+  const [toolsCommand, setToolsCommand] = useState(
+    profile?.tools_command || "!"
+  )
+
+  const [assistantCommand, setAssistantCommand] = useState(
+    profile?.assistant_command || "@"
+  )
+
+  const [filesCommand, setFilesCommand] = useState(
+    profile?.files_command || "#"
+  )
+
+  const [promptCommand, setPromptCommand] = useState(
+    profile?.prompt_command || "/"
+  )
+
+  const [sendMessageOnEnter, setSendMessageOnEnter] = useState<boolean>(
+    profile?.send_message_on_enter || true
+  )
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
@@ -161,7 +184,12 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       azure_openai_45_turbo_id: azureOpenai45TurboID,
       azure_openai_45_vision_id: azureOpenai45VisionID,
       azure_openai_embeddings_id: azureEmbeddingsID,
-      openrouter_api_key: openrouterAPIKey
+      openrouter_api_key: openrouterAPIKey,
+      send_message_on_enter: sendMessageOnEnter,
+      tools_command: toolsCommand,
+      assistant_command: assistantCommand,
+      files_command: filesCommand,
+      prompt_command: promptCommand
     })
 
     setProfile(updatedProfile)
@@ -288,6 +316,14 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     []
   )
 
+  function resetToDefaults() {
+    setFilesCommand("#")
+    setAssistantCommand("@")
+    setPromptCommand("/")
+    setToolsCommand("!")
+    setSendMessageOnEnter(true)
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter") {
       buttonRef.current?.click()
@@ -337,12 +373,13 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="profile">
-            {profile?.plan.startsWith("byok_") && (
-              <TabsList className="mt-4 grid w-full grid-cols-2">
-                <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsList className="mt-4 grid w-full grid-cols-2">
+              <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="shortcuts">Shortcuts</TabsTrigger>
+              {profile?.plan.startsWith("byok_") && (
                 <TabsTrigger value="keys">API Keys</TabsTrigger>
-              </TabsList>
-            )}
+              )}
+            </TabsList>
 
             <TabsContent className="mt-4 space-y-4" value="profile">
               <form>
@@ -734,6 +771,66 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                     />
                   </>
                 )}
+              </div>
+            </TabsContent>
+            <TabsContent className="mt-4 space-y-4 py-2" value="shortcuts">
+              <div className="space-y-5">
+                <div className={"flex items-center justify-between"}>
+                  <Label>
+                    Send message on{" "}
+                    {navigator.platform.toUpperCase().indexOf("MAC") > -1
+                      ? "⌘"
+                      : "Ctrl"}
+                    +Enter
+                  </Label>
+                  <Switch
+                    checked={!sendMessageOnEnter}
+                    onCheckedChange={() =>
+                      setSendMessageOnEnter(!sendMessageOnEnter)
+                    }
+                  />
+                </div>
+
+                <Separator />
+                <div>
+                  <div className={"grid grid-cols-2 items-center gap-1"}>
+                    <Label>Assistant command</Label>
+                    <Input
+                      minLength={1}
+                      maxLength={1}
+                      value={assistantCommand}
+                      onChange={e => setAssistantCommand(e.target.value)}
+                    />
+                    <Label>Tools command</Label>
+                    <Input
+                      minLength={1}
+                      maxLength={1}
+                      value={toolsCommand}
+                      onChange={e => setToolsCommand(e.target.value)}
+                    />
+                    <Label>Prompt command</Label>
+                    <Input
+                      minLength={1}
+                      maxLength={1}
+                      value={promptCommand}
+                      onChange={e => setPromptCommand(e.target.value)}
+                    />
+                    <Label>Files command</Label>
+                    <Input
+                      minLength={1}
+                      maxLength={1}
+                      value={filesCommand}
+                      onChange={e => setFilesCommand(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <Button
+                  className="w-full"
+                  variant={"secondary"}
+                  onClick={resetToDefaults}
+                >
+                  Reset to defaults
+                </Button>
               </div>
             </TabsContent>
           </Tabs>

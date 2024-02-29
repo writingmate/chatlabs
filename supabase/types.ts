@@ -1104,6 +1104,7 @@ export interface Database {
       profiles: {
         Row: {
           anthropic_api_key: string | null
+          assistant_command: string | null
           azure_openai_35_turbo_id: string | null
           azure_openai_45_turbo_id: string | null
           azure_openai_45_vision_id: string | null
@@ -1113,6 +1114,7 @@ export interface Database {
           bio: string
           created_at: string
           display_name: string
+          files_command: string | null
           google_gemini_api_key: string | null
           has_onboarded: boolean
           id: string
@@ -1125,7 +1127,10 @@ export interface Database {
           perplexity_api_key: string | null
           plan: string
           profile_context: string
+          prompt_command: string | null
+          send_message_on_enter: boolean | null
           stripe_customer_id: string | null
+          tools_command: string | null
           updated_at: string | null
           use_azure_openai: boolean
           user_id: string
@@ -1133,6 +1138,7 @@ export interface Database {
         }
         Insert: {
           anthropic_api_key?: string | null
+          assistant_command?: string | null
           azure_openai_35_turbo_id?: string | null
           azure_openai_45_turbo_id?: string | null
           azure_openai_45_vision_id?: string | null
@@ -1142,6 +1148,7 @@ export interface Database {
           bio: string
           created_at?: string
           display_name: string
+          files_command?: string | null
           google_gemini_api_key?: string | null
           has_onboarded?: boolean
           id?: string
@@ -1154,7 +1161,10 @@ export interface Database {
           perplexity_api_key?: string | null
           plan?: string
           profile_context: string
+          prompt_command?: string | null
+          send_message_on_enter?: boolean | null
           stripe_customer_id?: string | null
+          tools_command?: string | null
           updated_at?: string | null
           use_azure_openai: boolean
           user_id: string
@@ -1162,6 +1172,7 @@ export interface Database {
         }
         Update: {
           anthropic_api_key?: string | null
+          assistant_command?: string | null
           azure_openai_35_turbo_id?: string | null
           azure_openai_45_turbo_id?: string | null
           azure_openai_45_vision_id?: string | null
@@ -1171,6 +1182,7 @@ export interface Database {
           bio?: string
           created_at?: string
           display_name?: string
+          files_command?: string | null
           google_gemini_api_key?: string | null
           has_onboarded?: boolean
           id?: string
@@ -1183,7 +1195,10 @@ export interface Database {
           perplexity_api_key?: string | null
           plan?: string
           profile_context?: string
+          prompt_command?: string | null
+          send_message_on_enter?: boolean | null
           stripe_customer_id?: string | null
+          tools_command?: string | null
           updated_at?: string | null
           use_azure_openai?: boolean
           user_id?: string
