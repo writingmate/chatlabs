@@ -235,7 +235,7 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
                     })
                   }
                   formAction={formActionPro}
-                  className={"bg-violet-700"}
+                  className={"bg-violet-700 text-white"}
                   data-testid="select-plan-button-Pros-create"
                 >
                   Try Pro for free
