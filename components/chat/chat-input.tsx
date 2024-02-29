@@ -212,7 +212,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       </div>
 
       <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2 backdrop-blur-xl">
-        <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-auto rounded-xl dark:border-none">
+        <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-y-auto rounded-xl dark:border-none">
           <ChatCommandInput />
         </div>
 

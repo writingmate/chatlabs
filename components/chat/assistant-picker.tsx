@@ -113,7 +113,7 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
                   <div className="ml-3 flex flex-col">
                     <div className="font-bold">{item.name}</div>
 
-                    <div className="truncate text-sm opacity-80">
+                    <div className="line-clamp-1 max-w-full overflow-hidden text-ellipsis text-sm opacity-80">
                       {item.description || "No description."}
                     </div>
                   </div>
