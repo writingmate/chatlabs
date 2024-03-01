@@ -12,7 +12,8 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({ content }) => {
   return (
     <MessageMarkdownMemoized
       className="prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 min-w-full space-y-6 break-words"
-      remarkPlugins={[remarkGfm, remarkMath]}
+      // remarkPlugins={[remarkGfm, remarkMath]}
+      remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
       components={{
         p({ children }) {
           return <p className="mb-2 last:mb-0">{children}</p>
