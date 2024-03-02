@@ -83,7 +83,7 @@ export default function Plans() {
                   </p>
                   <p className={"text-token-text-tertiary text-xs font-light"}>
                     after free trial <br />
-                    {billingCycle === "yearly" && "billed yearly $119.88/year"}
+                    {billingCycle === "yearly" && "billed yearly $83.88/year"}
                   </p>
                 </div>
               </div>
@@ -93,7 +93,8 @@ export default function Plans() {
             <Button
               formAction={formActionBYOK}
               onClick={() =>
-                sendGAEvent("event", "click_plan_byok", {
+                sendGAEvent({
+                  event: "click_plan_byok",
                   plan: profile?.plan,
                   userId: profile?.user_id,
                   location: window.location.href
@@ -148,7 +149,8 @@ export default function Plans() {
             <Button
               formAction={formActionPro}
               onClick={() =>
-                sendGAEvent("event", "click_plan_pro", {
+                sendGAEvent({
+                  event: "click_plan_pro",
                   plan: profile?.plan,
                   userId: profile?.user_id,
                   location: window.location.href
