@@ -83,8 +83,11 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   }, [selectedPreset, selectedAssistant])
 
   function isSendShortcut(event: React.KeyboardEvent) {
+    if (isGenerating) {
+      return false
+    }
     let shortcutPressed = event.key === "Enter" && !event.shiftKey
-    if (!profile?.send_message_on_enter) {
+    if (profile?.send_message_on_enter === false) {
       shortcutPressed =
         event.key === "Enter" && (event.ctrlKey || event.metaKey)
     }
