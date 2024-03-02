@@ -94,10 +94,10 @@ export default function Plans() {
               formAction={formActionBYOK}
               onClick={() =>
                 sendGAEvent({
-                  event: "click_plan_byok",
-                  plan: profile?.plan,
-                  userId: profile?.user_id,
-                  location: window.location.href
+                  event: "click_plan_byok"
+                  // plan: profile?.plan,
+                  // userId: profile?.user_id,
+                  // location: window.location.href
                 })
               }
               className={"bg-violet-700 text-white"}
@@ -150,10 +150,10 @@ export default function Plans() {
               formAction={formActionPro}
               onClick={() =>
                 sendGAEvent({
-                  event: "click_plan_pro",
-                  plan: profile?.plan,
-                  userId: profile?.user_id,
-                  location: window.location.href
+                  event: "click_plan_pro"
+                  // plan: profile?.plan,
+                  // userId: profile?.user_id,
+                  // location: window.location.href
                 })
               }
               data-testid="select-plan-button-Pros-create"
