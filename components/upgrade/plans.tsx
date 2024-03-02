@@ -92,6 +92,13 @@ export default function Plans() {
           <div className="bg-token-main-surface-primary relative flex flex-col">
             <Button
               formAction={formActionBYOK}
+              onClick={() =>
+                sendGAEvent("event", "click_plan_byok", {
+                  plan: profile?.plan,
+                  userId: profile?.user_id,
+                  location: window.location.href
+                })
+              }
               className={"bg-violet-700 text-white"}
             >
               Try BYOK for free
@@ -141,7 +148,7 @@ export default function Plans() {
             <Button
               formAction={formActionPro}
               onClick={() =>
-                sendGAEvent("event", "click_plan_pro_onboarding", {
+                sendGAEvent("event", "click_plan_pro", {
                   plan: profile?.plan,
                   userId: profile?.user_id,
                   location: window.location.href
