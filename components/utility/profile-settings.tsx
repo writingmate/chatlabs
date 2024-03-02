@@ -490,7 +490,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                         setIsPaywallOpen(true)
                       }}
                     >
-                      Subscribe to Pro
+                      Upgrade
                     </Button>
                   )}
                 </div>

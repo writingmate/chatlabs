@@ -3,18 +3,26 @@ import { WithTooltip } from "@/components/ui/with-tooltip"
 import { IconSparkles } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { PlanFeature } from "@/components/upgrade/plan-picker"
-import { sendGAEvent } from "@next/third-parties/google"
 import { useContext, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { supabase } from "@/lib/supabase/browser-client"
 import { createCheckoutSession } from "@/actions/stripe"
 
+const BYOK_PLAN_PREFIX = "byok"
+const PRO_PLAN_PREFIX = "pro"
+const BILLING_CYCLE_YEARLY = "yearly"
+const BILLING_CYCLE_MONTHLY = "monthly"
+
+type BILLING_CYCLE = typeof BILLING_CYCLE_YEARLY | typeof BILLING_CYCLE_MONTHLY
+
 export default function Plans() {
   const { profile } = useContext(ChatbotUIContext)
 
-  const [billingCycle, setBillingCycle] = useState<"yearly" | "monthly">(
-    "yearly"
+  const [billingCycle, setBillingCycle] = useState<BILLING_CYCLE>(
+    BILLING_CYCLE_MONTHLY
   )
+
+  const [loading, setLoading] = useState("")
 
   const formAction = async (data: FormData): Promise<void> => {
     const user = (await supabase.auth.getUser()).data.user
@@ -31,14 +39,19 @@ export default function Plans() {
     window.location.assign(url as string)
   }
 
-  const formActionBYOK = async (data: FormData) => {
-    data.set("plan", "byok_" + data.get("billingCycle"))
-    return formAction(data)
+  function createFormAction(plan_prefix: string) {
+    return (data: FormData) => {
+      const plan = `${plan_prefix}_${billingCycle}`
+      data.set("plan", plan)
+      return formAction(data)
+    }
   }
 
-  const formActionPro = async (data: FormData) => {
-    data.set("plan", "pro_" + data.get("billingCycle"))
-    return formAction(data)
+  const handleClick = (plan: string) => {
+    const event = `click_${plan}_${billingCycle}`
+    window.gtag && window.gtag("event", event)
+    // sendGAEvent("event", event);
+    setLoading(plan)
   }
 
   return (
@@ -52,8 +65,10 @@ export default function Plans() {
             setBillingCycle(value as "yearly" | "monthly")
           }
         >
-          <ToggleGroupItem value={"yearly"}>Yearly</ToggleGroupItem>
-          <ToggleGroupItem value={"monthly"}>Monthly</ToggleGroupItem>
+          <ToggleGroupItem value={BILLING_CYCLE_YEARLY}>Yearly</ToggleGroupItem>
+          <ToggleGroupItem value={BILLING_CYCLE_MONTHLY}>
+            Monthly
+          </ToggleGroupItem>
         </ToggleGroup>
       </div>
       <div className="flex flex-col md:flex-row">
@@ -91,15 +106,10 @@ export default function Plans() {
           </div>
           <div className="bg-token-main-surface-primary relative flex flex-col">
             <Button
-              formAction={formActionBYOK}
-              onClick={() =>
-                sendGAEvent({
-                  event: "click_plan_byok"
-                  // plan: profile?.plan,
-                  // userId: profile?.user_id,
-                  // location: window.location.href
-                })
-              }
+              disabled={loading !== "" && loading !== BYOK_PLAN_PREFIX}
+              loading={loading === BYOK_PLAN_PREFIX}
+              formAction={createFormAction(BYOK_PLAN_PREFIX)}
+              onClick={() => handleClick(BYOK_PLAN_PREFIX)}
               className={"bg-violet-700 text-white"}
             >
               Try BYOK for free
@@ -147,15 +157,10 @@ export default function Plans() {
           </div>
           <div className="bg-token-main-surface-primary relative flex flex-col">
             <Button
-              formAction={formActionPro}
-              onClick={() =>
-                sendGAEvent({
-                  event: "click_plan_pro"
-                  // plan: profile?.plan,
-                  // userId: profile?.user_id,
-                  // location: window.location.href
-                })
-              }
+              disabled={loading !== "" && loading !== PRO_PLAN_PREFIX}
+              loading={loading === PRO_PLAN_PREFIX}
+              formAction={createFormAction(PRO_PLAN_PREFIX)}
+              onClick={() => handleClick(PRO_PLAN_PREFIX)}
               data-testid="select-plan-button-Pros-create"
             >
               Try Pro for free

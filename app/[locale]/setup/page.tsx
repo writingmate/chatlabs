@@ -20,14 +20,6 @@ import {
   SETUP_STEP_COUNT,
   StepContainer
 } from "@/components/setup/step-container"
-import { DialogClose, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { IconSparkles, IconX } from "@tabler/icons-react"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { Button } from "@/components/ui/button"
-import { sendGAEvent } from "@next/third-parties/google"
-import { useTheme } from "next-themes"
-import { PlanFeature } from "@/components/upgrade/plan-picker"
-import { WithTooltip } from "@/components/ui/with-tooltip"
 import Plans from "@/components/upgrade/plans"
 
 export default function SetupPage() {

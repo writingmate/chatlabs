@@ -243,7 +243,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
               Cancel
             </Button>
 
-            <Button disabled={creating} ref={buttonRef} onClick={handleCreate}>
+            <Button loading={creating} ref={buttonRef} onClick={handleCreate}>
               {creating ? "Creating..." : "Create"}
             </Button>
           </div>

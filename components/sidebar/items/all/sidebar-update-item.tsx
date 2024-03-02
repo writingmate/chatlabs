@@ -117,6 +117,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const [isOpen, setIsOpen] = useState(false)
   const [startingWorkspaces, setStartingWorkspaces] = useState<
@@ -584,6 +585,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
   const handleUpdate = async () => {
     try {
+      setIsUpdating(true)
       const updateFunction = updateFunctions[contentType]
       const setStateFunction = stateUpdateFunctions[contentType]
 
@@ -603,6 +605,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       toast.success(`${contentType.slice(0, -1)} updated successfully`)
     } catch (error) {
       toast.error(`Error updating ${contentType.slice(0, -1)}. ${error}`)
+    } finally {
+      setIsUpdating(false)
     }
   }
 
@@ -665,11 +669,15 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
           <SidebarDeleteItem item={item} contentType={contentType} />
 
           <div className="flex grow justify-end space-x-2">
-            <Button variant="outline" onClick={() => setIsOpen(false)}>
+            <Button
+              disabled={isUpdating}
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+            >
               Cancel
             </Button>
 
-            <Button ref={buttonRef} onClick={handleUpdate}>
+            <Button loading={isUpdating} ref={buttonRef} onClick={handleUpdate}>
               Save
             </Button>
           </div>
