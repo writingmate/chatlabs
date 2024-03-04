@@ -23,8 +23,33 @@ const CLAUDE_INSTANT: LLM = {
   provider: "anthropic",
   hostedId: "claude-instant-1.2",
   platformLink: ANTHROPIC_PLATFORM_LINK,
-  imageInput: false,
+  imageInput: true,
   paid: true
 }
 
-export const ANTHROPIC_LLM_LIST: LLM[] = [CLAUDE_2, CLAUDE_INSTANT]
+const CLAUDE_3_SONNET: LLM = {
+  modelId: "claude-3-sonnet-20240229",
+  modelName: "Claude 3 Sonnet",
+  provider: "anthropic",
+  hostedId: "claude-3-sonnet-20240229",
+  platformLink: ANTHROPIC_PLATFORM_LINK,
+  imageInput: true,
+  paid: true
+}
+
+const CLAUDE_3_OPUS: LLM = {
+  modelId: "claude-3-opus-20240229",
+  modelName: "Claude 3 Opus",
+  provider: "anthropic",
+  hostedId: "claude-3-opus-20240229",
+  platformLink: ANTHROPIC_PLATFORM_LINK,
+  imageInput: true,
+  paid: true
+}
+
+export const ANTHROPIC_LLM_LIST: LLM[] = [
+  CLAUDE_2,
+  CLAUDE_INSTANT,
+  CLAUDE_3_OPUS,
+  CLAUDE_3_SONNET
+]

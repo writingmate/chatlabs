@@ -76,14 +76,22 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // PASSIVE CHAT STORE
   const [userInput, setUserInput] = useState<string>("")
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
-  const [chatSettings, setChatSettings] = useState<ChatSettings>({
-    model: "gpt-3.5-turbo",
-    prompt: "You are a helpful AI assistant.",
-    temperature: 0.5,
-    contextLength: 4000,
-    includeProfileContext: true,
-    includeWorkspaceInstructions: true,
-    embeddingsProvider: "openai"
+  const [chatSettings, setChatSettings] = useState<ChatSettings>(() => {
+    const storedSettings = localStorage.getItem("chatSettings")
+
+    if (storedSettings) {
+      return JSON.parse(storedSettings)
+    }
+
+    return {
+      model: "gpt-3.5-turbo-0125",
+      prompt: "You are a helpful AI assistant.",
+      temperature: 0.5,
+      contextLength: 4000,
+      includeProfileContext: true,
+      includeWorkspaceInstructions: true,
+      embeddingsProvider: "openai"
+    }
   })
   const [selectedChat, setSelectedChat] = useState<Tables<"chats"> | null>(null)
   const [chatFileItems, setChatFileItems] = useState<Tables<"file_items">[]>([])
@@ -167,6 +175,12 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       }
     })()
   }, [])
+
+  useEffect(() => {
+    if (chatSettings) {
+      localStorage.setItem("chatSettings", JSON.stringify(chatSettings))
+    }
+  }, [chatSettings])
 
   const fetchStartingData = async () => {
     const session = (await supabase.auth.getSession()).data.session

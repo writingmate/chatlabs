@@ -37,6 +37,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   const workspaceId = params.workspaceid as string
 
   const {
+    chatSettings,
     setChatSettings,
     setAssistants,
     setAssistantImages,
@@ -195,46 +196,33 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     )
 
     setLoading(false)
-    // const chats = await getChatsByWorkspaceId(workspaceId)
-    // setChats(chats)
-
-    // const collectionData =
-    //   await getCollectionWorkspacesByWorkspaceId(workspaceId)
-    // setCollections(collectionData.collections)
-
-    // const folders = await getFoldersByWorkspaceId(workspaceId)
-    // setFolders(folders)
-    //
-    // const fileData = await getFileWorkspacesByWorkspaceId(workspaceId)
-    // setFiles(fileData.files)
-    //
-    // const presetData = await getPresetWorkspacesByWorkspaceId(workspaceId)
-    // setPresets(presetData.presets)
-    //
-    // const promptData = await getPromptWorkspacesByWorkspaceId(workspaceId)
-    // setPrompts(promptData.prompts)
-    //
-    // const toolData = await getToolWorkspacesByWorkspaceId(workspaceId)
-
-    // const publicTools = await getPublicTools()
-
-    // setTools([...toolData.tools, ...publicTools])
-
-    // const modelData = await getModelWorkspacesByWorkspaceId(workspaceId)
-    // setModels(modelData.models)
 
     setChatSettings({
-      model: (workspace?.default_model || "gpt-3.5-turbo") as LLMID,
+      model: (chatSettings?.model ||
+        workspace?.default_model ||
+        "gpt-3.5-turbo") as LLMID,
       prompt:
+        chatSettings?.prompt ||
         workspace?.default_prompt ||
         "You are a friendly, helpful AI assistant.",
-      temperature: workspace?.default_temperature || 0.5,
-      contextLength: workspace?.default_context_length || 4096,
-      includeProfileContext: workspace?.include_profile_context || true,
+      temperature:
+        chatSettings?.temperature || workspace?.default_temperature || 0.5,
+      contextLength:
+        chatSettings?.contextLength ||
+        workspace?.default_context_length ||
+        4096,
+      includeProfileContext:
+        chatSettings?.includeProfileContext ||
+        workspace?.include_profile_context ||
+        true,
       includeWorkspaceInstructions:
-        workspace?.include_workspace_instructions || true,
+        chatSettings?.includeWorkspaceInstructions ||
+        workspace?.include_workspace_instructions ||
+        true,
       embeddingsProvider:
-        (workspace?.embeddings_provider as "openai" | "local") || "openai"
+        chatSettings?.embeddingsProvider ||
+        (workspace?.embeddings_provider as "openai" | "local") ||
+        "openai"
     })
 
     setLoading(false)

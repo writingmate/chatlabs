@@ -142,6 +142,24 @@ export async function buildFinalMessages(
             }
           }
 
+          if (chatSettings.model.indexOf("claude-3") !== -1) {
+            // parse data:image/png;base64 media_type
+            try {
+              const data = formedUrl.split(",")
+              const mediaType = data[0].split(";")[0].split(":")[1]
+              return {
+                type: "image",
+                source: {
+                  type: "base64",
+                  media_type: mediaType,
+                  data: data[1]
+                }
+              }
+            } catch (error) {
+              console.log(error)
+            }
+          }
+
           return {
             type: "image_url",
             image_url: formedUrl
