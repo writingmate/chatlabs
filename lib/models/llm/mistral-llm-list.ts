@@ -36,11 +36,12 @@ const MISTRAL_MEDIUM: LLM = {
   paid: true
 }
 
+// Mistral Large (UPDATED 03/05/24)
 const MISTRAL_LARGE: LLM = {
-  modelId: "mistral-large-latest",
+  modelId: "mistral-large-2402",
   modelName: "Mistral Large",
   provider: "mistral",
-  hostedId: "mistral-large-latest",
+  hostedId: "mistral-large-2402",
   platformLink: MISTRAL_PLATORM_LINK,
   imageInput: false,
   paid: true
