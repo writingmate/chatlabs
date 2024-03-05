@@ -9,6 +9,8 @@ import { Tables, TablesInsert } from "@/supabase/types"
 import { FC, useContext, useEffect, useState } from "react"
 import { AssistantRetrievalSelect } from "./assistant-retrieval-select"
 import { AssistantToolSelect } from "./assistant-tool-select"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { LLMID } from "@/types"
 
 interface CreateAssistantProps {
   isOpen: boolean
@@ -88,19 +90,11 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
   const checkIfModelIsToolCompatible = () => {
     if (!assistantChatSettings.model) return false
 
-    const compatibleModels = [
-      "gpt-4-turbo-preview",
-      "gpt-4-vision-preview",
-      // "gpt-3.5-turbo-1106",
-      // "gpt-3.5-turbo",
-      "gpt-4",
-      // "gpt-3.5-turbo-0125",
-      "mistral-small",
-      "mistral-medium",
-      "mistral-large-latest"
-    ]
+    const compatibleModels = LLM_LIST.filter(llm => llm.tools == true).map(
+      llm => llm.modelId
+    )
     const isModelCompatible = compatibleModels.includes(
-      assistantChatSettings.model
+      assistantChatSettings.model as LLMID
     )
 
     return isModelCompatible

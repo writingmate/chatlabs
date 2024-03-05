@@ -77,10 +77,12 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [userInput, setUserInput] = useState<string>("")
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatSettings, setChatSettings] = useState<ChatSettings>(() => {
-    const storedSettings = localStorage.getItem("chatSettings")
+    if (typeof window !== "undefined") {
+      const storedSettings = window?.localStorage?.getItem("chatSettings")
 
-    if (storedSettings) {
-      return JSON.parse(storedSettings)
+      if (storedSettings) {
+        return JSON.parse(storedSettings)
+      }
     }
 
     return {

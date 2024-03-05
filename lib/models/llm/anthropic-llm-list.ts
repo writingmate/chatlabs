@@ -35,7 +35,8 @@ const CLAUDE_3_SONNET: LLM = {
   hostedId: "claude-3-sonnet-20240229",
   platformLink: ANTHROPIC_PLATFORM_LINK,
   imageInput: false,
-  paid: true
+  paid: true,
+  tools: true
 }
 
 // Claude 3 Opus (UPDATED 03/04/24)
@@ -46,7 +47,8 @@ const CLAUDE_3_OPUS: LLM = {
   hostedId: "claude-3-opus-20240229",
   platformLink: ANTHROPIC_PLATFORM_LINK,
   imageInput: false,
-  paid: true
+  paid: true,
+  tools: true
 }
 
 export const ANTHROPIC_LLM_LIST: LLM[] = [

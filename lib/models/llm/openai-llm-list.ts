@@ -12,7 +12,8 @@ const GPT4Turbo: LLM = {
   hostedId: "gpt-4-turbo-preview",
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: false,
-  paid: true
+  paid: true,
+  tools: true
 }
 
 // GPT-4 Vision (UPDATED 12/18/23)
@@ -23,7 +24,8 @@ const GPT4Vision: LLM = {
   hostedId: "gpt-4-vision-preview",
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: true,
-  paid: true
+  paid: true,
+  tools: true
 }
 
 // GPT-4 (UPDATED 1/29/24)
@@ -34,7 +36,8 @@ const GPT4: LLM = {
   hostedId: "gpt-4",
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: false,
-  paid: true
+  paid: true,
+  tools: true
 }
 
 // GPT-3.5 Turbo (UPDATED 1/25/24)
@@ -44,7 +47,8 @@ const GPT3_5Turbo: LLM = {
   provider: "openai",
   hostedId: "gpt-3.5-turbo-0125",
   platformLink: OPENAI_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  paid: true
 }
 
 export const OPENAI_LLM_LIST: LLM[] = [GPT4Turbo, GPT4Vision, GPT4, GPT3_5Turbo]

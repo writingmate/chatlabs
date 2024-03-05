@@ -38,13 +38,14 @@ const MISTRAL_MEDIUM: LLM = {
 
 // Mistral Large (UPDATED 03/05/24)
 const MISTRAL_LARGE: LLM = {
-  modelId: "mistral-large-2402",
+  modelId: "mistral-large-latest",
   modelName: "Mistral Large",
   provider: "mistral",
-  hostedId: "mistral-large-2402",
+  hostedId: "mistral-large-latest",
   platformLink: MISTRAL_PLATORM_LINK,
   imageInput: false,
-  paid: true
+  paid: true,
+  tools: true
 }
 
 export const MISTRAL_LLM_LIST: LLM[] = [
