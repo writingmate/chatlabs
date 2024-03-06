@@ -175,3 +175,16 @@ export const deletePromptWorkspace = async (
 
   return true
 }
+
+export const getPublicPrompts = async () => {
+  const { data: prompts, error } = await supabase
+    .from("prompts")
+    .select("*")
+    .neq("sharing", "private")
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return prompts
+}

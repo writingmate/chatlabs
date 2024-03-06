@@ -27,6 +27,7 @@ import { AssistantImage } from "@/types/images/assistant-image"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
+import { isMobileScreen } from "@/lib/mobile"
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -146,8 +147,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [isPaywallOpen, setIsPaywallOpen] = useState<boolean>(false)
 
   // SIDEBAR
-
-  const [showSidebar, setShowSidebar] = useState<boolean>(false)
+  const [showSidebar, setShowSidebar] = useState<boolean>(
+    () => !isMobileScreen()
+  )
 
   useEffect(() => {
     ;(async () => {
