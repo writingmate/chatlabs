@@ -63,6 +63,8 @@ export default function Login({
       }
     })
 
+    setDisabled(false)
+
     if (error) {
       return router.push(`/login?message=${error.message}`)
     }
@@ -79,6 +81,8 @@ export default function Login({
         emailRedirectTo: `${window.location.origin}/auth/confirm`
       }
     })
+
+    setDisabled(false)
 
     if (error) {
       return router.push(`/login?message=${error.message}`)
