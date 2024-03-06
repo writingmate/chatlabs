@@ -48,7 +48,7 @@ const GPT3_5Turbo: LLM = {
   hostedId: "gpt-3.5-turbo-0125",
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: false,
-  paid: true
+  tools: true
 }
 
 export const OPENAI_LLM_LIST: LLM[] = [GPT4Turbo, GPT4Vision, GPT4, GPT3_5Turbo]
