@@ -25,7 +25,7 @@ const GPT4Vision: LLM = {
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: true,
   paid: true,
-  tools: true
+  tools: false
 }
 
 // GPT-4 (UPDATED 1/29/24)
