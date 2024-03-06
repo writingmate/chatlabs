@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import {
   IconBolt,
   IconCirclePlus,
+  IconPaperclip,
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
@@ -20,6 +21,7 @@ import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
+import { WithTooltip } from "@/components/ui/with-tooltip"
 
 interface ChatInputProps {}
 
@@ -230,10 +232,16 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         </div>
 
         <>
-          <IconCirclePlus
-            className="absolute bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
-            size={32}
-            onClick={() => fileInputRef.current?.click()}
+          <WithTooltip
+            side={"top"}
+            display={`Upload files${filesToAccept.includes("image/*") ? " or images" : ""} to chat with`}
+            trigger={
+              <IconPaperclip
+                className="absolute bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
+                size={32}
+                onClick={() => fileInputRef.current?.click()}
+              />
+            }
           />
 
           {/* Hidden input to select files from device */}

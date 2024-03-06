@@ -200,29 +200,26 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setChatSettings({
       model: (chatSettings?.model ||
         workspace?.default_model ||
-        "gpt-3.5-turbo") as LLMID,
+        "gpt-3.5-turbo-0125") as LLMID,
       prompt:
-        chatSettings?.prompt ||
+        // chatSettings?.prompt ||
         workspace?.default_prompt ||
         "You are a friendly, helpful AI assistant.",
       temperature:
-        chatSettings?.temperature || workspace?.default_temperature || 0.5,
+        // chatSettings?.temperature ||
+        workspace?.default_temperature || 0.5,
       contextLength:
-        chatSettings?.contextLength ||
-        workspace?.default_context_length ||
-        4096,
+        // chatSettings?.contextLength ||
+        workspace?.default_context_length || 4096,
       includeProfileContext:
-        chatSettings?.includeProfileContext ||
-        workspace?.include_profile_context ||
-        true,
+        // chatSettings?.includeProfileContext ||
+        workspace?.include_profile_context || true,
       includeWorkspaceInstructions:
-        chatSettings?.includeWorkspaceInstructions ||
-        workspace?.include_workspace_instructions ||
-        true,
+        // chatSettings?.includeWorkspaceInstructions ||
+        workspace?.include_workspace_instructions || true,
       embeddingsProvider:
-        chatSettings?.embeddingsProvider ||
-        (workspace?.embeddings_provider as "openai" | "local") ||
-        "openai"
+        // chatSettings?.embeddingsProvider ||
+        (workspace?.embeddings_provider as "openai" | "local") || "openai"
     })
 
     setLoading(false)
