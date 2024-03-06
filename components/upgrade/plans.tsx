@@ -18,9 +18,8 @@ type BILLING_CYCLE = typeof BILLING_CYCLE_YEARLY | typeof BILLING_CYCLE_MONTHLY
 export default function Plans() {
   const { profile } = useContext(ChatbotUIContext)
 
-  const [billingCycle, setBillingCycle] = useState<BILLING_CYCLE>(
-    BILLING_CYCLE_MONTHLY
-  )
+  const [billingCycle, setBillingCycle] =
+    useState<BILLING_CYCLE>(BILLING_CYCLE_YEARLY)
 
   const [loading, setLoading] = useState("")
 
