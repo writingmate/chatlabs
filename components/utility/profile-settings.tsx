@@ -386,52 +386,52 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
             <TabsContent className="mt-4 space-y-4" value="profile">
               <form>
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <Label>Username</Label>
+                {/*<div className="space-y-1">*/}
+                {/*  <div className="flex items-center space-x-2">*/}
+                {/*    <Label>Username</Label>*/}
 
-                    <div className="text-xs">
-                      {username !== profile.username ? (
-                        usernameAvailable ? (
-                          <div className="text-green-500">AVAILABLE</div>
-                        ) : (
-                          <div className="text-red-500">UNAVAILABLE</div>
-                        )
-                      ) : null}
-                    </div>
-                  </div>
+                {/*    <div className="text-xs">*/}
+                {/*      {username !== profile.username ? (*/}
+                {/*        usernameAvailable ? (*/}
+                {/*          <div className="text-green-500">AVAILABLE</div>*/}
+                {/*        ) : (*/}
+                {/*          <div className="text-red-500">UNAVAILABLE</div>*/}
+                {/*        )*/}
+                {/*      ) : null}*/}
+                {/*    </div>*/}
+                {/*  </div>*/}
 
-                  <div className="relative">
-                    <Input
-                      className="pr-10"
-                      placeholder="Username..."
-                      value={username}
-                      onChange={e => {
-                        setUsername(e.target.value)
-                        checkUsernameAvailability(e.target.value)
-                      }}
-                      minLength={PROFILE_USERNAME_MIN}
-                      maxLength={PROFILE_USERNAME_MAX}
-                    />
+                {/*  <div className="relative">*/}
+                {/*    <Input*/}
+                {/*      className="pr-10"*/}
+                {/*      placeholder="Username..."*/}
+                {/*      value={username}*/}
+                {/*      onChange={e => {*/}
+                {/*        setUsername(e.target.value)*/}
+                {/*        checkUsernameAvailability(e.target.value)*/}
+                {/*      }}*/}
+                {/*      minLength={PROFILE_USERNAME_MIN}*/}
+                {/*      maxLength={PROFILE_USERNAME_MAX}*/}
+                {/*    />*/}
 
-                    {username !== profile.username ? (
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        {loadingUsername ? (
-                          <IconLoader2 className="animate-spin" />
-                        ) : usernameAvailable ? (
-                          <IconCircleCheckFilled className="text-green-500" />
-                        ) : (
-                          <IconCircleXFilled className="text-red-500" />
-                        )}
-                      </div>
-                    ) : null}
-                  </div>
+                {/*    {username !== profile.username ? (*/}
+                {/*      <div className="absolute inset-y-0 right-0 flex items-center pr-3">*/}
+                {/*        {loadingUsername ? (*/}
+                {/*          <IconLoader2 className="animate-spin" />*/}
+                {/*        ) : usernameAvailable ? (*/}
+                {/*          <IconCircleCheckFilled className="text-green-500" />*/}
+                {/*        ) : (*/}
+                {/*          <IconCircleXFilled className="text-red-500" />*/}
+                {/*        )}*/}
+                {/*      </div>*/}
+                {/*    ) : null}*/}
+                {/*  </div>*/}
 
-                  <LimitDisplay
-                    used={username.length}
-                    limit={PROFILE_USERNAME_MAX}
-                  />
-                </div>
+                {/*  <LimitDisplay*/}
+                {/*    used={username.length}*/}
+                {/*    limit={PROFILE_USERNAME_MAX}*/}
+                {/*  />*/}
+                {/*</div>*/}
 
                 <div className="space-y-1">
                   <Label>Profile Image</Label>
