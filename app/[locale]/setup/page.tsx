@@ -99,10 +99,24 @@ export default function SetupPage() {
     })()
   }, [])
 
+  async function redirectToHome() {
+    const session = (await supabase.auth.getSession()).data.session
+    if (!session) {
+      return router.push("/login")
+    }
+    const workspaceId = await getHomeWorkspaceByUserId(session.user.id)
+    router.push(`/${workspaceId}/chat`)
+    router.refresh()
+  }
+
   const handleShouldProceed = (proceed: boolean) => {
     if (proceed) {
       if (currentStep === SETUP_STEP_COUNT) {
+        redirectToHome()
+      }
+      if (currentStep === 1) {
         handleSaveSetupSetting()
+        setCurrentStep(currentStep + 1)
       } else {
         setCurrentStep(currentStep + 1)
       }
@@ -152,8 +166,6 @@ export default function SetupPage() {
     // There will always be a home workspace
     setSelectedWorkspace(homeWorkspace!)
     setWorkspaces(workspaces)
-
-    return router.push(`/${homeWorkspace?.id}/chat`)
   }
 
   const renderStep = (stepNum: number) => {

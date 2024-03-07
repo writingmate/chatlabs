@@ -7,7 +7,7 @@ const GOOGLE_PLATORM_LINK = "https://ai.google.dev/"
 // Gemini Pro (UPDATED 12/22/23)
 const GEMINI_PRO: LLM = {
   modelId: "gemini-pro",
-  modelName: "Gemini Pro",
+  modelName: "Gemini 1.0 Pro",
   provider: "google",
   hostedId: "gemini-pro",
   platformLink: GOOGLE_PLATORM_LINK,
@@ -18,9 +18,19 @@ const GEMINI_PRO: LLM = {
 // Gemini Pro Vision (UPDATED 12/22/23)
 const GEMINI_PRO_VISION: LLM = {
   modelId: "gemini-pro-vision",
-  modelName: "Gemini Pro Vision",
+  modelName: "Gemini 1.0 Pro Vision",
   provider: "google",
   hostedId: "gemini-pro-vision",
+  platformLink: GOOGLE_PLATORM_LINK,
+  imageInput: true,
+  paid: true
+}
+
+const GEMINI_PRO_15: LLM = {
+  modelId: "gemini-1.5-pro-latest",
+  modelName: "Gemini 1.5 Pro",
+  provider: "google",
+  hostedId: "gemini-1.5-pro-latest",
   platformLink: GOOGLE_PLATORM_LINK,
   imageInput: true,
   paid: true
