@@ -88,45 +88,45 @@ export const ProfileStep: FC<ProfileStepProps> = ({
 
   return (
     <>
-      <div className="space-y-1">
-        <div className="flex items-center space-x-2">
-          <Label>Username</Label>
+      {/*<div className="space-y-1">*/}
+      {/*<div className="flex items-center space-x-2">*/}
+      {/*  <Label>Username</Label>*/}
 
-          <div className="text-xs">
-            {usernameAvailable ? (
-              <div className="text-green-500">AVAILABLE</div>
-            ) : (
-              <div className="text-red-500">UNAVAILABLE</div>
-            )}
-          </div>
-        </div>
+      {/*  <div className="text-xs">*/}
+      {/*    {usernameAvailable ? (*/}
+      {/*      <div className="text-green-500">AVAILABLE</div>*/}
+      {/*    ) : (*/}
+      {/*      <div className="text-red-500">UNAVAILABLE</div>*/}
+      {/*    )}*/}
+      {/*  </div>*/}
+      {/*</div>*/}
 
-        <div className="relative">
-          <Input
-            className="pr-10"
-            placeholder="username"
-            value={username}
-            onChange={e => {
-              onUsernameChange(e.target.value)
-              checkUsernameAvailability(e.target.value)
-            }}
-            minLength={PROFILE_USERNAME_MIN}
-            maxLength={PROFILE_USERNAME_MAX}
-          />
+      {/*<div className="relative">*/}
+      {/*  <Input*/}
+      {/*    className="pr-10"*/}
+      {/*    placeholder="username"*/}
+      {/*    value={username}*/}
+      {/*    onChange={e => {*/}
+      {/*      onUsernameChange(e.target.value)*/}
+      {/*      checkUsernameAvailability(e.target.value)*/}
+      {/*    }}*/}
+      {/*    minLength={PROFILE_USERNAME_MIN}*/}
+      {/*    maxLength={PROFILE_USERNAME_MAX}*/}
+      {/*  />*/}
 
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-            {loading ? (
-              <IconLoader2 className="animate-spin" />
-            ) : usernameAvailable ? (
-              <IconCircleCheckFilled className="text-green-500" />
-            ) : (
-              <IconCircleXFilled className="text-red-500" />
-            )}
-          </div>
-        </div>
+      {/*  <div className="absolute inset-y-0 right-0 flex items-center pr-3">*/}
+      {/*    {loading ? (*/}
+      {/*      <IconLoader2 className="animate-spin" />*/}
+      {/*    ) : usernameAvailable ? (*/}
+      {/*      <IconCircleCheckFilled className="text-green-500" />*/}
+      {/*    ) : (*/}
+      {/*      <IconCircleXFilled className="text-red-500" />*/}
+      {/*    )}*/}
+      {/*  </div>*/}
+      {/*</div>*/}
 
-        <LimitDisplay used={username.length} limit={PROFILE_USERNAME_MAX} />
-      </div>
+      {/*<LimitDisplay used={username.length} limit={PROFILE_USERNAME_MAX} />*/}
+      {/*</div>*/}
 
       <div className="space-y-1">
         <Label>Chat Display Name</Label>

@@ -123,7 +123,8 @@ export default function SetupPage() {
     const updateProfilePayload: TablesUpdate<"profiles"> = {
       ...profile,
       has_onboarded: true,
-      display_name: displayName,
+      display_name: displayName || user?.user_metadata?.display_name,
+      image_url: user?.user_metadata?.picture,
       username,
       openai_api_key: openaiAPIKey,
       openai_organization_id: openaiOrgID,

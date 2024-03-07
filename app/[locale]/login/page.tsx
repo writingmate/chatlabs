@@ -12,6 +12,11 @@ import Loading from "../loading"
 import { Input } from "@/components/ui/input"
 import { IconMail } from "@tabler/icons-react"
 import { Separator } from "@/components/ui/separator"
+import {
+  getHomeWorkspaceByUserId,
+  getWorkspacesByUserId
+} from "@/db/workspaces"
+import { getProfileByUserId } from "@/db/profile"
 
 // export const metadata: Metadata = {
 //   title: "Login"
@@ -35,21 +40,16 @@ export default function Login({
         setLoading(false)
         return
       }
-      supabase
-        .from("workspaces")
-        .select("*")
-        .eq("user_id", data.session.user.id)
-        .eq("is_home", true)
-        .single()
-        .then(({ data: homeWorkspace, error }) => {
-          if (!homeWorkspace) {
-            setLoading(false)
-            throw new Error(error.message)
-          }
-          console.log(homeWorkspace)
-
-          return router.push(`/${homeWorkspace.id}/chat`)
-        })
+      const userId = data.session.user.id
+      Promise.all([
+        getProfileByUserId(userId),
+        getWorkspacesByUserId(userId)
+      ]).then(([profile, workspaces]) => {
+        if (profile?.has_onboarded) {
+          return router.push(`/${workspaces[0].id}/chat`)
+        }
+        return router.push("/setup")
+      })
     })
   }, [])
 

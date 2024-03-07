@@ -9,6 +9,12 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase/browser-client"
 import Loading from "@/app/[locale]/loading"
+import {
+  getHomeWorkspaceByUserId,
+  getWorkspaceById,
+  getWorkspacesByUserId
+} from "@/db/workspaces"
+import { getProfileByUserId } from "@/db/profile"
 
 export default function HomePage() {
   const router = useRouter()
@@ -18,20 +24,16 @@ export default function HomePage() {
       if (!data.session) {
         return router.push("/login")
       }
-      supabase
-        .from("workspaces")
-        .select("*")
-        .eq("user_id", data.session.user.id)
-        .eq("is_home", true)
-        .single()
-        .then(({ data: homeWorkspace, error }) => {
-          if (!homeWorkspace) {
-            throw new Error(error.message)
-          }
-          console.log(homeWorkspace)
-
-          return router.push(`/${homeWorkspace.id}/chat`)
-        })
+      const userId = data.session.user.id
+      Promise.all([
+        getProfileByUserId(userId),
+        getWorkspacesByUserId(userId)
+      ]).then(([profile, workspaces]) => {
+        if (profile?.has_onboarded) {
+          return router.push(`/${workspaces[0].id}/chat`)
+        }
+        return router.push("/setup")
+      })
     })
   }, [])
 

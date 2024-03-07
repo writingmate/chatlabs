@@ -153,8 +153,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   useEffect(() => {
     ;(async () => {
+      console.log("fetching starting data...")
       const profile = await fetchStartingData()
-
+      console.log("profile", profile)
       if (profile) {
         const hostedModelRes = await fetchHostedModels(profile)
         if (!hostedModelRes) return
@@ -189,13 +190,18 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const fetchStartingData = async () => {
     const session = (await supabase.auth.getSession()).data.session
 
+    console.log("fetchStartingData", session)
+
     if (session) {
       const user = session.user
 
       const profile = await getProfileByUserId(user.id)
+
+      console.log("fetchStartingData", profile)
+
       setProfile(profile)
 
-      if (!profile.has_onboarded) {
+      if (!profile?.has_onboarded) {
         return router.push("/setup")
       }
 
