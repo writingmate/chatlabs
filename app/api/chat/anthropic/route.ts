@@ -8,8 +8,9 @@ import { ChatSettings } from "@/types"
 import Anthropic from "@anthropic-ai/sdk"
 import { AnthropicStream, StreamingTextResponse } from "ai"
 
-export const runtime = "edge"
+// export const runtime = "edge"
 
+export const maxDuration = 300
 export async function POST(request: Request) {
   const json = await request.json()
   const { chatSettings, messages } = json as {
