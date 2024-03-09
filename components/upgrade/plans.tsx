@@ -111,7 +111,7 @@ export default function Plans() {
               onClick={() => handleClick(BYOK_PLAN_PREFIX)}
               className={"bg-violet-700 text-white"}
             >
-              Try BYOK for free
+              Upgrade now
             </Button>
           </div>
           <div className="flex grow flex-col gap-2">
@@ -137,7 +137,7 @@ export default function Plans() {
           <div className="bg-token-main-surface-primary relative flex flex-col">
             <div className="flex flex-col gap-1">
               <p className="flex items-center gap-2 text-xl font-medium">
-                <IconSparkles className={"text-foreground"} />
+                <IconSparkles className={"text-violet-700"} />
                 Pro
               </p>
               <div className="min-h-[56px] flex-col items-baseline gap-[6px]">
@@ -161,8 +161,9 @@ export default function Plans() {
               formAction={createFormAction(PRO_PLAN_PREFIX)}
               onClick={() => handleClick(PRO_PLAN_PREFIX)}
               data-testid="select-plan-button-Pros-create"
+              className={"bg-violet-700 text-white"}
             >
-              Try Pro for free
+              Upgrade now
             </Button>
           </div>
           <div className="flex grow flex-col gap-2">
