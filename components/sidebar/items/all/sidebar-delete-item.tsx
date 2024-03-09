@@ -25,11 +25,13 @@ import { FC, useContext, useRef, useState } from "react"
 interface SidebarDeleteItemProps {
   item: DataItemType
   contentType: ContentType
+  name?: string
 }
 
 export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
   item,
-  contentType
+  contentType,
+  name
 }) => {
   const {
     setChats,
@@ -45,6 +47,8 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const [showDialog, setShowDialog] = useState(false)
+
+  const resolvedName = name || contentType
 
   const deleteFunctions = {
     chats: async (chat: Tables<"chats">) => {
@@ -120,7 +124,7 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
 
       <DialogContent onKeyDown={handleKeyDown}>
         <DialogHeader>
-          <DialogTitle>Delete {contentType.slice(0, -1)}</DialogTitle>
+          <DialogTitle>Delete {resolvedName.slice(0, -1)}</DialogTitle>
 
           <DialogDescription>
             Are you sure you want to delete {item.name}?

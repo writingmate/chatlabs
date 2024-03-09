@@ -30,7 +30,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   const { profile, setIsPaywallOpen } = useContext(ChatbotUIContext)
 
   return (
-    <div className="flex flex-col justify-between border-r-2 pb-5">
+    <div className="flex flex-col justify-between border-r pb-5">
       <TabsList className="bg-background grid h-[440px] grid-rows-7">
         <SidebarSwitchItem
           icon={<IconMessage size={SIDEBAR_ICON_SIZE} />}
@@ -62,11 +62,11 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           onContentTypeChange={onContentTypeChange}
         />
 
-        <SidebarSwitchItem
-          icon={<IconBooks size={SIDEBAR_ICON_SIZE} />}
-          contentType="collections"
-          onContentTypeChange={onContentTypeChange}
-        />
+        {/*<SidebarSwitchItem*/}
+        {/*  icon={<IconBooks size={SIDEBAR_ICON_SIZE} />}*/}
+        {/*  contentType="collections"*/}
+        {/*  onContentTypeChange={onContentTypeChange}*/}
+        {/*/>*/}
 
         <SidebarSwitchItem
           icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} />}
@@ -77,6 +77,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         <SidebarSwitchItem
           icon={<IconBolt size={SIDEBAR_ICON_SIZE} />}
           contentType="tools"
+          name="Plugins"
           onContentTypeChange={onContentTypeChange}
         />
       </TabsList>

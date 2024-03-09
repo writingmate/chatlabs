@@ -13,6 +13,7 @@ import { LLM_LIST, LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 
 export const runtime = "edge"
 
+export const maxDuration = 300
 function getProviderClient(model: string, profile: Tables<"profiles">) {
   const provider = LLM_LIST.find(llm => llm.modelId === model)?.provider
 

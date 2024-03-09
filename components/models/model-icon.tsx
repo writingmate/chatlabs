@@ -32,7 +32,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
           className={cn(
             "rounded-sm bg-[#fff] p-1 text-black",
             props.className,
-            theme === "dark" ? "bg-white" : "border-[1px] border-black"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
           )}
           width={width}
           height={height}
@@ -43,7 +43,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-[1px] border-black"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
           )}
           src={mistral.src}
           alt="Mistral"
@@ -56,7 +56,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-0",
-            theme === "dark" ? "bg-white" : "border-[1px] border-black"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
           )}
           src={groq.src}
           alt="Groq"
@@ -70,7 +70,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
           className={cn(
             "rounded-sm bg-[#fff] p-1 text-black",
             props.className,
-            theme === "dark" ? "bg-white" : "border-[1px] border-black"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
           )}
           width={width}
           height={height}
@@ -82,7 +82,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
           className={cn(
             "rounded-sm bg-[#fff] p-1 text-black",
             props.className,
-            theme === "dark" ? "bg-white" : "border-[1px] border-black"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
           )}
           width={width}
           height={height}
@@ -93,7 +93,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-[1px] border-black"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
           )}
           src={perplexity.src}
           alt="Mistral"

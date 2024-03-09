@@ -2,7 +2,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { createChat } from "@/db/chats"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
-import { ContentType, DataItemType } from "@/types"
+import { ContentType, DataItemType, LLMID } from "@/types"
 import { useRouter } from "next/navigation"
 import { FC, useContext, useRef, useState } from "react"
 import { SidebarUpdateItem } from "./sidebar-update-item"
@@ -18,6 +18,7 @@ interface SidebarItemProps {
   icon: React.ReactNode
   updateState: any
   renderInputs: (renderState: any) => JSX.Element
+  name?: string
 }
 
 export const SidebarItem: FC<SidebarItemProps> = ({
@@ -26,7 +27,8 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   updateState,
   renderInputs,
   icon,
-  isTyping
+  isTyping,
+  name
 }) => {
   const {
     selectedWorkspace,
@@ -37,7 +39,8 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     setSelectedTools,
     chatFiles,
     setChatFiles,
-    setFocusPrompt
+    setFocusPrompt,
+    setChatSettings
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
@@ -61,24 +64,19 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     assistants: async (assistant: Tables<"assistants">) => {
       if (!selectedWorkspace) return
 
-      const createdChat = await createChat({
-        user_id: profile!.user_id,
-        workspace_id: selectedWorkspace.id,
-        assistant_id: assistant.id,
-        context_length: assistant.context_length,
-        include_profile_context: assistant.include_profile_context,
-        include_workspace_instructions:
-          assistant.include_workspace_instructions,
-        model: assistant.model,
-        name: `Chat with ${assistant.name}`,
+      setChatSettings({
+        contextLength: assistant.context_length,
+        includeProfileContext: assistant.include_profile_context,
+        includeWorkspaceInstructions: assistant.include_workspace_instructions,
+        model: assistant.model as LLMID,
         prompt: assistant.prompt,
         temperature: assistant.temperature,
-        embeddings_provider: assistant.embeddings_provider
+        embeddingsProvider: assistant.embeddings_provider as "openai" | "local"
       })
 
       setSelectedAssistant(assistant)
 
-      return router.push(`/${selectedWorkspace.id}/chat/${createdChat.id}`)
+      return router.push(`/${selectedWorkspace.id}/chat`)
     },
     tools: async (item: any) => {
       setSelectedTools([...new Set([...selectedTools, item])])
@@ -115,6 +113,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
 
   return (
     <SidebarUpdateItem
+      name={name}
       item={item}
       isTyping={isTyping}
       contentType={contentType}

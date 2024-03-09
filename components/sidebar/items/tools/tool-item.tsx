@@ -28,6 +28,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
       item={tool}
       isTyping={isTyping}
       contentType="tools"
+      name="plugins"
       icon={<IconBolt size={30} />}
       updateState={{
         name,

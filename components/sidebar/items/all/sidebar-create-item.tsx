@@ -34,6 +34,7 @@ interface SidebarCreateItemProps {
   isTyping: boolean
   onOpenChange: (isOpen: boolean) => void
   contentType: ContentType
+  name?: string
   renderInputs: () => JSX.Element
   createState: any
 }
@@ -44,7 +45,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   contentType,
   renderInputs,
   createState,
-  isTyping
+  isTyping,
+  name
 }) => {
   const {
     selectedWorkspace,
@@ -62,6 +64,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const [creating, setCreating] = useState(false)
+
+  const resolvedName = name || contentType
 
   const createFunctions = {
     chats: createChat,
@@ -203,7 +207,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       onOpenChange(false)
       setCreating(false)
     } catch (error) {
-      toast.error(`Error creating ${contentType.slice(0, -1)}. ${error}.`)
+      toast.error(`Error creating ${resolvedName.slice(0, -1)}. ${error}.`)
       setCreating(false)
     }
   }
@@ -226,7 +230,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
           <SheetHeader>
             <SheetTitle className="text-2xl font-bold">
               Create{" "}
-              {contentType.charAt(0).toUpperCase() + contentType.slice(1, -1)}
+              {resolvedName.charAt(0).toUpperCase() + resolvedName.slice(1, -1)}
             </SheetTitle>
           </SheetHeader>
 

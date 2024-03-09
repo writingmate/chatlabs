@@ -47,7 +47,6 @@ import {
   redirectToBillingPortal
 } from "@/actions/stripe"
 import { PLAN_FREE } from "@/lib/stripe/config"
-import { Divide } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 
@@ -376,11 +375,17 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="profile">
-            <TabsList className="mt-4 grid w-full grid-cols-2">
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="shortcuts">Shortcuts</TabsTrigger>
+            <TabsList className="mt-4 flex w-full space-x-1">
+              <TabsTrigger className={"flex-1"} value="profile">
+                Profile
+              </TabsTrigger>
+              <TabsTrigger className={"flex-1"} value="shortcuts">
+                Shortcuts
+              </TabsTrigger>
               {profile?.plan.startsWith("byok_") && (
-                <TabsTrigger value="keys">API Keys</TabsTrigger>
+                <TabsTrigger className={"flex-1"} value="keys">
+                  API Keys
+                </TabsTrigger>
               )}
             </TabsList>
 
@@ -820,7 +825,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       value={assistantCommand}
                       onChange={e => setAssistantCommand(e.target.value)}
                     />
-                    <Label>Tools command</Label>
+                    <Label>Plugins command</Label>
                     <Input
                       minLength={1}
                       maxLength={1}

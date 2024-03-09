@@ -18,7 +18,7 @@ interface ModelSelectProps {
   onSelectModel: (modelId: LLMID) => void
 }
 
-export const ModelSelect: FC<ModelSelectProps> = ({
+export const ModelSelectChat: FC<ModelSelectProps> = ({
   selectedModelId,
   onSelectModel
 }) => {
@@ -100,7 +100,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       }}
     >
       <DropdownMenuTrigger
-        className="bg-background w-full justify-start border-0 px-3 py-5"
+        className="w-full justify-start border-0 px-3 py-5"
         asChild
         disabled={allModels.length === 0}
       >
@@ -111,7 +111,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
         ) : (
           <Button
             ref={triggerRef}
-            className="flex items-center justify-between border-0"
+            className="flex items-center justify-between space-x-1"
             variant="ghost"
           >
             <div className="flex items-center">
@@ -122,7 +122,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
                     width={26}
                     height={26}
                   />
-                  <div className="ml-2 flex items-center">
+                  <div className="ml-2 flex items-center text-lg">
                     {selectedModel?.modelName}
                   </div>
                 </>
@@ -137,15 +137,14 @@ export const ModelSelect: FC<ModelSelectProps> = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="space-y-2 overflow-auto p-2"
-        style={{ width: triggerRef.current?.offsetWidth }}
+        className="w-[300px] space-y-2 overflow-auto p-2 sm:w-[350px] md:w-[400px] lg:w-[500px]"
+        // style={{ width: triggerRef.current?.offsetWidth }}
         align="start"
       >
         <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
           {availableLocalModels.length > 0 && (
             <TabsList defaultValue="hosted" className="grid grid-cols-2">
               <TabsTrigger value="hosted">Hosted</TabsTrigger>
-
               <TabsTrigger value="local">Local</TabsTrigger>
             </TabsList>
           )}
@@ -194,9 +193,9 @@ export const ModelSelect: FC<ModelSelectProps> = ({
                         {/*)}*/}
 
                         <ModelOption
-                          selected={selectedModelId === model.modelId}
                           key={model.modelId}
                           model={model}
+                          selected={selectedModelId === model.modelId}
                           onSelect={() => handleSelectModel(model.modelId)}
                         />
                       </div>

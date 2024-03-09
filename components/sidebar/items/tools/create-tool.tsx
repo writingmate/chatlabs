@@ -28,6 +28,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
 
   return (
     <SidebarCreateItem
+      name="Plugins"
       contentType="tools"
       createState={
         {

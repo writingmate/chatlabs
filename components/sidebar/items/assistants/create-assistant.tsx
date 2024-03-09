@@ -190,7 +190,7 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
 
           {checkIfModelIsToolCompatible() ? (
             <div className="space-y-1">
-              <Label>Tools</Label>
+              <Label>Plugins</Label>
 
               <AssistantToolSelect
                 selectedAssistantTools={selectedAssistantToolItems}

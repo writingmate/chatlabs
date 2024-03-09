@@ -4,6 +4,7 @@ import { IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef } from "react"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
+import { useClickOutside } from "@/components/chat/picker-hooks/use-click-outside"
 
 interface AssistantPickerProps {}
 
@@ -22,7 +23,7 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
   const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
-    if (focusAssistant && itemsRef.current[0]) {
+    if (itemsRef.current?.[0]) {
       itemsRef.current[0].focus()
     }
   }, [focusAssistant])
@@ -30,6 +31,8 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
   const filteredAssistants = assistants.filter(assistant =>
     assistant.name.toLowerCase().includes(atCommand.toLowerCase())
   )
+
+  useClickOutside(itemsRef, () => setIsAssistantPickerOpen(false))
 
   const handleOpenChange = (isOpen: boolean) => {
     setIsAssistantPickerOpen(isOpen)
@@ -68,13 +71,16 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
         e.preventDefault()
         const nextIndex = index + 1 < itemsRef.current.length ? index + 1 : 0
         itemsRef.current[nextIndex]?.focus()
+      } else if (e.key === "Escape") {
+        e.preventDefault()
+        handleOpenChange(false)
       }
     }
 
   return (
     <>
       {isAssistantPickerOpen && (
-        <div className="bg-background flex flex-col space-y-1 rounded-xl border-2 p-2 text-sm">
+        <div className="bg-background flex flex-col rounded-xl border p-2 text-sm shadow-lg">
           {filteredAssistants.length === 0 ? (
             <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
               No matching assistants.
@@ -88,33 +94,37 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
                     itemsRef.current[index] = ref
                   }}
                   tabIndex={0}
-                  className="hover:bg-accent focus:bg-accent flex cursor-pointer items-center rounded p-2 focus:outline-none"
+                  className="hover:bg-accent focus:bg-accent flex cursor-pointer items-center rounded-lg p-2 focus:outline-none"
                   onClick={() =>
                     callSelectAssistant(item as Tables<"assistants">)
                   }
                   onKeyDown={getKeyDownHandler(index)}
                 >
-                  {item.image_path ? (
-                    <Image
-                      src={
-                        assistantImages.find(
-                          image => image.path === item.image_path
-                        )?.url || ""
-                      }
-                      alt={item.name}
-                      width={32}
-                      height={32}
-                      className="rounded"
-                    />
-                  ) : (
-                    <IconRobotFace size={32} />
-                  )}
+                  <div className="w-[28px]">
+                    {item.image_path ? (
+                      <Image
+                        src={
+                          assistantImages.find(
+                            image => image.path === item.image_path
+                          )?.url || ""
+                        }
+                        alt={item.name}
+                        width={28}
+                        height={28}
+                        className="max-w-[28px] rounded"
+                      />
+                    ) : (
+                      <div className="bg-foreground flex size-[28px] items-center justify-center rounded">
+                        <IconRobotFace className="text-background" />
+                      </div>
+                    )}
+                  </div>
 
-                  <div className="ml-3 flex flex-col">
-                    <div className="font-bold">{item.name}</div>
+                  <div className="ml-3 flex space-x-2">
+                    <div className="text-nowrap font-bold">{item.name}</div>
 
-                    <div className="line-clamp-1 max-w-full overflow-hidden text-ellipsis text-sm opacity-80">
-                      {item.description || "No description."}
+                    <div className="line-clamp-1 max-w-full overflow-hidden text-ellipsis opacity-60">
+                      {item.description}
                     </div>
                   </div>
                 </div>

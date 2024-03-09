@@ -9,12 +9,14 @@ interface SidebarContentProps {
   contentType: ContentType
   data: DataListType
   folders: Tables<"folders">[]
+  name?: string
 }
 
 export const SidebarContent: FC<SidebarContentProps> = ({
   contentType,
   data,
-  folders
+  folders,
+  name
 }) => {
   const [searchTerm, setSearchTerm] = useState("")
 
@@ -27,6 +29,7 @@ export const SidebarContent: FC<SidebarContentProps> = ({
     <div className="flex max-h-[calc(100%-50px)] grow flex-col">
       <div className="mt-2 flex items-center">
         <SidebarCreateButtons
+          name={name}
           contentType={contentType}
           hasData={data.length > 0}
         />

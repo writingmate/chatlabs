@@ -155,7 +155,7 @@ export const usePromptAndCommand = () => {
   const handleSelectTool = (tool: Tables<"tools">) => {
     setIsToolPickerOpen(false)
     setUserInput(userInput.replace(/![^ ]*$/, ""))
-    setSelectedTools(prev => [...prev, tool])
+    setSelectedTools(prev => [...new Set([...prev, tool])])
   }
 
   const handleSelectAssistant = async (assistant: Tables<"assistants">) => {

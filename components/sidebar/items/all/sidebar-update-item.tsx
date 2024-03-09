@@ -92,10 +92,12 @@ interface SidebarUpdateItemProps {
   children: React.ReactNode
   renderInputs: (renderState: any) => JSX.Element
   updateState: any
+  name?: string
 }
 
 export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   item,
+  name,
   contentType,
   children,
   renderInputs,
@@ -633,6 +635,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     }
   }
 
+  const resolvedName = name || contentType
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -645,7 +649,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
         <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="text-2xl font-bold">
-              Edit {contentType.slice(0, -1)}
+              Edit {resolvedName.slice(0, -1)}
             </SheetTitle>
           </SheetHeader>
 
@@ -666,7 +670,11 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
         </div>
 
         <SheetFooter className="mt-2 flex justify-between">
-          <SidebarDeleteItem item={item} contentType={contentType} />
+          <SidebarDeleteItem
+            item={item}
+            name={name}
+            contentType={contentType}
+          />
 
           <div className="flex grow justify-end space-x-2">
             <Button

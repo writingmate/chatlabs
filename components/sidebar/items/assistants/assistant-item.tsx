@@ -270,7 +270,7 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
           </div>
 
           <div className="space-y-1">
-            <Label>Tools</Label>
+            <Label>Plugins</Label>
 
             <AssistantToolSelect
               selectedAssistantTools={

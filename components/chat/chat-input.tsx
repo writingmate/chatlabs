@@ -7,7 +7,8 @@ import {
   IconCirclePlus,
   IconPaperclip,
   IconPlayerStopFilled,
-  IconSend
+  IconSend,
+  IconX
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -22,6 +23,7 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
 import { WithTooltip } from "@/components/ui/with-tooltip"
+import { Button } from "@/components/ui/button"
 
 interface ChatInputProps {}
 
@@ -43,6 +45,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isGenerating,
     selectedPreset,
     selectedAssistant,
+    setSelectedAssistant,
     focusPrompt,
     setFocusPrompt,
     focusFile,
@@ -182,118 +185,122 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       <div className="flex flex-col flex-wrap justify-center gap-2">
         <ChatFilesDisplay />
 
-        {selectedTools &&
-          selectedTools.map((tool, index) => (
-            <div
-              key={index}
-              className="flex justify-center"
-              onClick={() =>
-                setSelectedTools(
-                  selectedTools.filter(
-                    selectedTool => selectedTool.id !== tool.id
-                  )
-                )
-              }
-            >
-              <div className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-600 px-3 py-1 hover:opacity-50">
-                <IconBolt size={20} />
+        {/*{selectedTools &&*/}
+        {/*  selectedTools.map((tool, index) => (*/}
+        {/*    <div*/}
+        {/*      key={index}*/}
+        {/*      className="flex justify-center"*/}
+        {/*      onClick={() =>*/}
+        {/*        setSelectedTools(*/}
+        {/*          selectedTools.filter(*/}
+        {/*            selectedTool => selectedTool.id !== tool.id*/}
+        {/*          )*/}
+        {/*        )*/}
+        {/*      }*/}
+        {/*    >*/}
+        {/*      <div*/}
+        {/*        className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-600 px-3 py-1 hover:opacity-50">*/}
+        {/*        <IconBolt size={20}/>*/}
 
-                <div>{tool.name}</div>
-              </div>
-            </div>
-          ))}
-
-        {selectedAssistant && (
-          <div className="border-primary mx-auto flex w-fit items-center space-x-2 rounded-lg border p-1.5">
-            {selectedAssistant.image_path && (
-              <Image
-                className="rounded"
-                src={
-                  assistantImages.find(
-                    img => img.path === selectedAssistant.image_path
-                  )?.url || ""
-                }
-                width={28}
-                height={28}
-                alt={selectedAssistant.name}
-              />
-            )}
-
-            <div className="text-sm font-bold">
-              Talking to {selectedAssistant.name}
-            </div>
-          </div>
-        )}
+        {/*        <div>{tool.name}</div>*/}
+        {/*      </div>*/}
+        {/*    </div>*/}
+        {/*  ))}*/}
       </div>
 
-      <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2 backdrop-blur-xl">
+      <div className={"relative"}>
         <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-y-auto rounded-xl dark:border-none">
           <ChatCommandInput />
         </div>
+        <div className="border-input mt-3 flex min-h-[60px] w-full flex-col justify-end overflow-hidden rounded-xl border backdrop-blur-xl">
+          {selectedAssistant && (
+            <div className="bg-secondary flex items-center justify-between space-x-2 p-2 pl-4 pr-6">
+              <div className={"flex items-center space-x-2"}>
+                {selectedAssistant.image_path && (
+                  <Image
+                    className="rounded"
+                    src={
+                      assistantImages.find(
+                        img => img.path === selectedAssistant.image_path
+                      )?.url || ""
+                    }
+                    width={28}
+                    height={28}
+                    alt={selectedAssistant.name}
+                  />
+                )}
+                <div className="text-sm font-bold">
+                  Talking to {selectedAssistant.name}
+                </div>
+              </div>
 
-        <>
-          <WithTooltip
-            side={"top"}
-            display={`Upload files${filesToAccept.includes("image/*") ? " or images" : ""} to chat with`}
-            trigger={
-              <IconPaperclip
-                className="absolute bottom-[12px] left-3 cursor-pointer p-1 hover:opacity-50"
-                size={32}
-                onClick={() => fileInputRef.current?.click()}
+              <IconX
+                onClick={() => setSelectedAssistant(null)}
+                className={
+                  "hover:text-foreground/50 absolute right-2 top-4 flex size-4 max-w-[calc(100vw-40px)] cursor-pointer items-center justify-center text-[10px] sm:max-w-[calc(100%-10px)]"
+                }
               />
-            }
-          />
-
-          {/* Hidden input to select files from device */}
-          <Input
-            ref={fileInputRef}
-            className="hidden"
-            type="file"
-            onChange={e => {
-              if (!e.target.files) return
-              handleSelectDeviceFile(e.target.files[0])
-            }}
-            accept={filesToAccept}
-          />
-        </>
-
-        <TextareaAutosize
-          textareaRef={chatInputRef}
-          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder={t(
-            `Ask anything. Type "${profile?.assistant_command}" for assistants, "${profile?.prompt_command}" for prompts, "${profile?.files_command}" for files, and "${profile?.tools_command}" for tools.`
+            </div>
           )}
-          onValueChange={handleInputChange}
-          value={userInput}
-          minRows={1}
-          maxRows={18}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          onCompositionStart={() => setIsTyping(true)}
-          onCompositionEnd={() => setIsTyping(false)}
-        />
 
-        <div className="absolute bottom-[14px] right-3 cursor-pointer hover:opacity-50">
-          {isGenerating ? (
-            <IconPlayerStopFilled
-              className="hover:bg-background animate-pulse rounded bg-transparent p-1"
-              onClick={handleStopMessage}
-              size={30}
+          <div className={"relative my-2 flex items-center justify-center"}>
+            <IconPaperclip
+              className="absolute bottom-[4px] left-3 cursor-pointer p-1 hover:opacity-50"
+              size={32}
+              onClick={() => fileInputRef.current?.click()}
             />
-          ) : (
-            <IconSend
-              className={cn(
-                "bg-primary text-secondary rounded p-1",
-                !userInput && "cursor-not-allowed opacity-50"
-              )}
-              onClick={() => {
-                if (!userInput) return
 
-                handleSendMessage(userInput, chatMessages, false)
+            {/* Hidden input to select files from device */}
+            <Input
+              ref={fileInputRef}
+              className="hidden"
+              type="file"
+              onChange={e => {
+                if (!e.target.files) return
+                handleSelectDeviceFile(e.target.files[0])
               }}
-              size={30}
+              accept={filesToAccept}
             />
-          )}
+
+            <TextareaAutosize
+              textareaRef={chatInputRef}
+              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder={t(
+                `Ask anything. Type "${profile?.assistant_command}" for assistants, "${profile?.prompt_command}" for prompts, "${profile?.files_command}" for files, and "${profile?.tools_command}" for plugins.`
+              )}
+              onValueChange={handleInputChange}
+              value={userInput}
+              minRows={1}
+              maxRows={18}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+              onCompositionStart={() => setIsTyping(true)}
+              onCompositionEnd={() => setIsTyping(false)}
+            />
+
+            <div className="absolute bottom-[6px] right-3 cursor-pointer hover:opacity-50">
+              {isGenerating ? (
+                <IconPlayerStopFilled
+                  className="hover:bg-background animate-pulse rounded bg-transparent p-1"
+                  onClick={handleStopMessage}
+                  size={30}
+                />
+              ) : (
+                <IconSend
+                  className={cn(
+                    "bg-primary text-secondary rounded-lg p-1",
+                    !userInput && "opacity-md cursor-not-allowed"
+                  )}
+                  onClick={() => {
+                    if (!userInput) return
+
+                    handleSendMessage(userInput, chatMessages, false)
+                  }}
+                  size={30}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </>

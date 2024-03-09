@@ -21,6 +21,7 @@ import { Button } from "../ui/button"
 import { FilePreview } from "../ui/file-preview"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ChatRetrievalSettings } from "./chat-retrieval-settings"
+import { XIcon } from "@/components/ui/x-icon"
 
 interface ChatFilesDisplayProps {}
 
@@ -99,23 +100,23 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
       )}
 
       <div className="space-y-2">
-        <div className="flex w-full items-center justify-center">
-          <Button
-            className="flex h-[32px] w-[140px] space-x-2"
-            onClick={() => setShowFilesDisplay(false)}
-          >
-            <RetrievalToggle />
+        {/*<div className="flex w-full items-center justify-center">*/}
+        {/*  <Button*/}
+        {/*    className="flex h-[32px] w-[140px] space-x-2"*/}
+        {/*    onClick={() => setShowFilesDisplay(false)}*/}
+        {/*  >*/}
+        {/*    <RetrievalToggle />*/}
 
-            <div>Hide files</div>
+        {/*    <div>Hide files</div>*/}
 
-            <div onClick={e => e.stopPropagation()}>
-              <ChatRetrievalSettings />
-            </div>
-          </Button>
-        </div>
+        {/*    <div onClick={e => e.stopPropagation()}>*/}
+        {/*      <ChatRetrievalSettings />*/}
+        {/*    </div>*/}
+        {/*  </Button>*/}
+        {/*</div>*/}
 
         <div className="overflow-auto">
-          <div className="flex flex-col gap-2 overflow-auto pt-2">
+          <div className="flex gap-2 overflow-auto pt-2">
             {messageImages.map((image, index) => (
               <div
                 key={index}
@@ -140,8 +141,8 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                   }}
                 />
 
-                <IconX
-                  className="bg-muted-foreground border-primary absolute right-[-6px] top-[-2px] flex size-5 max-w-[calc(100vw-40px)] cursor-pointer items-center justify-center rounded-full border-[1px] text-[10px] hover:border-red-500 hover:bg-white hover:text-red-500 sm:max-w-[calc(100%-10px)]"
+                <XIcon
+                  className="absolute right-[-6px] top-[-2px]"
                   onClick={e => {
                     e.stopPropagation()
                     setNewMessageImages(
@@ -161,7 +162,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
               file.id === "loading" ? (
                 <div
                   key={index}
-                  className="relative flex h-[64px] max-w-[calc(100vw-40px)] items-center space-x-4 rounded-xl border-2 px-4 py-3 sm:max-w-[calc(100%-10px)]"
+                  className="relative flex h-[64px] max-w-[calc(100vw-40px)] items-center space-x-4 rounded-xl border px-4 py-3 sm:max-w-[calc(100%-10px)]"
                 >
                   <div className="rounded bg-violet-500 p-2">
                     <IconLoader2 className="animate-spin" />
@@ -175,7 +176,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
               ) : (
                 <div
                   key={file.id}
-                  className="relative flex h-[64px] max-w-[calc(100vw-40px)] cursor-pointer items-center space-x-4 rounded-xl border-2 px-4 py-3 hover:opacity-50 sm:max-w-[calc(100%-10px)]"
+                  className="relative flex h-[64px] max-w-[260px] cursor-pointer items-center space-x-4 rounded-xl border px-4 py-3 hover:opacity-50"
                   onClick={() => getLinkAndView(file)}
                 >
                   <div className="rounded bg-violet-500 p-2">
@@ -186,29 +187,30 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
 
                       switch (fileExtension) {
                         case "pdf":
-                          return <IconFileTypePdf />
+                          return <IconFileTypePdf stroke={1.5} />
                         case "markdown":
-                          return <IconMarkdown />
+                          return <IconMarkdown stroke={1.5} />
                         case "txt":
-                          return <IconFileTypeTxt />
+                          return <IconFileTypeTxt stroke={1.5} />
                         case "json":
-                          return <IconJson />
+                          return <IconJson stroke={1.5} />
                         case "csv":
-                          return <IconFileTypeCsv />
+                          return <IconFileTypeCsv stroke={1.5} />
                         case "docx":
-                          return <IconFileTypeDocx />
+                          return <IconFileTypeDocx stroke={1.5} />
                         default:
-                          return <IconFileFilled />
+                          return <IconFileFilled stroke={1.5} />
                       }
                     })()}
                   </div>
 
                   <div className="truncate text-sm">
                     <div className="truncate">{file.name}</div>
+                    <div className="truncate opacity-50">{file.type}</div>
                   </div>
 
-                  <IconX
-                    className="bg-muted-foreground border-primary absolute right-[-6px] top-[-6px] flex size-5 cursor-pointer items-center justify-center rounded-full border-[1px] text-[10px] hover:border-red-500 hover:bg-white hover:text-red-500"
+                  <XIcon
+                    className="absolute right-[-6px] top-[-6px]"
                     onClick={e => {
                       e.stopPropagation()
                       setNewMessageFiles(

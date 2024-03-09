@@ -23,7 +23,8 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
     collections,
     assistants,
     tools,
-    models
+    models,
+    workspaces
   } = useContext(ChatbotUIContext)
 
   const chatFolders = folders.filter(folder => folder.type === "chats")
@@ -42,10 +43,16 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
   const renderSidebarContent = (
     contentType: ContentType,
     data: any[],
-    folders: Tables<"folders">[]
+    folders: Tables<"folders">[],
+    name?: string
   ) => {
     return (
-      <SidebarContent contentType={contentType} data={data} folders={folders} />
+      <SidebarContent
+        name={name}
+        contentType={contentType}
+        data={data}
+        folders={folders}
+      />
     )
   }
 
@@ -61,11 +68,13 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
       value={contentType}
     >
       <div className="flex h-full flex-col p-3">
-        <div className="flex items-center border-b-2 pb-2">
-          <WorkspaceSwitcher />
+        {workspaces?.length > 1 && (
+          <div className="flex items-center border-b pb-2">
+            <WorkspaceSwitcher />
 
-          <WorkspaceSettings />
-        </div>
+            <WorkspaceSettings />
+          </div>
+        )}
 
         {(() => {
           switch (contentType) {
@@ -96,7 +105,12 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
               )
 
             case "tools":
-              return renderSidebarContent("tools", tools, toolFolders)
+              return renderSidebarContent(
+                "tools",
+                tools,
+                toolFolders,
+                "Plugins"
+              )
 
             case "models":
               return renderSidebarContent("models", models, modelFolders)

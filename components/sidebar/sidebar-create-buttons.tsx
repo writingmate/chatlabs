@@ -17,9 +17,11 @@ import { isMobileScreen } from "@/lib/mobile"
 interface SidebarCreateButtonsProps {
   contentType: ContentType
   hasData: boolean
+  name?: string
 }
 
 export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
+  name,
   contentType,
   hasData
 }) => {
@@ -48,6 +50,8 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
     })
     setFolders([...folders, createdFolder])
   }
+
+  const resolvedName = name || contentType
 
   const getCreateFunction = () => {
     switch (contentType) {
@@ -104,8 +108,8 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       <Button className="flex h-[36px] grow" onClick={getCreateFunction()}>
         <IconPlus className="mr-1" size={20} />
         New{" "}
-        {contentType.charAt(0).toUpperCase() +
-          contentType.slice(1, contentType.length - 1)}
+        {resolvedName.charAt(0).toUpperCase() +
+          resolvedName.slice(1, resolvedName.length - 1)}
       </Button>
 
       {hasData && (

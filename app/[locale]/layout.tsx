@@ -64,7 +64,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#000000"
+  themeColor: "#FFFFFF"
 }
 
 const i18nNamespaces = ["translation"]
@@ -91,7 +91,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning className={"h-full"}>
-      <body className={inter.className + " h-full"}>
+      <body className={inter.className + " h-full antialiased"}>
         <Providers attribute="class" defaultTheme="dark">
           <TranslationsProvider
             namespaces={i18nNamespaces}
