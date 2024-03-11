@@ -72,6 +72,9 @@ export default function SetupPage() {
 
         const profile = await getProfileByUserId(user.id)
         setProfile(profile)
+        setDisplayName(
+          profile.display_name || user?.user_metadata?.display_name
+        )
         setUsername(profile.username)
 
         if (!profile.has_onboarded) {
