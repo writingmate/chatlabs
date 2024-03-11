@@ -112,11 +112,11 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
           resolvedName.slice(1, resolvedName.length - 1)}
       </Button>
 
-      {hasData && (
-        <Button className="size-[36px] p-1" onClick={handleCreateFolder}>
-          <IconFolderPlus size={20} />
-        </Button>
-      )}
+      {/*{hasData && (*/}
+      {/*  <Button className="size-[36px] p-1" onClick={handleCreateFolder}>*/}
+      {/*    <IconFolderPlus size={20} />*/}
+      {/*  </Button>*/}
+      {/*)}*/}
 
       {isCreatingPrompt && (
         <CreatePrompt
