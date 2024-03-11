@@ -116,7 +116,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
         {/*</div>*/}
 
         <div className="flex overflow-auto sm:w-[360px] md:w-[460px] lg:w-[620px] xl:w-[760px]">
-          <div className="flex gap-2 overflow-auto pt-2">
+          <div className="flex gap-2 pt-2">
             {messageImages.map((image, index) => (
               <div
                 key={index}
