@@ -5,7 +5,11 @@ import { Tables } from "@/supabase/types"
 import { CollectionFile } from "@/types"
 import { IconBooks } from "@tabler/icons-react"
 import { FC, useState } from "react"
-import { SidebarItem } from "../all/sidebar-display-item"
+import {
+  SIDEBAR_ITEM_ICON_SIZE,
+  SIDEBAR_ITEM_ICON_STROKE,
+  SidebarItem
+} from "../all/sidebar-display-item"
 import { CollectionFileSelect } from "./collection-file-select"
 
 interface CollectionItemProps {
@@ -41,7 +45,12 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
       item={collection}
       isTyping={isTyping}
       contentType="collections"
-      icon={<IconBooks size={30} />}
+      icon={
+        <IconBooks
+          size={SIDEBAR_ITEM_ICON_SIZE}
+          stroke={SIDEBAR_ITEM_ICON_STROKE}
+        />
+      }
       updateState={{
         name,
         description

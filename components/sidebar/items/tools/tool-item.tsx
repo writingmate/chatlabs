@@ -6,7 +6,11 @@ import { validateOpenAPI } from "@/lib/openapi-conversion"
 import { Tables } from "@/supabase/types"
 import { IconBolt } from "@tabler/icons-react"
 import { FC, useState } from "react"
-import { SidebarItem } from "../all/sidebar-display-item"
+import {
+  SIDEBAR_ITEM_ICON_SIZE,
+  SIDEBAR_ITEM_ICON_STROKE,
+  SidebarItem
+} from "../all/sidebar-display-item"
 
 interface ToolItemProps {
   tool: Tables<"tools">
@@ -29,7 +33,12 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
       isTyping={isTyping}
       contentType="tools"
       name="plugins"
-      icon={<IconBolt size={30} />}
+      icon={
+        <IconBolt
+          size={SIDEBAR_ITEM_ICON_SIZE}
+          stroke={SIDEBAR_ITEM_ICON_STROKE}
+        />
+      }
       updateState={{
         name,
         description,

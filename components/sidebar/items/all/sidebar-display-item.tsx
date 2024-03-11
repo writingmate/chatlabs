@@ -26,6 +26,9 @@ interface SidebarItemProps {
   name?: string
 }
 
+export const SIDEBAR_ITEM_ICON_SIZE = 24
+export const SIDEBAR_ITEM_ICON_STROKE = 1.5
+
 export const SidebarItem: FC<SidebarItemProps> = ({
   item,
   contentType,

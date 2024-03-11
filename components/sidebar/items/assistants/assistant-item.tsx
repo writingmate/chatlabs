@@ -9,7 +9,11 @@ import { IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useState } from "react"
 import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
-import { SidebarItem } from "../all/sidebar-display-item"
+import {
+  SIDEBAR_ITEM_ICON_SIZE,
+  SIDEBAR_ITEM_ICON_STROKE,
+  SidebarItem
+} from "../all/sidebar-display-item"
 import { AssistantRetrievalSelect } from "./assistant-retrieval-select"
 import { AssistantToolSelect } from "./assistant-tool-select"
 
@@ -111,17 +115,21 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
       icon={
         imageLink ? (
           <Image
-            style={{ width: "30px", height: "30px" }}
+            style={{
+              width: SIDEBAR_ITEM_ICON_SIZE + "px",
+              height: SIDEBAR_ITEM_ICON_SIZE + "px"
+            }}
             className="rounded"
             src={imageLink}
             alt={assistant.name}
-            width={30}
-            height={30}
+            width={SIDEBAR_ITEM_ICON_SIZE}
+            height={SIDEBAR_ITEM_ICON_SIZE}
           />
         ) : (
           <IconRobotFace
             className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-            size={30}
+            size={SIDEBAR_ITEM_ICON_SIZE}
+            stroke={SIDEBAR_ITEM_ICON_STROKE}
           />
         )
       }

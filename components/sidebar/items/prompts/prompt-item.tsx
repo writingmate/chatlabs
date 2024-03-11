@@ -5,7 +5,11 @@ import { PROMPT_NAME_MAX } from "@/db/limits"
 import { Tables } from "@/supabase/types"
 import { IconPencil } from "@tabler/icons-react"
 import { FC, useState } from "react"
-import { SidebarItem } from "../all/sidebar-display-item"
+import {
+  SIDEBAR_ITEM_ICON_SIZE,
+  SIDEBAR_ITEM_ICON_STROKE,
+  SidebarItem
+} from "../all/sidebar-display-item"
 
 interface PromptItemProps {
   prompt: Tables<"prompts">
@@ -20,7 +24,12 @@ export const PromptItem: FC<PromptItemProps> = ({ prompt }) => {
       item={prompt}
       isTyping={isTyping}
       contentType="prompts"
-      icon={<IconPencil size={30} />}
+      icon={
+        <IconPencil
+          size={SIDEBAR_ITEM_ICON_SIZE}
+          stroke={SIDEBAR_ITEM_ICON_STROKE}
+        />
+      }
       updateState={{ name, content }}
       renderInputs={() => (
         <>

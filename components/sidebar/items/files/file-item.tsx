@@ -5,7 +5,11 @@ import { FILE_DESCRIPTION_MAX, FILE_NAME_MAX } from "@/db/limits"
 import { getFileFromStorage } from "@/db/storage/files"
 import { Tables } from "@/supabase/types"
 import { FC, useState } from "react"
-import { SidebarItem } from "../all/sidebar-display-item"
+import {
+  SIDEBAR_ITEM_ICON_SIZE,
+  SIDEBAR_ITEM_ICON_STROKE,
+  SidebarItem
+} from "../all/sidebar-display-item"
 
 interface FileItemProps {
   file: Tables<"files">
@@ -26,7 +30,13 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
       item={file}
       isTyping={isTyping}
       contentType="files"
-      icon={<FileIcon type={file.type} size={30} />}
+      icon={
+        <FileIcon
+          type={file.type}
+          size={SIDEBAR_ITEM_ICON_SIZE}
+          stroke={SIDEBAR_ITEM_ICON_STROKE}
+        />
+      }
       updateState={{ name, description }}
       renderInputs={() => (
         <>

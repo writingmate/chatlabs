@@ -11,6 +11,11 @@ import { useParams, useRouter } from "next/navigation"
 import { FC, useContext, useRef } from "react"
 import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
+import { SIDEBAR_ICON_SIZE } from "@/components/sidebar/sidebar-switcher"
+import {
+  SIDEBAR_ITEM_ICON_SIZE,
+  SIDEBAR_ITEM_ICON_STROKE
+} from "@/components/sidebar/items/all/sidebar-display-item"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -71,13 +76,14 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
             className="rounded"
             src={assistantImage}
             alt="Assistant image"
-            width={30}
-            height={30}
+            width={SIDEBAR_ITEM_ICON_SIZE}
+            height={SIDEBAR_ITEM_ICON_SIZE}
           />
         ) : (
           <IconRobotFace
             className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-            size={30}
+            size={SIDEBAR_ITEM_ICON_SIZE}
+            stroke={SIDEBAR_ITEM_ICON_STROKE}
           />
         )
       ) : (
@@ -85,7 +91,11 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           delayDuration={200}
           display={<div>{MODEL_DATA?.modelName}</div>}
           trigger={
-            <ModelIcon provider={MODEL_DATA?.provider} height={30} width={30} />
+            <ModelIcon
+              provider={MODEL_DATA?.provider}
+              height={SIDEBAR_ITEM_ICON_SIZE}
+              width={SIDEBAR_ITEM_ICON_SIZE}
+            />
           }
         />
       )}
