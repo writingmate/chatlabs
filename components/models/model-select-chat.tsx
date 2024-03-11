@@ -47,14 +47,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   }, [isOpen])
 
   const handleSelectModel = (modelId: LLMID) => {
-    if (
-      profile?.plan == "free" &&
-      allModels?.find(x => x.modelId == modelId)?.paid == true
-    ) {
-      setIsPaywallOpen(true)
-    } else {
-      onSelectModel(modelId)
-    }
+    onSelectModel(modelId)
     setIsOpen(false)
   }
 

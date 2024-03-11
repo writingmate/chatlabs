@@ -22,6 +22,7 @@ import {
   validateChatSettings
 } from "../chat-helpers"
 import { isMobileScreen } from "@/lib/mobile"
+import { SubscriptionRequiredError } from "@/lib/errors"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -391,7 +392,7 @@ export const useChatHandler = () => {
       setFirstTokenReceived(false)
       // setUserInput("")
     } catch (error) {
-      if (e instanceof LimitError) {
+      if (error instanceof SubscriptionRequiredError) {
         setIsPaywallOpen(true)
       }
       console.error(error)

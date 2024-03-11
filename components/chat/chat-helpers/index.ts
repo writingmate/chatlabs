@@ -30,6 +30,7 @@ export const validateChatSettings = (
   profile: Tables<"profiles"> | null,
   selectedWorkspace: Tables<"workspaces"> | null,
   messageContent: string,
+  selectedAssistant: Tables<"assistants"> | null,
   selectedTools: Tables<"tools">[]
 ) => {
   if (!chatSettings) {
@@ -64,7 +65,7 @@ export const validateChatSettings = (
     )
   }
 
-  if (profile.plan === "free" && selectedTools.length > 0) {
+  if (profile.plan === "free" && selectedTools?.length > 0) {
     throw new SubscriptionRequiredError("Subscription required to use tools")
   }
 }
