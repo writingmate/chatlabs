@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     } else if (errorCode === 401) {
       errorMessage =
         "Anthropic API Key is incorrect. Please fix it in your profile settings."
-    } else if (errorCode === 429) {
+    } else if (errorCode === 403) {
       errorMessage = error.message
     }
 

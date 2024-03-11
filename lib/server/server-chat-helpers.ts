@@ -5,7 +5,7 @@ import { cookies } from "next/headers"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
-import { getProfileByUserId } from "@/db/profile"
+import { SubscriptionRequiredError } from "@/lib/errors"
 
 function createClient() {
   return createServerClient<Database>(
@@ -90,17 +90,7 @@ export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
   const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
 
   if (paidLLMS.includes(model)) {
-    throw new LimitError("Pro plan required to use this model")
-  }
-}
-
-class LimitError extends Error {
-  status: number
-
-  constructor(message: string) {
-    super(message)
-    this.name = "LimitError"
-    this.status = 429
+    throw new SubscriptionRequiredError("Pro plan required to use this model")
   }
 }
 
@@ -127,7 +117,7 @@ export async function validateMessageCount(
   }
 
   if (count > 30) {
-    throw new LimitError(
+    throw new SubscriptionRequiredError(
       "You have reached daily message limit. Upgrade to Pro plan to continue come back tomorrow."
     )
   }

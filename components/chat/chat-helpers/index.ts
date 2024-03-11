@@ -22,6 +22,7 @@ import {
 import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
+import { SubscriptionRequiredError } from "@/lib/errors"
 
 export const validateChatSettings = (
   chatSettings: ChatSettings | null,
@@ -52,15 +53,19 @@ export const validateChatSettings = (
   }
 
   if (profile.plan === "free" && modelData.paid) {
-    throw new LimitError("Subscription required to use this model")
+    throw new SubscriptionRequiredError(
+      "Subscription required to use this model"
+    )
   }
 
   if (profile.plan === "free" && selectedAssistant) {
-    throw new LimitError("Subscription required to use assistants")
+    throw new SubscriptionRequiredError(
+      "Subscription required to use assistants"
+    )
   }
 
   if (profile.plan === "free" && selectedTools.length > 0) {
-    throw new LimitError("Subscription required to use tools")
+    throw new SubscriptionRequiredError("Subscription required to use tools")
   }
 }
 

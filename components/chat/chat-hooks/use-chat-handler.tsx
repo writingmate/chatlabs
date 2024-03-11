@@ -393,7 +393,6 @@ export const useChatHandler = () => {
     } catch (error) {
       if (e instanceof LimitError) {
         setIsPaywallOpen(true)
-        return
       }
       console.error(error)
       setIsGenerating(false)
