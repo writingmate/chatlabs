@@ -209,7 +209,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       </div>
 
       <div className={"relative"}>
-        <div className="absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-y-auto rounded-xl dark:border-none">
+        <div
+          className={cn(
+            "bg-background absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-y-auto rounded-xl border dark:border-none",
+            selectedAssistant && "bottom-[106px]"
+          )}
+        >
           <ChatCommandInput />
         </div>
         <div className="border-input mt-3 flex min-h-[60px] w-full flex-col justify-end overflow-hidden rounded-xl border backdrop-blur-xl">

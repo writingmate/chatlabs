@@ -104,7 +104,7 @@ export const FilePicker: FC<FilePickerProps> = ({
   return (
     <>
       {isOpen && (
-        <div className="bg-background flex flex-col space-y-1 rounded-xl border p-2 text-sm">
+        <div className="flex flex-col space-y-1 p-2 text-sm">
           {filteredFiles.length === 0 && filteredCollections.length === 0 ? (
             <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
               No matching files.
@@ -135,17 +135,20 @@ export const FilePicker: FC<FilePickerProps> = ({
                   }
                 >
                   {"type" in item ? (
-                    <FileIcon type={(item as Tables<"files">).type} size={32} />
+                    <FileIcon
+                      type={(item as Tables<"files">).type}
+                      size={24}
+                      stroke={1.5}
+                    />
                   ) : (
-                    <IconBooks size={32} />
+                    <IconBooks size={24} stroke={1.5} />
                   )}
 
                   <div className="ml-3 flex flex-col">
                     <div className="font-bold">{item.name}</div>
-
-                    <div className="truncate text-sm opacity-80">
-                      {item.description || "No description."}
-                    </div>
+                    {/*<div className="truncate text-sm opacity-80">*/}
+                    {/*  {item.description || "No description."}*/}
+                    {/*</div>*/}
                   </div>
                 </div>
               ))}

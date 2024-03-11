@@ -115,12 +115,12 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
         {/*  </Button>*/}
         {/*</div>*/}
 
-        <div className="overflow-auto">
+        <div className="flex overflow-auto sm:w-[360px] md:w-[460px] lg:w-[620px] xl:w-[760px]">
           <div className="flex gap-2 overflow-auto pt-2">
             {messageImages.map((image, index) => (
               <div
                 key={index}
-                className="relative flex h-[64px] max-w-[calc(100vw-40px)] cursor-pointer items-center space-x-4 rounded-xl hover:opacity-50 sm:max-w-[calc(100%-10px)]"
+                className="relative flex h-[64px] cursor-pointer items-center space-x-4 rounded-xl hover:opacity-50"
               >
                 <Image
                   className="rounded"
@@ -162,7 +162,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
               file.id === "loading" ? (
                 <div
                   key={index}
-                  className="relative flex h-[64px] max-w-[calc(100vw-40px)] items-center space-x-4 rounded-xl border px-4 py-3 sm:max-w-[calc(100%-10px)]"
+                  className="relative flex h-[64px] max-w-[260px] items-center space-x-4 rounded-xl border px-4 py-3"
                 >
                   <div className="rounded bg-violet-500 p-2">
                     <IconLoader2 className="animate-spin" />
@@ -273,6 +273,7 @@ const RetrievalToggle = ({}) => {
               useRetrieval ? "hover:text-green-200" : "hover:text-red-200"
             )}
             size={24}
+            stroke={1.5}
             onClick={e => {
               e.stopPropagation()
               setUseRetrieval(prev => !prev)

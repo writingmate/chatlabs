@@ -129,7 +129,7 @@ export default function Login({
           onClick={e => handleEmailLogin(e)}
           className="text-md mb-1 rounded-lg px-4 py-2"
         >
-          <IconMail height={20} width={20} className="mr-2" />
+          <IconMail height={20} width={20} stroke={1.5} className="mr-2" />
           Continue with email
         </Button>
 

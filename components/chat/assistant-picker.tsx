@@ -80,7 +80,7 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
   return (
     <>
       {isAssistantPickerOpen && (
-        <div className="bg-background flex flex-col rounded-xl border p-2 text-sm shadow-lg">
+        <div className="flex flex-col border p-2 text-sm shadow-lg">
           {filteredAssistants.length === 0 ? (
             <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
               No matching assistants.
