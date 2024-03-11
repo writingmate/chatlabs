@@ -13,6 +13,7 @@ import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
 
+const maxDuration = 300
 export async function POST(req: Request) {
   try {
     const supabaseAdmin = createClient<Database>(
