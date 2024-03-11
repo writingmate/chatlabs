@@ -84,6 +84,8 @@ import { FC, useContext, useEffect, useRef, useState } from "react"
 import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
 import { toast } from "sonner"
 import { SidebarDeleteItem } from "./sidebar-delete-item"
+import { WithTooltip } from "@/components/ui/with-tooltip"
+import { IconEdit, IconTrash } from "@tabler/icons-react"
 
 interface SidebarUpdateItemProps {
   isTyping: boolean
@@ -93,6 +95,8 @@ interface SidebarUpdateItemProps {
   renderInputs: (renderState: any) => JSX.Element
   updateState: any
   name?: string
+  isHovering?: boolean
+  isActive?: boolean
 }
 
 export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
@@ -102,7 +106,9 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   children,
   renderInputs,
   updateState,
-  isTyping
+  isTyping,
+  isHovering,
+  isActive
 }) => {
   const {
     workspaces,
@@ -639,8 +645,46 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>{children}</SheetTrigger>
-
+      {children}
+      {isHovering && (
+        <div
+          onClick={e => {
+            e.stopPropagation()
+            e.preventDefault()
+          }}
+          className={`ml-2 flex items-center space-x-2 ${!isActive && "w-11 opacity-0 group-hover:opacity-100"}`}
+        >
+          <WithTooltip
+            delayDuration={1000}
+            display={<div>Edit {(name || contentType).slice(0, -1)}</div>}
+            trigger={
+              <SheetTrigger asChild>
+                <IconEdit
+                  className="cursor-pointer hover:opacity-50"
+                  size={18}
+                />
+              </SheetTrigger>
+            }
+          />
+          <WithTooltip
+            delayDuration={1000}
+            display={<div>Delete {(name || contentType).slice(0, -1)}</div>}
+            trigger={
+              <SidebarDeleteItem
+                item={item}
+                name={name}
+                contentType={contentType}
+                trigger={
+                  <IconTrash
+                    size={18}
+                    className="cursor-pointer hover:opacity-50"
+                  />
+                }
+              />
+            }
+          />
+        </div>
+      )}
       <SheetContent
         className="min-w-3/4 flex flex-col justify-between sm:min-w-[450px]"
         side="left"

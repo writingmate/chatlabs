@@ -14,9 +14,7 @@ import { TabsList } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "../utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
-import { PlanPicker } from "@/components/upgrade/plan-picker"
 import { ChatbotUIContext } from "@/context/context"
-import { DialogTrigger } from "@/components/ui/dialog"
 
 export const SIDEBAR_ICON_SIZE = 28
 
@@ -33,7 +31,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
     <div className="flex flex-col justify-between border-r pb-5">
       <TabsList className="bg-background grid h-[440px] grid-rows-7">
         <SidebarSwitchItem
-          icon={<IconMessage size={SIDEBAR_ICON_SIZE} />}
+          icon={<IconMessage size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
           contentType="chats"
           onContentTypeChange={onContentTypeChange}
         />
@@ -45,7 +43,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         {/*/>*/}
 
         <SidebarSwitchItem
-          icon={<IconPencil size={SIDEBAR_ICON_SIZE} />}
+          icon={<IconPencil size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
           contentType="prompts"
           onContentTypeChange={onContentTypeChange}
         />
@@ -57,7 +55,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         {/*/>*/}
 
         <SidebarSwitchItem
-          icon={<IconFile size={SIDEBAR_ICON_SIZE} />}
+          icon={<IconFile size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
           contentType="files"
           onContentTypeChange={onContentTypeChange}
         />
@@ -69,13 +67,13 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         {/*/>*/}
 
         <SidebarSwitchItem
-          icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} />}
+          icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
           contentType="assistants"
           onContentTypeChange={onContentTypeChange}
         />
 
         <SidebarSwitchItem
-          icon={<IconBolt size={SIDEBAR_ICON_SIZE} />}
+          icon={<IconBolt size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
           contentType="tools"
           name="Plugins"
           onContentTypeChange={onContentTypeChange}

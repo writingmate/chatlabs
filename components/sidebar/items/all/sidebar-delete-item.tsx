@@ -26,12 +26,14 @@ interface SidebarDeleteItemProps {
   item: DataItemType
   contentType: ContentType
   name?: string
+  trigger?: JSX.Element
 }
 
 export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
   item,
   contentType,
-  name
+  name,
+  trigger
 }) => {
   const {
     setChats,
@@ -117,9 +119,11 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
   return (
     <Dialog open={showDialog} onOpenChange={setShowDialog}>
       <DialogTrigger asChild>
-        <Button className="text-red-500" variant="ghost">
-          Delete
-        </Button>
+        {trigger || (
+          <Button className="text-red-500" variant="ghost">
+            Delete
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent onKeyDown={handleKeyDown}>
