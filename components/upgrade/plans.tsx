@@ -96,7 +96,6 @@ export default function Plans() {
                     {billingCycle === "yearly" ? "$6.99/month" : "$9.99/month"}
                   </p>
                   <p className={"text-token-text-tertiary text-xs font-light"}>
-                    after free trial <br />
                     {billingCycle === "yearly" && "billed yearly $83.88/year"}
                   </p>
                 </div>
@@ -148,7 +147,6 @@ export default function Plans() {
                   {billingCycle === "yearly" ? "$19.99/month" : "$29.99/month"}
                 </p>
                 <p className={"text-token-text-tertiary text-xs font-light"}>
-                  after free trial <br />
                   {billingCycle === "yearly" && "billed yearly $239.88/year"}
                 </p>
               </div>

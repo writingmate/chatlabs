@@ -28,7 +28,8 @@ export const validateChatSettings = (
   modelData: LLM | undefined,
   profile: Tables<"profiles"> | null,
   selectedWorkspace: Tables<"workspaces"> | null,
-  messageContent: string
+  messageContent: string,
+  selectedTools: Tables<"tools">[]
 ) => {
   if (!chatSettings) {
     throw new Error("Chat settings not found")
@@ -48,6 +49,18 @@ export const validateChatSettings = (
 
   if (!messageContent) {
     throw new Error("Message content not found")
+  }
+
+  if (profile.plan === "free" && modelData.paid) {
+    throw new LimitError("Subscription required to use this model")
+  }
+
+  if (profile.plan === "free" && selectedAssistant) {
+    throw new LimitError("Subscription required to use assistants")
+  }
+
+  if (profile.plan === "free" && selectedTools.length > 0) {
+    throw new LimitError("Subscription required to use tools")
   }
 }
 

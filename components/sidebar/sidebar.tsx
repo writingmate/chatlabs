@@ -71,7 +71,6 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
         {workspaces?.length > 1 && (
           <div className="flex items-center border-b pb-2">
             <WorkspaceSwitcher />
-
             <WorkspaceSettings />
           </div>
         )}

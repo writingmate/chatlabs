@@ -67,7 +67,8 @@ export const useChatHandler = () => {
     models,
     isPromptPickerOpen,
     isFilePickerOpen,
-    isToolPickerOpen
+    isToolPickerOpen,
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -228,7 +229,9 @@ export const useChatHandler = () => {
         modelData,
         profile,
         selectedWorkspace,
-        messageContent
+        messageContent,
+        selectedAssistant,
+        selectedTools
       )
 
       let currentChat = selectedChat ? { ...selectedChat } : null
@@ -388,6 +391,10 @@ export const useChatHandler = () => {
       setFirstTokenReceived(false)
       // setUserInput("")
     } catch (error) {
+      if (e instanceof LimitError) {
+        setIsPaywallOpen(true)
+        return
+      }
       console.error(error)
       setIsGenerating(false)
       setFirstTokenReceived(false)
