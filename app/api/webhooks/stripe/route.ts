@@ -7,6 +7,10 @@ import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 import { ACTIVE_PLAN_STATUSES, PLAN_FREE, PLANS } from "@/lib/stripe/config"
 import { buffer } from "node:stream/consumers"
+import {
+  getProfileByStripeCustomerId,
+  updateProfileByUserId
+} from "@/db/profile"
 
 export async function POST(req: Request) {
   let event: Stripe.Event
@@ -42,27 +46,55 @@ export async function POST(req: Request) {
     "customer.subscription.created"
   ]
 
-  async function updateProfileByStripeCustomerId(
-    stripeCustomerId: string,
-    profile: Database["public"]["Tables"]["profiles"]["Update"]
-  ) {
-    return supabaseAdmin
-      .from("profiles")
-      .update(profile)
-      .eq("stripe_customer_id", stripeCustomerId)
-      .select("*")
-      .single()
-  }
-
   if (permittedEvents.includes(event.type)) {
     subscription = event.data.object as Stripe.Subscription
 
     const stripeCustomerId = subscription.customer as string
 
+    const { data: profile, error } = await getProfileByStripeCustomerId(
+      supabaseAdmin,
+      stripeCustomerId
+    )
+
+    let userId = profile?.user_id
+
+    if (!userId) {
+      const customerResponse = await stripe.customers.retrieve(stripeCustomerId)
+
+      const customer = customerResponse as Stripe.Customer
+
+      console.log("customer", customer)
+
+      const { data, error } = await supabaseAdmin.auth.admin.createUser({
+        email: customer.email!,
+        // password: "password",
+        email_confirm: true
+      })
+
+      if (error) {
+        console.log(error)
+        return NextResponse.json(
+          { message: "Webhook handler failed" },
+          { status: 500 }
+        )
+      }
+
+      await stripe.customers.update(stripeCustomerId, {
+        metadata: {
+          supabaseUUID: data.user!.id
+        }
+      })
+
+      userId = data.user!.id
+
+      await new Promise(r => setTimeout(r, 2000))
+    }
+
     try {
       switch (event.type) {
         case "customer.subscription.deleted":
-          await updateProfileByStripeCustomerId(stripeCustomerId, {
+          await updateProfileByUserId(supabaseAdmin, userId, {
+            stripe_customer_id: stripeCustomerId,
             plan: PLAN_FREE
           })
           break
@@ -74,7 +106,10 @@ export async function POST(req: Request) {
             plan = PLAN_FREE
           }
           if (ACTIVE_PLAN_STATUSES.includes(status)) {
-            await updateProfileByStripeCustomerId(stripeCustomerId, { plan })
+            await updateProfileByUserId(supabaseAdmin, userId, {
+              stripe_customer_id: stripeCustomerId,
+              plan
+            })
           }
           break
       }

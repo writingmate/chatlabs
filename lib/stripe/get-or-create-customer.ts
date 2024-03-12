@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js"
 import { Database } from "@/supabase/types"
 import { stripe } from "@/lib/stripe/stripe"
+import { updateProfileByUserId } from "@/db/profile"
 
 export const getOrCreateCustomer = async ({
   email,
@@ -22,18 +23,6 @@ export const getOrCreateCustomer = async ({
       .single()
   }
 
-  function updateProfileByUserId(
-    userId: string,
-    profile: Database["public"]["Tables"]["profiles"]["Update"]
-  ) {
-    return supabaseAdmin
-      .from("profiles")
-      .update(profile)
-      .eq("user_id", userId)
-      .select("*")
-      .single()
-  }
-
   const { data, error } = await getProfileByUserId(userId)
   if (error || !data?.stripe_customer_id) {
     // No customer record found, let's create one.
@@ -46,9 +35,13 @@ export const getOrCreateCustomer = async ({
     if (email) customerData.email = email
     const customer = await stripe.customers.create(customerData)
     // Now insert the customer ID into our Supabase mapping table.
-    const { error: supabaseError } = await updateProfileByUserId(userId, {
-      stripe_customer_id: customer.id
-    })
+    const { error: supabaseError } = await updateProfileByUserId(
+      supabaseAdmin,
+      userId,
+      {
+        stripe_customer_id: customer.id
+      }
+    )
     if (supabaseError) throw supabaseError
     console.log(
       `Updated profile with user_id ${userId} with customer ID ${customer.id}.`
