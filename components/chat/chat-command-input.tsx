@@ -28,7 +28,11 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
   const { handleSelectUserFile, handleSelectUserCollection } =
     usePromptAndCommand()
 
-  const isOpen = isPromptPickerOpen || isToolPickerOpen || isAssistantPickerOpen
+  const isOpen =
+    isPromptPickerOpen ||
+    isToolPickerOpen ||
+    isAssistantPickerOpen ||
+    isFilePickerOpen
 
   return (
     isOpen && (
