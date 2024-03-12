@@ -139,7 +139,7 @@ export const ProfileStep: FC<ProfileStepProps> = ({
         />
 
         <LimitDisplay
-          used={displayName.length}
+          used={displayName?.length}
           limit={PROFILE_DISPLAY_NAME_MAX}
         />
       </div>
