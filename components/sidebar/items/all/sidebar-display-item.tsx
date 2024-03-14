@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, LLMID } from "@/types"
 import { useRouter } from "next/navigation"
-import { FC, useContext, useRef, useState } from "react"
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { SidebarUpdateItem } from "./sidebar-update-item"
 import {
   IconEdit,
@@ -143,11 +143,11 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   ) => {
     e.stopPropagation()
 
-    if (readOnly) {
-      e.preventDefault()
-      e.stopPropagation()
-      return
-    }
+    // if (readOnly) {
+    //   e.preventDefault()
+    //   e.stopPropagation()
+    //   return
+    // }
 
     const action = actionMap[contentType]
 
@@ -158,7 +158,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     <div
       ref={itemRef}
       className={cn(
-        "hover:bg-accent relative flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none",
+        "hover:bg-accent focus:bg-accent group flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none",
         isActiveMap[contentType]?.(item) && "bg-accent"
       )}
       tabIndex={0}
