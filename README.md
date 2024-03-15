@@ -8,16 +8,6 @@ The open-source AI chat app for everyone.
 
 View the latest demo [here](https://twitter.com/avysotsky/status/1765805788402995206).
 
-## Updates
-
-Hey everyone! I've heard your feedback and am working hard on a big update.
-
-Things like simpler deployment, better backend compatibility, and improved mobile layouts are on their way.
-
-Be back soon.
-
--- Mckay
-
 ## Official Hosted Version
 
 Use ChatLabs without having to host it yourself!
