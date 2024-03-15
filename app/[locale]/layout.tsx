@@ -93,7 +93,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={"h-full"}>
       <body className={inter.className + " h-full antialiased"}>
-        <Providers attribute="class" defaultTheme="dark">
+        <Providers attribute="class" defaultTheme="light">
           <TranslationsProvider
             namespaces={i18nNamespaces}
             locale={locale}
@@ -106,9 +106,9 @@ export default async function RootLayout({
           </TranslationsProvider>
         </Providers>
         <Analytics />
+        <SpeedInsights />
+        <GoogleAnalytics gaId="G-Y14R2TP0QH" />
       </body>
-      <SpeedInsights />
-      <GoogleAnalytics gaId="G-Y14R2TP0QH" />
     </html>
   )
 }

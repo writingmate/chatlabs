@@ -153,9 +153,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   useEffect(() => {
     ;(async () => {
-      console.log("fetching starting data...")
       const profile = await fetchStartingData()
-      console.log("profile", profile)
       if (profile) {
         const hostedModelRes = await fetchHostedModels(profile)
         if (!hostedModelRes) return

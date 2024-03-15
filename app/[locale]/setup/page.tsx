@@ -11,7 +11,7 @@ import {
   fetchOpenRouterModels
 } from "@/lib/models/fetch-models"
 import { supabase } from "@/lib/supabase/browser-client"
-import { TablesUpdate } from "@/supabase/types"
+import { Tables, TablesUpdate } from "@/supabase/types"
 import { useRouter } from "next/navigation"
 import { useContext, useEffect, useState } from "react"
 import { FinishStep } from "@/components/setup/finish-step"
@@ -80,36 +80,41 @@ export default function SetupPage() {
         if (!profile.has_onboarded) {
           setLoading(false)
         } else {
-          const data = await fetchHostedModels(profile)
-
-          if (!data) return
-
-          setEnvKeyMap(data.envKeyMap)
-          setAvailableHostedModels(data.hostedModels)
-
-          if (profile["openrouter_api_key"] || data.envKeyMap["openrouter"]) {
-            const openRouterModels = await fetchOpenRouterModels()
-            if (!openRouterModels) return
-            setAvailableOpenRouterModels(openRouterModels)
-          }
-
-          const homeWorkspaceId = await getHomeWorkspaceByUserId(
-            session.user.id
-          )
-          return router.push(`/${homeWorkspaceId}/chat`)
+          redirectToHome(profile)
         }
       }
     })()
   }, [])
 
-  async function redirectToHome() {
+  async function redirectToHome(profile?: Tables<"profiles">) {
     const session = (await supabase.auth.getSession()).data.session
     if (!session) {
       return router.push("/login")
     }
+
+    const user = session.user
+
+    if (!profile || typeof profile === "undefined") {
+      profile = await getProfileByUserId(user.id)
+    }
+
+    const data = await fetchHostedModels(profile)
+
+    if (!data) return
+
+    setEnvKeyMap(data.envKeyMap)
+    setAvailableHostedModels(data.hostedModels)
+
+    if (profile["openrouter_api_key"] || data.envKeyMap["openrouter"]) {
+      const openRouterModels = await fetchOpenRouterModels()
+      if (!openRouterModels) return
+      setAvailableOpenRouterModels(openRouterModels)
+    }
     const workspaceId = await getHomeWorkspaceByUserId(session.user.id)
-    router.push(`/${workspaceId}/chat`)
-    router.refresh()
+
+    // TODO: this should be a redirect
+    window.location.href = window.location.origin + `/${workspaceId}/chat`
+    // router.push(`/${workspaceId}/chat`)
   }
 
   const handleShouldProceed = (proceed: boolean) => {

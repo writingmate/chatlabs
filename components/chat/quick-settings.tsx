@@ -253,53 +253,55 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
               onKeyDown={e => e.stopPropagation()}
             />
 
-            {!!(selectedPreset || selectedAssistant) && (
-              <QuickSettingOption
-                contentType={selectedPreset ? "presets" : "assistants"}
-                isSelected={true}
-                item={
-                  selectedPreset ||
-                  (selectedAssistant as
-                    | Tables<"presets">
-                    | Tables<"assistants">)
-                }
-                onSelect={() => {
-                  handleSelectQuickSetting(null, "remove")
-                }}
-                image={selectedPreset ? "" : selectedAssistantImage}
-              />
-            )}
-
-            {items
-              .filter(
-                item =>
-                  item.name.toLowerCase().includes(search.toLowerCase()) &&
-                  item.id !== selectedPreset?.id &&
-                  item.id !== selectedAssistant?.id
-              )
-              .map(({ contentType, ...item }) => (
+            <div className="max-h-[300px] overflow-auto">
+              {!!(selectedPreset || selectedAssistant) && (
                 <QuickSettingOption
-                  key={item.id}
-                  contentType={contentType as "presets" | "assistants"}
-                  isSelected={false}
-                  item={item}
-                  onSelect={() =>
-                    handleSelectQuickSetting(
-                      item,
-                      contentType as "presets" | "assistants"
-                    )
+                  contentType={selectedPreset ? "presets" : "assistants"}
+                  isSelected={true}
+                  item={
+                    selectedPreset ||
+                    (selectedAssistant as
+                      | Tables<"presets">
+                      | Tables<"assistants">)
                   }
-                  image={
-                    contentType === "assistants"
-                      ? assistantImages.find(
-                          image =>
-                            image.path ===
-                            (item as Tables<"assistants">).image_path
-                        )?.url || ""
-                      : ""
-                  }
+                  onSelect={() => {
+                    handleSelectQuickSetting(null, "remove")
+                  }}
+                  image={selectedPreset ? "" : selectedAssistantImage}
                 />
-              ))}
+              )}
+
+              {items
+                .filter(
+                  item =>
+                    item.name.toLowerCase().includes(search.toLowerCase()) &&
+                    item.id !== selectedPreset?.id &&
+                    item.id !== selectedAssistant?.id
+                )
+                .map(({ contentType, ...item }) => (
+                  <QuickSettingOption
+                    key={item.id}
+                    contentType={contentType as "presets" | "assistants"}
+                    isSelected={false}
+                    item={item}
+                    onSelect={() =>
+                      handleSelectQuickSetting(
+                        item,
+                        contentType as "presets" | "assistants"
+                      )
+                    }
+                    image={
+                      contentType === "assistants"
+                        ? assistantImages.find(
+                            image =>
+                              image.path ===
+                              (item as Tables<"assistants">).image_path
+                          )?.url || ""
+                        : ""
+                    }
+                  />
+                ))}
+            </div>
           </>
         )}
       </DropdownMenuContent>
