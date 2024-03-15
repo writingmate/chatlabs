@@ -10,6 +10,7 @@ import { useContext } from "react"
 export const usePromptAndCommand = () => {
   const {
     chatFiles,
+    newMessageFiles,
     setNewMessageFiles,
     userInput,
     setUserInput,
@@ -21,6 +22,7 @@ export const usePromptAndCommand = () => {
     setUseRetrieval,
     setToolCommand,
     setIsToolPickerOpen,
+    selectedTools,
     setSelectedTools,
     setAtCommand,
     setIsAssistantPickerOpen,
@@ -99,6 +101,30 @@ export const usePromptAndCommand = () => {
     setIsFilePickerOpen(false)
     setUseRetrieval(true)
 
+    if (newMessageFiles.some(chatFile => chatFile.id === file.id)) {
+      setNewMessageFiles(prev => {
+        const result = prev.filter(prevFile => prevFile.id !== file.id)
+
+        if (result.length === 0 && chatFiles.length === 0) {
+          setUseRetrieval(false)
+        }
+
+        return result
+      })
+
+      setChatFiles(prev => {
+        const result = prev.filter(chatFile => chatFile.id !== file.id)
+
+        if (result.length === 0 && newMessageFiles.length === 0) {
+          setUseRetrieval(false)
+        }
+
+        return result
+      })
+
+      return
+    }
+
     setNewMessageFiles(prev => {
       const fileAlreadySelected =
         prev.some(prevFile => prevFile.id === file.id) ||
@@ -155,6 +181,10 @@ export const usePromptAndCommand = () => {
   const handleSelectTool = (tool: Tables<"tools">) => {
     setIsToolPickerOpen(false)
     setUserInput(userInput.replace(/![^ ]*$/, ""))
+    if (selectedTools.includes(tool)) {
+      setSelectedTools(selectedTools.filter(t => t !== tool))
+      return
+    }
     setSelectedTools(prev => [...new Set([...prev, tool])])
   }
 

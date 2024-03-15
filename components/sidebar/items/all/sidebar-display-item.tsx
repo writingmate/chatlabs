@@ -41,22 +41,22 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   const {
     selectedWorkspace,
     profile,
-    setChats,
     selectedAssistant,
-    setSelectedAssistant,
     selectedTools,
-    setSelectedTools,
     chatFiles,
-    setChatFiles,
-    setFocusPrompt,
-    setChatSettings
+    newMessageFiles
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
 
   const itemRef = useRef<HTMLDivElement>(null)
 
-  const { handleSelectPromptWithVariables } = usePromptAndCommand()
+  const {
+    handleSelectPromptWithVariables,
+    handleSelectAssistant,
+    handleSelectTool,
+    handleSelectUserFile
+  } = usePromptAndCommand()
 
   const [isHovering, setIsHovering] = useState(false)
 
@@ -71,7 +71,10 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       return false
     },
     files: (item: any) => {
-      return chatFiles?.includes(item)
+      return (
+        chatFiles?.some(file => file.id === item.id) ||
+        newMessageFiles.some(file => file.id === item.id)
+      )
     },
     collections: (item: any) => {
       return false
@@ -94,36 +97,18 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       handleSelectPromptWithVariables(item)
     },
     files: async (item: any) => {
-      if (chatFiles.includes(item)) {
-        setChatFiles(chatFiles.filter(file => file !== item))
-        return
-      }
-      setChatFiles([...new Set([...chatFiles, item])])
+      handleSelectUserFile(item)
     },
     collections: async (item: any) => {},
     assistants: async (assistant: Tables<"assistants">) => {
       if (!selectedWorkspace) return
 
-      setChatSettings({
-        contextLength: assistant.context_length,
-        includeProfileContext: assistant.include_profile_context,
-        includeWorkspaceInstructions: assistant.include_workspace_instructions,
-        model: assistant.model as LLMID,
-        prompt: assistant.prompt,
-        temperature: assistant.temperature,
-        embeddingsProvider: assistant.embeddings_provider as "openai" | "local"
-      })
-
-      setSelectedAssistant(assistant)
+      handleSelectAssistant(assistant)
 
       return router.push(`/${selectedWorkspace.id}/chat`)
     },
     tools: async (item: any) => {
-      if (selectedTools.includes(item)) {
-        setSelectedTools(selectedTools.filter(tool => tool !== item))
-        return
-      }
-      setSelectedTools([...new Set([...selectedTools, item])])
+      handleSelectTool(item)
     },
     models: async (item: any) => {}
   }
