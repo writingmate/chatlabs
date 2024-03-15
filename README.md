@@ -1,12 +1,12 @@
-# Chatbot UI
+# ChatLabs
 
 The open-source AI chat app for everyone.
 
-<img src="./public/readme/screenshot.png" alt="Chatbot UI" width="600">
+<img src="./public/readme/screenshot.png" alt="ChatLabs" width="600">
 
 ## Demo
 
-View the latest demo [here](https://x.com/mckaywrigley/status/1738273242283151777?s=20).
+View the latest demo [here](https://twitter.com/avysotsky/status/1765805788402995206).
 
 ## Updates
 
@@ -20,13 +20,9 @@ Be back soon.
 
 ## Official Hosted Version
 
-Use Chatbot UI without having to host it yourself!
+Use ChatLabs without having to host it yourself!
 
-Find the official hosted version of Chatbot UI [here](https://chatbotui.com).
-
-## Sponsor
-
-If you find Chatbot UI useful, please consider [sponsoring](https://github.com/sponsors/mckaywrigley) me to support my open-source work :)
+Find the official hosted version of ChatLabs [here](https://labs.writingmate.ai).
 
 ## Issues
 
@@ -46,15 +42,9 @@ Discussions are a great place to ask questions, share ideas, and get help.
 
 Odds are if you have a question, someone else has the same question.
 
-## Legacy Code
-
-Chatbot UI was recently updated to its 2.0 version.
-
-The code for 1.0 can be found on the `legacy` branch.
-
 ## Updating
 
-In your terminal at the root of your local Chatbot UI repository, run:
+In your terminal at the root of your local ChatLabs repository, run:
 
 ```bash
 npm run update
@@ -70,37 +60,23 @@ to apply the latest migrations to your live database.
 
 ## Local Quickstart
 
-Follow these steps to get your own Chatbot UI instance running locally.
-
-You can watch the full video tutorial [here](https://www.youtube.com/watch?v=9Qq3-7-HNgw).
+Follow these steps to get your own ChatLabs instance running locally.
 
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/mckaywrigley/chatbot-ui.git
+git clone https://github.com/writingmate/webapp.git
 ```
 
 ### 2. Install Dependencies
 
-Open a terminal in the root directory of your local Chatbot UI repository and run:
+Open a terminal in the root directory of your local ChatLabs repository and run:
 
 ```bash
 npm install
 ```
 
 ### 3. Install Supabase & Run Locally
-
-#### Why Supabase?
-
-Previously, we used local browser storage to store data. However, this was not a good solution for a few reasons:
-
-- Security issues
-- Limited storage
-- Limits multi-modal use cases
-
-We now use Supabase because it's easy to use, it's open-source, it's Postgres, and it has a free tier for hosted instances.
-
-We will support other providers in the future to give you more options.
 
 #### 1. Install Docker
 
@@ -123,7 +99,7 @@ scoop install supabase
 
 #### 3. Start Supabase
 
-In your terminal at the root of your local Chatbot UI repository, run:
+In your terminal at the root of your local ChatLabs repository, run:
 
 ```bash
 supabase start
@@ -133,7 +109,7 @@ supabase start
 
 #### 1. Environment Variables
 
-In your terminal at the root of your local Chatbot UI repository, run:
+In your terminal at the root of your local ChatLabs repository, run:
 
 ```bash
 cp .env.local.example .env.local
@@ -166,19 +142,19 @@ Follow the instructions [here](https://github.com/jmorganca/ollama#macos).
 
 ### 6. Run app locally
 
-In your terminal at the root of your local Chatbot UI repository, run:
+In your terminal at the root of your local ChatLabs repository, run:
 
 ```bash
 npm run chat
 ```
 
-Your local instance of Chatbot UI should now be running at [http://localhost:3000](http://localhost:3000). Be sure to use a compatible node version (i.e. v18).
+Your local instance of ChatLabs should now be running at [http://localhost:3000](http://localhost:3000). Be sure to use a compatible node version (i.e. v18).
 
 You can view your backend GUI at [http://localhost:54323/project/default/editor](http://localhost:54323/project/default/editor).
 
 ## Hosted Quickstart
 
-Follow these steps to get your own Chatbot UI instance running in the cloud.
+Follow these steps to get your own ChatLabs instance running in the cloud.
 
 Video tutorial coming soon.
 
@@ -188,7 +164,7 @@ Repeat steps 1-4 in "Local Quickstart" above.
 
 You will want separate repositories for your local and hosted instances.
 
-Create a new repository for your hosted instance of Chatbot UI on GitHub and push your code to it.
+Create a new repository for your hosted instance of ChatLabs on GitHub and push your code to it.
 
 ### 2. Setup Backend with Supabase
 
@@ -226,14 +202,14 @@ We recommend turning off "Confirm email" for your own personal instance.
 
 #### 4. Connect to Hosted DB
 
-Open up your repository for your hosted instance of Chatbot UI.
+Open up your repository for your hosted instance of ChatLabs.
 
 In the 1st migration file `supabase/migrations/20240108234540_setup.sql` you will need to replace 2 values with the values you got above:
 
 - `project_url` (line 53): Use the `Project URL` value from above
 - `service_role_key` (line 54): Use the `Service role key` value from above
 
-Now, open a terminal in the root directory of your local Chatbot UI repository. We will execute a few commands here.
+Now, open a terminal in the root directory of your local ChatLabs repository. We will execute a few commands here.
 
 Login to Supabase by running:
 
@@ -261,7 +237,7 @@ Your hosted database should now be set up!
 
 Go to [Vercel](https://vercel.com/) and create a new project.
 
-In the setup page, import your GitHub repository for your hosted instance of Chatbot UI. Within the project Settings, in the "Build & Development Settings" section, switch Framework Preset to "Next.js".
+In the setup page, import your GitHub repository for your hosted instance of ChatLabs. Within the project Settings, in the "Build & Development Settings" section, switch Framework Preset to "Next.js".
 
 In environment variables, add the following from the values you got above:
 
@@ -281,7 +257,7 @@ For the full list of environment variables, refer to the '.env.local.example' fi
 
 Click "Deploy" and wait for your frontend to deploy.
 
-Once deployed, you should be able to use your hosted instance of Chatbot UI via the URL Vercel gives you.
+Once deployed, you should be able to use your hosted instance of ChatLabs via the URL Vercel gives you.
 
 ## Contributing
 
