@@ -130,11 +130,11 @@ export const ToolSelect: FC<ToolSelectProps> = ({
             )
           })}
         </div>
-        <Separator />
-        <DropdownMenuItem className={"flex w-full items-center space-x-2"}>
-          <IconSettings size={16} />
-          <div>Manage tools</div>
-        </DropdownMenuItem>
+        {/*<Separator />*/}
+        {/*<DropdownMenuItem className={"flex w-full items-center space-x-2"}>*/}
+        {/*  <IconSettings size={16} />*/}
+        {/*  <div>Manage tools</div>*/}
+        {/*</DropdownMenuItem>*/}
       </DropdownMenuContent>
     </DropdownMenu>
   )
