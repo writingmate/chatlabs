@@ -34,6 +34,14 @@ function getProviderClient(model: string, profile: Tables<"profiles">) {
     })
   }
 
+  if (provider === "anthropic") {
+    checkApiKey(profile.anthropic_api_key, "Anthropic")
+    return new OpenAI({
+      apiKey: profile.anthropic_api_key || "",
+      baseURL: "https://api.anthropic.com"
+    })
+  }
+
   throw new Error(`Provider not supported: ${provider}`)
 }
 
