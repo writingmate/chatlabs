@@ -3,6 +3,8 @@ import {
   IconAdjustmentsHorizontal,
   IconBolt,
   IconBooks,
+  IconDiamond,
+  IconDiamondFilled,
   IconFile,
   IconMessage,
   IconPencil,
@@ -92,10 +94,10 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
               <div>Upgrade to paid plans to get access to all features.</div>
             }
             trigger={
-              <IconSparkles
+              <IconDiamondFilled
                 onClick={() => setIsPaywallOpen(true)}
                 className="cursor-pointer pt-[4px] text-violet-700 hover:opacity-50"
-                size={24}
+                size={28}
               />
             }
           />
