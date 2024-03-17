@@ -68,7 +68,23 @@ export default function Plans({ onClose }: PlansProps) {
       <div
         className={`dialog-container ${isDialogVisible ? "visible" : "hidden"}`}
       >
-        <div className="flex justify-end p-4">
+        <div className="flex items-center justify-between p-4">
+          <div className="grow justify-center">
+            <ToggleGroup
+              type={"single"}
+              value={billingCycle}
+              onValueChange={value =>
+                setBillingCycle(value as "yearly" | "monthly")
+              }
+            >
+              <ToggleGroupItem value={BILLING_CYCLE_YEARLY}>
+                Yearly
+              </ToggleGroupItem>
+              <ToggleGroupItem value={BILLING_CYCLE_MONTHLY}>
+                Monthly
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
           <button onClick={closeDialog} className="p-2">
             <IconX size={24} />
           </button>
@@ -76,22 +92,6 @@ export default function Plans({ onClose }: PlansProps) {
         <div className="my-2">
           <form method={"POST"}>
             <input type={"hidden"} value={billingCycle} name={"billingCycle"} />
-            <div className="my-2">
-              <ToggleGroup
-                type={"single"}
-                value={billingCycle}
-                onValueChange={value =>
-                  setBillingCycle(value as "yearly" | "monthly")
-                }
-              >
-                <ToggleGroupItem value={BILLING_CYCLE_YEARLY}>
-                  Yearly
-                </ToggleGroupItem>
-                <ToggleGroupItem value={BILLING_CYCLE_MONTHLY}>
-                  Monthly
-                </ToggleGroupItem>
-              </ToggleGroup>
-            </div>
             <div className="flex flex-col md:flex-row">
               <div
                 className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t px-6 py-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
