@@ -60,6 +60,7 @@ export default function SetupPage() {
   const [groqAPIKey, setGroqAPIKey] = useState("")
   const [perplexityAPIKey, setPerplexityAPIKey] = useState("")
   const [openrouterAPIKey, setOpenrouterAPIKey] = useState("")
+  const [isPaywallOpen, setIsPaywallOpen] = useState(true)
 
   useEffect(() => {
     ;(async () => {
@@ -210,7 +211,7 @@ export default function SetupPage() {
             showNextButton={true}
             showBackButton={true}
           >
-            <Plans />
+            <Plans onClose={() => setIsPaywallOpen(false)} />
           </StepContainer>
         )
 
