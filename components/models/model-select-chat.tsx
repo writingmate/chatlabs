@@ -162,32 +162,28 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
         />
 
         <div className="max-h-[300px] overflow-auto">
-          {mostRecentModels.length > 0 && (
-            <div className="mb-4">
-              <div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
-                Recent
-              </div>
-              <div className="mb-4">
-                {mostRecentModels.map(recentModel => {
-                  const model = allModels.find(
-                    model => model.modelId === recentModel.model
-                  )
-                  if (!model) return null
-                  return (
-                    <div
+          {!search && mostRecentModels.length > 0 && (
+            <div className="mb-2">
+              {mostRecentModels.map(recentModel => {
+                const model = allModels.find(
+                  model => model.modelId === recentModel.model
+                )
+                if (!model) return null
+                return (
+                  <div
+                    key={model.modelId}
+                    className="flex items-center space-x-1"
+                  >
+                    <ModelOption
+                      recent={true}
                       key={model.modelId}
-                      className="flex items-center space-x-1"
-                    >
-                      <ModelOption
-                        key={model.modelId}
-                        model={model}
-                        selected={false}
-                        onSelect={() => handleSelectModel(model.modelId)}
-                      />
-                    </div>
-                  )
-                })}
-              </div>
+                      model={model}
+                      selected={false}
+                      onSelect={() => handleSelectModel(model.modelId)}
+                    />
+                  </div>
+                )
+              })}
             </div>
           )}
           <div className="mb-4">
