@@ -1,6 +1,6 @@
 import { ChatbotUIContext } from "@/context/context"
 import { LLM, LLMID, ModelProvider } from "@/types"
-import { IconCheck, IconChevronDown } from "@tabler/icons-react"
+import { IconCheck, IconChevronDown, IconSquarePlus } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Button } from "../ui/button"
 import {
@@ -12,6 +12,8 @@ import { Input } from "../ui/input"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { ModelIcon } from "./model-icon"
 import { ModelOption } from "./model-option"
+import { getMostRecentModels } from "@/db/models"
+import { Tables } from "@/supabase/types"
 
 interface ModelSelectProps {
   selectedModelId: string
@@ -37,6 +39,9 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [tab, setTab] = useState<"hosted" | "local">("hosted")
+  const [mostRecentModels, setMostRecentModels] = useState<
+    Tables<"recent_models">[]
+  >([])
 
   useEffect(() => {
     if (isOpen) {
@@ -66,23 +71,28 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
     ...availableOpenRouterModels
   ]
 
-  const groupedModels = allModels.reduce<Record<string, LLM[]>>(
-    (groups, model) => {
-      const key = model.provider
-      if (!groups[key]) {
-        groups[key] = []
-      }
-      groups[key].push(model)
-      return groups
-    },
-    {}
-  )
+  useEffect(() => {
+    getMostRecentModels().then(result => {
+      setMostRecentModels(result)
+    })
+  }, [])
 
   const selectedModel = allModels.find(
     model => model.modelId === selectedModelId
   )
 
   if (!profile) return null
+
+  const filteredModels = allModels
+    .filter(model => {
+      if (tab === "hosted") return model.provider !== "ollama"
+      if (tab === "local") return model.provider === "ollama"
+      if (tab === "openrouter") return model.provider === "openrouter"
+    })
+    .filter(model =>
+      model.modelName.toLowerCase().includes(search.toLowerCase())
+    )
+    .sort((a, b) => a.provider.localeCompare(b.provider))
 
   return (
     <DropdownMenu
@@ -152,52 +162,54 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
         />
 
         <div className="max-h-[300px] overflow-auto">
-          {Object.entries(groupedModels).map(([provider, models]) => {
-            const filteredModels = models
-              .filter(model => {
-                if (tab === "hosted") return model.provider !== "ollama"
-                if (tab === "local") return model.provider === "ollama"
-                if (tab === "openrouter") return model.provider === "openrouter"
-              })
-              .filter(model =>
-                model.modelName.toLowerCase().includes(search.toLowerCase())
-              )
-              .sort((a, b) => a.provider.localeCompare(b.provider))
-
-            if (filteredModels.length === 0) return null
-
-            return (
-              <div key={provider}>
-                <div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
-                  {provider === "openai" && profile.use_azure_openai
-                    ? "AZURE OPENAI"
-                    : provider.toLocaleUpperCase()}
-                </div>
-
-                <div className="mb-4">
-                  {filteredModels.map(model => {
-                    return (
-                      <div
-                        key={model.modelId}
-                        className="flex items-center space-x-1"
-                      >
-                        {/*{selectedModelId === model.modelId && (*/}
-                        {/*  <IconCheck className="ml-2" size={32} />*/}
-                        {/*)}*/}
-
-                        <ModelOption
-                          key={model.modelId}
-                          model={model}
-                          selected={selectedModelId === model.modelId}
-                          onSelect={() => handleSelectModel(model.modelId)}
-                        />
-                      </div>
-                    )
-                  })}
-                </div>
+          {mostRecentModels.length > 0 && (
+            <div className="mb-4">
+              <div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
+                Recent
               </div>
-            )
-          })}
+              <div className="mb-4">
+                {mostRecentModels.map(recentModel => {
+                  const model = allModels.find(
+                    model => model.modelId === recentModel.model
+                  )
+                  if (!model) return null
+                  return (
+                    <div
+                      key={model.modelId}
+                      className="flex items-center space-x-1"
+                    >
+                      <ModelOption
+                        key={model.modelId}
+                        model={model}
+                        selected={false}
+                        onSelect={() => handleSelectModel(model.modelId)}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+          <div className="mb-4">
+            {filteredModels.map(model => {
+              return (
+                <div
+                  key={model.modelId}
+                  className="flex items-center space-x-1"
+                >
+                  {/*{selectedModelId === model.modelId && (*/}
+                  {/*  <IconCheck className="ml-2" size={32} />*/}
+                  {/*)}*/}
+                  <ModelOption
+                    key={model.modelId}
+                    model={model}
+                    selected={selectedModelId === model.modelId}
+                    onSelect={() => handleSelectModel(model.modelId)}
+                  />
+                </div>
+              )
+            })}
+          </div>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

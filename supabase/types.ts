@@ -1484,7 +1484,13 @@ export interface Database {
       }
     }
     Views: {
-      [_ in never]: never
+      recent_models: {
+        Row: {
+          last_used_at: string | null
+          model: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       create_duplicate_messages_for_new_chat: {
