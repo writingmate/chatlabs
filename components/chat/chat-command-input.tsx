@@ -35,32 +35,31 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
     isFilePickerOpen
 
   return (
-    isOpen && (
-      <div
-        className={cn(
-          "bg-background absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-y-auto rounded-xl border dark:border-none",
-          selectedAssistant && "bottom-[106px]"
+    <div
+      className={cn(
+        "bg-background absolute bottom-[76px] left-0 max-h-[300px] w-full overflow-y-auto rounded-xl border dark:border-none",
+        selectedAssistant && "bottom-[106px]",
+        isOpen ? "block" : "hidden"
+      )}
+    >
+      <PromptPicker />
+
+      <FilePicker
+        isOpen={isFilePickerOpen}
+        searchQuery={hashtagCommand}
+        onOpenChange={setIsFilePickerOpen}
+        selectedFileIds={[...newMessageFiles, ...chatFiles].map(
+          file => file.id
         )}
-      >
-        <PromptPicker />
+        selectedCollectionIds={[]}
+        onSelectFile={handleSelectUserFile}
+        onSelectCollection={handleSelectUserCollection}
+        isFocused={focusFile}
+      />
 
-        <FilePicker
-          isOpen={isFilePickerOpen}
-          searchQuery={hashtagCommand}
-          onOpenChange={setIsFilePickerOpen}
-          selectedFileIds={[...newMessageFiles, ...chatFiles].map(
-            file => file.id
-          )}
-          selectedCollectionIds={[]}
-          onSelectFile={handleSelectUserFile}
-          onSelectCollection={handleSelectUserCollection}
-          isFocused={focusFile}
-        />
+      <ToolPicker />
 
-        <ToolPicker />
-
-        <AssistantPicker />
-      </div>
-    )
+      <AssistantPicker />
+    </div>
   )
 }
