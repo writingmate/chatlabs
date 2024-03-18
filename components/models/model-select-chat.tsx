@@ -182,7 +182,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
 
         <div className="max-h-[300px] overflow-auto">
           {!search && mostRecentModels.length > 0 && (
-            <div className="mb-2">
+            <div>
               {mostRecentModels.map(recentModel => {
                 const model = allModels.find(
                   model => model.modelId === recentModel.model
@@ -203,6 +203,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
                   </div>
                 )
               })}
+              <Separator className={"opacity-75"} />
             </div>
           )}
           <div className="mb-4">

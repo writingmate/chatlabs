@@ -90,7 +90,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
       {selectedModel?.tools && (
         <ToolSelect
           selectedTools={selectedTools}
-          onSelectTools={handleSelectTools}
+          onSelectTools={setSelectedTools}
         />
       )}
       <ModelSelectChat
