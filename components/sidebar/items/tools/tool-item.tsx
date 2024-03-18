@@ -4,7 +4,7 @@ import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
 import { validateOpenAPI } from "@/lib/openapi-conversion"
 import { Tables } from "@/supabase/types"
-import { IconBolt } from "@tabler/icons-react"
+import { IconBolt, IconPuzzle } from "@tabler/icons-react"
 import { FC, useState } from "react"
 import {
   SIDEBAR_ITEM_ICON_SIZE,
@@ -34,7 +34,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
       contentType="tools"
       name="plugins"
       icon={
-        <IconBolt
+        <IconPuzzle
           size={SIDEBAR_ITEM_ICON_SIZE}
           stroke={SIDEBAR_ITEM_ICON_STROKE}
         />

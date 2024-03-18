@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { PROMPT_NAME_MAX } from "@/db/limits"
 import { Tables } from "@/supabase/types"
-import { IconPencil } from "@tabler/icons-react"
+import { IconPencil, IconTerminal2 } from "@tabler/icons-react"
 import { FC, useState } from "react"
 import {
   SIDEBAR_ITEM_ICON_SIZE,
@@ -25,7 +25,7 @@ export const PromptItem: FC<PromptItemProps> = ({ prompt }) => {
       isTyping={isTyping}
       contentType="prompts"
       icon={
-        <IconPencil
+        <IconTerminal2
           size={SIDEBAR_ITEM_ICON_SIZE}
           stroke={SIDEBAR_ITEM_ICON_STROKE}
         />

@@ -1,6 +1,6 @@
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
-import { IconBolt } from "@tabler/icons-react"
+import { IconBolt, IconPuzzle } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef } from "react"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { validatePlanForTools } from "@/lib/subscription"
@@ -97,7 +97,7 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
                   onClick={() => callSelectTool(item as Tables<"tools">)}
                   onKeyDown={getKeyDownHandler(index)}
                 >
-                  <IconBolt size={32} />
+                  <IconPuzzle size={32} />
 
                   <div className="ml-3 flex flex-col">
                     <div className="font-bold">{item.name}</div>

@@ -3,11 +3,14 @@ import {
   IconAdjustmentsHorizontal,
   IconBolt,
   IconBooks,
+  IconDiamondFilled,
   IconFile,
   IconMessage,
   IconPencil,
+  IconPuzzle,
   IconRobotFace,
-  IconSparkles
+  IconSparkles,
+  IconTerminal2
 } from "@tabler/icons-react"
 import { FC, useContext } from "react"
 import { TabsList } from "../ui/tabs"
@@ -43,7 +46,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         {/*/>*/}
 
         <SidebarSwitchItem
-          icon={<IconPencil size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
+          icon={<IconTerminal2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
           contentType="prompts"
           onContentTypeChange={onContentTypeChange}
         />
@@ -73,7 +76,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         />
 
         <SidebarSwitchItem
-          icon={<IconBolt size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
+          icon={<IconPuzzle size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
           contentType="tools"
           name="Plugins"
           onContentTypeChange={onContentTypeChange}
@@ -92,10 +95,11 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
               <div>Upgrade to paid plans to get access to all features.</div>
             }
             trigger={
-              <IconSparkles
+              <IconDiamondFilled
                 onClick={() => setIsPaywallOpen(true)}
                 className="cursor-pointer pt-[4px] text-violet-700 hover:opacity-50"
-                size={24}
+                stroke={1.5}
+                size={SIDEBAR_ICON_SIZE}
               />
             }
           />

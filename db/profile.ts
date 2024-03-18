@@ -7,10 +7,10 @@ export const getProfileByUserId = async (userId: string) => {
     .from("profiles")
     .select("*")
     .eq("user_id", userId)
-    .single()
+    .maybeSingle()
 
-  if (!profile) {
-    throw new Error(error.message)
+  if (!profile || error) {
+    throw new Error(error?.message || "Profile not found")
   }
 
   return profile
