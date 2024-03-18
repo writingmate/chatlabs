@@ -19,6 +19,7 @@ import {
   DEFAULT_MODEL_VISIBILITY,
   ModelSettings
 } from "@/components/models/model-settings"
+import { validatePlanForModel } from "@/lib/subscription"
 
 interface ModelSelectProps {
   selectedModelId: string
@@ -57,6 +58,10 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   }, [isOpen])
 
   const handleSelectModel = (modelId: LLMID) => {
+    if (!validatePlanForModel(profile, modelId)) {
+      setIsPaywallOpen(true)
+      return
+    }
     onSelectModel(modelId)
     setIsOpen(false)
   }

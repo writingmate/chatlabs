@@ -3,6 +3,8 @@ import { Tables } from "@/supabase/types"
 import { IconBolt } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef } from "react"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
+import { validatePlanForTools } from "@/lib/subscription"
+import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
 
 interface ToolPickerProps {}
 
@@ -12,7 +14,8 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
     focusTool,
     toolCommand,
     isToolPickerOpen,
-    setIsToolPickerOpen
+    setIsToolPickerOpen,
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const { handleSelectTool } = usePromptAndCommand()
@@ -34,6 +37,10 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
   }
 
   const callSelectTool = (tool: Tables<"tools">) => {
+    if (validatePlanForTools(profile, [tool])) {
+      setIsPaywallOpen(true)
+      return
+    }
     handleSelectTool(tool)
     handleOpenChange(false)
   }

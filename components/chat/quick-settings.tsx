@@ -21,6 +21,8 @@ import {
 import { Input } from "../ui/input"
 import { QuickSettingOption } from "./quick-setting-option"
 import { set } from "date-fns"
+import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
+import { validatePlanForAssistant } from "@/lib/subscription"
 
 interface QuickSettingsProps {}
 
@@ -30,6 +32,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
   useHotkey("p", () => setIsOpen(prevState => !prevState))
 
   const {
+    profile,
     presets,
     assistants,
     selectedAssistant,
@@ -42,10 +45,13 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     setChatFiles,
     setSelectedTools,
     setShowFilesDisplay,
-    selectedWorkspace
+    selectedWorkspace,
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const { handleSelectAssistant } = usePromptAndCommand()
 
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
@@ -65,33 +71,14 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
   ) => {
     console.log({ item, contentType })
     if (contentType === "assistants" && item) {
-      setSelectedAssistant(item as Tables<"assistants">)
-      setLoading(true)
-      let allFiles = []
-      const assistantFiles = (await getAssistantFilesByAssistantId(item.id))
-        .files
-      allFiles = [...assistantFiles]
-      const assistantCollections = (
-        await getAssistantCollectionsByAssistantId(item.id)
-      ).collections
-      for (const collection of assistantCollections) {
-        const collectionFiles = (
-          await getCollectionFilesByCollectionId(collection.id)
-        ).files
-        allFiles = [...allFiles, ...collectionFiles]
+      // setSelectedAssistant(item as Tables<"assistants">)
+
+      if (!validatePlanForAssistant(profile, item as Tables<"assistants">)) {
+        setIsPaywallOpen(true)
+        return
       }
-      const assistantTools = (await getAssistantToolsByAssistantId(item.id))
-        .tools
-      setSelectedTools(assistantTools)
-      setChatFiles(
-        allFiles.map(file => ({
-          id: file.id,
-          name: file.name,
-          type: file.type,
-          file: null
-        }))
-      )
-      if (allFiles.length > 0) setShowFilesDisplay(true)
+      setLoading(true)
+      await handleSelectAssistant(item as Tables<"assistants">)
       setLoading(false)
       setSelectedPreset(null)
     } else if (contentType === "presets" && item) {
