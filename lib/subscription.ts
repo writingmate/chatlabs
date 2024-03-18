@@ -14,7 +14,7 @@ export function validatePlanForModel(
     return false
   }
 
-  if (profile?.plan !== "free" && profile?.plan?.indexOf("premium") !== -1) {
+  if (profile?.plan !== "free" && profile?.plan?.indexOf("premium") === -1) {
     return true
   }
 
@@ -34,5 +34,5 @@ export function validatePlanForTools(
   profile: Tables<"profiles"> | null,
   tools: any[]
 ) {
-  return profile?.plan !== "free" && profile?.plan?.indexOf("premium") !== -1
+  return profile?.plan !== "free" && profile?.plan?.indexOf("premium") === -1
 }
