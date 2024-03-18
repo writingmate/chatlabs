@@ -348,6 +348,7 @@ export interface Database {
           include_workspace_instructions: boolean
           model: string
           name: string
+          pinned: boolean | null
           prompt: string
           sharing: string
           temperature: number
@@ -366,6 +367,7 @@ export interface Database {
           include_workspace_instructions: boolean
           model: string
           name: string
+          pinned?: boolean | null
           prompt: string
           sharing?: string
           temperature: number
@@ -384,6 +386,7 @@ export interface Database {
           include_workspace_instructions?: boolean
           model?: string
           name?: string
+          pinned?: boolean | null
           prompt?: string
           sharing?: string
           temperature?: number
@@ -1122,6 +1125,7 @@ export interface Database {
           image_path: string
           image_url: string
           mistral_api_key: string | null
+          model_visibility: Json | null
           openai_api_key: string | null
           openai_organization_id: string | null
           openrouter_api_key: string | null
@@ -1157,6 +1161,7 @@ export interface Database {
           image_path: string
           image_url: string
           mistral_api_key?: string | null
+          model_visibility?: Json | null
           openai_api_key?: string | null
           openai_organization_id?: string | null
           openrouter_api_key?: string | null
@@ -1192,6 +1197,7 @@ export interface Database {
           image_path?: string
           image_url?: string
           mistral_api_key?: string | null
+          model_visibility?: Json | null
           openai_api_key?: string | null
           openai_organization_id?: string | null
           openrouter_api_key?: string | null

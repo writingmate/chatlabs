@@ -2,18 +2,23 @@ import { ChatbotUIContext } from "@/context/context"
 import { LLM, LLMID, ModelProvider } from "@/types"
 import { IconCheck, IconChevronDown, IconSquarePlus } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
-import { Button } from "../ui/button"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger
-} from "../ui/dropdown-menu"
-import { Input } from "../ui/input"
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { ModelIcon } from "./model-icon"
 import { ModelOption } from "./model-option"
 import { getMostRecentModels } from "@/db/models"
 import { Tables } from "@/supabase/types"
+import { Separator } from "@/components/ui/separator"
+import {
+  DEFAULT_MODEL_VISIBILITY,
+  ModelSettings
+} from "@/components/models/model-settings"
 
 interface ModelSelectProps {
   selectedModelId: string
@@ -89,6 +94,15 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
       if (tab === "local") return model.provider === "ollama"
       if (tab === "openrouter") return model.provider === "openrouter"
     })
+    .filter(
+      model =>
+        (
+          (profile.model_visibility || DEFAULT_MODEL_VISIBILITY) as Record<
+            LLMID,
+            boolean
+          >
+        )?.[model.modelId] ?? true
+    )
     .filter(model =>
       model.modelName.toLowerCase().includes(search.toLowerCase())
     )
@@ -193,9 +207,6 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
                   key={model.modelId}
                   className="flex items-center space-x-1"
                 >
-                  {/*{selectedModelId === model.modelId && (*/}
-                  {/*  <IconCheck className="ml-2" size={32} />*/}
-                  {/*)}*/}
                   <ModelOption
                     key={model.modelId}
                     model={model}
@@ -207,6 +218,8 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
             })}
           </div>
         </div>
+        <Separator className={"opacity-75"} />
+        <ModelSettings models={allModels} />
       </DropdownMenuContent>
     </DropdownMenu>
   )
