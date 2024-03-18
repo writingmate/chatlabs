@@ -25,6 +25,7 @@ import { LLMID } from "@/types"
 import { useParams, useRouter } from "next/navigation"
 import { ReactNode, useContext, useEffect, useState } from "react"
 import Loading from "../loading"
+import { platformToolDefinitions } from "@/lib/platformTools/utils/platformToolsUtils"
 
 interface WorkspaceLayoutProps {
   children: ReactNode
@@ -48,6 +49,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setPresets,
     setPrompts,
     setTools,
+    setPlatformTools,
     setModels,
     selectedWorkspace,
     setSelectedWorkspace,
@@ -152,6 +154,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setPrompts(promptData.prompts)
     setTools([...toolData.tools, ...publicToolData].filter(onlyUniqueById))
     setModels(modelData.models)
+    setPlatformTools(platformToolDefinitions())
 
     const parallelize = async (array: any, callback: any) => {
       const promises = array.map((item: any) => callback(item))
