@@ -227,6 +227,28 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
   const dataWithFolders = data.filter(item => item.folder_id)
   const dataWithoutFolders = data.filter(item => item.folder_id === null)
 
+  const getDescription = (contentType: ContentType) => {
+    switch (contentType) {
+      case "chats":
+        return "Your chat history will be displayed here."
+
+      case "prompts":
+        return "Prompts are pre-saved text inputs designed to generate specific responses and communicate with AI quicker. Prompts you create will be displayed here."
+
+      case "files":
+        return "Upload files to enrich conversations and assistants with context, data analysis, feedback, or customization. Uploaded files will be displayed here."
+
+      case "tools":
+        return "Plugins are special add-ons that allow you to do extra things beyond just chatting, such as using up-to-date information from the web or checking the weather by connecting to external services or databases."
+
+      case "assistants":
+        return "Assistants are special AI characters instructed to provide information, solve specific problems, simulate conversations or offer creative content based on user queries."
+
+      default:
+        return null
+    }
+  }
+
   return (
     <>
       <div
@@ -236,8 +258,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
       >
         {data.length === 0 && (
           <div className="flex grow flex-col items-center justify-center">
-            <div className=" text-centertext-muted-foreground p-8 text-lg italic">
-              No {contentType}.
+            <div className="text-centertext-muted-foreground p-3 italic">
+              {getDescription(contentType)}
             </div>
           </div>
         )}
