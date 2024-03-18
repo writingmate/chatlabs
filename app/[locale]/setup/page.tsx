@@ -211,7 +211,10 @@ export default function SetupPage() {
             showNextButton={true}
             showBackButton={true}
           >
-            <Plans onClose={() => setIsPaywallOpen(false)} />
+            <Plans
+              onClose={() => setIsPaywallOpen(false)}
+              showCloseIcon={false}
+            />
           </StepContainer>
         )
 

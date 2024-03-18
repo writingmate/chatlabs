@@ -17,8 +17,9 @@ type BILLING_CYCLE = typeof BILLING_CYCLE_YEARLY | typeof BILLING_CYCLE_MONTHLY
 
 interface PlansProps {
   onClose: () => void // Function to close the dialog
+  showCloseIcon: boolean
 }
-export default function Plans({ onClose }: PlansProps) {
+export default function Plans({ onClose, showCloseIcon }: PlansProps) {
   const { profile } = useContext(ChatbotUIContext)
 
   const [billingCycle, setBillingCycle] =
@@ -69,9 +70,11 @@ export default function Plans({ onClose }: PlansProps) {
         className={`dialog-container ${isDialogVisible ? "visible" : "hidden"} relative`}
       >
         <div className="absolute right-0 top-0 p-2">
-          <button onClick={closeDialog} className="p-2">
-            <IconX size={24} />
-          </button>
+          {showCloseIcon && (
+            <button onClick={closeDialog} className="p-2">
+              <IconX size={24} />
+            </button>
+          )}
         </div>
         <div className="my-2">
           <form method={"POST"}>
