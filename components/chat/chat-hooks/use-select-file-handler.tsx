@@ -14,7 +14,9 @@ export const ACCEPTED_FILE_TYPES = [
   "text/plain"
 ].join(",")
 
-export const useSelectFileHandler = () => {
+export const useSelectFileHandler = (
+  setIsUploading: (value: boolean) => void
+) => {
   const {
     selectedWorkspace,
     profile,
@@ -47,7 +49,7 @@ export const useSelectFileHandler = () => {
 
   const handleSelectDeviceFile = async (file: File) => {
     if (!profile || !selectedWorkspace || !chatSettings) return
-
+    setIsUploading(true)
     setShowFilesDisplay(true)
     setUseRetrieval(true)
 
@@ -191,6 +193,8 @@ export const useSelectFileHandler = () => {
             prev.filter(img => img.messageId !== "temp")
           )
           setNewMessageFiles(prev => prev.filter(file => file.id !== "loading"))
+        } finally {
+          setIsUploading(false)
         }
       }
     }

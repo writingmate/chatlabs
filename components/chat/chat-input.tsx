@@ -35,6 +35,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   })
 
   const [isTyping, setIsTyping] = useState<boolean>(false)
+  const [isUploading, setIsUploading] = useState<boolean>(false)
 
   const {
     isAssistantPickerOpen,
@@ -72,7 +73,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   const { handleInputChange } = usePromptAndCommand()
 
-  const { filesToAccept, handleSelectDeviceFile } = useSelectFileHandler()
+  const { filesToAccept, handleSelectDeviceFile } =
+    useSelectFileHandler(setIsUploading)
 
   const {
     setNewMessageContentToNextUserMessage,
@@ -287,10 +289,11 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 <IconSend
                   className={cn(
                     "bg-primary text-secondary rounded-lg p-1",
-                    !userInput && "opacity-md cursor-not-allowed"
+                    (!userInput || isUploading) &&
+                      "opacity-md cursor-not-allowed"
                   )}
                   onClick={() => {
-                    if (!userInput) return
+                    if (!userInput || isUploading) return
 
                     handleSendMessage(userInput, chatMessages, false)
                   }}
