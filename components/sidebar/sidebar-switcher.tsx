@@ -3,6 +3,7 @@ import {
   IconAdjustmentsHorizontal,
   IconBolt,
   IconBooks,
+  IconDiamond,
   IconDiamondFilled,
   IconFile,
   IconMessage,

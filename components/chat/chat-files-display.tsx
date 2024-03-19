@@ -115,8 +115,8 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
         {/*  </Button>*/}
         {/*</div>*/}
 
-        <div className="flex overflow-auto sm:w-[360px] md:w-[460px] lg:w-[620px] xl:w-[760px]">
-          <div className="flex gap-2 pt-2">
+        <div className="flex sm:w-[360px] md:w-[460px] lg:w-[620px] xl:w-[760px]">
+          <div className="flex flex-wrap gap-2 pt-2">
             {messageImages.map((image, index) => (
               <div
                 key={index}
@@ -146,13 +146,9 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                   onClick={e => {
                     e.stopPropagation()
                     setNewMessageImages(
-                      newMessageImages.filter(
-                        f => f.messageId !== image.messageId
-                      )
+                      newMessageImages.filter(f => f.url !== image.url)
                     )
-                    setChatImages(
-                      chatImages.filter(f => f.messageId !== image.messageId)
-                    )
+                    setChatImages(chatImages.filter(f => f.url !== image.url))
                   }}
                 />
               </div>
@@ -176,7 +172,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
               ) : (
                 <div
                   key={file.id}
-                  className="relative flex h-[64px] max-w-[260px] cursor-pointer items-center space-x-4 rounded-xl border px-4 py-3 hover:opacity-50"
+                  className="relative flex h-[64px] max-w-[246px] cursor-pointer items-center space-x-4 rounded-xl border px-4 py-3 hover:opacity-50"
                   onClick={() => getLinkAndView(file)}
                 >
                   <div className="rounded bg-violet-500 p-2">
