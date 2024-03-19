@@ -6,6 +6,7 @@ import { FilePicker } from "./file-picker"
 import { PromptPicker } from "./prompt-picker"
 import { ToolPicker } from "./tool-picker"
 import { cn } from "@/lib/utils"
+import { MessageHistoryPicker } from "@/components/message-history-picker"
 
 interface ChatCommandInputProps {}
 
@@ -22,7 +23,8 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
     selectedAssistant,
     isPromptPickerOpen,
     isToolPickerOpen,
-    isAssistantPickerOpen
+    isAssistantPickerOpen,
+    isMessageHistoryPickerOpen
   } = useContext(ChatbotUIContext)
 
   const { handleSelectUserFile, handleSelectUserCollection } =
@@ -32,7 +34,8 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
     isPromptPickerOpen ||
     isToolPickerOpen ||
     isAssistantPickerOpen ||
-    isFilePickerOpen
+    isFilePickerOpen ||
+    isMessageHistoryPickerOpen
 
   return (
     <div
@@ -56,7 +59,6 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
         onSelectCollection={handleSelectUserCollection}
         isFocused={focusFile}
       />
-
       <ToolPicker />
 
       <AssistantPicker />

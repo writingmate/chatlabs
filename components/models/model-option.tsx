@@ -5,31 +5,50 @@ import {
   IconBrain,
   IconCurrencyDollar,
   IconEye,
+  IconHistory,
   IconPuzzle,
   IconTools
 } from "@tabler/icons-react"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { WithTooltip } from "@/components/ui/with-tooltip"
+import { cn } from "@/lib/utils"
+import { useTheme } from "next-themes"
 
 interface ModelOptionProps {
   model: LLM
   onSelect: () => void
   selected: boolean
+  recent?: boolean
 }
 
 export const ModelOption: FC<ModelOptionProps> = ({
   model,
   selected,
-  onSelect
+  onSelect,
+  recent
 }) => {
+  const { theme } = useTheme()
   return (
     <div
       className="hover:bg-accent flex w-full cursor-pointer justify-start space-x-3 truncate rounded p-2 hover:opacity-50"
       onClick={onSelect}
     >
       <div className="flex w-full items-center justify-between space-x-2">
-        <div className={"flex items-center space-x-2"}>
-          <ModelIcon provider={model.provider} width={28} height={28} />
+        <div className={"relative flex items-center space-x-2"}>
+          {recent ? (
+            <IconHistory
+              className={cn(
+                "rounded-sm bg-[#fff] p-1 text-black",
+                theme === "dark"
+                  ? "bg-white"
+                  : "border-foreground/10 border-[1px]"
+              )}
+              stroke={1.5}
+              size={28}
+            />
+          ) : (
+            <ModelIcon provider={model.provider} width={28} height={28} />
+          )}
           <div
             className={
               "text-sm " + (selected ? "font-semibold" : "font-normal")

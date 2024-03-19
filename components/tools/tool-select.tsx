@@ -19,6 +19,7 @@ import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Tables } from "@/supabase/types"
 import { Separator } from "@/components/ui/separator"
+import { validatePlanForTools } from "@/lib/subscription"
 // import { ModelIcon } from "./model-icon"
 // import { ModelOption } from "./model-option"
 
@@ -31,7 +32,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
   selectedTools,
   onSelectTools
 }) => {
-  const { profile, tools } = useContext(ChatbotUIContext)
+  const { profile, tools, setIsPaywallOpen } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -54,6 +55,10 @@ export const ToolSelect: FC<ToolSelectProps> = ({
     }
   }
   function handleSelectTool(tool: Tables<"tools">, selected: boolean) {
+    if (!validatePlanForTools(profile, [tool])) {
+      setIsPaywallOpen(true)
+      return
+    }
     if (selected) {
       onSelectTools([...selectedTools, tool])
     } else {
@@ -130,11 +135,11 @@ export const ToolSelect: FC<ToolSelectProps> = ({
             )
           })}
         </div>
-        <Separator />
-        <DropdownMenuItem className={"flex w-full items-center space-x-2"}>
-          <IconSettings size={16} />
-          <div>Manage tools</div>
-        </DropdownMenuItem>
+        {/*<Separator />*/}
+        {/*<DropdownMenuItem className={"flex w-full items-center space-x-2"}>*/}
+        {/*  <IconSettings size={16} />*/}
+        {/*  <div>Manage tools</div>*/}
+        {/*</DropdownMenuItem>*/}
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -15,6 +15,10 @@ import {
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { unique } from "next/dist/build/utils"
 import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
+import {
+  validatePlanForAssistant,
+  validatePlanForTools
+} from "@/lib/subscription"
 
 interface SidebarItemProps {
   item: DataItemType
@@ -44,7 +48,8 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     selectedAssistant,
     selectedTools,
     chatFiles,
-    newMessageFiles
+    newMessageFiles,
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
@@ -102,12 +107,19 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     collections: async (item: any) => {},
     assistants: async (assistant: Tables<"assistants">) => {
       if (!selectedWorkspace) return
-
+      if (!validatePlanForAssistant(profile, assistant)) {
+        setIsPaywallOpen(true)
+        return
+      }
       handleSelectAssistant(assistant)
 
       return router.push(`/${selectedWorkspace.id}/chat`)
     },
     tools: async (item: any) => {
+      if (!validatePlanForTools(profile, [item])) {
+        setIsPaywallOpen(true)
+        return
+      }
       handleSelectTool(item)
     },
     models: async (item: any) => {}

@@ -88,6 +88,8 @@ interface ChatbotUIContext {
   setIsGenerating: Dispatch<SetStateAction<boolean>>
 
   // CHAT INPUT COMMAND STORE
+  isMessageHistoryPickerOpen: boolean
+  setIsMessageHistoryPickerOpen: Dispatch<SetStateAction<boolean>>
   isPromptPickerOpen: boolean
   setIsPromptPickerOpen: Dispatch<SetStateAction<boolean>>
   slashCommand: string
@@ -238,6 +240,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setAbortController: () => {},
 
   // CHAT INPUT COMMAND STORE
+  isMessageHistoryPickerOpen: false,
+  setIsMessageHistoryPickerOpen: () => {},
   isPromptPickerOpen: false,
   setIsPromptPickerOpen: () => {},
   slashCommand: "",

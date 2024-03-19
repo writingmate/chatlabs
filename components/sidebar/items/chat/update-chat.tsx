@@ -14,12 +14,14 @@ import { updateChat } from "@/db/chats"
 import { Tables } from "@/supabase/types"
 import { IconEdit } from "@tabler/icons-react"
 import { FC, useContext, useRef, useState } from "react"
+import { cn } from "@/lib/utils"
 
 interface UpdateChatProps {
+  className?: string
   chat: Tables<"chats">
 }
 
-export const UpdateChat: FC<UpdateChatProps> = ({ chat }) => {
+export const UpdateChat: FC<UpdateChatProps> = ({ chat, className }) => {
   const { setChats } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -47,7 +49,7 @@ export const UpdateChat: FC<UpdateChatProps> = ({ chat }) => {
   return (
     <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
       <DialogTrigger asChild>
-        <IconEdit className="hover:opacity-50" size={18} />
+        <IconEdit className={cn("hover:opacity-50", className)} size={18} />
       </DialogTrigger>
 
       <DialogContent onKeyDown={handleKeyDown}>

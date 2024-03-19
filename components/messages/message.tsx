@@ -11,7 +11,9 @@ import {
   IconCircleFilled,
   IconFileText,
   IconMoodSmile,
-  IconPencil
+  IconPencil,
+  IconPuzzle,
+  IconTerminal2
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -204,7 +206,7 @@ export const Message: FC<MessageProps> = ({
         <div className="space-y-3">
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
-              <IconPencil
+              <IconTerminal2
                 className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
                 size={ICON_SIZE}
               />
@@ -288,7 +290,7 @@ export const Message: FC<MessageProps> = ({
                   default:
                     return (
                       <div className="flex animate-pulse items-center space-x-2">
-                        <IconBolt size={20} />
+                        <IconPuzzle size={20} />
 
                         <div>Using {toolInUse}...</div>
                       </div>

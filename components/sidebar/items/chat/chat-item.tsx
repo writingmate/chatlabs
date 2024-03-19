@@ -16,6 +16,7 @@ import {
   SIDEBAR_ITEM_ICON_SIZE,
   SIDEBAR_ITEM_ICON_STROKE
 } from "@/components/sidebar/items/all/sidebar-display-item"
+import { PinChat } from "@/components/sidebar/items/chat/pin-chat"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -107,11 +108,22 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           e.stopPropagation()
           e.preventDefault()
         }}
-        className={`ml-2 flex space-x-2 ${!isActive && "w-11 opacity-0 group-hover:opacity-100"}`}
+        className={`ml-2 flex space-x-2`}
       >
-        <UpdateChat chat={chat} />
-
-        <DeleteChat chat={chat} />
+        <UpdateChat
+          className={!isActive ? " hidden group-hover:flex" : ""}
+          chat={chat}
+        />
+        <DeleteChat
+          className={!isActive ? " hidden group-hover:flex" : ""}
+          chat={chat}
+        />
+        <PinChat
+          className={
+            !isActive && !chat.pinned ? " hidden group-hover:flex" : ""
+          }
+          chat={chat}
+        />
       </div>
     </div>
   )

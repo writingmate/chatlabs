@@ -175,3 +175,16 @@ export const deleteModelWorkspace = async (
 
   return true
 }
+
+export const getMostRecentModels = async (limit: number = 3) => {
+  const { data: models, error } = await supabase
+    .from("recent_models")
+    .select("*")
+    .limit(limit)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return models
+}

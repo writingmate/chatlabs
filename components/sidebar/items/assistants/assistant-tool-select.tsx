@@ -10,7 +10,8 @@ import { Tables } from "@/supabase/types"
 import {
   IconBolt,
   IconChevronDown,
-  IconCircleCheckFilled
+  IconCircleCheckFilled,
+  IconPuzzle
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 
@@ -147,7 +148,7 @@ const AssistantToolItem: FC<AssistantToolItemProps> = ({
     >
       <div className="flex grow items-center truncate">
         <div className="mr-2 min-w-[24px]">
-          <IconBolt size={24} />
+          <IconPuzzle size={24} />
         </div>
 
         <div className="truncate">{tool.name}</div>

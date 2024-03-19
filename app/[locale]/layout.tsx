@@ -6,7 +6,7 @@ import initTranslations from "@/lib/i18n"
 import { Database } from "@/supabase/types"
 import { createServerClient } from "@supabase/ssr"
 import { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
+import { DM_Sans, Inter } from "next/font/google"
 import { cookies } from "next/headers"
 import { ReactNode } from "react"
 import { GoogleAnalytics } from "@next/third-parties/google"
@@ -14,7 +14,7 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] })
+const font = DM_Sans({ subsets: ["latin"] })
 const APP_NAME = "ChatLabs"
 const APP_DEFAULT_TITLE = "ChatLabs"
 const APP_TITLE_TEMPLATE = "%s - ChatLabs"
@@ -92,7 +92,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning className={"h-full"}>
-      <body className={inter.className + " h-full antialiased"}>
+      <body className={font.className + " h-full antialiased"}>
         <Providers attribute="class" defaultTheme="light">
           <TranslationsProvider
             namespaces={i18nNamespaces}

@@ -106,6 +106,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     useState<AbortController | null>(null)
 
   // CHAT INPUT COMMAND STORE
+  const [isMessageHistoryPickerOpen, setIsMessageHistoryPickerOpen] =
+    useState(false)
   const [isPromptPickerOpen, setIsPromptPickerOpen] = useState(false)
   const [slashCommand, setSlashCommand] = useState("")
   const [isFilePickerOpen, setIsFilePickerOpen] = useState(false)
@@ -188,14 +190,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const fetchStartingData = async () => {
     const session = (await supabase.auth.getSession()).data.session
 
-    console.log("fetchStartingData", session)
-
     if (session) {
       const user = session.user
 
       const profile = await getProfileByUserId(user.id)
-
-      console.log("fetchStartingData", profile)
 
       setProfile(profile)
 
@@ -313,6 +311,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setAbortController,
 
         // CHAT INPUT COMMAND STORE
+        isMessageHistoryPickerOpen,
+        setIsMessageHistoryPickerOpen,
         isPromptPickerOpen,
         setIsPromptPickerOpen,
         slashCommand,

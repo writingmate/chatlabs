@@ -36,11 +36,11 @@ export const usePromptAndCommand = () => {
 
   const handleInputChange = (value: string) => {
     const assistantTextRegex = new RegExp(
-      `${profile?.assistant_command}([^ ]*)$`
+      `^${profile?.assistant_command}([^ ]*)$`
     )
-    const promptTextRegex = new RegExp(`${profile?.prompt_command}([^ ]*)$`)
-    const filesTextRegex = new RegExp(`${profile?.files_command}([^ ]*)$`)
-    const toolTextRegex = new RegExp(`${profile?.tools_command}([^ ]*)$`)
+    const promptTextRegex = new RegExp(`^${profile?.prompt_command}([^ ]*)$`)
+    const filesTextRegex = new RegExp(`^${profile?.files_command}([^ ]*)$`)
+    const toolTextRegex = new RegExp(`^${profile?.tools_command}([^ ]*)$`)
     const assistantMatch = value.match(assistantTextRegex)
     const promptMatch = value.match(promptTextRegex)
     const filesMatch = value.match(filesTextRegex)
@@ -94,6 +94,11 @@ export const usePromptAndCommand = () => {
   const handleSelectPrompt = (prompt: Tables<"prompts">) => {
     setIsPromptPickerOpen(false)
     setUserInput(userInput.replace(/\/[^ ]*$/, "") + prompt.content)
+  }
+
+  const handleSelectHistoryMessage = (message: string) => {
+    setIsPromptPickerOpen(false)
+    setUserInput(userInput.replace(/\/[^ ]*$/, "") + message)
   }
 
   const handleSelectUserFile = async (file: Tables<"files">) => {
@@ -240,6 +245,7 @@ export const usePromptAndCommand = () => {
     handleSelectUserCollection,
     handleSelectTool,
     handleSelectAssistant,
-    handleSelectPromptWithVariables
+    handleSelectPromptWithVariables,
+    handleSelectHistoryMessage
   }
 }

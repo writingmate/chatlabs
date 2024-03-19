@@ -95,7 +95,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const getSortedData = (
     data: any,
-    dateCategory: "Today" | "Yesterday" | "Previous Week" | "Older"
+    dateCategory: "Today" | "Yesterday" | "Previous Week" | "Older" | "Pinned"
   ) => {
     const now = new Date()
     const todayStart = new Date(now.setHours(0, 0, 0, 0))
@@ -110,14 +110,24 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
       .filter((item: any) => {
         const itemDate = new Date(item.updated_at || item.created_at)
         switch (dateCategory) {
+          case "Pinned":
+            return item.pinned
           case "Today":
-            return itemDate >= todayStart
+            return !item.pinned && itemDate >= todayStart
           case "Yesterday":
-            return itemDate >= yesterdayStart && itemDate < todayStart
+            return (
+              !item.pinned &&
+              itemDate >= yesterdayStart &&
+              itemDate < todayStart
+            )
           case "Previous Week":
-            return itemDate >= oneWeekAgoStart && itemDate < yesterdayStart
+            return (
+              !item.pinned &&
+              itemDate >= oneWeekAgoStart &&
+              itemDate < yesterdayStart
+            )
           case "Older":
-            return itemDate < oneWeekAgoStart
+            return !item.pinned && itemDate < oneWeekAgoStart
           default:
             return true
         }
@@ -263,11 +273,12 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
             {contentType === "chats" ? (
               <>
-                {["Today", "Yesterday", "Previous Week", "Older"].map(
+                {["Pinned", "Today", "Yesterday", "Previous Week", "Older"].map(
                   dateCategory => {
                     const sortedData = getSortedData(
                       dataWithoutFolders,
                       dateCategory as
+                        | "Pinned"
                         | "Today"
                         | "Yesterday"
                         | "Previous Week"

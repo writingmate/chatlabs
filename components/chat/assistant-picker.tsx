@@ -5,17 +5,20 @@ import Image from "next/image"
 import { FC, useContext, useEffect, useRef } from "react"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useClickOutside } from "@/components/chat/picker-hooks/use-click-outside"
+import { validatePlanForAssistant } from "@/lib/subscription"
 
 interface AssistantPickerProps {}
 
 export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
   const {
+    profile,
     assistants,
     assistantImages,
     focusAssistant,
     atCommand,
     isAssistantPickerOpen,
-    setIsAssistantPickerOpen
+    setIsAssistantPickerOpen,
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const { handleSelectAssistant } = usePromptAndCommand()
@@ -39,6 +42,10 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
   }
 
   const callSelectAssistant = (assistant: Tables<"assistants">) => {
+    if (!validatePlanForAssistant(profile, assistant)) {
+      setIsPaywallOpen(true)
+      return
+    }
     handleSelectAssistant(assistant)
     handleOpenChange(false)
   }
