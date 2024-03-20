@@ -27,6 +27,7 @@ export const useSelectFileHandler = () => {
   } = useContext(ChatbotUIContext)
 
   const [filesToAccept, setFilesToAccept] = useState(ACCEPTED_FILE_TYPES)
+  const [isUploading, setIsUploading] = useState<boolean>(false)
 
   useEffect(() => {
     handleFilesToAccept()
@@ -47,7 +48,7 @@ export const useSelectFileHandler = () => {
 
   const handleSelectDeviceFile = async (file: File) => {
     if (!profile || !selectedWorkspace || !chatSettings) return
-
+    setIsUploading(true)
     setShowFilesDisplay(true)
     setUseRetrieval(true)
 
@@ -191,6 +192,8 @@ export const useSelectFileHandler = () => {
             prev.filter(img => img.messageId !== "temp")
           )
           setNewMessageFiles(prev => prev.filter(file => file.id !== "loading"))
+        } finally {
+          setIsUploading(false)
         }
       }
     }
@@ -198,6 +201,7 @@ export const useSelectFileHandler = () => {
 
   return {
     handleSelectDeviceFile,
-    filesToAccept
+    filesToAccept,
+    isUploading
   }
 }
