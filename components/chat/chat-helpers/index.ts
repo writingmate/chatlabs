@@ -445,35 +445,28 @@ export const handleCreateMessages = async (
     image_paths: []
   }
 
-  let finalChatMessages: ChatMessage[] = []
+  const cleanGeneratedText = generatedText.trim()
 
-  if (isRegeneration) {
+  if (isRegeneration && cleanGeneratedText) {
     const lastStartingMessage = chatMessages[chatMessages.length - 1].message
 
     const updatedMessage = await updateMessage(lastStartingMessage.id, {
       ...lastStartingMessage,
-      content: generatedText
+      content: cleanGeneratedText
     })
 
     chatMessages[chatMessages.length - 1].message = updatedMessage
 
-    finalChatMessages = [...chatMessages]
-
-    setChatMessages(finalChatMessages)
+    setChatMessages([...chatMessages])
   } else {
-    const createdMessages = await createMessages([
-      finalUserMessage,
-      finalAssistantMessage
-    ])
+    const createdMessages = cleanGeneratedText
+      ? await createMessages([finalUserMessage, finalAssistantMessage])
+      : await createMessages([finalUserMessage])
 
-    // Upload each image (stored in newMessageImages) for the user message to message_images bucket
     const uploadPromises = newMessageImages
       .filter(obj => obj.file !== null)
       .map(obj => {
-        let filePath = `${profile.user_id}/${currentChat.id}/${
-          createdMessages[0].id
-        }/${uuidv4()}`
-
+        const filePath = `${profile.user_id}/${currentChat.id}/${createdMessages[0].id}/${uuidv4()}`
         return uploadMessageImage(filePath, obj.file as File).catch(error => {
           console.error(`Failed to upload image at ${filePath}:`, error)
           return null
@@ -498,26 +491,32 @@ export const handleCreateMessages = async (
       image_paths: paths
     })
 
-    const createdMessageFileItems = await createMessageFileItems(
-      retrievedFileItems.map(fileItem => {
-        return {
-          user_id: profile.user_id,
-          message_id: createdMessages[1].id,
-          file_item_id: fileItem.id
-        }
-      })
-    )
+    if (cleanGeneratedText) {
+      await createMessageFileItems(
+        retrievedFileItems.map(fileItem => {
+          return {
+            user_id: profile.user_id,
+            message_id: createdMessages[1].id,
+            file_item_id: fileItem.id
+          }
+        })
+      )
+    }
 
-    finalChatMessages = [
+    const finalChatMessages = [
       ...chatMessages,
       {
         message: updatedMessage,
         fileItems: []
       },
-      {
-        message: createdMessages[1],
-        fileItems: retrievedFileItems.map(fileItem => fileItem.id)
-      }
+      ...(cleanGeneratedText
+        ? [
+            {
+              message: createdMessages[1],
+              fileItems: retrievedFileItems.map(fileItem => fileItem.id)
+            }
+          ]
+        : [])
     ]
 
     setChatFileItems(prevFileItems => {
