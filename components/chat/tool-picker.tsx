@@ -5,6 +5,7 @@ import { FC, useContext, useEffect, useRef } from "react"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { validatePlanForTools } from "@/lib/subscription"
 import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
+import { LLM_LIST, LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 
 interface ToolPickerProps {}
 
@@ -16,7 +17,8 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
     toolCommand,
     isToolPickerOpen,
     setIsToolPickerOpen,
-    setIsPaywallOpen
+    setIsPaywallOpen,
+    chatSettings
   } = useContext(ChatbotUIContext)
 
   const { handleSelectTool } = usePromptAndCommand()
@@ -29,7 +31,7 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
     }
   }, [focusTool])
 
-  const allTools = [...tools, ...platformTools]
+  const allTools = [...tools]
 
   const filteredTools = allTools.filter(tool =>
     tool.name.toLowerCase().includes(toolCommand.toLowerCase())
@@ -79,11 +81,19 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
       }
     }
 
+  const toolsSupported = LLM_LIST.find(
+    llm => llm.modelId === chatSettings?.model
+  )?.tools
+
   return (
     <>
       {isToolPickerOpen && (
         <div className="bg-background flex flex-col space-y-1 rounded-xl border p-2 text-sm">
-          {filteredTools.length === 0 ? (
+          {!toolsSupported ? (
+            <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
+              This model does not support plugins. Select a different model.
+            </div>
+          ) : filteredTools.length === 0 ? (
             <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
               No matching tools.
             </div>
@@ -100,13 +110,14 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
                   onClick={() => callSelectTool(item as Tables<"tools">)}
                   onKeyDown={getKeyDownHandler(index)}
                 >
-                  <IconPuzzle size={32} />
-
+                  <div className={"w-[32px]"}>
+                    <IconPuzzle size={32} />
+                  </div>
                   <div className="ml-3 flex flex-col">
                     <div className="font-bold">{item.name}</div>
 
-                    <div className="truncate text-sm opacity-80">
-                      {item.description || "No description."}
+                    <div className="line-clamp-1 max-w-full overflow-hidden text-ellipsis opacity-60">
+                      {item.description}
                     </div>
                   </div>
                 </div>
