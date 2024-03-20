@@ -22,8 +22,7 @@ import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
-import { WithTooltip } from "@/components/ui/with-tooltip"
-import { Button } from "@/components/ui/button"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
 
 interface ChatInputProps {}
 
@@ -212,21 +211,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         <ChatCommandInput />
         <div className="border-input mt-3 flex min-h-[60px] w-full flex-col justify-end overflow-hidden rounded-xl border backdrop-blur-xl">
           {selectedAssistant && (
-            <div className="bg-secondary flex items-center justify-between space-x-2 p-2 pl-4 pr-6">
+            <div className="bg-secondary flex items-center justify-between space-x-2 p-2 pl-4 pr-3">
               <div className={"flex items-center space-x-2"}>
-                {selectedAssistant.image_path && (
-                  <Image
-                    className="rounded"
-                    src={
-                      assistantImages.find(
-                        img => img.path === selectedAssistant.image_path
-                      )?.url || ""
-                    }
-                    width={28}
-                    height={28}
-                    alt={selectedAssistant.name}
-                  />
-                )}
+                <AssistantIcon assistant={selectedAssistant} size={24} />
                 <div className="text-sm font-bold">
                   Talking to {selectedAssistant.name}
                 </div>
@@ -235,7 +222,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               <IconX
                 onClick={() => setSelectedAssistant(null)}
                 className={
-                  "hover:text-foreground/50 absolute right-2 top-4 flex size-4 max-w-[calc(100vw-40px)] cursor-pointer items-center justify-center text-[10px] sm:max-w-[calc(100%-10px)]"
+                  "hover:text-foreground/50 flex size-4 cursor-pointer items-center justify-center text-[10px]"
                 }
               />
             </div>

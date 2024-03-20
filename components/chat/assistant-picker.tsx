@@ -6,6 +6,7 @@ import { FC, useContext, useEffect, useRef } from "react"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useClickOutside } from "@/components/chat/picker-hooks/use-click-outside"
 import { validatePlanForAssistant } from "@/lib/subscription"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
 
 interface AssistantPickerProps {}
 
@@ -13,7 +14,6 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
   const {
     profile,
     assistants,
-    assistantImages,
     focusAssistant,
     atCommand,
     isAssistantPickerOpen,
@@ -107,29 +107,9 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
                   }
                   onKeyDown={getKeyDownHandler(index)}
                 >
-                  <div className="w-[28px]">
-                    {item.image_path ? (
-                      <Image
-                        src={
-                          assistantImages.find(
-                            image => image.path === item.image_path
-                          )?.url || ""
-                        }
-                        alt={item.name}
-                        width={28}
-                        height={28}
-                        className="max-w-[28px] rounded"
-                      />
-                    ) : (
-                      <div className="bg-foreground flex size-[28px] items-center justify-center rounded">
-                        <IconRobotFace className="text-background" />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="ml-3 flex space-x-2">
+                  <AssistantIcon assistant={item} />
+                  <div className="ml-3 flex items-center space-x-2">
                     <div className="text-nowrap font-bold">{item.name}</div>
-
                     <div className="line-clamp-1 max-w-full overflow-hidden text-ellipsis opacity-60">
                       {item.description}
                     </div>
