@@ -1,21 +1,20 @@
 # ChatLabs
 
-ChatLabs is a fork of [Chatbotui](https://github.com/mckaywrigley/chatbot-ui) project.
+ChatLabs is a fork of the [Chatbotui](https://github.com/mckaywrigley/chatbot-ui) project.
 
 ## Why fork? And why private repo?
 
-1. First, that original project is not moving as fast as we want to: there is a growing number of pull requests that is not merged into the main. We use the fork to selectively merge those pull requests.
-2. Paywall, since we introduced a paywall, and there is no easy way to not include into the open source model we keep separate fork. In ideal world, we would like to find a way to fix this so that we can contribute back.
-3. Significant UI and UX changes. We've conducted large number of interviews with paid customers, and realized that original UX/UI isn't perfect and needs a lot of work. Hence the fork.
+1. The original project is not moving as fast as we want: [there is a growing number](https://github.com/mckaywrigley/chatbot-ui/pulls) of pull requests that are not being merged into the main branch. We use the fork to selectively merge those pull requests.
+2. Paywall: Since we introduced a paywall, and there is no easy way to exclude it from the open-source model, we keep a separate fork. Ideally, we would like to find a way to fix this so that we can contribute back.
+3. Significant UI and UX changes: We've conducted numerous interviews with paid customers and realized that the original UX/UI isn't perfect and needs a lot of work. Hence the fork.
 
 ## What is the strategy moving forward?
-1. In ideal world we would like to find a way to contribute back to the project
-2. We would like to find a way to make our own code open sourced. This will require removing some things like paywall
-3. Writingmate is currenly a monthly donor to original owner
+1. Ideally, we would like to find a way to contribute back to the project.
+2. We would like to find a way to make our own code open-source. This will require removing some things like the paywall.
+3. Writingmate is currently a monthly donor to the original owner.
 
-## What can I do to make this project opensource?
-1. Everyone is encouraged to help here
-2. Discuss what needs to be done to make it open source in [this issue](https://github.com/writingmate/webapp/issues/34)
+## What can I do to make this project open-source?
+2. Discuss what needs to be done to make it open-source in [this issue](https://github.com/writingmate/webapp/issues/34).
 
 ## Demo
 
