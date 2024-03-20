@@ -30,8 +30,9 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
   const searchParams = useSearchParams()
   const tabValue = searchParams.get("tab") || "chats"
   const { theme } = useTheme()
+  const [isUploading, setIsUploading] = useState<boolean>(false)
 
-  const { handleSelectDeviceFile } = useSelectFileHandler()
+  const { handleSelectDeviceFile } = useSelectFileHandler(setIsUploading)
 
   const [contentType, setContentType] = useState<ContentType>(
     tabValue as ContentType
