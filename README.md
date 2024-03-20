@@ -117,6 +117,15 @@ In your terminal at the root of your local ChatLabs repository, run:
 cp .env.local.example .env.local
 ```
 
+#### 2. Additional env variables for supabase
+
+Please do not share these credentials with anyone. This is a quickfix and we need to figure out how to encorporate these into the env file above.
+
+```
+export SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=xxx
+export SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET=xxx
+```
+
 Get the required values by running:
 
 ```bash
