@@ -1,9 +1,6 @@
 import { PlatformTool } from "@/types/platformTools"
 import { platformToolList } from "../platformToolsList"
-
 import { Tables } from "@/supabase/types"
-import { t } from "i18next"
-
 const generateToolSchema = (tool: any) => {
   const paths = tool.toolsFunctions.reduce((acc: any, toolFunction: any) => {
     acc[`/${toolFunction.id}`] = {
@@ -38,21 +35,18 @@ const generateToolSchema = (tool: any) => {
 
 const getToolIds = (id: string): string[] => id.split("__")
 
-export const platformToolDefinitionById = (id: string) => {
-  const tool = platformToolList.find(tool => tool.id === id)
-
-  if (!tool) {
-    throw new Error(t("Tool not found"))
-  }
-
-  return platformToolDefinition(tool) as Tables<"tools">
-}
-
 export const platformToolDefinition = (tool: PlatformTool) => {
   return {
     id: tool.id,
     name: tool.name,
     description: tool.description,
+    sharing: "platform",
+    folder_id: null,
+    user_id: "",
+    created_at: new Date("2023-03-19T00:00:00.000Z").toISOString(),
+    custom_headers: {},
+    updated_at: new Date("2023-03-19T00:00:00.000Z").toISOString(),
+    url: "",
     schema: generateToolSchema(tool) // Assuming "FetchDataFromUrl" is the function ID for all tools for simplicity
   } as Tables<"tools">
 }
@@ -62,7 +56,6 @@ export const platformToolDefinitions = () => {
 }
 
 export const platformToolFunction = (functionName: string): Function => {
-  console.log("functionName", functionName)
   const [toolName, toolFunctionId] = getToolIds(functionName)
   const tool = platformToolList.find(tool => tool.toolName === toolName)
   if (!tool) {

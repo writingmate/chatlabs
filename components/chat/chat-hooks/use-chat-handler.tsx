@@ -281,7 +281,7 @@ export const useChatHandler = () => {
       let generatedText = ""
 
       if (selectedTools.length > 0) {
-        setToolInUse("Tools")
+        setToolInUse("plugins")
 
         const formattedMessages = await buildFinalMessages(
           payload,

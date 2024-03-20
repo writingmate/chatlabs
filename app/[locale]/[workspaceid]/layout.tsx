@@ -25,7 +25,7 @@ import { LLMID } from "@/types"
 import { useParams, useRouter } from "next/navigation"
 import { ReactNode, useContext, useEffect, useState } from "react"
 import Loading from "../loading"
-import { platformToolDefinitions } from "@/lib/platformTools/utils/platformToolsUtils"
+import { getPlatformTools } from "@/db/platform-tools"
 
 interface WorkspaceLayoutProps {
   children: ReactNode
@@ -81,14 +81,11 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
   useEffect(() => {
     ;(async () => await fetchWorkspaceData(workspaceId))()
-
     setUserInput("")
     setChatMessages([])
     setSelectedChat(null)
-
     setIsGenerating(false)
     setFirstTokenReceived(false)
-
     setChatFiles([])
     setChatImages([])
     setNewMessageFiles([])
@@ -124,6 +121,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
       promptData,
       toolData,
       publicToolData,
+      platformToolData,
       modelData
     ] = await Promise.all([
       getWorkspaceById(workspaceId),
@@ -137,6 +135,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
       getPromptWorkspacesByWorkspaceId(workspaceId),
       getToolWorkspacesByWorkspaceId(workspaceId),
       getPublicTools(),
+      getPlatformTools(),
       getModelWorkspacesByWorkspaceId(workspaceId)
     ])
 
@@ -152,9 +151,13 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setFiles(fileData.files)
     setPresets(presetData.presets)
     setPrompts(promptData.prompts)
-    setTools([...toolData.tools, ...publicToolData].filter(onlyUniqueById))
+    setTools(
+      [...platformToolData, ...toolData.tools, ...publicToolData].filter(
+        onlyUniqueById
+      )
+    )
+    setPlatformTools(platformToolData)
     setModels(modelData.models)
-    setPlatformTools(platformToolDefinitions())
 
     const parallelize = async (array: any, callback: any) => {
       const promises = array.map((item: any) => callback(item))
@@ -167,8 +170,6 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
         let url = assistant.image_path
           ? getAssistantPublicImageUrl(assistant.image_path)
           : ""
-
-        console.log("url", url)
 
         if (url) {
           // const response = await fetch(url)

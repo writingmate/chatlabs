@@ -502,15 +502,22 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       )
 
       for (const tool of toolsToAdd) {
-        await createAssistantTool({
-          user_id: item.user_id,
-          assistant_id: assistantId,
-          tool_id: tool.id
-        })
+        await createAssistantTool(
+          {
+            user_id: item.user_id,
+            assistant_id: assistantId,
+            tool_id: tool.id
+          },
+          tool.sharing === "platform"
+        )
       }
 
       for (const tool of toolsToRemove) {
-        await deleteAssistantTool(assistantId, tool.id)
+        await deleteAssistantTool(
+          assistantId,
+          tool.id,
+          tool.sharing === "platform"
+        )
       }
 
       let updatedAssistant = await updateAssistant(assistantId, rest)

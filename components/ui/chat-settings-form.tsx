@@ -196,34 +196,34 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
         )}
       </div>
 
-      <div className="mt-4 flex items-center space-x-2">
-        <Checkbox
-          checked={chatSettings.includeWorkspaceInstructions}
-          onCheckedChange={(value: boolean) =>
-            onChangeChatSettings({
-              ...chatSettings,
-              includeWorkspaceInstructions: value
-            })
-          }
-        />
+      {/*<div className="mt-4 flex items-center space-x-2">*/}
+      {/*  <Checkbox*/}
+      {/*    checked={chatSettings.includeWorkspaceInstructions}*/}
+      {/*    onCheckedChange={(value: boolean) =>*/}
+      {/*      onChangeChatSettings({*/}
+      {/*        ...chatSettings,*/}
+      {/*        includeWorkspaceInstructions: value*/}
+      {/*      })*/}
+      {/*    }*/}
+      {/*  />*/}
 
-        <Label>Chats Include Workspace Instructions</Label>
+      {/*  <Label>Chats Include Workspace Instructions</Label>*/}
 
-        {showTooltip && (
-          <WithTooltip
-            delayDuration={0}
-            display={
-              <div className="w-[400px] p-3">
-                {selectedWorkspace?.instructions ||
-                  "No workspace instructions."}
-              </div>
-            }
-            trigger={
-              <IconInfoCircle className="cursor-hover:opacity-50" size={16} />
-            }
-          />
-        )}
-      </div>
+      {/*  {showTooltip && (*/}
+      {/*    <WithTooltip*/}
+      {/*      delayDuration={0}*/}
+      {/*      display={*/}
+      {/*        <div className="w-[400px] p-3">*/}
+      {/*          {selectedWorkspace?.instructions ||*/}
+      {/*            "No workspace instructions."}*/}
+      {/*        </div>*/}
+      {/*      }*/}
+      {/*      trigger={*/}
+      {/*        <IconInfoCircle className="cursor-hover:opacity-50" size={16} />*/}
+      {/*      }*/}
+      {/*    />*/}
+      {/*  )}*/}
+      {/*</div>*/}
 
       <div className="mt-5">
         <Label>Embeddings Provider</Label>

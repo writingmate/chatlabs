@@ -26,10 +26,6 @@ export const AssistantToolSelect: FC<AssistantToolSelectProps> = ({
 }) => {
   const { tools, platformTools } = useContext(ChatbotUIContext)
 
-  const allTools = (tools || []).concat(
-    platformTools || []
-  ) as Tables<"tools">[]
-
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
 
@@ -48,7 +44,7 @@ export const AssistantToolSelect: FC<AssistantToolSelectProps> = ({
     onAssistantToolsSelect(tool)
   }
 
-  if (!allTools) return null
+  if (!tools) return null
 
   return (
     <DropdownMenu
@@ -106,7 +102,7 @@ export const AssistantToolSelect: FC<AssistantToolSelectProps> = ({
             />
           ))}
 
-        {allTools
+        {tools
           .filter(
             tool =>
               !selectedAssistantTools.some(

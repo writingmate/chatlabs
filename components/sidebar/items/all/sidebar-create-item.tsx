@@ -170,7 +170,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
 
       await createAssistantFiles(assistantFiles)
       await createAssistantCollections(assistantCollections)
-      await createAssistantTools(assistantTools)
+      await createAssistantTools(assistantTools, tools)
 
       return updatedAssistant
     },

@@ -1,5 +1,8 @@
 import { openapiToFunctions } from "@/lib/openapi-conversion"
-import { platformToolFunction } from "@/lib/platformTools/utils/platformToolsUtils"
+import {
+  platformToolDefinitions,
+  platformToolFunction
+} from "@/lib/platformTools/utils/platformToolsUtils"
 import {
   checkApiKey,
   getServerProfile,
@@ -15,6 +18,14 @@ import { LLM_LIST, LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 export const runtime = "edge"
 
 export const maxDuration = 300
+
+export async function GET() {
+  return new Response(JSON.stringify(platformToolDefinitions()), {
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+}
 function getProviderClient(model: string, profile: Tables<"profiles">) {
   const provider = LLM_LIST.find(llm => llm.modelId === model)?.provider
 
@@ -61,7 +72,7 @@ export async function POST(request: Request) {
 
     await validateModelAndMessageCount(chatSettings.model, new Date())
 
-    const openai = getProviderClient(chatSettings.model, profile)
+    const client = getProviderClient(chatSettings.model, profile)
 
     let allTools: OpenAI.Chat.Completions.ChatCompletionTool[] = []
     let allRouteMaps = {}
@@ -106,7 +117,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const firstResponse = await openai.chat.completions.create({
+    const firstResponse = await client.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages,
       tools: allTools.length > 0 ? allTools : undefined
@@ -265,7 +276,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const secondResponse = await openai.chat.completions.create({
+    const secondResponse = await client.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages,
       stream: true

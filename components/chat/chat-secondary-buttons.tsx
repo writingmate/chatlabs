@@ -34,13 +34,13 @@ export const ChatSecondaryButtons: FC<ChatSecondaryButtonsProps> = ({}) => {
                       ? "Enabled"
                       : "Disabled"}
                   </div>
-                  <div>
-                    {" "}
-                    Workspace Instructions:{" "}
-                    {selectedChat.include_workspace_instructions
-                      ? "Enabled"
-                      : "Disabled"}
-                  </div>
+                  {/*<div>*/}
+                  {/*  {" "}*/}
+                  {/*  Workspace Instructions:{" "}*/}
+                  {/*  {selectedChat.include_workspace_instructions*/}
+                  {/*    ? "Enabled"*/}
+                  {/*    : "Disabled"}*/}
+                  {/*</div>*/}
 
                   <div>
                     Embeddings Provider: {selectedChat.embeddings_provider}
