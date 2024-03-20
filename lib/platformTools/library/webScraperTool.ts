@@ -104,9 +104,7 @@ async function googleSearch({
   const response = await fetch("https://google.serper.dev/search", {
     method: "POST",
     headers: {
-      "X-API-KEY":
-        process.env.SERPER_API_KEY ||
-        "ed8b5dff55f338bb672b086aa0e96b84a84f301f",
+      "X-API-KEY": process.env.SERPER_API_KEY,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({ q: query })
