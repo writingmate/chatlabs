@@ -320,3 +320,18 @@ export async function buildGoogleGeminiFinalMessages(
 
   return finalMessages
 }
+
+// Anthropic API requires first assistant message to be user
+export async function buildClaudeFinalMessages(
+  payload: ChatPayload,
+  profile: Tables<"profiles">,
+  chatImages: MessageImage[]
+) {
+  const finalMessages = await buildFinalMessages(payload, profile, chatImages)
+
+  if (finalMessages.length > 1 && finalMessages[1].role !== "user") {
+    return finalMessages.toSpliced(1, 1)
+  }
+
+  return finalMessages
+}

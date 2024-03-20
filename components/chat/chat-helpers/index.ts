@@ -6,6 +6,7 @@ import { createMessageFileItems } from "@/db/message-file-items"
 import { createMessages, updateMessage } from "@/db/messages"
 import { uploadMessageImage } from "@/db/storage/message-images"
 import {
+  buildClaudeFinalMessages,
   buildFinalMessages,
   buildGoogleGeminiFinalMessages
 } from "@/lib/build-prompt"
@@ -227,8 +228,16 @@ export const handleHostedChat = async (
 
   let formattedMessages = []
 
+  console.log("provider", provider)
+
   if (provider === "google") {
     formattedMessages = await buildGoogleGeminiFinalMessages(
+      payload,
+      profile,
+      newMessageImages
+    )
+  } else if (provider === "anthropic") {
+    formattedMessages = await buildClaudeFinalMessages(
       payload,
       profile,
       newMessageImages
