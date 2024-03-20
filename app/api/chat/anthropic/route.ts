@@ -45,25 +45,32 @@ export async function POST(request: NextRequest) {
         const stream = AnthropicStream(response)
         return new StreamingTextResponse(stream)
       } catch (error: any) {
-        console.error("Error parsing Anthropic API response:", error)
+        const errorCode = error.status || 500
+        console.error("Error parsing Anthropic API response:", error, {
+          payload: json
+        })
         return new NextResponse(
           JSON.stringify({
             message:
               "An error occurred while parsing the Anthropic API response"
           }),
-          { status: 500 }
+          { status: errorCode }
         )
       }
     } catch (error: any) {
-      console.error("Error calling Anthropic API:", error)
+      const errorCode = error.status || 500
+      console.error("Error calling Anthropic API:", error, {
+        payload: json
+      })
       return new NextResponse(
         JSON.stringify({
           message: "An error occurred while calling the Anthropic API"
         }),
-        { status: 500 }
+        { status: errorCode }
       )
     }
   } catch (error: any) {
+    console.error("Error processing request:", error, { payload: json })
     let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     if (errorMessage.toLowerCase().includes("api key not found")) {
