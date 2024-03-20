@@ -14,9 +14,7 @@ export const ACCEPTED_FILE_TYPES = [
   "text/plain"
 ].join(",")
 
-export const useSelectFileHandler = (
-  setIsUploading: (value: boolean) => void
-) => {
+export const useSelectFileHandler = () => {
   const {
     selectedWorkspace,
     profile,
@@ -29,6 +27,7 @@ export const useSelectFileHandler = (
   } = useContext(ChatbotUIContext)
 
   const [filesToAccept, setFilesToAccept] = useState(ACCEPTED_FILE_TYPES)
+  const [isUploading, setIsUploading] = useState<boolean>(false)
 
   useEffect(() => {
     handleFilesToAccept()
@@ -202,6 +201,7 @@ export const useSelectFileHandler = (
 
   return {
     handleSelectDeviceFile,
-    filesToAccept
+    filesToAccept,
+    isUploading
   }
 }

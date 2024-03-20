@@ -35,7 +35,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   })
 
   const [isTyping, setIsTyping] = useState<boolean>(false)
-  const [isUploading, setIsUploading] = useState<boolean>(false)
 
   const {
     isAssistantPickerOpen,
@@ -73,8 +72,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   const { handleInputChange } = usePromptAndCommand()
 
-  const { filesToAccept, handleSelectDeviceFile } =
-    useSelectFileHandler(setIsUploading)
+  const { filesToAccept, handleSelectDeviceFile, isUploading } =
+    useSelectFileHandler()
 
   const {
     setNewMessageContentToNextUserMessage,
