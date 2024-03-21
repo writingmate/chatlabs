@@ -228,8 +228,6 @@ export const handleHostedChat = async (
 
   let formattedMessages = []
 
-  console.log("provider", provider)
-
   if (provider === "google") {
     formattedMessages = await buildGoogleGeminiFinalMessages(
       payload,
@@ -240,7 +238,7 @@ export const handleHostedChat = async (
     formattedMessages = await buildClaudeFinalMessages(
       payload,
       profile,
-      newMessageImages
+      chatImages
     )
   } else {
     formattedMessages = await buildFinalMessages(payload, profile, chatImages)
@@ -485,6 +483,9 @@ export const handleCreateMessages = async (
     const paths = (await Promise.all(uploadPromises)).filter(
       Boolean
     ) as string[]
+
+    console.log(paths)
+    console.log(newMessageImages)
 
     setChatImages(prevImages => [
       ...prevImages,

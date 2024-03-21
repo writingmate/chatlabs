@@ -329,7 +329,12 @@ export async function buildClaudeFinalMessages(
 ) {
   const finalMessages = await buildFinalMessages(payload, profile, chatImages)
 
-  if (finalMessages.length > 1 && finalMessages[1].role !== "user") {
+  // Remove first assistant message
+  if (
+    finalMessages.length > 1 &&
+    finalMessages[1].role !== "user" &&
+    finalMessages[0].role === "system"
+  ) {
     return finalMessages.toSpliced(1, 1)
   }
 

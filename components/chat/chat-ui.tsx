@@ -59,8 +59,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchMessages()
-      await fetchChat()
+      await Promise.all([fetchMessages(), fetchChat()])
 
       scrollToBottom()
       setIsAtBottom(true)
@@ -111,6 +110,9 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     )
 
     const images: MessageImage[] = await Promise.all(imagePromises.flat())
+
+    console.log("MessageImage", images)
+
     setChatImages(images)
 
     const messageFileItemPromises = fetchedMessages.map(
