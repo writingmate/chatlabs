@@ -2,8 +2,12 @@ import { supabase } from "@/lib/supabase/browser-client"
 import { Database, TablesInsert, TablesUpdate } from "@/supabase/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 
-export const getProfileByUserId = async (userId: string) => {
-  const { data: profile, error } = await supabase
+export const getProfileByUserId = async (
+  userId: string,
+  supabaseClient?: SupabaseClient
+) => {
+  const client = supabaseClient || supabase
+  const { data: profile, error } = await client
     .from("profiles")
     .select("*")
     .eq("user_id", userId)
