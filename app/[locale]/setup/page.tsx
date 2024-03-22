@@ -99,6 +99,10 @@ export default function SetupPage() {
       profile = await getProfileByUserId(user.id)
     }
 
+    if (!profile || typeof profile === "undefined") {
+      return router.push("/setup")
+    }
+
     const data = await fetchHostedModels(profile)
 
     if (!data) return

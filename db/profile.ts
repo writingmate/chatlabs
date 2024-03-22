@@ -11,7 +11,7 @@ export const getProfileByUserId = async (
     .from("profiles")
     .select("*")
     .eq("user_id", userId)
-    .maybeSingle()
+    .single()
 
   if (!profile || error) {
     throw new Error(error?.message || "Profile not found")
