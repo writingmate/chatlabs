@@ -8,7 +8,11 @@ import { FC } from "react"
 export const Providers: FC<ThemeProviderProps> = ({ children, ...props }) => {
   return (
     <NextThemesProvider {...props}>
-      <TooltipProvider>{children}</TooltipProvider>
+      <TooltipProvider>
+        {/*<AI>*/}
+        {children}
+        {/*</AI>*/}
+      </TooltipProvider>
     </NextThemesProvider>
   )
 }
