@@ -307,6 +307,25 @@ export const fetchChatResponse = async (
   return response
 }
 
+function parseDataStream(contentToAdd: string) {
+  // regex to parse message like this '0: "text", 1: "text"'
+  let data = null
+  const regex = /0:"(.+)"/g
+  const regexData = /8:"(.+)"/g
+  let matches
+  let newContentToAdd = ""
+  contentToAdd.split("\n").forEach(value => {
+    if ((matches = regex.exec(value)) !== null) {
+      newContentToAdd += matches[1]
+    }
+    if ((matches = regexData.exec(value)) !== null) {
+      data = JSON.parse(matches[1])
+    }
+  })
+
+  return { text: newContentToAdd, data: data }
+}
+
 export const processResponse = async (
   response: Response,
   lastChatMessage: ChatMessage,
@@ -314,10 +333,12 @@ export const processResponse = async (
   controller: AbortController,
   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setToolInUse: React.Dispatch<React.SetStateAction<string>>
+  setToolInUse: React.Dispatch<React.SetStateAction<string>>,
+  selectedTools: Tables<"tools">[] = []
 ) => {
   let fullText = ""
   let contentToAdd = ""
+  let data: any = null
 
   if (response.body) {
     await consumeReadableStream(
@@ -340,7 +361,13 @@ export const processResponse = async (
                   (acc, line) => acc + JSON.parse(line).message.content,
                   ""
                 )
-          fullText += contentToAdd
+
+          if (selectedTools.length > 0) {
+            // regex to parse message like this '0: "text", 1: "text"'
+            ;({ text: contentToAdd, data } = parseDataStream(contentToAdd))
+          } else {
+            fullText += contentToAdd
+          }
         } catch (error) {
           console.error("Error parsing JSON:", error)
         }
@@ -353,7 +380,8 @@ export const processResponse = async (
                   ...chatMessage.message,
                   content: chatMessage.message.content + contentToAdd
                 },
-                fileItems: chatMessage.fileItems
+                fileItems: chatMessage.fileItems,
+                annotations: data
               }
 
               return updatedChatMessage
@@ -365,6 +393,13 @@ export const processResponse = async (
       },
       controller.signal
     )
+
+    if (selectedTools.length > 0) {
+      return {
+        text: fullText,
+        data: data
+      }
+    }
 
     return fullText
   } else {

@@ -13,6 +13,7 @@ import { useContext, useEffect, useRef } from "react"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import {
   createTempMessages,
+  fetchChatResponse,
   handleCreateChat,
   handleCreateMessages,
   handleHostedChat,
@@ -289,17 +290,18 @@ export const useChatHandler = () => {
           chatImages
         )
 
-        const response = await fetch("/api/chat/tools", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
+        const response = await fetchChatResponse(
+          "/api/chat/tools",
+          {
             chatSettings: payload.chatSettings,
             messages: formattedMessages,
             selectedTools
-          })
-        })
+          },
+          true,
+          newAbortController,
+          setIsGenerating,
+          setChatMessages
+        )
 
         setToolInUse("none")
 
@@ -312,7 +314,8 @@ export const useChatHandler = () => {
           newAbortController,
           setFirstTokenReceived,
           setChatMessages,
-          setToolInUse
+          setToolInUse,
+          selectedTools
         )
       } else {
         if (modelData!.provider === "ollama") {

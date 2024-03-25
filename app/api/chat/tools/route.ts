@@ -10,7 +10,11 @@ import {
 } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
-import { OpenAIStream, StreamingTextResponse } from "ai"
+import {
+  experimental_StreamData,
+  OpenAIStream,
+  StreamingTextResponse
+} from "ai"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 import { LLM_LIST, LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
@@ -64,6 +68,8 @@ export async function POST(request: Request) {
     messages: any[]
     selectedTools: Tables<"tools">[]
   }
+
+  const streamData = new experimental_StreamData()
 
   try {
     const profile = await getServerProfile()
@@ -128,7 +134,7 @@ export async function POST(request: Request) {
     const toolCalls = message.tool_calls || []
 
     if (toolCalls.length === 0) {
-      return new Response(message.content, {
+      return new Response(`0:"${message.content?.replace("\n", "\\n")}"`, {
         headers: {
           "Content-Type": "application/json"
         }
@@ -159,6 +165,10 @@ export async function POST(request: Request) {
           }
 
           const data = await toolFunction(parsedArgs)
+
+          streamData.appendMessageAnnotation({
+            [`${functionName}`]: data
+          })
 
           messages.push({
             tool_call_id: toolCall.id,
@@ -267,6 +277,10 @@ export async function POST(request: Request) {
           }
         }
 
+        streamData.appendMessageAnnotation({
+          functionName: data
+        })
+
         messages.push({
           tool_call_id: toolCall.id,
           role: "tool",
@@ -282,11 +296,15 @@ export async function POST(request: Request) {
       stream: true
     })
 
-    const stream = OpenAIStream(secondResponse)
+    const stream = OpenAIStream(secondResponse, {
+      onFinal(completion) {
+        streamData.close()
+      },
+      experimental_streamData: true
+    })
 
-    return new StreamingTextResponse(stream)
+    return new StreamingTextResponse(stream, {}, streamData)
   } catch (error: any) {
-    console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {

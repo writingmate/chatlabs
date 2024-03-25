@@ -2,12 +2,24 @@ import { PlatformTool } from "@/types/platformTools"
 import OpenAI from "openai"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 
+type ImageSize = "256x256" | "512x512" | "1024x1024" | "1792x1024" | "1024x1792"
 // This function fetches data from a URL and returns it in markdown format.
-const imageGenerator = async ({
-  parameters: { prompt, size = "1024x1024" }
-}: {
-  parameters: { prompt: string; size: "1024x1024" }
-}) => {
+const imageGenerator = async (
+  params:
+    | {
+        parameters: { prompt: string; size: ImageSize }
+      }
+    | {
+        prompt: string
+        size: ImageSize
+      }
+) => {
+  if ("parameters" in params) {
+    params = params.parameters
+  }
+
+  let { prompt, size } = params
+
   if (prompt === undefined) {
     throw new Error("prompt is required")
   }
@@ -16,19 +28,10 @@ const imageGenerator = async ({
     throw new Error("prompt must be a string")
   }
 
-  if (size === undefined) {
-    throw new Error("size is required")
-  }
-
-  if (typeof size !== "string") {
-    throw new Error("size must be a string")
-  }
-
   if (
     size !== "1024x1024" &&
     size !== "256x256" &&
     size !== "512x512" &&
-    size !== "1024x1024" &&
     size !== "1792x1024" &&
     size !== "1024x1792"
   ) {
@@ -77,7 +80,7 @@ export const imageGeneratorTool: PlatformTool = {
       id: "generateImage", // This is the unique identifier of the tool function.
       toolFunction: imageGenerator, // This is the function that will be called when the tool function is executed.
       description:
-        "Generate an image from a prompt. Returns the URL of the image. Always display the image using markdown", // This is the description of the tool function.
+        "Generate an image from a prompt. Returns the URL of the image. Never display the image in the response, nor include the link or url, it is handled in the frontend.", // This is the description of the tool function.
       parameters: [
         // These are the parameters of the tool function.
         {
