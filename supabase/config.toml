@@ -121,7 +121,7 @@ secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
 #url = ""
 
 [auth.external.azure]
-enabled = true
+enabled = false
 client_id = "env(SUPABASE_AUTH_EXTERNAL_AZURE_CLIENT_ID)"
 # DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
 secret = "env(SUPABASE_AUTH_EXTERNAL_AZURE_CLIENT_SECRET)"
