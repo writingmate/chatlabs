@@ -187,13 +187,13 @@ export const Message: FC<MessageProps> = ({
     return acc
   }, fileAccumulator)
 
-  function Annotations({ annon }: { annon: Annotation }) {
-    if (!annon) {
+  function Annotations({ annotation }: { annotation: Annotation }) {
+    if (!annotation) {
       return null
     }
 
-    if (Array.isArray(annon)) {
-      annon = annon.reduce((acc, item) => {
+    if (Array.isArray(annotation)) {
+      annotation = annotation.reduce((acc, item) => {
         acc = {
           ...acc,
           ...item
@@ -211,9 +211,9 @@ export const Message: FC<MessageProps> = ({
       webScraper__googleSearch: WebSearch
     }
 
-    return Object.keys(annon).map(key => {
+    return Object.keys(annotation).map(key => {
       const AnnotationComponent = annotationMap[key]!
-      return <AnnotationComponent key={key} annotation={annon} />
+      return <AnnotationComponent key={key} annotation={annotation} />
     })
   }
 
@@ -303,7 +303,7 @@ export const Message: FC<MessageProps> = ({
               </div>
             </div>
           )}
-          <Annotations annon={message.annotation as Annotation} />
+          <Annotations annotation={message.annotation as Annotation} />
           {!firstTokenReceived &&
           isGenerating &&
           isLast &&

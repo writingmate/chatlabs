@@ -106,7 +106,8 @@ export const createTempMessages = (
   b64Images: string[],
   isRegeneration: boolean,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  selectedAssistant: Tables<"assistants"> | null
+  selectedAssistant: Tables<"assistants"> | null,
+  data = {}
 ) => {
   let tempUserChatMessage: ChatMessage = {
     message: {
