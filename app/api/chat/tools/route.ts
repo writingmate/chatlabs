@@ -97,8 +97,6 @@ export async function POST(request: Request) {
   try {
     const profile = await getServerProfile()
 
-    checkApiKey(profile.openai_api_key, "OpenAI")
-
     await validateModelAndMessageCount(chatSettings.model, new Date())
 
     const client = getProviderClient(chatSettings.model, profile)
@@ -328,7 +326,8 @@ export async function POST(request: Request) {
 
     return new StreamingTextResponse(stream, {}, streamData)
   } catch (error: any) {
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    console.error(error)
+    const errorMessage = error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
