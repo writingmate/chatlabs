@@ -15,6 +15,21 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({ content }) => {
       // remarkPlugins={[remarkGfm, remarkMath]}
       remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
       components={{
+        a({ children, ...props }) {
+          if (typeof children === "string" && /^\d+$/.test(children)) {
+            return (
+              <a
+                {...props}
+                title={props.href}
+                target={"_blank"}
+                className="bg-foreground/20 ml-1 inline-flex size-[16px] items-center justify-center rounded-full text-[10px] no-underline"
+              >
+                {children}
+              </a>
+            )
+          }
+          return <a {...props}>{children}</a>
+        },
         p({ children }) {
           return <p className="mb-2 last:mb-0">{children}</p>
         },

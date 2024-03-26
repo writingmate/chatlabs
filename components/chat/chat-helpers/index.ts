@@ -120,7 +120,8 @@ export const createTempMessages = (
       role: "user",
       sequence_number: chatMessages.length,
       updated_at: "",
-      user_id: ""
+      user_id: "",
+      annotation: {}
     },
     fileItems: []
   }
@@ -137,7 +138,8 @@ export const createTempMessages = (
       role: "assistant",
       sequence_number: chatMessages.length + 1,
       updated_at: "",
-      user_id: ""
+      user_id: "",
+      annotation: {}
     },
     fileItems: []
   }
@@ -147,6 +149,7 @@ export const createTempMessages = (
   if (isRegeneration) {
     const lastMessageIndex = chatMessages.length - 1
     chatMessages[lastMessageIndex].message.content = ""
+    chatMessages[lastMessageIndex].message.annotation = {}
     newMessages = [...chatMessages]
   } else {
     newMessages = [
@@ -310,20 +313,21 @@ export const fetchChatResponse = async (
 function parseDataStream(contentToAdd: string) {
   // regex to parse message like this '0: "text", 1: "text"'
   let data = null
-  const regex = /0:"(.+)"/g
-  const regexData = /8:"(.+)"/g
+
   let matches
-  let newContentToAdd = ""
-  contentToAdd.split("\n").forEach(value => {
+  let newContentToAdd: string[] = []
+  contentToAdd.split("\n").forEach((value, index) => {
+    const regex = /0:"(.+)"/g
+    const regexData = /8:(\[.+\])/g
     if ((matches = regex.exec(value)) !== null) {
-      newContentToAdd += matches[1]
+      newContentToAdd[index] = matches[1]
     }
     if ((matches = regexData.exec(value)) !== null) {
       data = JSON.parse(matches[1])
     }
   })
 
-  return { text: newContentToAdd, data: data }
+  return { text: newContentToAdd.join("").replace(/\\n/g, "\n"), data: data }
 }
 
 export const processResponse = async (
@@ -363,8 +367,12 @@ export const processResponse = async (
                 )
 
           if (selectedTools.length > 0) {
-            // regex to parse message like this '0: "text", 1: "text"'
-            ;({ text: contentToAdd, data } = parseDataStream(contentToAdd))
+            const { text, data: newData } = parseDataStream(contentToAdd)
+            if (newData) {
+              data = newData
+            }
+            contentToAdd = text
+            fullText += text
           } else {
             fullText += contentToAdd
           }
@@ -378,10 +386,10 @@ export const processResponse = async (
               const updatedChatMessage: ChatMessage = {
                 message: {
                   ...chatMessage.message,
-                  content: chatMessage.message.content + contentToAdd
+                  content: chatMessage.message.content + contentToAdd,
+                  annotation: data
                 },
-                fileItems: chatMessage.fileItems,
-                annotations: data
+                fileItems: chatMessage.fileItems
               }
 
               return updatedChatMessage
@@ -394,14 +402,10 @@ export const processResponse = async (
       controller.signal
     )
 
-    if (selectedTools.length > 0) {
-      return {
-        text: fullText,
-        data: data
-      }
+    return {
+      generatedText: fullText,
+      data
     }
-
-    return fullText
   } else {
     throw new Error("Response body is null")
   }
@@ -414,9 +418,11 @@ export const handleCreateChat = async (
   messageContent: string,
   selectedAssistant: Tables<"assistants">,
   newMessageFiles: ChatFile[],
+  selectedTools: Tables<"tools">[],
   setSelectedChat: React.Dispatch<React.SetStateAction<Tables<"chats"> | null>>,
   setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>,
-  setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>
+  setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>,
+  setSelectedTools: React.Dispatch<React.SetStateAction<Tables<"tools">[]>>
 ) => {
   const createdChat = await createChat({
     user_id: profile.user_id,
@@ -432,6 +438,7 @@ export const handleCreateChat = async (
     embeddings_provider: chatSettings.embeddingsProvider
   })
 
+  setSelectedTools(selectedTools)
   setSelectedChat(createdChat)
   setChats(chats => [createdChat, ...chats])
 
@@ -463,7 +470,8 @@ export const handleCreateMessages = async (
     React.SetStateAction<Tables<"file_items">[]>
   >,
   setChatImages: React.Dispatch<React.SetStateAction<MessageImage[]>>,
-  selectedAssistant: Tables<"assistants"> | null
+  selectedAssistant: Tables<"assistants"> | null,
+  data: any
 ) => {
   const finalUserMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
@@ -473,7 +481,8 @@ export const handleCreateMessages = async (
     model: modelData.modelId,
     role: "user",
     sequence_number: chatMessages.length,
-    image_paths: []
+    image_paths: [],
+    annotation: {}
   }
 
   const finalAssistantMessage: TablesInsert<"messages"> = {
@@ -484,7 +493,8 @@ export const handleCreateMessages = async (
     model: modelData.modelId,
     role: "assistant",
     sequence_number: chatMessages.length + 1,
-    image_paths: []
+    image_paths: [],
+    annotation: data
   }
 
   const cleanGeneratedText = generatedText.trim()

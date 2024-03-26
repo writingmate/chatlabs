@@ -860,6 +860,7 @@ export interface Database {
       }
       messages: {
         Row: {
+          annotation: Json | null
           assistant_id: string | null
           chat_id: string
           content: string
@@ -873,6 +874,7 @@ export interface Database {
           user_id: string
         }
         Insert: {
+          annotation?: Json | null
           assistant_id?: string | null
           chat_id: string
           content: string
@@ -886,6 +888,7 @@ export interface Database {
           user_id: string
         }
         Update: {
+          annotation?: Json | null
           assistant_id?: string | null
           chat_id?: string
           content?: string

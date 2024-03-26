@@ -9,7 +9,6 @@ interface MessageActionsProps {
   isAssistant: boolean
   isLast: boolean
   isEditing: boolean
-  isHovering: boolean
   onCopy: () => void
   onEdit: () => void
   onRegenerate: () => void
@@ -19,7 +18,6 @@ export const MessageActions: FC<MessageActionsProps> = ({
   isAssistant,
   isLast,
   isEditing,
-  isHovering,
   onCopy,
   onEdit,
   onRegenerate
@@ -62,54 +60,48 @@ export const MessageActions: FC<MessageActionsProps> = ({
         />
       )} */}
 
-      {!isAssistant && isHovering && (
-        <WithTooltip
-          delayDuration={1000}
-          side="bottom"
-          display={<div>Edit</div>}
-          trigger={
-            <IconEdit
-              className="cursor-pointer hover:opacity-50"
-              size={MESSAGE_ICON_SIZE}
-              onClick={onEdit}
-            />
-          }
-        />
-      )}
+      <WithTooltip
+        delayDuration={1000}
+        side="bottom"
+        display={<div>Edit</div>}
+        trigger={
+          <IconEdit
+            className="hidden cursor-pointer hover:opacity-50 group-hover:group-[.role-user]:block"
+            size={MESSAGE_ICON_SIZE}
+            onClick={onEdit}
+          />
+        }
+      />
 
-      {(isHovering || isLast) && (
-        <WithTooltip
-          delayDuration={1000}
-          side="bottom"
-          display={<div>Copy</div>}
-          trigger={
-            showCheckmark ? (
-              <IconCheck size={MESSAGE_ICON_SIZE} />
-            ) : (
-              <IconCopy
-                className="cursor-pointer hover:opacity-50"
-                size={MESSAGE_ICON_SIZE}
-                onClick={handleCopy}
-              />
-            )
-          }
-        />
-      )}
-
-      {isLast && (
-        <WithTooltip
-          delayDuration={1000}
-          side="bottom"
-          display={<div>Regenerate</div>}
-          trigger={
-            <IconRepeat
-              className="cursor-pointer hover:opacity-50"
+      <WithTooltip
+        delayDuration={1000}
+        side="bottom"
+        display={<div>Copy</div>}
+        trigger={
+          showCheckmark ? (
+            <IconCheck size={MESSAGE_ICON_SIZE} />
+          ) : (
+            <IconCopy
+              className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
               size={MESSAGE_ICON_SIZE}
-              onClick={onRegenerate}
+              onClick={handleCopy}
             />
-          }
-        />
-      )}
+          )
+        }
+      />
+
+      <WithTooltip
+        delayDuration={1000}
+        side="bottom"
+        display={<div>Regenerate</div>}
+        trigger={
+          <IconRepeat
+            className="hidden cursor-pointer hover:opacity-50 group-[.is-last]:block"
+            size={MESSAGE_ICON_SIZE}
+            onClick={onRegenerate}
+          />
+        }
+      />
 
       {/* {1 > 0 && isAssistant && <MessageReplies />} */}
     </div>

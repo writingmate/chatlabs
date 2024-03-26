@@ -12,6 +12,8 @@ import {
   IconFileText,
   IconMoodSmile,
   IconPencil,
+  IconPlayerPlay,
+  IconPlayerPlayFilled,
   IconPuzzle,
   IconTerminal2
 } from "@tabler/icons-react"
@@ -25,6 +27,10 @@ import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { MessageActions } from "./message-actions"
 import { MessageMarkdown } from "./message-markdown"
+import { YouTube } from "@/components/messages/annotations/youtube"
+import { WebSearch } from "@/components/messages/annotations/websearch"
+import AnnotationImage from "@/components/messages/annotations/image"
+import { Annotation } from "@/types/annotation"
 
 const ICON_SIZE = 32
 
@@ -181,14 +187,44 @@ export const Message: FC<MessageProps> = ({
     return acc
   }, fileAccumulator)
 
+  function Annotations({ annon }: { annon: Annotation }) {
+    if (!annon) {
+      return null
+    }
+
+    if (Array.isArray(annon)) {
+      annon = annon.reduce((acc, item) => {
+        acc = {
+          ...acc,
+          ...item
+        }
+
+        return acc
+      }, {})
+    }
+
+    const annotationMap: {
+      [key: string]: React.FC<{ annotation: Annotation }>
+    } = {
+      imageGenerator__generateImage: AnnotationImage,
+      webScraper__youtubeCaptions: YouTube,
+      webScraper__googleSearch: WebSearch
+    }
+
+    return Object.keys(annon).map(key => {
+      const AnnotationComponent = annotationMap[key]!
+      return <AnnotationComponent key={key} annotation={annon} />
+    })
+  }
+
   return (
     <div
       className={cn(
-        "flex w-full justify-center",
-        message.role === "user" ? "" : "bg-secondary"
+        "group flex w-full justify-center",
+        message.role === "user" ? "" : "bg-secondary",
+        "role-" + message.role,
+        isLast ? "is-last" : ""
       )}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
       onKeyDown={handleKeyDown}
     >
       <div className="relative flex w-[300px] flex-col py-6 sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]">
@@ -199,7 +235,6 @@ export const Message: FC<MessageProps> = ({
             isAssistant={message.role === "assistant"}
             isLast={isLast}
             isEditing={isEditing}
-            isHovering={isHovering}
             onRegenerate={handleRegenerate}
           />
         </div>
@@ -268,6 +303,7 @@ export const Message: FC<MessageProps> = ({
               </div>
             </div>
           )}
+          <Annotations annon={message.annotation as Annotation} />
           {!firstTokenReceived &&
           isGenerating &&
           isLast &&

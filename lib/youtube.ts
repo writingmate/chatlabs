@@ -70,7 +70,5 @@ export async function getSubtitles({
       }
     })
 
-  console.log(lines)
-
   return lines
 }

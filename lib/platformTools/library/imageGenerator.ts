@@ -1,4 +1,4 @@
-import { PlatformTool } from "@/types/platformTools"
+import { ImageGeneratorResult, PlatformTool } from "@/types/platformTools"
 import OpenAI from "openai"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 
@@ -13,7 +13,7 @@ const imageGenerator = async (
         prompt: string
         size: ImageSize
       }
-) => {
+): Promise<ImageGeneratorResult> => {
   if ("parameters" in params) {
     params = params.parameters
   }

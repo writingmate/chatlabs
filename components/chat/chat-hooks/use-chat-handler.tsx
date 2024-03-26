@@ -100,7 +100,7 @@ export const useChatHandler = () => {
     setIsPromptPickerOpen(false)
     setIsFilePickerOpen(false)
 
-    setSelectedTools([])
+    // setSelectedTools([])
     setToolInUse("none")
 
     if (selectedAssistant) {
@@ -280,6 +280,7 @@ export const useChatHandler = () => {
       }
 
       let generatedText = ""
+      let data = null
 
       if (selectedTools.length > 0) {
         setToolInUse("plugins")
@@ -305,7 +306,7 @@ export const useChatHandler = () => {
 
         setToolInUse("none")
 
-        generatedText = await processResponse(
+        ;({ generatedText, data } = await processResponse(
           response,
           isRegeneration
             ? payload.chatMessages[payload.chatMessages.length - 1]
@@ -316,10 +317,10 @@ export const useChatHandler = () => {
           setChatMessages,
           setToolInUse,
           selectedTools
-        )
+        ))
       } else {
         if (modelData!.provider === "ollama") {
-          generatedText = await handleLocalChat(
+          ;({ generatedText, data } = await handleLocalChat(
             payload,
             profile!,
             chatSettings!,
@@ -330,9 +331,9 @@ export const useChatHandler = () => {
             setFirstTokenReceived,
             setChatMessages,
             setToolInUse
-          )
+          ))
         } else {
-          generatedText = await handleHostedChat(
+          ;({ generatedText } = await handleHostedChat(
             payload,
             profile!,
             modelData!,
@@ -345,7 +346,7 @@ export const useChatHandler = () => {
             setFirstTokenReceived,
             setChatMessages,
             setToolInUse
-          )
+          ))
         }
       }
 
@@ -357,9 +358,11 @@ export const useChatHandler = () => {
           messageContent,
           selectedAssistant!,
           newMessageFiles,
+          selectedTools,
           setSelectedChat,
           setChats,
-          setChatFiles
+          setChatFiles,
+          setSelectedTools
         )
       } else {
         const updatedChat = await updateChat(currentChat.id, {
@@ -388,7 +391,8 @@ export const useChatHandler = () => {
         setChatMessages,
         setChatFileItems,
         setChatImages,
-        selectedAssistant
+        selectedAssistant,
+        data
       )
 
       setIsGenerating(false)

@@ -1,4 +1,8 @@
-import { PlatformTool } from "@/types/platformTools"
+import {
+  GetYoutubeCaptionsResult,
+  GoogleSearchResult,
+  PlatformTool
+} from "@/types/platformTools"
 import html2md from "html-to-md"
 import { getSubtitles } from "@/lib/youtube"
 
@@ -59,7 +63,9 @@ const webScraper = async ({
   return { url, mdDoc }
 }
 
-async function getYoutubeCaptions(params: any) {
+async function getYoutubeCaptions(
+  params: any
+): Promise<GetYoutubeCaptionsResult> {
   let videoId = params.videoId || params.parameters?.videoId || ""
 
   if (!videoId) {
@@ -82,25 +88,25 @@ async function getYoutubeCaptions(params: any) {
     throw new Error("videoId must be a string")
   }
 
-  const result = await getSubtitles({
-    videoID: videoId,
-    lang: "en"
-  })
+  const result = (
+    await getSubtitles({
+      videoID: videoId,
+      lang: "en"
+    })
+  ).flatMap(x => (!!x ? [x] : []))
 
   return {
-    subitles: result,
-    imageUrl: "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg"
+    subtitles: result,
+    imageUrl: "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg",
+    videoUrl: "https://www.youtube.com/watch?v=" + videoId
   }
 }
 
-// printf '{"q":"apple inc"}'| http  --follow --timeout 3600 POST 'https://google.serper.dev/search' \
-//  X-API-KEY:'ed8b5dff55f338bb672b086aa0e96b84a84f301f' \
-//  Content-Type:'application/json'
 async function googleSearch({
   parameters: { query }
 }: {
   parameters: { query: string }
-}) {
+}): Promise<GoogleSearchResult> {
   const response = await fetch("https://google.serper.dev/search", {
     method: "POST",
     headers: {
@@ -128,10 +134,7 @@ export const webScraperTool: PlatformTool = {
   // This is the description of the tool.
   description: `This tool uses two functions, 
   one to search google when a search query is provided, 
-  and another to fetch data from a URL. 
-  When performing a search, it should always scrape the provided urls and return the results in markdown format. 
-  When performing Google Search, always add the results into the response, including links. 
-  For youtube links use youtubeCaptions function. Also always include markdown image in the response in the format https://img.youtube.com/vi/{videoId}/hqdefault.jpg.`,
+  and another to fetch data from a URL.`,
   toolsFunctions: [
     {
       id: "FetchDataFromUrl", // This is the unique identifier of the tool function.
