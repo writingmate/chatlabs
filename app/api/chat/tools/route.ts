@@ -72,6 +72,7 @@ function getProviderCaller(model: string, profile: Tables<"profiles">) {
 }
 
 const SYSTEM_PROMPT = `
+Today is ${new Date().toLocaleDateString()}.
 
 Always break down youtube captions in to three sentence paragraphs and add links to time codes like this:
 <paragraph1>[1](https://youtube.com/watch?v=VIDEO_ID&s=START).
@@ -164,7 +165,7 @@ export async function POST(request: Request) {
     const toolCalls = message.tool_calls || []
 
     if (toolCalls.length === 0) {
-      return new Response(`0:"${message.content?.replace("\n", "\\n")}"`, {
+      return new Response(`0:"${message.content?.replace(/\n/g, "\\n")}"`, {
         headers: {
           "Content-Type": "application/json"
         }

@@ -19,11 +19,19 @@ const fetchAndReturn = async (url: string) => {
 }
 
 // This function fetches data from a URL and returns it in markdown format.
-const webScraper = async ({
-  parameters: { url }
-}: {
-  parameters: { url: string }
-}) => {
+const webScraper = async (
+  params:
+    | {
+        parameters: { url: string }
+      }
+    | { url: string }
+) => {
+  if ("parameters" in params) {
+    params = params.parameters
+  }
+
+  const url = params.url
+
   if (url === undefined) {
     throw new Error("URL is required")
   }
@@ -102,11 +110,22 @@ async function getYoutubeCaptions(
   }
 }
 
-async function googleSearch({
-  parameters: { query }
-}: {
-  parameters: { query: string }
-}): Promise<GoogleSearchResult> {
+async function googleSearch(
+  params:
+    | {
+        parameters: { query: string }
+      }
+    | { query: string }
+): Promise<Partial<GoogleSearchResult>> {
+  if ("parameters" in params) {
+    params = params.parameters
+  }
+  const query = params.query
+
+  if (query === undefined) {
+    throw new Error("Query is required")
+  }
+
   const response = await fetch("https://google.serper.dev/search", {
     method: "POST",
     headers: {
@@ -122,7 +141,9 @@ async function googleSearch({
 
   const result = await response.json()
 
-  return result
+  return {
+    organic: result.organic.slice(0, 3)
+  }
 }
 
 // This is the definition of the webscrapping tool.
