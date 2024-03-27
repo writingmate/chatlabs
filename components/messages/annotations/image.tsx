@@ -8,12 +8,17 @@ export default function AnnotationImage({
 }) {
   const imageParams = annotation.imageGenerator__generateImage!
   return (
-    <a href={imageParams.url!} target={"_blank"}>
-      <img
-        src={imageParams.url!}
-        alt={imageParams.prompt}
-        className="mb-4 w-1/2 rounded-md sm:w-1/3"
-      />
-    </a>
+    <div className={"my-4 w-1/2 sm:w-1/3"}>
+      <a href={imageParams.url!} target={"_blank"}>
+        <Image
+          src={imageParams.url!}
+          alt={imageParams.prompt}
+          width={0}
+          height={0}
+          style={{ width: "100%", height: "auto" }}
+          className="rounded-md"
+        />
+      </a>
+    </div>
   )
 }

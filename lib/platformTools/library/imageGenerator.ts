@@ -28,13 +28,7 @@ const imageGenerator = async (
     throw new Error("prompt must be a string")
   }
 
-  if (
-    size !== "1024x1024" &&
-    size !== "256x256" &&
-    size !== "512x512" &&
-    size !== "1792x1024" &&
-    size !== "1024x1792"
-  ) {
+  if (size !== "1024x1024" && size !== "1792x1024" && size !== "1024x1792") {
     size = "1024x1024"
   }
 
@@ -58,7 +52,8 @@ const imageGenerator = async (
 
     result = response.data[0].url as string
   } catch (error: any) {
-    result = "Failed to fetch the URL: " + error.message
+    console.error("Failed to generate image", error, prompt, size)
+    throw new Error("Failed to generate image", error)
   }
 
   return {
@@ -95,7 +90,7 @@ export const imageGeneratorTool: PlatformTool = {
         {
           name: "size",
           description:
-            "The size of the image to generate. Allowed values: 256x256, 512x512, 1024x1024, 1792x1024, 1024x1792. Map aliases square to 1024x1024, portrait to 1024x1792, landscape to 1792x1024.",
+            "The size of the image to generate. Allowed values: 1024x1024 (square), 1792x1024 (portrait), 1024x1792 (landscape). Defaults to 1024x1024.",
           required: false,
           schema: {
             type: "string"

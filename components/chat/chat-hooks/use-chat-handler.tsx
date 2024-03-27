@@ -34,6 +34,7 @@ export const useChatHandler = () => {
     setUserInput,
     setNewMessageImages,
     profile,
+    isGenerating,
     setIsGenerating,
     setChatMessages,
     setFirstTokenReceived,
@@ -305,7 +306,6 @@ export const useChatHandler = () => {
         )
 
         setToolInUse("none")
-
         ;({ generatedText, data } = await processResponse(
           response,
           isRegeneration
@@ -362,7 +362,8 @@ export const useChatHandler = () => {
           setSelectedChat,
           setChats,
           setChatFiles,
-          setSelectedTools
+          setSelectedTools,
+          isGenerating
         )
       } else {
         const updatedChat = await updateChat(currentChat.id, {
@@ -392,7 +393,8 @@ export const useChatHandler = () => {
         setChatFileItems,
         setChatImages,
         selectedAssistant,
-        data
+        data,
+        isGenerating
       )
 
       setIsGenerating(false)

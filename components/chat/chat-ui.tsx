@@ -27,6 +27,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   const params = useParams()
 
   const {
+    chatMessages,
     setChatMessages,
     selectedChat,
     setSelectedChat,
@@ -65,7 +66,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       setIsAtBottom(true)
     }
 
-    if (params.chatid) {
+    if (chatMessages.length === 0 && params.chatid) {
       fetchData().then(() => {
         handleFocusChatInput()
         setLoading(false)

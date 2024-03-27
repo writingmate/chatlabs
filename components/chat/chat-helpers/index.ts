@@ -423,7 +423,8 @@ export const handleCreateChat = async (
   setSelectedChat: React.Dispatch<React.SetStateAction<Tables<"chats"> | null>>,
   setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>,
   setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>,
-  setSelectedTools: React.Dispatch<React.SetStateAction<Tables<"tools">[]>>
+  setSelectedTools: React.Dispatch<React.SetStateAction<Tables<"tools">[]>>,
+  updateState = false
 ) => {
   const createdChat = await createChat({
     user_id: profile.user_id,
@@ -439,10 +440,6 @@ export const handleCreateChat = async (
     embeddings_provider: chatSettings.embeddingsProvider
   })
 
-  setSelectedTools(selectedTools)
-  setSelectedChat(createdChat)
-  setChats(chats => [createdChat, ...chats])
-
   await createChatFiles(
     newMessageFiles.map(file => ({
       user_id: profile.user_id,
@@ -451,7 +448,13 @@ export const handleCreateChat = async (
     }))
   )
 
-  setChatFiles(prev => [...prev, ...newMessageFiles])
+  setChats(chats => [createdChat, ...chats])
+
+  if (updateState) {
+    setSelectedTools(selectedTools)
+    setSelectedChat(createdChat)
+    setChatFiles(prev => [...prev, ...newMessageFiles])
+  }
 
   return createdChat
 }
@@ -472,7 +475,8 @@ export const handleCreateMessages = async (
   >,
   setChatImages: React.Dispatch<React.SetStateAction<MessageImage[]>>,
   selectedAssistant: Tables<"assistants"> | null,
-  data: any
+  data: any,
+  updateState = true
 ) => {
   const finalUserMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
@@ -580,6 +584,8 @@ export const handleCreateMessages = async (
       return [...prevFileItems, ...newFileItems]
     })
 
-    setChatMessages(finalChatMessages)
+    if (updateState) {
+      setChatMessages(finalChatMessages)
+    }
   }
 }
