@@ -6,15 +6,19 @@ import { useState } from "react"
 export function WebSearch({ annotation }: { annotation: Annotation }) {
   const { organic } = annotation.webScraper__googleSearch!
   const [showAll, setShowAll] = useState(false)
-  const organicLength = organic.length
 
   return (
-    <div className={"grid grid-cols-4 gap-2 pb-4"}>
+    <div className={"grid grid-cols-2 gap-2 pb-4 md:grid-cols-4"}>
       {(showAll ? organic : organic.slice(0, 4)).map((item, index) => {
         const hostname = new URL(item.link).hostname
+        const displayHostname = hostname.replace("www.", "")
         return (
           <Card className={"flex border-0 hover:opacity-50"} key={index}>
-            <a className="p-2 text-xs" href={item.link} target={"_blank"}>
+            <a
+              className="overflow-hidden p-2 text-xs"
+              href={item.link}
+              target={"_blank"}
+            >
               <div className={"flex space-x-1"}>
                 <div className="bg-background text-background flex size-[16px] items-center justify-center rounded-full text-[10px]">
                   <Image
@@ -27,24 +31,33 @@ export function WebSearch({ annotation }: { annotation: Annotation }) {
                     height={16}
                   />
                 </div>
-                <div className="text-xs font-semibold">
-                  {hostname.replace("www.", "")}
-                </div>
+                <div className="text-xs font-semibold">{displayHostname}</div>
               </div>
-              <div className="text-xs">{item.title}</div>
+              <div className="line-clamp-3 text-ellipsis text-xs">
+                {item.title}
+              </div>
             </a>
           </Card>
         )
       })}
-      {!showAll && (
-        <a
-          href={"#"}
-          onClick={() => setShowAll(true)}
-          className="col col-span-4 w-full text-right text-xs font-semibold underline hover:opacity-50"
-        >
-          Show {organic.length - 4} more
-        </a>
-      )}
+      {organic.length > 4 &&
+        (!showAll ? (
+          <a
+            href={"#"}
+            onClick={() => setShowAll(true)}
+            className="col col-span-2 w-full text-right text-xs font-semibold underline hover:opacity-50 md:col-span-4"
+          >
+            Show {organic.length - 4} more
+          </a>
+        ) : (
+          <a
+            href={"#"}
+            onClick={() => setShowAll(false)}
+            className="col col-span-2 w-full text-right text-xs font-semibold underline hover:opacity-50 md:col-span-4"
+          >
+            Show less
+          </a>
+        ))}
     </div>
   )
 }
