@@ -11,15 +11,19 @@ import {
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import {
+  AnthropicStream,
   experimental_StreamData,
   OpenAIStream,
   StreamingTextResponse
 } from "ai"
 import OpenAI from "openai"
+import Anthropic from "@anthropic-ai/sdk"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
-import { LLM_LIST, LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
-
-export const runtime = "edge"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import {
+  AnthropicFunctionCaller,
+  OpenAIFunctionCaller
+} from "@/lib/tools/function-callers"
 
 export const maxDuration = 300
 
@@ -30,32 +34,38 @@ export async function GET() {
     }
   })
 }
-function getProviderClient(model: string, profile: Tables<"profiles">) {
-  const provider = LLM_LIST.find(llm => llm.modelId === model)?.provider
 
+function getProviderCaller(model: string, profile: Tables<"profiles">) {
+  const provider = LLM_LIST.find(llm => llm.modelId === model)?.provider
   if (provider === "openai") {
     checkApiKey(profile.openai_api_key, "OpenAI")
 
-    return new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY || "",
-      organization: process.env.OPENAI_ORGANIZATION_ID
-    })
+    return new OpenAIFunctionCaller(
+      new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY || "",
+        organization: process.env.OPENAI_ORGANIZATION_ID
+      })
+    )
   }
 
   if (provider === "mistral") {
     checkApiKey(profile.mistral_api_key, "Mistral")
-    return new OpenAI({
-      apiKey: profile.mistral_api_key || "",
-      baseURL: "https://api.mistral.ai/v1"
-    })
+    return new OpenAIFunctionCaller(
+      new OpenAI({
+        apiKey: profile.mistral_api_key || "",
+        baseURL: "https://api.mistral.ai/v1"
+      })
+    )
   }
 
   if (provider === "anthropic") {
     checkApiKey(profile.anthropic_api_key, "Anthropic")
-    return new OpenAI({
-      apiKey: profile.anthropic_api_key || "",
-      baseURL: "https://api.anthropic.com"
-    })
+    return new AnthropicFunctionCaller(
+      new Anthropic({
+        apiKey: profile.anthropic_api_key || "",
+        baseURL: "https://api.anthropic.com"
+      })
+    )
   }
 
   throw new Error(`Provider not supported: ${provider}`)
@@ -99,7 +109,7 @@ export async function POST(request: Request) {
 
     await validateModelAndMessageCount(chatSettings.model, new Date())
 
-    const client = getProviderClient(chatSettings.model, profile)
+    const client = getProviderCaller(chatSettings.model, profile)
 
     let allTools: OpenAI.Chat.Completions.ChatCompletionTool[] = []
     let allRouteMaps = {}
@@ -144,13 +154,12 @@ export async function POST(request: Request) {
       }
     }
 
-    const firstResponse = await client.chat.completions.create({
+    const message = await client.findFunctionCalls({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages,
       tools: allTools.length > 0 ? allTools : undefined
     })
 
-    const message = firstResponse.choices[0].message
     messages.push(message)
     const toolCalls = message.tool_calls || []
 
@@ -166,8 +175,11 @@ export async function POST(request: Request) {
       for (const toolCall of toolCalls) {
         const functionCall = toolCall.function
         const functionName = functionCall.name
-        const argumentsString = toolCall.function.arguments.trim()
-        const parsedArgs = JSON.parse(argumentsString)
+
+        let parsedArgs = functionCall.arguments as any
+        if (typeof functionCall.arguments === "string") {
+          parsedArgs = JSON.parse(functionCall.arguments.trim())
+        }
 
         // Find the schema detail that contains the function name
         const schemaDetail = schemaDetails.find(detail =>
@@ -311,17 +323,11 @@ export async function POST(request: Request) {
       }
     }
 
-    const secondResponse = await client.chat.completions.create({
+    const stream = await client.createResponseStream({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages,
-      stream: true
-    })
-
-    const stream = OpenAIStream(secondResponse, {
-      onFinal(completion) {
-        streamData.close()
-      },
-      experimental_streamData: true
+      tools: allTools,
+      streamData
     })
 
     return new StreamingTextResponse(stream, {}, streamData)
