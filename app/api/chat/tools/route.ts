@@ -75,13 +75,15 @@ const SYSTEM_PROMPT = `
 Today is ${new Date().toLocaleDateString()}.
 
 Always break down youtube captions in to three sentence paragraphs and add links to time codes like this:
-<paragraph1>[1](https://youtube.com/watch?v=VIDEO_ID&s=START).
-<paragraph2>[2](https://youtube.com/watch?v=VIDEO_ID&s=START).
-<paragraph3>[3](https://youtube.com/watch?v=VIDEO_ID&s=START).
+<paragraph1>[1](https://youtube.com/watch?v=VIDEO_ID&s=START1).
+<paragraph2>[2](https://youtube.com/watch?v=VIDEO_ID&s=START2).
+<paragraph3>[3](https://youtube.com/watch?v=VIDEO_ID&s=START3).
 
 Always add references for google search results at the end of each sentence like this:
-<sentence1>[1](https://google-result-link1.com).
-<sentence2>[2](https://google-result-link2.com).
+<sentence1>[1](<link1>).
+<sentence2>[2](<link2>).
+
+Each unique link has unique reference number.
 
 Never include image url in the response for generated images. Do not say you can't display image.
 `
