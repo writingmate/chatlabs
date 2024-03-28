@@ -245,7 +245,7 @@ export const usePromptAndCommand = () => {
     handleSelectUserCollection,
     handleSelectTool,
     handleSelectAssistant,
-    handleSelectPromptWithVariables,
+    //handleSelectPromptWithVariables,
     handleSelectHistoryMessage
   }
 }
