@@ -44,7 +44,9 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     setAssistants,
     setTools,
     setPlatformTools,
-    setModels
+    setModels,
+    selectedAssistant,
+    setSelectedAssistant
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -103,6 +105,7 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     if (!deleteFunction || !setStateFunction) return
 
     await deleteFunction(item as any)
+    if (item == selectedAssistant) setSelectedAssistant(null)
 
     setStateFunction((prevItems: any) =>
       prevItems.filter((prevItem: any) => prevItem.id !== item.id)
