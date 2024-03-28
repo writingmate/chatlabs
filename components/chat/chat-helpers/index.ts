@@ -318,8 +318,8 @@ function parseDataStream(contentToAdd: string) {
   let matches
   let newContentToAdd: string[] = []
   contentToAdd.split("\n").forEach((value, index) => {
-    const regex = /0:\s?"(.+)"/g
-    const regexData = /8:\s?(\[.+\])/g
+    const regex = /^0:\s?"(.+)"$/g
+    const regexData = /^8:\s?(\[.+\])$/g
     if ((matches = regex.exec(value)) !== null) {
       newContentToAdd[index] = matches[1]
     }
