@@ -34,8 +34,8 @@ export interface ImageGeneratorResult {
 }
 export interface GetYoutubeCaptionsResult {
   subtitles: {
-    start: string
-    dur: string
+    start: string | number
+    dur: string | number
     text: string
   }[]
   imageUrl: string

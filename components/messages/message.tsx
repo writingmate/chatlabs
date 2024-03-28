@@ -212,6 +212,9 @@ export const Message: FC<MessageProps> = ({
     }
 
     return Object.keys(annotation).map(key => {
+      if (!annotationMap[key]) {
+        return null
+      }
       const AnnotationComponent = annotationMap[key]!
       return <AnnotationComponent key={key} annotation={annotation} />
     })

@@ -71,6 +71,29 @@ const webScraper = async (
   return { url, mdDoc }
 }
 
+function mergeSubtitleChunks(chunks: any[], n: number) {
+  if (chunks.length === 0) {
+    return []
+  }
+
+  let mergedChunks = []
+
+  for (let i = 0; i < chunks.length; i += n) {
+    const chunkGroup = chunks.slice(i, i + n)
+    const mergedChunk = {
+      start: parseInt(chunkGroup[0].start),
+      text: chunkGroup.map(chunk => chunk.text).join(" "),
+      dur: chunkGroup
+        .map(x => x.dur)
+        .reduce((a, b) => parseFloat(a) + parseFloat(b))
+    }
+
+    mergedChunks.push(mergedChunk)
+  }
+
+  return mergedChunks
+}
+
 async function getYoutubeCaptions(
   params: any
 ): Promise<GetYoutubeCaptionsResult> {
@@ -103,8 +126,10 @@ async function getYoutubeCaptions(
     })
   ).flatMap(x => (!!x ? [x] : []))
 
+  const optimizedResult = mergeSubtitleChunks(result, 6)
+
   return {
-    subtitles: result,
+    subtitles: optimizedResult,
     imageUrl: "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg",
     videoUrl: "https://www.youtube.com/watch?v=" + videoId
   }
