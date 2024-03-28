@@ -66,7 +66,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       setIsAtBottom(true)
     }
 
-    if (chatMessages.length === 0 && params.chatid) {
+    if (chatMessages.length === 0 || !params.chatid || params.chatid) {
       fetchData().then(() => {
         handleFocusChatInput()
         setLoading(false)
