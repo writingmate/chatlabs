@@ -1,5 +1,8 @@
 # ChatLabs
 
+<img width="1464" alt="image" src="https://github.com/writingmate/chatlabs/assets/420428/aad7706f-8b8d-4671-b668-0e38babc5f09">
+
+
 ChatLabs is all-in-one LLM chat platform with access to over 20+ LLMs in one place. 
 It comes with Web Search and Image Generation plugins included.
 
