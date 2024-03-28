@@ -699,9 +699,6 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
         className="min-w-3/4 flex flex-col justify-between sm:min-w-[450px]"
         side="left"
         onKeyDown={handleKeyDown}
-        onClick={e => {
-          e.stopPropagation()
-        }}
       >
         <div className="grow overflow-auto">
           <SheetHeader>
