@@ -1,20 +1,9 @@
 # ChatLabs
 
+ChatLabs is all-in-one LLM chat platform with access to over 20+ LLMs in one place. 
+It comes with Web Search and Image Generation plugins included.
+
 ChatLabs is a fork of the [Chatbotui](https://github.com/mckaywrigley/chatbot-ui) project.
-
-## Why fork? And why private repo?
-
-1. The original project is not moving as fast as we want: [there is a growing number](https://github.com/mckaywrigley/chatbot-ui/pulls) of pull requests that are not being merged into the main branch. We use the fork to selectively merge those pull requests.
-2. Paywall: Since we introduced a paywall, and there is no easy way to exclude it from the open-source model, we keep a separate fork. Ideally, we would like to find a way to fix this so that we can contribute back.
-3. Significant UI and UX changes: We've conducted numerous interviews with paid customers and realized that the original UX/UI isn't perfect and needs a lot of work. Hence the fork.
-
-## What is the strategy moving forward?
-1. Ideally, we would like to find a way to contribute back to the project.
-2. We would like to find a way to make our own code open-source. This will require removing some things like the paywall.
-3. Writingmate is currently a monthly donor to the original owner.
-
-## What can I do to make this project open-source?
-2. Discuss what needs to be done to make it open-source in [this issue](https://github.com/writingmate/webapp/issues/34).
 
 ## Demo
 
@@ -274,16 +263,14 @@ Once deployed, you should be able to use your hosted instance of ChatLabs via th
 
 We've introduced a new feature that allows every user to access a set of platform tools directly within the application. These tools are designed to enhance your productivity and streamline your workflow. Here's a quick overview of the tools currently available:
 
-* **Web Scraper Tool**:  This tool fetches data from a URL and returns it in markdown format to the LLM. It's perfect for quickly grabbing content from web pages without having to manually copy and paste or write markdown.
+* **Web Scraper Tool**:  This tool fetches data from a URL and returns it in markdown format to the LLM. It's perfect for quickly grabbing content from web pages without having to manually copy and paste or write markdown. It also supports google fetching results from google search and summarizing youtube videos. 
+
+* **Image Generation Tool**:  This tool generates AI images with Dall-E. 
 
 For adding or removing platform tools, consult the [platformToolsList.ts](./lib/platformTools/platformToolsList.ts) document.
 
 To introduce a new tool, utilize the `PlatformTool` interface and incorporate it into the aforementioned list. For a practical illustration, examine the [webScraperTool.ts](./lib/platformTools/library/webScraperTool.ts) example.
 
-## Contributing
-
-We are working on a guide for contributing.
-
 ## Contact
 
-Message Mckay on [Twitter/X](https://twitter.com/mckaywrigley)
+Message Artem on [Twitter/X](https://twitter.com/avysotsky)
