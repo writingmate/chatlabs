@@ -45,8 +45,7 @@ const PERPLEXITY_SONAR_SMALL_CHAT_7B: LLM = {
   provider: "perplexity",
   hostedId: "sonar-small-chat",
   platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false,
-  paid: true
+  imageInput: false
 }
 
 // Sonar Small Online (UPDATED 2/25/24)
@@ -56,8 +55,7 @@ const PERPLEXITY_SONAR_SMALL_ONLINE_7B: LLM = {
   provider: "perplexity",
   hostedId: "sonar-small-online",
   platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false,
-  paid: true
+  imageInput: false
 }
 
 // Sonar Medium Chat (UPDATED 2/25/24)
@@ -67,7 +65,8 @@ const PERPLEXITY_SONAR_MEDIUM_CHAT_8x7B: LLM = {
   provider: "perplexity",
   hostedId: "sonar-medium-chat",
   platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  paid: true
 }
 
 // Sonar Medium Online (UPDATED 2/25/24)

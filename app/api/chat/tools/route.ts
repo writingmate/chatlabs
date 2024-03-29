@@ -75,9 +75,9 @@ const SYSTEM_PROMPT = `
 Today is ${new Date().toLocaleDateString()}.
 
 Always break down youtube captions in to three sentence paragraphs and add links to time codes like this:
-<paragraph1>[1](https://youtube.com/watch?v=VIDEO_ID&s=START1).
-<paragraph2>[2](https://youtube.com/watch?v=VIDEO_ID&s=START2).
-<paragraph3>[3](https://youtube.com/watch?v=VIDEO_ID&s=START3).
+<paragraph1>[1](https://youtube.com/watch?v=VIDEO_ID&t=START1s).
+<paragraph2>[2](https://youtube.com/watch?v=VIDEO_ID&t=START2s).
+<paragraph3>[3](https://youtube.com/watch?v=VIDEO_ID&t=START3s).
 
 Always add references for google search results at the end of each sentence like this:
 <sentence1>[1](<link1>).
