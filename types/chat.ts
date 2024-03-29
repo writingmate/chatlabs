@@ -5,6 +5,8 @@ export interface ChatSettings {
   model: LLMID
   prompt: string
   temperature: number
+  useCustomSystemPrompt?: boolean
+  customSystemPrompt?: string
   contextLength: number
   includeProfileContext: boolean
   includeWorkspaceInstructions: boolean

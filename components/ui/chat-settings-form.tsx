@@ -19,6 +19,7 @@ import {
 import { Slider } from "./slider"
 import { TextareaAutosize } from "./textarea-autosize"
 import { WithTooltip } from "./with-tooltip"
+import { buildBasePrompt } from "@/lib/build-prompt"
 
 interface ChatSettingsFormProps {
   chatSettings: ChatSettings
@@ -67,9 +68,10 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
         />
       </div>
 
+      {PromptSettings}
+
       {useAdvancedDropdown ? (
         <AdvancedSettings>
-          {PromptSettings}
           <AdvancedContent
             chatSettings={chatSettings}
             onChangeChatSettings={onChangeChatSettings}
@@ -94,15 +96,22 @@ interface AdvancedContentProps {
   chatSettings: ChatSettings
   onChangeChatSettings: (value: ChatSettings) => void
   showTooltip: boolean
+  showOverrideSystemPrompt?: boolean
 }
 
-const AdvancedContent: FC<AdvancedContentProps> = ({
+export const AdvancedContent: FC<AdvancedContentProps> = ({
   chatSettings,
   onChangeChatSettings,
-  showTooltip
+  showTooltip,
+  showOverrideSystemPrompt = false
 }) => {
-  const { profile, selectedWorkspace, availableOpenRouterModels, models } =
-    useContext(ChatbotUIContext)
+  const {
+    profile,
+    selectedAssistant,
+    selectedWorkspace,
+    availableOpenRouterModels,
+    models
+  } = useContext(ChatbotUIContext)
 
   const isCustomModel = models.some(
     model => model.model_id === chatSettings.model
@@ -118,6 +127,13 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
     MAX_CONTEXT_LENGTH:
       findOpenRouterModel(chatSettings.model)?.maxContext || 4096
   }
+
+  const SYSTEM_PROMPT = buildBasePrompt(
+    chatSettings.prompt || "",
+    profile?.profile_context || "",
+    selectedWorkspace?.instructions || "",
+    selectedAssistant
+  )
 
   return (
     <div className="mt-5">
@@ -168,62 +184,51 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
         />
       </div>
 
-      <div className="mt-7 flex items-center space-x-2">
-        <Checkbox
-          checked={chatSettings.includeProfileContext}
-          onCheckedChange={(value: boolean) =>
-            onChangeChatSettings({
-              ...chatSettings,
-              includeProfileContext: value
-            })
-          }
-        />
+      {showOverrideSystemPrompt && (
+        <>
+          <div className="mt-7 flex items-center space-x-2">
+            <Checkbox
+              checked={!!chatSettings.useCustomSystemPrompt}
+              onCheckedChange={(value: boolean) =>
+                onChangeChatSettings({
+                  ...chatSettings,
+                  customSystemPrompt: SYSTEM_PROMPT,
+                  useCustomSystemPrompt: value
+                })
+              }
+            />
 
-        <Label>Chats Include Profile Context</Label>
+            <Label>Override System Prompt</Label>
 
-        {showTooltip && (
-          <WithTooltip
-            delayDuration={0}
-            display={
-              <div className="w-[400px] p-3">
-                {profile?.profile_context || "No profile context."}
-              </div>
-            }
-            trigger={
-              <IconInfoCircle className="cursor-hover:opacity-50" size={16} />
-            }
-          />
-        )}
-      </div>
+            {showTooltip && (
+              <WithTooltip
+                delayDuration={0}
+                display={<div className="w-[400px] p-3">{SYSTEM_PROMPT}</div>}
+                trigger={
+                  <IconInfoCircle
+                    className="cursor-hover:opacity-50"
+                    size={16}
+                  />
+                }
+              />
+            )}
+          </div>
 
-      {/*<div className="mt-4 flex items-center space-x-2">*/}
-      {/*  <Checkbox*/}
-      {/*    checked={chatSettings.includeWorkspaceInstructions}*/}
-      {/*    onCheckedChange={(value: boolean) =>*/}
-      {/*      onChangeChatSettings({*/}
-      {/*        ...chatSettings,*/}
-      {/*        includeWorkspaceInstructions: value*/}
-      {/*      })*/}
-      {/*    }*/}
-      {/*  />*/}
-
-      {/*  <Label>Chats Include Workspace Instructions</Label>*/}
-
-      {/*  {showTooltip && (*/}
-      {/*    <WithTooltip*/}
-      {/*      delayDuration={0}*/}
-      {/*      display={*/}
-      {/*        <div className="w-[400px] p-3">*/}
-      {/*          {selectedWorkspace?.instructions ||*/}
-      {/*            "No workspace instructions."}*/}
-      {/*        </div>*/}
-      {/*      }*/}
-      {/*      trigger={*/}
-      {/*        <IconInfoCircle className="cursor-hover:opacity-50" size={16} />*/}
-      {/*      }*/}
-      {/*    />*/}
-      {/*  )}*/}
-      {/*</div>*/}
+          {chatSettings.useCustomSystemPrompt && (
+            <TextareaAutosize
+              minRows={5}
+              className="mt-2"
+              value={chatSettings.customSystemPrompt || ""}
+              onValueChange={value => {
+                onChangeChatSettings({
+                  ...chatSettings,
+                  customSystemPrompt: value
+                })
+              }}
+            />
+          )}
+        </>
+      )}
 
       <div className="mt-5">
         <Label>Embeddings Provider</Label>

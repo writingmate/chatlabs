@@ -15,13 +15,13 @@ import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
 import { Switch } from "@/components/ui/switch"
 
-interface ModelSettingsOption {
+interface ModelVisibilityOption {
   model: LLM
   onSelect: (checked: boolean) => void
   selected: boolean
 }
 
-export const ModelSettingsOption: FC<ModelSettingsOption> = ({
+export const ModelVisibilityOption: FC<ModelVisibilityOption> = ({
   model,
   selected,
   onSelect
