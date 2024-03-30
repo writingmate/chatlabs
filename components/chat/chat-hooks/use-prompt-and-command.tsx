@@ -72,16 +72,7 @@ export const usePromptAndCommand = () => {
     setUserInput(value)
   }
 
-  const handleSelectPromptWithVariables = (
-    prompt: Tables<"prompts">,
-    checkRegex = false
-  ) => {
-    if (!checkRegex) {
-      handleSelectPrompt(prompt)
-      setIsPromptPickerOpen(false)
-      return
-    }
-
+  const handleSelectPromptWithVariables = (prompt: Tables<"prompts">) => {
     const regex = /\{\{.*?\}\}/g
     const matches = prompt.content.match(regex)
     if (matches) {

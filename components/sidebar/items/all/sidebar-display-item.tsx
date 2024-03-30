@@ -57,7 +57,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   const itemRef = useRef<HTMLDivElement>(null)
 
   const {
-    handleSelectPromptWithVariables,
+    handleSelectPrompt,
     handleSelectAssistant,
     handleSelectTool,
     handleSelectUserFile
@@ -99,7 +99,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     chats: async (item: any) => {},
     presets: async (item: any) => {},
     prompts: async (item: any) => {
-      handleSelectPromptWithVariables(item)
+      handleSelectPrompt(item)
     },
     files: async (item: any) => {
       handleSelectUserFile(item)
