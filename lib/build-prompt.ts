@@ -2,11 +2,12 @@ import { Tables } from "@/supabase/types"
 import { ChatPayload, MessageImage } from "@/types"
 import { encode } from "gpt-tokenizer"
 
-const buildBasePrompt = (
+export const buildBasePrompt = (
   prompt: string,
   profileContext: string,
   workspaceInstructions: string,
-  assistant: Tables<"assistants"> | null
+  assistant: Tables<"assistants"> | null,
+  includeTodayDate = true
 ) => {
   let fullPrompt = ""
 
@@ -14,7 +15,9 @@ const buildBasePrompt = (
     fullPrompt += `<INJECT ROLE>\nYou are not an AI. You are ${assistant.name}.\n</INJECT ROLE>\n\n`
   }
 
-  fullPrompt += `Today is ${new Date().toLocaleDateString()}.\n\n`
+  if (includeTodayDate) {
+    fullPrompt += `Today is ${new Date().toLocaleDateString()}.\n\n`
+  }
 
   if (profileContext) {
     fullPrompt += `User Info:\n${profileContext}\n\n`
@@ -24,7 +27,9 @@ const buildBasePrompt = (
     fullPrompt += `System Instructions:\n${workspaceInstructions}\n\n`
   }
 
-  fullPrompt += `User Instructions:\n${prompt}`
+  if (prompt) {
+    fullPrompt += `User Instructions:\n${prompt}\n\n`
+  }
 
   return fullPrompt
 }
@@ -43,12 +48,14 @@ export async function buildFinalMessages(
     chatFileItems
   } = payload
 
-  const BUILT_PROMPT = buildBasePrompt(
-    chatSettings.prompt,
-    chatSettings.includeProfileContext ? profile.profile_context || "" : "",
-    chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant
-  )
+  const BUILT_PROMPT = chatSettings.useCustomSystemPrompt
+    ? chatSettings.customSystemPrompt || ""
+    : buildBasePrompt(
+        chatSettings.prompt,
+        chatSettings.includeProfileContext ? profile.profile_context || "" : "",
+        chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
+        assistant
+      )
 
   const CHUNK_SIZE = chatSettings.contextLength
   const PROMPT_TOKENS = encode(chatSettings.prompt).length

@@ -20,8 +20,6 @@ import { Switch } from "@/components/ui/switch"
 import { Tables } from "@/supabase/types"
 import { Separator } from "@/components/ui/separator"
 import { validatePlanForTools } from "@/lib/subscription"
-// import { ModelIcon } from "./model-icon"
-// import { ModelOption } from "./model-option"
 
 interface ToolSelectProps {
   selectedTools: Tables<"tools">[]
