@@ -75,6 +75,7 @@ export const usePromptAndCommand = () => {
   const handleSelectPromptWithVariables = (prompt: Tables<"prompts">) => {
     const regex = /\{\{.*?\}\}/g
     const matches = prompt.content.match(regex)
+
     if (matches) {
       const newPromptVariables = matches.map(match => ({
         promptId: prompt.id,
