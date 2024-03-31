@@ -85,7 +85,8 @@ export const ModelOption: FC<ModelOptionProps> = ({
             display={
               "Context length: " +
               (
-                CHAT_SETTING_LIMITS[model.modelId].MAX_CONTEXT_LENGTH / 1000
+                (CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH || 0) /
+                1000
               ).toFixed(0) +
               "k"
             }
@@ -93,7 +94,8 @@ export const ModelOption: FC<ModelOptionProps> = ({
               <div className="flex w-12 text-xs font-normal opacity-75">
                 <IconBrain stroke={2} size={16} />
                 {(
-                  CHAT_SETTING_LIMITS[model.modelId].MAX_CONTEXT_LENGTH / 1000
+                  (CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH ||
+                    0) / 1000
                 ).toFixed(0)}
                 k
               </div>
