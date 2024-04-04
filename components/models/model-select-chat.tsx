@@ -106,7 +106,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
             LLMID,
             boolean
           >
-        )?.[model.modelId] ?? true
+        )?.[model.modelId] ?? false
     )
     .filter(model =>
       model.modelName.toLowerCase().includes(search.toLowerCase())
@@ -141,6 +141,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
                 <>
                   <ModelIcon
                     provider={selectedModel?.provider}
+                    modelId={selectedModel?.modelId}
                     width={26}
                     height={26}
                   />

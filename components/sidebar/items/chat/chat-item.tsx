@@ -94,6 +94,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           trigger={
             <ModelIcon
               provider={MODEL_DATA?.provider}
+              modelId={MODEL_DATA?.modelId}
               height={SIDEBAR_ITEM_ICON_SIZE}
               width={SIDEBAR_ITEM_ICON_SIZE}
             />

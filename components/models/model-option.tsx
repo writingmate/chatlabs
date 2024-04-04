@@ -47,7 +47,12 @@ export const ModelOption: FC<ModelOptionProps> = ({
               size={28}
             />
           ) : (
-            <ModelIcon provider={model.provider} width={28} height={28} />
+            <ModelIcon
+              provider={model.provider}
+              modelId={model?.modelId}
+              width={28}
+              height={28}
+            />
           )}
           <div
             className={

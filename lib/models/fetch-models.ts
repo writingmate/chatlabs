@@ -3,6 +3,54 @@ import { LLM, LLMID, OpenRouterLLM } from "@/types"
 import { toast } from "sonner"
 import { LLM_LIST_MAP } from "./llm/llm-list"
 
+const KNOWN_MODEL_NAMES: {
+  [key: string]: {
+    modelProvider: string
+    modelName: string
+  }
+} = {
+  "databricks/dbrx-instruct": {
+    modelProvider: "databricks",
+    modelName: "DBRX Instruct"
+  }
+}
+
+export function parseOpenRouterModelName(modelId: string) {
+  if (Object.keys(KNOWN_MODEL_NAMES).includes(modelId)) {
+    return KNOWN_MODEL_NAMES[modelId]
+  }
+
+  const openRouterModelRegex = /^(.+)\/(.+)(:+)?$/
+  const match = modelId?.match(openRouterModelRegex)
+  const modelProvider = match ? match[1] : "openrouter"
+  const modelName = match ? humanize(match[2]) : modelId
+
+  return {
+    modelProvider: modelProvider,
+    modelName
+  }
+}
+
+function parseSupportedModelsFromEnv() {
+  let SUPPORTED_OPENROUTER_MODELS = ["databricks/dbrx-instruct"]
+
+  if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {
+    SUPPORTED_OPENROUTER_MODELS = (
+      process.env.NEXT_PUBLIC_OPENROUTER_MODELS + ""
+    )
+      .split(",")
+      .map(model => model.trim())
+  }
+
+  return SUPPORTED_OPENROUTER_MODELS
+}
+
+function humanize(str: string) {
+  str = str.replace(/-/g, " ")
+  // Capitalize first letter of each word
+  return str.replace(/\b\w/g, l => l.toUpperCase())
+}
+
 export const fetchHostedModels = async (profile: Tables<"profiles">) => {
   try {
     const providers = ["google", "anthropic", "mistral", "groq", "perplexity"]
@@ -89,21 +137,34 @@ export const fetchOpenRouterModels = async () => {
 
     const { data } = await response.json()
 
-    const openRouterModels = data.map(
-      (model: {
-        id: string
-        name: string
-        context_length: number
-      }): OpenRouterLLM => ({
-        modelId: model.id as LLMID,
-        modelName: model.id,
-        provider: "openrouter",
-        hostedId: model.name,
-        platformLink: "https://openrouter.dev",
-        imageInput: false,
-        maxContext: model.context_length
+    let SUPPORTED_OPENROUTER_MODELS = parseSupportedModelsFromEnv()
+
+    const openRouterModels = data
+      .map(
+        (model: {
+          id: string
+          name: string
+          context_length: number
+        }): OpenRouterLLM => ({
+          modelId: model.id as LLMID,
+          modelName: model.id,
+          provider: "openrouter",
+          hostedId: model.name,
+          platformLink: "https://openrouter.dev",
+          imageInput: false,
+          maxContext: model.context_length
+        })
+      )
+      .filter(({ modelId }: { modelId: string }) =>
+        SUPPORTED_OPENROUTER_MODELS.includes(modelId)
+      )
+      .map((model: any) => {
+        const { modelName } = parseOpenRouterModelName(model.modelId)
+        return {
+          ...model,
+          modelName
+        }
       })
-    )
 
     return openRouterModels
   } catch (error) {
