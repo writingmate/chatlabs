@@ -85,27 +85,29 @@ export const ModelOption: FC<ModelOptionProps> = ({
               }
             />
           )}
-          <WithTooltip
-            side="top"
-            display={
-              "Context length: " +
-              (
-                (CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH || 0) /
-                1000
-              ).toFixed(0) +
-              "k"
-            }
-            trigger={
-              <div className="flex w-12 text-xs font-normal opacity-75">
-                <IconBrain stroke={2} size={16} />
-                {(
+          {!!CHAT_SETTING_LIMITS[model.modelId] && (
+            <WithTooltip
+              side="top"
+              display={
+                "Context length: " +
+                (
                   (CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH ||
                     0) / 1000
-                ).toFixed(0)}
-                k
-              </div>
-            }
-          />
+                ).toFixed(0) +
+                "k"
+              }
+              trigger={
+                <div className="flex w-12 text-xs font-normal opacity-75">
+                  <IconBrain stroke={2} size={16} />
+                  {(
+                    (CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH ||
+                      0) / 1000
+                  ).toFixed(0)}
+                  k
+                </div>
+              }
+            />
+          )}
         </div>
       </div>
     </div>
