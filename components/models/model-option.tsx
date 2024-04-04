@@ -47,7 +47,12 @@ export const ModelOption: FC<ModelOptionProps> = ({
               size={28}
             />
           ) : (
-            <ModelIcon provider={model.provider} width={28} height={28} />
+            <ModelIcon
+              provider={model.provider}
+              modelId={model?.modelId}
+              width={28}
+              height={28}
+            />
           )}
           <div
             className={
@@ -85,7 +90,8 @@ export const ModelOption: FC<ModelOptionProps> = ({
             display={
               "Context length: " +
               (
-                CHAT_SETTING_LIMITS[model.modelId].MAX_CONTEXT_LENGTH / 1000
+                (CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH || 0) /
+                1000
               ).toFixed(0) +
               "k"
             }
@@ -93,7 +99,8 @@ export const ModelOption: FC<ModelOptionProps> = ({
               <div className="flex w-12 text-xs font-normal opacity-75">
                 <IconBrain stroke={2} size={16} />
                 {(
-                  CHAT_SETTING_LIMITS[model.modelId].MAX_CONTEXT_LENGTH / 1000
+                  (CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH ||
+                    0) / 1000
                 ).toFixed(0)}
                 k
               </div>

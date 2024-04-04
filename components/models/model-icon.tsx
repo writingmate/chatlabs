@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils"
 import mistral from "@/public/providers/mistral.png"
 import groq from "@/public/providers/groq.png"
 import perplexity from "@/public/providers/perplexity.png"
+import databricks from "@/public/providers/databricks.png"
 import { ModelProvider } from "@/types"
 import { IconSparkles } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
@@ -10,9 +11,11 @@ import { FC, HTMLAttributes } from "react"
 import { AnthropicSVG } from "../icons/anthropic-svg"
 import { GoogleSVG } from "../icons/google-svg"
 import { OpenAISVG } from "../icons/openai-svg"
+import { parseOpenRouterModelName } from "@/lib/models/fetch-models"
 
 interface ModelIconProps extends HTMLAttributes<HTMLDivElement> {
   provider: ModelProvider
+  modelId?: string
   height: number
   width: number
 }
@@ -21,6 +24,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
   provider,
   height,
   width,
+  modelId,
   ...props
 }) => {
   const { theme } = useTheme()
@@ -99,6 +103,28 @@ export const ModelIcon: FC<ModelIconProps> = ({
           alt="Mistral"
           width={width}
           height={height}
+        />
+      )
+    case "databricks":
+      return (
+        <Image
+          className={cn(
+            "rounded-sm p-1",
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+          )}
+          src={databricks.src}
+          alt="Databricks"
+          width={width}
+          height={height}
+        />
+      )
+    case "openrouter":
+      const { modelProvider } = parseOpenRouterModelName(modelId!)
+      return (
+        <ModelIcon
+          provider={modelProvider as ModelProvider}
+          height={height}
+          width={width}
         />
       )
     default:

@@ -10,7 +10,7 @@ module.exports = withBundleAnalyzer(
   withPWA({
     reactStrictMode: true,
     images: {
-      unoptimized: true,
+      // unoptimized: true,
       remotePatterns: [
         {
           protocol: "http",
