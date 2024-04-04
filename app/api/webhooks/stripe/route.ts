@@ -194,7 +194,7 @@ export async function POST(req: Request) {
           break
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return createErrorResponse("Webhook handler failed", 500)
     }
   }
