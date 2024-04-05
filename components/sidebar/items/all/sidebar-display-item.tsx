@@ -57,7 +57,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   const itemRef = useRef<HTMLDivElement>(null)
 
   const {
-    handleSelectPrompt,
+    handleSelectPromptWithVariables,
     handleSelectAssistant,
     handleSelectTool,
     handleSelectUserFile
@@ -99,7 +99,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     chats: async (item: any) => {},
     presets: async (item: any) => {},
     prompts: async (item: any) => {
-      handleSelectPrompt(item)
+      handleSelectPromptWithVariables(item)
     },
     files: async (item: any) => {
       handleSelectUserFile(item)
@@ -160,7 +160,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         isActiveMap[contentType]?.(item) && "bg-accent"
       )}
       tabIndex={0}
-      onClick={handleClickAction}
+      onClick={contentType === "prompts" ? undefined : handleClickAction}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
