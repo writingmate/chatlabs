@@ -423,8 +423,7 @@ export const handleCreateChat = async (
   setSelectedChat: React.Dispatch<React.SetStateAction<Tables<"chats"> | null>>,
   setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>,
   setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>,
-  setSelectedTools: React.Dispatch<React.SetStateAction<Tables<"tools">[]>>,
-  updateState = false
+  setSelectedTools: React.Dispatch<React.SetStateAction<Tables<"tools">[]>>
 ) => {
   const createdChat = await createChat({
     user_id: profile.user_id,
@@ -449,12 +448,9 @@ export const handleCreateChat = async (
   )
 
   setChats(chats => [createdChat, ...chats])
-
-  if (updateState) {
-    setSelectedTools(selectedTools)
-    setSelectedChat(createdChat)
-    setChatFiles(prev => [...prev, ...newMessageFiles])
-  }
+  setSelectedTools(selectedTools)
+  setSelectedChat(createdChat)
+  setChatFiles(prev => [...prev, ...newMessageFiles])
 
   return createdChat
 }
