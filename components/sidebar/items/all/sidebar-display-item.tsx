@@ -160,7 +160,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         isActiveMap[contentType]?.(item) && "bg-accent"
       )}
       tabIndex={0}
-      onClick={handleClickAction}
+      onClick={contentType === "prompts" ? undefined : handleClickAction}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
