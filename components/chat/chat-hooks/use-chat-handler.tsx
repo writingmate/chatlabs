@@ -362,8 +362,7 @@ export const useChatHandler = () => {
           setSelectedChat,
           setChats,
           setChatFiles,
-          setSelectedTools,
-          isGenerating
+          setSelectedTools
         )
       } else {
         const updatedChat = await updateChat(currentChat.id, {
