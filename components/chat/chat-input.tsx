@@ -100,7 +100,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   }
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (!isTyping && isSendShortcut(event)) {
+    if (!isTyping && isSendShortcut(event) && !isUploading) {
       event.preventDefault()
       setIsPromptPickerOpen(false)
       handleSendMessage(userInput, chatMessages, false)
