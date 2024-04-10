@@ -85,7 +85,8 @@ Always add references for google search results at the end of each sentence like
 
 Each unique link has unique reference number.
 
-Never include image url in the response for generated images. Do not say you can't display image.
+Never include image url in the response for generated images. Do not say you can't display image. 
+Do not use semi-colons when describing the image. 
 `
 
 export async function POST(request: Request) {

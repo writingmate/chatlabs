@@ -12,6 +12,7 @@ import { Input } from "../ui/input"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { ModelIcon } from "./model-icon"
 import { ModelOption } from "./model-option"
+import { validateProPlan } from "@/lib/subscription"
 
 interface ModelSelectProps {
   selectedModelId: string
@@ -48,7 +49,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
 
   const handleSelectModel = (modelId: LLMID) => {
     if (
-      profile?.plan == "free" &&
+      !validateProPlan(profile) &&
       allModels?.find(x => x.modelId == modelId)?.paid == true
     ) {
       setIsPaywallOpen(true)

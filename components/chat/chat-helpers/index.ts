@@ -24,6 +24,7 @@ import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { SubscriptionRequiredError } from "@/lib/errors"
+import { validateProPlan } from "@/lib/subscription"
 
 export const validateChatSettings = (
   chatSettings: ChatSettings | null,
@@ -54,19 +55,19 @@ export const validateChatSettings = (
     throw new Error("Message content not found")
   }
 
-  if (profile.plan === "free" && modelData.paid) {
+  if (!validateProPlan(profile) && modelData.paid) {
     throw new SubscriptionRequiredError(
       "Subscription required to use this model"
     )
   }
 
-  if (profile.plan === "free" && selectedAssistant) {
+  if (!validateProPlan(profile) && selectedAssistant) {
     throw new SubscriptionRequiredError(
       "Subscription required to use assistants"
     )
   }
 
-  if (profile.plan === "free" && selectedTools?.length > 0) {
+  if (!validateProPlan(profile) && selectedTools?.length > 0) {
     throw new SubscriptionRequiredError("Subscription required to use tools")
   }
 }

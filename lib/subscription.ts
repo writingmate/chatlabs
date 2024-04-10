@@ -1,6 +1,11 @@
 import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { PLAN_FREE } from "@/lib/stripe/config"
+
+export function validateProPlan(profile: Tables<"profiles"> | null) {
+  return profile?.plan !== PLAN_FREE && profile?.plan?.indexOf("premium") === -1
+}
 
 export function validatePlanForModel(
   profile: Tables<"profiles"> | null,
@@ -14,7 +19,7 @@ export function validatePlanForModel(
     return false
   }
 
-  if (profile?.plan !== "free" && profile?.plan?.indexOf("premium") === -1) {
+  if (validateProPlan(profile)) {
     return true
   }
 
@@ -34,5 +39,5 @@ export function validatePlanForTools(
   profile: Tables<"profiles"> | null,
   tools: any[]
 ) {
-  return profile?.plan !== "free" && profile?.plan?.indexOf("premium") === -1
+  return validateProPlan(profile)
 }
