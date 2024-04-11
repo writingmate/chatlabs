@@ -5,15 +5,11 @@ import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { LLM, LLMID, MessageImage, ModelProvider } from "@/types"
 import {
-  IconBolt,
   IconCaretDownFilled,
   IconCaretRightFilled,
   IconCircleFilled,
   IconFileText,
   IconMoodSmile,
-  IconPencil,
-  IconPlayerPlay,
-  IconPlayerPlayFilled,
   IconPuzzle,
   IconTerminal2
 } from "@tabler/icons-react"
@@ -25,12 +21,13 @@ import { FileIcon } from "../ui/file-icon"
 import { FilePreview } from "../ui/file-preview"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
-import { MessageActions } from "./message-actions"
-import { MessageMarkdown } from "./message-markdown"
 import { YouTube } from "@/components/messages/annotations/youtube"
 import { WebSearch } from "@/components/messages/annotations/websearch"
 import AnnotationImage from "@/components/messages/annotations/image"
 import { Annotation } from "@/types/annotation"
+import { ChatbotUIChatContext } from "@/context/chat"
+import { MessageActions } from "@/components/messages/message-actions"
+import { MessageMarkdown } from "@/components/messages/message-markdown"
 
 const ICON_SIZE = 32
 
@@ -56,12 +53,8 @@ export const Message: FC<MessageProps> = ({
   const {
     assistants,
     profile,
-    isGenerating,
-    setIsGenerating,
-    firstTokenReceived,
     availableLocalModels,
     availableOpenRouterModels,
-    chatMessages,
     selectedAssistant,
     chatImages,
     assistantImages,
@@ -69,6 +62,9 @@ export const Message: FC<MessageProps> = ({
     files,
     models
   } = useContext(ChatbotUIContext)
+
+  const { isGenerating, setIsGenerating, firstTokenReceived, chatMessages } =
+    useContext(ChatbotUIChatContext)
 
   const { handleSendMessage } = useChatHandler()
 

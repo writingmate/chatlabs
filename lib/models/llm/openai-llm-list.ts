@@ -5,13 +5,24 @@ const OPENAI_PLATORM_LINK = "https://platform.openai.com/docs/overview"
 // OpenAI Models (UPDATED 1/25/24) -----------------------------
 
 // GPT-4 Turbo (UPDATED 1/25/24)
-const GPT4Turbo: LLM = {
+const GPT4TurboPreview: LLM = {
   modelId: "gpt-4-turbo-preview",
-  modelName: "GPT-4 Turbo",
+  modelName: "GPT-4 Turbo Preview",
   provider: "openai",
   hostedId: "gpt-4-turbo-preview",
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: false,
+  paid: true,
+  tools: true
+}
+
+const GPT4Turbo: LLM = {
+  modelId: "gpt-4-turbo",
+  modelName: "GPT-4 Turbo",
+  provider: "openai",
+  hostedId: "gpt-4-turbo",
+  platformLink: OPENAI_PLATORM_LINK,
+  imageInput: true,
   paid: true,
   tools: true
 }
@@ -51,4 +62,10 @@ const GPT3_5Turbo: LLM = {
   tools: true
 }
 
-export const OPENAI_LLM_LIST: LLM[] = [GPT4Turbo, GPT4Vision, GPT4, GPT3_5Turbo]
+export const OPENAI_LLM_LIST: LLM[] = [
+  GPT4Turbo,
+  GPT4TurboPreview,
+  GPT4Vision,
+  GPT4,
+  GPT3_5Turbo
+]

@@ -6,10 +6,14 @@ import { FC, useContext, useEffect, useRef } from "react"
 import { ModelSelectChat } from "@/components/models/model-select-chat"
 import { ToolSelect } from "@/components/tools/tool-select"
 import { ModelSettings } from "@/components/models/model-settings"
+import { cx } from "class-variance-authority"
+import { cn } from "@/lib/utils"
 
-interface ChatSettingsProps {}
+interface ChatSettingsProps {
+  className?: string
+}
 
-export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
+export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
   useHotkey("i", () => handleClick())
 
   const {
@@ -85,7 +89,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
   const selectedModel = allModels.find(x => x.modelId == chatSettings.model)
 
   return (
-    <div className="flex items-center space-x-1">
+    <div className={cn("flex items-center space-x-1", className)}>
       {selectedModel?.tools && (
         <ToolSelect
           selectedTools={selectedTools}

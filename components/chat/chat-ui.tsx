@@ -209,12 +209,18 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       </div>
 
       <div
-        className="flex size-full flex-col overflow-auto"
+        className="flex size-full flex-col overflow-auto pt-4"
         onScroll={handleScroll}
       >
         <div ref={messagesStartRef} />
 
-        <ChatMessages />
+        <div
+          className={
+            "mx-auto w-[300px] sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]"
+          }
+        >
+          <ChatMessages />
+        </div>
 
         <div ref={messagesEndRef} />
       </div>
