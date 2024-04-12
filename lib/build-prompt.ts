@@ -168,6 +168,15 @@ export async function buildFinalMessages(
             }
           }
 
+          if (chatSettings.model.indexOf("gpt-4-turbo") !== -1) {
+            return {
+              type: "image_url",
+              image_url: {
+                url: formedUrl
+              }
+            }
+          }
+
           return {
             type: "image_url",
             image_url: formedUrl

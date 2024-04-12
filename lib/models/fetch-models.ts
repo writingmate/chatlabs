@@ -12,6 +12,14 @@ const KNOWN_MODEL_NAMES: {
   "databricks/dbrx-instruct": {
     modelProvider: "databricks",
     modelName: "DBRX Instruct"
+  },
+  "cohere/command-r-plus": {
+    modelProvider: "cohere",
+    modelName: "Command R Plus"
+  },
+  "mistralai/mixtral-8x22b": {
+    modelProvider: "mistral",
+    modelName: "Mixtral 8x22B"
   }
 }
 
@@ -32,7 +40,11 @@ export function parseOpenRouterModelName(modelId: string) {
 }
 
 function parseSupportedModelsFromEnv() {
-  let SUPPORTED_OPENROUTER_MODELS = ["databricks/dbrx-instruct"]
+  let SUPPORTED_OPENROUTER_MODELS = [
+    "databricks/dbrx-instruct",
+    "cohere/command-r-plus",
+    "mistralai/mixtral-8x22b"
+  ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {
     SUPPORTED_OPENROUTER_MODELS = (

@@ -15,7 +15,8 @@ import { updateProfile } from "@/db/profile"
 export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "gpt-3.5-turbo-0125": true,
   "gpt-4-vision-preview": true,
-  "gpt-4-turbo-preview": true,
+  "gpt-4-turbo-preview": false,
+  "gpt-4-turbo": true,
   "claude-3-haiku-20240307": true,
   "claude-3-sonnet-20240229": true,
   "claude-3-opus-20240229": true,
