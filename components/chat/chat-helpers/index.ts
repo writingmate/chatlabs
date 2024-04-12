@@ -24,6 +24,7 @@ import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { SubscriptionRequiredError } from "@/lib/errors"
+import { JSONValue } from "ai"
 import { validateProPlan } from "@/lib/subscription"
 
 export const validateChatSettings = (
@@ -312,24 +313,44 @@ export const fetchChatResponse = async (
   return response
 }
 
-function parseDataStream(contentToAdd: string) {
+function parseDataStream(line: string): { text: string; data: any } {
   // regex to parse message like this '0: "text", 1: "text"'
-  let data = null
 
-  let matches
-  let newContentToAdd: string[] = []
-  contentToAdd.split("\n").forEach((value, index) => {
-    const regex = /^0:\s?"(.+)"$/g
-    const regexData = /^8:\s?(\[.+\])$/g
-    if ((matches = regex.exec(value)) !== null) {
-      newContentToAdd[index] = matches[1]
-    }
-    if ((matches = regexData.exec(value)) !== null) {
-      data = JSON.parse(matches[1])
-    }
-  })
+  const firstSeparatorIndex = line.indexOf(":")
 
-  return { text: newContentToAdd.join("").replace(/\\n/g, "\n"), data: data }
+  if (firstSeparatorIndex === -1) {
+    throw new Error("Failed to parse stream string. No separator found.")
+  }
+
+  const prefix = line.slice(0, firstSeparatorIndex)
+
+  const streamPartsByCode = {
+    "0": {
+      parse: (jsonValue: JSONValue) => {
+        return { text: jsonValue as string, data: null }
+      }
+    },
+    "8": {
+      parse: (jsonValue: JSONValue) => {
+        return { data: jsonValue as any, text: "" }
+      }
+    }
+  }
+
+  if (
+    !Object.keys(streamPartsByCode).includes(
+      prefix as keyof typeof streamPartsByCode
+    )
+  ) {
+    throw new Error(`Failed to parse stream string. Invalid code ${prefix}.`)
+  }
+
+  const code = prefix as keyof typeof streamPartsByCode
+
+  const textValue = line.slice(firstSeparatorIndex + 1)
+  const jsonValue: JSONValue = JSON.parse(textValue)
+
+  return streamPartsByCode[code].parse(jsonValue)
 }
 
 export const processResponse = async (
@@ -345,6 +366,8 @@ export const processResponse = async (
   let fullText = ""
   let contentToAdd = ""
   let data: any = null
+
+  let chunks: string[] = []
 
   if (response.body) {
     await consumeReadableStream(
@@ -368,13 +391,30 @@ export const processResponse = async (
                   ""
                 )
 
+          if (contentToAdd === "") {
+            return
+          }
+
           if (selectedTools.length > 0) {
-            const { text, data: newData } = parseDataStream(contentToAdd)
-            if (newData) {
-              data = newData
+            chunks.push(contentToAdd)
+            if (chunk[chunk.length - 1] !== "\n") {
+              return
             }
-            contentToAdd = text
-            fullText += text
+
+            const streamParts = chunks
+              .join("")
+              .split("\n")
+              .filter(x => x !== "")
+              .map(parseDataStream)
+            chunks = []
+
+            for (const { text, data: newData } of streamParts) {
+              if (newData) {
+                data = newData
+              }
+              contentToAdd = text
+              fullText += text
+            }
           } else {
             fullText += contentToAdd
           }
@@ -388,7 +428,7 @@ export const processResponse = async (
               const updatedChatMessage: ChatMessage = {
                 message: {
                   ...chatMessage.message,
-                  content: chatMessage.message.content + contentToAdd,
+                  content: fullText,
                   annotation: data
                 },
                 fileItems: chatMessage.fileItems
