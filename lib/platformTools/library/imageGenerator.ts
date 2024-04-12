@@ -2,23 +2,25 @@ import { ImageGeneratorResult, PlatformTool } from "@/types/platformTools"
 import OpenAI from "openai"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 
-type ImageSize = "256x256" | "512x512" | "1024x1024" | "1792x1024" | "1024x1792"
+type ImageFormat = "portrait" | "landscape" | "square"
 // This function fetches data from a URL and returns it in markdown format.
 const imageGenerator = async (
   params:
     | {
-        parameters: { prompt: string; size: ImageSize }
+        parameters: { prompt: string; format: ImageFormat }
       }
     | {
         prompt: string
-        size: ImageSize
+        format: ImageFormat
       }
 ): Promise<ImageGeneratorResult> => {
   if ("parameters" in params) {
     params = params.parameters
   }
 
-  let { prompt, size } = params
+  let { prompt, format } = params
+
+  console.log("Generating image", prompt, format)
 
   if (prompt === undefined) {
     throw new Error("prompt is required")
@@ -28,7 +30,17 @@ const imageGenerator = async (
     throw new Error("prompt must be a string")
   }
 
-  if (size !== "1024x1024" && size !== "1792x1024" && size !== "1024x1792") {
+  let size: "1024x1024" | "1792x1024" | "1024x1792" = "1024x1024"
+
+  if (["landscape", "wide"].includes(format)) {
+    size = "1792x1024"
+  }
+
+  if (["portrait", "tall"].includes(format)) {
+    size = "1024x1792"
+  }
+
+  if (format === "square") {
     size = "1024x1024"
   }
 
@@ -47,7 +59,7 @@ const imageGenerator = async (
       model: "dall-e-3",
       prompt,
       n: 1,
-      size
+      size: size as any
     })
 
     result = response.data[0].url as string
@@ -58,7 +70,8 @@ const imageGenerator = async (
 
   return {
     prompt: prompt,
-    url: result
+    url: result,
+    size: size
   }
 }
 
@@ -88,10 +101,10 @@ export const imageGeneratorTool: PlatformTool = {
           }
         },
         {
-          name: "size",
+          name: "format",
           description:
-            "The size of the image to generate. Allowed values: 1024x1024 (square), 1792x1024 (portrait), 1024x1792 (landscape). Defaults to 1024x1024.",
-          required: false,
+            "The format of the image to generate. Allowed values: square, portrait or tall, or landscape or wide. Defaults to square.",
+          required: true,
           schema: {
             type: "string"
           }

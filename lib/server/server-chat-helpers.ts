@@ -6,6 +6,7 @@ import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { SubscriptionRequiredError } from "@/lib/errors"
+import { validateProPlan } from "@/lib/subscription"
 
 function createClient() {
   return createServerClient<Database>(
@@ -83,7 +84,7 @@ export function checkApiKey(apiKey: string | null, keyName: string) {
 export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
   const { plan } = profile
 
-  if (plan !== "free") {
+  if (validateProPlan(profile)) {
     return
   }
 
@@ -101,7 +102,7 @@ export async function validateMessageCount(
 ) {
   const { plan } = profile
 
-  if (plan !== "free") {
+  if (validateProPlan(profile)) {
     return
   }
 
