@@ -4,7 +4,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { ChatSettings } from "@/types"
 import { IconInfoCircle } from "@tabler/icons-react"
-import { FC, useContext } from "react"
+import { FC, useContext, useEffect, useState } from "react"
 import { ModelSelect } from "../models/model-select"
 import { AdvancedSettings } from "./advanced-settings"
 import { Checkbox } from "./checkbox"
@@ -14,6 +14,7 @@ import { TextareaAutosize } from "./textarea-autosize"
 import { WithTooltip } from "./with-tooltip"
 import { buildBasePrompt } from "@/lib/build-prompt"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 const TEMPERATURE_DESCRIPTION = `
 Temperature affects the randomness of the AI model's responses. A higher temperature increases the randomness, while a lower temperature makes the responses more deterministic.
@@ -133,6 +134,14 @@ export const AdvancedContent: FC<AdvancedContentProps> = ({
     model => model.model_id === chatSettings.model
   )
 
+  const REGEX_SYSTEM_PROMPT =
+    /(?=.*{profile_context})(?=.*{local_date})(?=.*{assistant})/g
+
+  const validSystemPrompt =
+    chatSettings.customSystemPrompt?.match(REGEX_SYSTEM_PROMPT)
+
+  useEffect(() => {}, [])
+
   function findOpenRouterModel(modelId: string) {
     return availableOpenRouterModels.find(model => model.modelId === modelId)
   }
@@ -160,30 +169,33 @@ export const AdvancedContent: FC<AdvancedContentProps> = ({
     <div className="mt-5">
       <div className="space-y-3">
         <Label className="flex items-center justify-between space-x-1">
-          <div className={"text-nowrap"}>Temperature</div>
-
-          <div className={"flex w-[140px] items-center space-x-1"}>
-            <Input
-              min={MODEL_LIMITS.MIN_TEMPERATURE}
-              step={"any"}
-              max={MODEL_LIMITS.MAX_TEMPERATURE}
-              type={"number"}
-              onChange={e =>
-                onChangeChatSettings({
-                  ...chatSettings,
-                  temperature: Math.max(
-                    MODEL_LIMITS.MIN_TEMPERATURE,
-                    Math.min(
-                      parseFloat(e.target.value),
-                      MODEL_LIMITS.MAX_TEMPERATURE!
-                    )
-                  )
-                })
-              }
-              value={chatSettings.temperature}
-            />
-            <InfoIconTooltip label={CONTEXT_LENGTH_DESCRIPTION} />
+          <div className={"flex items-center space-x-2 text-nowrap"}>
+            <div>Temperature</div>
+            <InfoIconTooltip label={TEMPERATURE_DESCRIPTION} />
           </div>
+
+          <Input
+            className={
+              "hover:border-input focus:border-input w-[140px] border-transparent text-right"
+            }
+            min={MODEL_LIMITS.MIN_TEMPERATURE}
+            step={"any"}
+            max={MODEL_LIMITS.MAX_TEMPERATURE}
+            // type={"number"}
+            onChange={e =>
+              onChangeChatSettings({
+                ...chatSettings,
+                temperature: Math.max(
+                  MODEL_LIMITS.MIN_TEMPERATURE,
+                  Math.min(
+                    parseFloat(e.target.value),
+                    MODEL_LIMITS.MAX_TEMPERATURE!
+                  )
+                )
+              })
+            }
+            value={chatSettings.temperature}
+          />
         </Label>
 
         <Slider
@@ -202,26 +214,30 @@ export const AdvancedContent: FC<AdvancedContentProps> = ({
 
       <div className="mt-6 space-y-3">
         <Label className="flex items-center justify-between space-x-1">
-          <div className={"text-nowrap"}>Context Length</div>
-          <div className={"flex w-[140px] items-center space-x-1"}>
-            <Input
-              min={0}
-              max={maxContextLength}
-              step={1}
-              type={"number"}
-              onChange={e =>
-                onChangeChatSettings({
-                  ...chatSettings,
-                  contextLength: Math.min(
-                    parseInt(e.target.value),
-                    maxContextLength!
-                  )
-                })
-              }
-              value={chatSettings.contextLength}
-            />
+          <div className={"flex items-center space-x-2 text-nowrap"}>
+            <div>Context Length</div>
             <InfoIconTooltip label={CONTEXT_LENGTH_DESCRIPTION} />
           </div>
+          <Input
+            className={
+              "hover:border-input focus:border-input w-[140px] border-transparent text-right"
+            }
+            min={0}
+            max={maxContextLength}
+            step={1}
+            pattern={"[0-9]*"}
+            // type={"number"}
+            onChange={e =>
+              onChangeChatSettings({
+                ...chatSettings,
+                contextLength: Math.min(
+                  parseInt(e.target.value),
+                  maxContextLength!
+                )
+              })
+            }
+            value={chatSettings.contextLength}
+          />
         </Label>
 
         <Slider
@@ -241,35 +257,42 @@ export const AdvancedContent: FC<AdvancedContentProps> = ({
       {showOverrideSystemPrompt && (
         <>
           <div className="mb-4 mt-7 flex items-center space-x-2">
-            <Checkbox
-              checked={!!chatSettings.useCustomSystemPrompt}
-              onCheckedChange={(value: boolean) =>
-                onChangeChatSettings({
-                  ...chatSettings,
-                  customSystemPrompt: SYSTEM_PROMPT,
-                  useCustomSystemPrompt: value
-                })
-              }
-            />
-
-            <Label>Override System Prompt</Label>
-
+            <Label>System Prompt</Label>
             {showTooltip && <InfoIconTooltip label={SYSTEM_PROMPT} />}
           </div>
 
-          {chatSettings.useCustomSystemPrompt && (
-            <TextareaAutosize
-              minRows={5}
-              className="mt-2"
-              value={chatSettings.customSystemPrompt || ""}
-              onValueChange={value => {
-                onChangeChatSettings({
-                  ...chatSettings,
-                  customSystemPrompt: value
-                })
-              }}
-            />
-          )}
+          <TextareaAutosize
+            minRows={5}
+            className="mt-2"
+            value={chatSettings.customSystemPrompt || SYSTEM_PROMPT}
+            onValueChange={value => {
+              onChangeChatSettings({
+                ...chatSettings,
+                customSystemPrompt: value
+              })
+            }}
+          />
+          <div className="flex items-center space-x-2">
+            <Button className={"text-xs"} variant={"link"}>
+              Reset to default
+            </Button>
+            {!validSystemPrompt && (
+              <WithTooltip
+                trigger={
+                  <div className="text-xs text-yellow-500">
+                    Missing dynamic variables
+                  </div>
+                }
+                display={
+                  <div className="w-[400px] p-3 font-normal">
+                    The system prompt must contain the following dynamic
+                    variables: {`{profile_context}`}, {`{local_date}`}, and{" "}
+                    {`{assistant}`}
+                  </div>
+                }
+              />
+            )}
+          </div>
         </>
       )}
 

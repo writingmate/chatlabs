@@ -4,6 +4,7 @@ import {
   IconAdjustments,
   IconCheck,
   IconChevronDown,
+  IconLogout,
   IconPuzzle
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -19,6 +20,13 @@ import { ModelIcon } from "./model-icon"
 import { ModelOption } from "./model-option"
 import { AdvancedSettings } from "@/components/ui/advanced-settings"
 import { AdvancedContent } from "@/components/ui/chat-settings-form"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from "@/components/ui/sheet"
 
 interface ModelSelectProps {
   chatSettings: ChatSettings
@@ -38,13 +46,8 @@ export const ModelSettings: FC<ModelSelectProps> = ({
   if (!profile) return null
 
   return (
-    <DropdownMenu
-      open={isOpen}
-      onOpenChange={isOpen => {
-        setIsOpen(isOpen)
-      }}
-    >
-      <DropdownMenuTrigger>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTrigger asChild>
         <Button
           ref={triggerRef}
           className={
@@ -54,18 +57,21 @@ export const ModelSettings: FC<ModelSelectProps> = ({
         >
           <IconAdjustments />
         </Button>
-      </DropdownMenuTrigger>
+      </SheetTrigger>
 
-      <DropdownMenuContent className="w-[280px] space-y-2 p-2" align="start">
-        {chatSettings && (
-          <AdvancedContent
-            showOverrideSystemPrompt={true}
-            chatSettings={chatSettings}
-            onChangeChatSettings={onChangeChatSettings}
-            showTooltip={true}
-          />
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      <SheetContent side="right" className="space-y-2 p-4">
+        <SheetHeader>
+          <SheetTitle className="flex items-center justify-between space-x-2">
+            <div>Model Settings</div>
+          </SheetTitle>
+        </SheetHeader>
+        <AdvancedContent
+          showOverrideSystemPrompt={true}
+          chatSettings={chatSettings}
+          onChangeChatSettings={onChangeChatSettings}
+          showTooltip={true}
+        />
+      </SheetContent>
+    </Sheet>
   )
 }
