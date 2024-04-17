@@ -29,7 +29,6 @@ interface ChatInputProps {}
 
 export const ChatInput: FC<ChatInputProps> = ({}) => {
   const { t } = useTranslation()
-
   useHotkey("l", () => {
     handleFocusChatInput()
   })
@@ -41,7 +40,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     browserSupportsSpeechRecognition,
     setBrowserSupportsSpeechRecognition
   ] = useState(false)
-  const recognition = new webkitSpeechRecognition()
+  const recognition = window.webkitSpeechRecognition
+    ? new window.webkitSpeechRecognition()
+    : null
   const {
     isAssistantPickerOpen,
     focusAssistant,
@@ -191,17 +192,21 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
   const startListening = () => {
-    recognition.onresult = event => {
-      setTranscript(event.results[0][0].transcript)
-      setUserInput(event.results[0][0].transcript)
+    if (recognition) {
+      recognition.onresult = event => {
+        setTranscript(event.results[0][0].transcript)
+        setUserInput(event.results[0][0].transcript)
+      }
+      recognition.start()
+      setListening(true)
     }
-    recognition.start()
-    setListening(true)
   }
 
   const stopListening = () => {
-    recognition.stop()
-    setListening(false)
+    if (recognition) {
+      recognition.stop()
+      setListening(false)
+    }
   }
 
   return (
