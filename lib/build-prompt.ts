@@ -2,36 +2,29 @@ import { Tables } from "@/supabase/types"
 import { ChatPayload, MessageImage } from "@/types"
 import { encode } from "gpt-tokenizer"
 
+export const DEFAULT_SYSTEM_PROMPT = `Today is {local_date}.
+User info: "{profile_context}"
+{assistant}`
+
+export function validateSystemPromptTemplate(template: string) {
+  return (
+    template.includes("{profile_context}") &&
+    template.includes("{local_date}") &&
+    template.includes("{assistant}")
+  )
+}
 export const buildBasePrompt = (
-  prompt: string,
   profileContext: string,
-  workspaceInstructions: string,
   assistant: Tables<"assistants"> | null,
-  includeTodayDate = true
+  template = DEFAULT_SYSTEM_PROMPT
 ) => {
-  let fullPrompt = ""
-
-  if (assistant) {
-    fullPrompt += `<INJECT ROLE>\nYou are not an AI. You are ${assistant.name}.\n</INJECT ROLE>\n\n`
-  }
-
-  if (includeTodayDate) {
-    fullPrompt += `Today is ${new Date().toLocaleDateString()}.\n\n`
-  }
-
-  if (profileContext) {
-    fullPrompt += `User Info:\n${profileContext}\n\n`
-  }
-
-  if (workspaceInstructions) {
-    fullPrompt += `System Instructions:\n${workspaceInstructions}\n\n`
-  }
-
-  if (prompt) {
-    fullPrompt += `User Instructions:\n${prompt}\n\n`
-  }
-
-  return fullPrompt
+  return template
+    .replace("{local_date}", new Date().toLocaleDateString())
+    .replace("{profile_context}", profileContext)
+    .replace(
+      "{assistant}",
+      assistant ? `You are ${assistant.name}.\n\n ${assistant.prompt}` : ""
+    )
 }
 
 export async function buildFinalMessages(
@@ -41,21 +34,17 @@ export async function buildFinalMessages(
 ) {
   const {
     chatSettings,
-    workspaceInstructions,
     chatMessages,
     assistant,
     messageFileItems,
     chatFileItems
   } = payload
 
-  const BUILT_PROMPT = chatSettings.useCustomSystemPrompt
-    ? chatSettings.customSystemPrompt || ""
-    : buildBasePrompt(
-        chatSettings.prompt,
-        chatSettings.includeProfileContext ? profile.profile_context || "" : "",
-        chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-        assistant
-      )
+  const BUILT_PROMPT = buildBasePrompt(
+    profile.profile_context || "",
+    assistant,
+    profile.system_prompt_template || DEFAULT_SYSTEM_PROMPT
+  )
 
   const CHUNK_SIZE = chatSettings.contextLength
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
@@ -168,6 +157,15 @@ export async function buildFinalMessages(
             }
           }
 
+          if (chatSettings.model.indexOf("gpt-4-turbo") !== -1) {
+            return {
+              type: "image_url",
+              image_url: {
+                url: formedUrl
+              }
+            }
+          }
+
           return {
             type: "image_url",
             image_url: {
@@ -217,10 +215,9 @@ export async function buildGoogleGeminiFinalMessages(
     payload
 
   const BUILT_PROMPT = buildBasePrompt(
-    chatSettings.prompt,
-    chatSettings.includeProfileContext ? profile.profile_context || "" : "",
-    chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant
+    profile.profile_context || "",
+    assistant,
+    profile.system_prompt_template || DEFAULT_SYSTEM_PROMPT
   )
 
   let finalMessages = []
@@ -262,51 +259,76 @@ export async function buildGoogleGeminiFinalMessages(
 
   finalMessages.unshift(tempSystemMessage)
 
-  let GOOGLE_FORMATTED_MESSAGES = []
+  let GOOGLE_FORMATTED_MESSAGES: any[] = []
 
-  if (chatSettings.model === "gemini-pro") {
+  async function fileToGenerativePart(file: File) {
+    const base64EncodedDataPromise = new Promise(resolve => {
+      const reader = new FileReader()
+
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result.split(",")[1])
+        }
+      }
+
+      reader.readAsDataURL(file)
+    })
+
+    return {
+      inlineData: {
+        data: await base64EncodedDataPromise,
+        mimeType: file.type
+      }
+    }
+  }
+
+  if (
+    chatSettings.model === "gemini-pro" ||
+    chatSettings.model === "gemini-1.5-pro-latest"
+  ) {
     GOOGLE_FORMATTED_MESSAGES = [
       {
         role: "user",
-        parts: finalMessages[0].content
+        parts: [
+          {
+            text: finalMessages[0].content
+          }
+        ]
       },
       {
         role: "model",
-        parts: "I will follow your instructions."
+        parts: [
+          {
+            text: "I will follow your instructions."
+          }
+        ]
       }
     ]
 
     for (let i = 1; i < finalMessages.length; i++) {
       GOOGLE_FORMATTED_MESSAGES.push({
         role: finalMessages[i].role === "user" ? "user" : "model",
-        parts: finalMessages[i].content as string
+        parts: [
+          {
+            text: finalMessages[i].content as string
+          }
+        ]
       })
     }
+
+    const files = messageImageFiles.map(file => file.file)
+
+    const imageParts = await Promise.all(
+      files.flatMap(file => (file ? [fileToGenerativePart(file)] : []))
+    )
+
+    GOOGLE_FORMATTED_MESSAGES[GOOGLE_FORMATTED_MESSAGES.length - 1].parts.push(
+      ...imageParts
+    )
 
     return GOOGLE_FORMATTED_MESSAGES
-  } else if ((chatSettings.model = "gemini-pro-vision")) {
+  } else if (chatSettings.model === "gemini-pro-vision") {
     // Gemini Pro Vision doesn't currently support messages
-    async function fileToGenerativePart(file: File) {
-      const base64EncodedDataPromise = new Promise(resolve => {
-        const reader = new FileReader()
-
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result.split(",")[1])
-          }
-        }
-
-        reader.readAsDataURL(file)
-      })
-
-      return {
-        inlineData: {
-          data: await base64EncodedDataPromise,
-          mimeType: file.type
-        }
-      }
-    }
-
     let prompt = ""
 
     for (let i = 0; i < finalMessages.length; i++) {

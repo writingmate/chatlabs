@@ -1,3 +1,5 @@
+import { JSONValue } from "ai"
+
 export async function consumeReadableStream(
   stream: ReadableStream<Uint8Array>,
   callback: (chunk: string) => void,
@@ -39,4 +41,45 @@ export async function consumeReadableStream(
   } finally {
     reader.releaseLock()
   }
+}
+
+export function parseDataStream(line: string): { text: string; data: any } {
+  // regex to parse message like this '0: "text", 1: "text"'
+
+  const firstSeparatorIndex = line.indexOf(":")
+
+  if (firstSeparatorIndex === -1) {
+    throw new Error("Failed to parse stream string. No separator found.")
+  }
+
+  const prefix = line.slice(0, firstSeparatorIndex)
+
+  const streamPartsByCode = {
+    "0": {
+      parse: (jsonValue: JSONValue) => {
+        return { text: jsonValue as string, data: null }
+      }
+    },
+    "8": {
+      parse: (jsonValue: JSONValue) => {
+        return { data: jsonValue as any, text: "" }
+      }
+    }
+  }
+
+  if (
+    !Object.keys(streamPartsByCode).includes(
+      prefix as keyof typeof streamPartsByCode
+    )
+  ) {
+    throw new Error(`Failed to parse stream string. Invalid code ${prefix}.`)
+  }
+
+  const code = prefix as keyof typeof streamPartsByCode
+
+  const textValue = line.slice(firstSeparatorIndex + 1)
+  console.log("textValue", textValue)
+  const jsonValue: JSONValue = JSON.parse(textValue)
+
+  return streamPartsByCode[code].parse(jsonValue)
 }

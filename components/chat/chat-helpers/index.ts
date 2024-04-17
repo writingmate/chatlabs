@@ -10,7 +10,7 @@ import {
   buildFinalMessages,
   buildGoogleGeminiFinalMessages
 } from "@/lib/build-prompt"
-import { consumeReadableStream } from "@/lib/consume-stream"
+import { consumeReadableStream, parseDataStream } from "@/lib/consume-stream"
 import { Tables, TablesInsert } from "@/supabase/types"
 import {
   ChatFile,
@@ -24,6 +24,7 @@ import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { SubscriptionRequiredError } from "@/lib/errors"
+import { JSONValue } from "ai"
 import { validateProPlan } from "@/lib/subscription"
 import { encode } from "gpt-tokenizer"
 
@@ -381,26 +382,6 @@ export const fetchChatResponse = async (
   return response
 }
 
-function parseDataStream(contentToAdd: string) {
-  // regex to parse message like this '0: "text", 1: "text"'
-  let data = null
-
-  let matches
-  let newContentToAdd: string[] = []
-  contentToAdd.split("\n").forEach((value, index) => {
-    const regex = /^0:\s?"(.+)"$/g
-    const regexData = /^8:\s?(\[.+\])$/g
-    if ((matches = regex.exec(value)) !== null) {
-      newContentToAdd[index] = matches[1]
-    }
-    if ((matches = regexData.exec(value)) !== null) {
-      data = JSON.parse(matches[1])
-    }
-  })
-
-  return { text: newContentToAdd.join("").replace(/\\n/g, "\n"), data: data }
-}
-
 export const processResponse = async (
   response: Response,
   lastChatMessage: ChatMessage,
@@ -419,6 +400,8 @@ export const processResponse = async (
   let contentToAdd = ""
   let data: any = null
 
+  let chunks: string[] = []
+
   if (response.body) {
     await consumeReadableStream(
       response.body,
@@ -431,6 +414,8 @@ export const processResponse = async (
         })
         setFirstTokenReceived(true)
         setToolInUse("none")
+
+        console.log("chunk", chunk, selectedTools.length)
 
         try {
           contentToAdd = isHosted
@@ -447,13 +432,40 @@ export const processResponse = async (
                   ""
                 )
 
+          console.log("contentToAdd", contentToAdd)
+
+          if (contentToAdd === "") {
+            return
+          }
+
+          console.log(
+            "contentToAdd !== ''",
+            contentToAdd,
+            selectedTools.length > 0
+          )
+
           if (selectedTools.length > 0) {
-            const { text, data: newData } = parseDataStream(contentToAdd)
-            if (newData) {
-              data = newData
+            chunks.push(contentToAdd)
+            if (chunk[chunk.length - 1] !== "\n") {
+              return
             }
-            contentToAdd = text
-            fullText += text
+
+            console.log("chunks", chunks)
+
+            const streamParts = chunks
+              .join("")
+              .split("\n")
+              .filter(x => x !== "")
+              .map(parseDataStream)
+            chunks = []
+
+            for (const { text, data: newData } of streamParts) {
+              if (newData) {
+                data = newData
+              }
+              contentToAdd = text
+              fullText += text
+            }
           } else {
             fullText += contentToAdd
           }
@@ -470,7 +482,7 @@ export const processResponse = async (
               const updatedChatMessage: ChatMessage = {
                 message: {
                   ...chatMessage.message,
-                  content: chatMessage.message.content + contentToAdd,
+                  content: fullText,
                   annotation: data
                 },
                 fileItems: chatMessage.fileItems
