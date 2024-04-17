@@ -2,36 +2,29 @@ import { Tables } from "@/supabase/types"
 import { ChatPayload, MessageImage } from "@/types"
 import { encode } from "gpt-tokenizer"
 
+export const DEFAULT_SYSTEM_PROMPT = `Today is {local_date}.
+User info: "{profile_context}"
+{assistant}`
+
+export function validateSystemPromptTemplate(template: string) {
+  return (
+    template.includes("{profile_context}") &&
+    template.includes("{local_date}") &&
+    template.includes("{assistant}")
+  )
+}
 export const buildBasePrompt = (
-  prompt: string,
   profileContext: string,
-  workspaceInstructions: string,
   assistant: Tables<"assistants"> | null,
-  includeTodayDate = true
+  template = DEFAULT_SYSTEM_PROMPT
 ) => {
-  let fullPrompt = ""
-
-  if (assistant) {
-    fullPrompt += `<INJECT ROLE>\nYou are not an AI. You are ${assistant.name}.\n</INJECT ROLE>\n\n`
-  }
-
-  if (includeTodayDate) {
-    fullPrompt += `Today is ${new Date().toLocaleDateString()}.\n\n`
-  }
-
-  if (profileContext) {
-    fullPrompt += `User Info:\n${profileContext}\n\n`
-  }
-
-  if (workspaceInstructions) {
-    fullPrompt += `System Instructions:\n${workspaceInstructions}\n\n`
-  }
-
-  if (prompt) {
-    fullPrompt += `User Instructions:\n${prompt}\n\n`
-  }
-
-  return fullPrompt
+  return template
+    .replace("{local_date}", new Date().toLocaleDateString())
+    .replace("{profile_context}", profileContext)
+    .replace(
+      "{assistant}",
+      assistant ? `You are ${assistant.name}.\n\n ${assistant.prompt}` : ""
+    )
 }
 
 export async function buildFinalMessages(
@@ -41,21 +34,17 @@ export async function buildFinalMessages(
 ) {
   const {
     chatSettings,
-    workspaceInstructions,
     chatMessages,
     assistant,
     messageFileItems,
     chatFileItems
   } = payload
 
-  const BUILT_PROMPT = chatSettings.useCustomSystemPrompt
-    ? chatSettings.customSystemPrompt || ""
-    : buildBasePrompt(
-        chatSettings.prompt,
-        chatSettings.includeProfileContext ? profile.profile_context || "" : "",
-        chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-        assistant
-      )
+  const BUILT_PROMPT = buildBasePrompt(
+    profile.profile_context || "",
+    assistant,
+    profile.system_prompt_template || DEFAULT_SYSTEM_PROMPT
+  )
 
   const CHUNK_SIZE = chatSettings.contextLength
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
@@ -224,10 +213,9 @@ export async function buildGoogleGeminiFinalMessages(
     payload
 
   const BUILT_PROMPT = buildBasePrompt(
-    chatSettings.prompt,
-    chatSettings.includeProfileContext ? profile.profile_context || "" : "",
-    chatSettings.includeWorkspaceInstructions ? workspaceInstructions : "",
-    assistant
+    profile.profile_context || "",
+    assistant,
+    profile.system_prompt_template || DEFAULT_SYSTEM_PROMPT
   )
 
   let finalMessages = []

@@ -17,8 +17,8 @@ import { Tables } from "@/supabase/types"
 import { Separator } from "@/components/ui/separator"
 import {
   DEFAULT_MODEL_VISIBILITY,
-  ModelVisibility
-} from "@/components/models/model-visibility"
+  ModelSettings
+} from "@/components/models/model-settings"
 import { validatePlanForModel } from "@/lib/subscription"
 
 interface ModelSelectProps {
@@ -226,7 +226,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
           </div>
         </div>
         <Separator className={"opacity-75"} />
-        <ModelVisibility models={allModels} />
+        <ModelSettings models={allModels} />
       </DropdownMenuContent>
     </DropdownMenu>
   )

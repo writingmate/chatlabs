@@ -5,7 +5,6 @@ import { LLMID, ModelProvider } from "@/types"
 import { FC, useContext, useEffect, useRef } from "react"
 import { ModelSelectChat } from "@/components/models/model-select-chat"
 import { ToolSelect } from "@/components/tools/tool-select"
-import { ModelSettings } from "@/components/models/model-settings"
 
 interface ChatSettingsProps {}
 
@@ -92,10 +91,10 @@ export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
           onSelectTools={setSelectedTools}
         />
       )}
-      <ModelSettings
-        chatSettings={chatSettings}
-        onChangeChatSettings={setChatSettings}
-      />
+      {/*<ModelSettings*/}
+      {/*  chatSettings={chatSettings}*/}
+      {/*  onChangeChatSettings={setChatSettings}*/}
+      {/*/>*/}
       <ModelSelectChat
         selectedModelId={chatSettings.model}
         onSelectModel={handleSelectModel}
