@@ -269,51 +269,76 @@ export async function buildGoogleGeminiFinalMessages(
 
   finalMessages.unshift(tempSystemMessage)
 
-  let GOOGLE_FORMATTED_MESSAGES = []
+  let GOOGLE_FORMATTED_MESSAGES: any[] = []
 
-  if (chatSettings.model === "gemini-pro") {
+  async function fileToGenerativePart(file: File) {
+    const base64EncodedDataPromise = new Promise(resolve => {
+      const reader = new FileReader()
+
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result.split(",")[1])
+        }
+      }
+
+      reader.readAsDataURL(file)
+    })
+
+    return {
+      inlineData: {
+        data: await base64EncodedDataPromise,
+        mimeType: file.type
+      }
+    }
+  }
+
+  if (
+    chatSettings.model === "gemini-pro" ||
+    chatSettings.model === "gemini-1.5-pro-latest"
+  ) {
     GOOGLE_FORMATTED_MESSAGES = [
       {
         role: "user",
-        parts: finalMessages[0].content
+        parts: [
+          {
+            text: finalMessages[0].content
+          }
+        ]
       },
       {
         role: "model",
-        parts: "I will follow your instructions."
+        parts: [
+          {
+            text: "I will follow your instructions."
+          }
+        ]
       }
     ]
 
     for (let i = 1; i < finalMessages.length; i++) {
       GOOGLE_FORMATTED_MESSAGES.push({
         role: finalMessages[i].role === "user" ? "user" : "model",
-        parts: finalMessages[i].content as string
+        parts: [
+          {
+            text: finalMessages[i].content as string
+          }
+        ]
       })
     }
+
+    const files = messageImageFiles.map(file => file.file)
+
+    const imageParts = await Promise.all(
+      files.flatMap(file => (file ? [fileToGenerativePart(file)] : []))
+    )
+
+    GOOGLE_FORMATTED_MESSAGES[GOOGLE_FORMATTED_MESSAGES.length - 1].parts.push(
+      ...imageParts
+    )
 
     return GOOGLE_FORMATTED_MESSAGES
-  } else if ((chatSettings.model = "gemini-pro-vision")) {
+  } else if (chatSettings.model === "gemini-pro-vision") {
     // Gemini Pro Vision doesn't currently support messages
-    async function fileToGenerativePart(file: File) {
-      const base64EncodedDataPromise = new Promise(resolve => {
-        const reader = new FileReader()
-
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result.split(",")[1])
-          }
-        }
-
-        reader.readAsDataURL(file)
-      })
-
-      return {
-        inlineData: {
-          data: await base64EncodedDataPromise,
-          mimeType: file.type
-        }
-      }
-    }
-
     let prompt = ""
 
     for (let i = 0; i < finalMessages.length; i++) {
