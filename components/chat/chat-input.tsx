@@ -8,7 +8,8 @@ import {
   IconPaperclip,
   IconPlayerStopFilled,
   IconSend,
-  IconX
+  IconX,
+  IconMicrophone
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -34,12 +35,19 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   })
 
   const [isTyping, setIsTyping] = useState<boolean>(false)
-
+  const [transcript, setTranscript] = useState("")
+  const [listening, setListening] = useState(false)
+  const [
+    browserSupportsSpeechRecognition,
+    setBrowserSupportsSpeechRecognition
+  ] = useState(false)
+  const recognition = new webkitSpeechRecognition()
   const {
     isAssistantPickerOpen,
     focusAssistant,
     setFocusAssistant,
     userInput,
+    setUserInput,
     chatMessages,
     isGenerating,
     selectedPreset,
@@ -82,6 +90,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    if ("webkitSpeechRecognition" in window) {
+      setBrowserSupportsSpeechRecognition(true)
+    }
     setTimeout(() => {
       handleFocusChatInput()
     }, 200) // FIX: hacky
@@ -179,6 +190,19 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       }
     }
   }
+  const startListening = () => {
+    recognition.onresult = event => {
+      setTranscript(event.results[0][0].transcript)
+      setUserInput(event.results[0][0].transcript)
+    }
+    recognition.start()
+    setListening(true)
+  }
+
+  const stopListening = () => {
+    recognition.stop()
+    setListening(false)
+  }
 
   return (
     <>
@@ -263,29 +287,37 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               onCompositionStart={() => setIsTyping(true)}
               onCompositionEnd={() => setIsTyping(false)}
             />
-
-            <div className="absolute bottom-[6px] right-3 cursor-pointer hover:opacity-50">
-              {isGenerating ? (
-                <IconPlayerStopFilled
-                  className="hover:bg-background animate-pulse rounded bg-transparent p-1"
-                  onClick={handleStopMessage}
-                  size={30}
-                />
-              ) : (
-                <IconSend
-                  className={cn(
-                    "bg-primary text-secondary rounded-lg p-1",
-                    (!userInput || isUploading) &&
-                      "opacity-md cursor-not-allowed"
+            <div className="flex w-full items-center justify-between">
+              <div className="grow">
+                {/* This div is used to push the buttons to the right */}
+              </div>
+              <div className="flex items-center space-x-2">
+                <button onClick={listening ? stopListening : startListening}>
+                  <IconMicrophone size={24} />
+                </button>
+                <div className="cursor-pointer hover:opacity-50">
+                  {isGenerating ? (
+                    <IconPlayerStopFilled
+                      className="hover:bg-background animate-pulse rounded bg-transparent p-1"
+                      onClick={handleStopMessage}
+                      size={30}
+                    />
+                  ) : (
+                    <IconSend
+                      className={cn(
+                        "bg-primary text-secondary rounded-lg p-1",
+                        (!userInput || isUploading) &&
+                          "opacity-md cursor-not-allowed"
+                      )}
+                      onClick={() => {
+                        if (!userInput || isUploading) return
+                        handleSendMessage(userInput, chatMessages, false)
+                      }}
+                      size={30}
+                    />
                   )}
-                  onClick={() => {
-                    if (!userInput || isUploading) return
-
-                    handleSendMessage(userInput, chatMessages, false)
-                  }}
-                  size={30}
-                />
-              )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
