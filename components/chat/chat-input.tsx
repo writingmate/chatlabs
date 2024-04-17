@@ -287,37 +287,30 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               onCompositionStart={() => setIsTyping(true)}
               onCompositionEnd={() => setIsTyping(false)}
             />
-            <div className="flex w-full items-center justify-between">
-              <div className="grow">
-                {/* This div is used to push the buttons to the right */}
-              </div>
-              <div className="flex items-center space-x-2">
-                <button onClick={listening ? stopListening : startListening}>
-                  <IconMicrophone size={24} />
-                </button>
-                <div className="cursor-pointer hover:opacity-50">
-                  {isGenerating ? (
-                    <IconPlayerStopFilled
-                      className="hover:bg-background animate-pulse rounded bg-transparent p-1"
-                      onClick={handleStopMessage}
-                      size={30}
-                    />
-                  ) : (
-                    <IconSend
-                      className={cn(
-                        "bg-primary text-secondary rounded-lg p-1",
-                        (!userInput || isUploading) &&
-                          "opacity-md cursor-not-allowed"
-                      )}
-                      onClick={() => {
-                        if (!userInput || isUploading) return
-                        handleSendMessage(userInput, chatMessages, false)
-                      }}
-                      size={30}
-                    />
+            <div className="absolute bottom-[6px] right-3 flex cursor-pointer justify-end hover:opacity-50">
+              <button onClick={listening ? stopListening : startListening}>
+                <IconMicrophone size={24} />
+              </button>
+              {isGenerating ? (
+                <IconPlayerStopFilled
+                  className="hover:bg-background animate-pulse rounded bg-transparent p-1"
+                  onClick={handleStopMessage}
+                  size={30}
+                />
+              ) : (
+                <IconSend
+                  className={cn(
+                    "bg-primary text-secondary rounded-lg p-1",
+                    (!userInput || isUploading) &&
+                      "opacity-md cursor-not-allowed"
                   )}
-                </div>
-              </div>
+                  onClick={() => {
+                    if (!userInput || isUploading) return
+                    handleSendMessage(userInput, chatMessages, false)
+                  }}
+                  size={30}
+                />
+              )}
             </div>
           </div>
         </div>
