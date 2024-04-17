@@ -51,7 +51,7 @@ export const ModelSettings: FC<ModelSelectProps> = ({
         <Button
           ref={triggerRef}
           className={
-            "relative flex items-center justify-between space-x-0 border-0"
+            "relative hidden items-center justify-between space-x-0 border-0 sm:flex"
           }
           variant="ghost"
         >
