@@ -12,14 +12,18 @@ export const MicrosoftSVG: FC<AnthropicSVGProps> = ({
   className
 }) => {
   return (
-    <div
+    <svg
       className={className}
-      style={{
-        width: width + "px",
-        height: height + "px",
-        backgroundImage:
-          "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='21' height='21'%3E%3Cpath fill='%23f25022' d='M1 1h9v9H1z'/%3E%3Cpath fill='%2300a4ef' d='M1 11h9v9H1z'/%3E%3Cpath fill='%237fba00' d='M11 1h9v9h-9z'/%3E%3Cpath fill='%23ffb900' d='M11 11h9v9h-9z'/%3E%3C/svg%3E\")"
-      }}
-    ></div>
+      width={width}
+      height={height}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 23 23"
+    >
+      <path fill="#f3f3f3" d="M0 0h23v23H0z" />
+      <path fill="#f35325" d="M1 1h10v10H1z" />
+      <path fill="#81bc06" d="M12 1h10v10H12z" />
+      <path fill="#05a6f0" d="M1 12h10v10H1z" />
+      <path fill="#ffba08" d="M12 12h10v10H12z" />
+    </svg>
   )
 }

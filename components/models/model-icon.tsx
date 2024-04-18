@@ -12,6 +12,7 @@ import { AnthropicSVG } from "../icons/anthropic-svg"
 import { GoogleSVG } from "../icons/google-svg"
 import { OpenAISVG } from "../icons/openai-svg"
 import { parseOpenRouterModelName } from "@/lib/models/fetch-models"
+import { MicrosoftSVG } from "@/components/icons/microsoft-svg"
 
 interface ModelIconProps extends HTMLAttributes<HTMLDivElement> {
   provider: ModelProvider
@@ -114,6 +115,18 @@ export const ModelIcon: FC<ModelIconProps> = ({
           )}
           src={databricks.src}
           alt="Databricks"
+          width={width}
+          height={height}
+        />
+      )
+    case "microsoft":
+      return (
+        <MicrosoftSVG
+          className={cn(
+            "rounded-sm bg-[#fff] p-1 text-black",
+            props.className,
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+          )}
           width={width}
           height={height}
         />

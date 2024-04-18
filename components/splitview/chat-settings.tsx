@@ -73,12 +73,6 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
           onSelectModel={handleSelectModel}
         />
       </div>
-      <div>
-        <ModelSettings
-          chatSettings={chatSettings}
-          onChangeChatSettings={setChatSettings}
-        />
-      </div>
     </div>
   )
 }

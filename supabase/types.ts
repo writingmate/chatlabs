@@ -1471,7 +1471,6 @@ export interface Database {
           default_context_length: number
           default_model: string
           default_prompt: string
-          default_system_prompt: string | null
           default_temperature: number
           description: string
           embeddings_provider: string
@@ -1491,7 +1490,6 @@ export interface Database {
           default_context_length: number
           default_model: string
           default_prompt: string
-          default_system_prompt?: string | null
           default_temperature: number
           description: string
           embeddings_provider: string
@@ -1511,7 +1509,6 @@ export interface Database {
           default_context_length?: number
           default_model?: string
           default_prompt?: string
-          default_system_prompt?: string | null
           default_temperature?: number
           description?: string
           embeddings_provider?: string

@@ -9,3 +9,5 @@ export type ModelProvider =
   | "openrouter"
   | "custom"
   | "databricks"
+  | "cohere"
+  | "microsoft"

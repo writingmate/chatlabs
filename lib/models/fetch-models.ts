@@ -17,9 +17,13 @@ const KNOWN_MODEL_NAMES: {
     modelProvider: "cohere",
     modelName: "Command R Plus"
   },
-  "mistralai/mixtral-8x22b": {
+  "mistralai/mixtral-8x22b-instruct": {
     modelProvider: "mistral",
-    modelName: "Mixtral 8x22B"
+    modelName: "Mixtral 8x22B Instruct"
+  },
+  "microsoft/wizardlm-2-8x22b": {
+    modelProvider: "microsoft",
+    modelName: "WizardLM 2 8x22B"
   }
 }
 
@@ -43,7 +47,8 @@ function parseSupportedModelsFromEnv() {
   let SUPPORTED_OPENROUTER_MODELS = [
     "databricks/dbrx-instruct",
     "cohere/command-r-plus",
-    "mistralai/mixtral-8x22b"
+    "mistralai/mixtral-8x22b-instruct",
+    "microsoft/wizardlm-2-8x22b"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {
@@ -159,9 +164,9 @@ export const fetchOpenRouterModels = async () => {
           context_length: number
         }): OpenRouterLLM => ({
           modelId: model.id as LLMID,
-          modelName: model.id,
+          modelName: model.name,
           provider: "openrouter",
-          hostedId: model.name,
+          hostedId: model.id,
           platformLink: "https://openrouter.dev",
           imageInput: false,
           maxContext: model.context_length
