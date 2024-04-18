@@ -9,7 +9,8 @@ import {
   IconPlayerStopFilled,
   IconSend,
   IconX,
-  IconMicrophone
+  IconMicrophone,
+  IconPlayerRecordFilled
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -193,9 +194,14 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   }
   const startListening = () => {
     if (recognition) {
-      recognition.onresult = event => {
+      recognition.onresult = (event: any) => {
         setTranscript(event.results[0][0].transcript)
-        setUserInput(event.results[0][0].transcript)
+        setUserInput(
+          prevState => prevState + " " + event.results[0][0].transcript
+        )
+      }
+      recognition.onend = () => {
+        setListening(false)
       }
       recognition.start()
       setListening(true)
@@ -292,20 +298,27 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               onCompositionStart={() => setIsTyping(true)}
               onCompositionEnd={() => setIsTyping(false)}
             />
-            <div className="absolute bottom-[6px] right-3 flex cursor-pointer justify-end hover:opacity-50">
+            <div className="absolute bottom-[6px] right-3 flex cursor-pointer justify-end space-x-2">
               <button onClick={listening ? stopListening : startListening}>
-                <IconMicrophone size={24} />
+                {listening ? (
+                  <IconPlayerRecordFilled
+                    className={"animate-pulse text-red-500"}
+                    size={24}
+                  />
+                ) : (
+                  <IconMicrophone size={24} />
+                )}
               </button>
               {isGenerating ? (
                 <IconPlayerStopFilled
-                  className="hover:bg-background animate-pulse rounded bg-transparent p-1"
+                  className="hover:bg-background animate-pulse rounded bg-transparent p-1 hover:opacity-50"
                   onClick={handleStopMessage}
                   size={30}
                 />
               ) : (
                 <IconSend
                   className={cn(
-                    "bg-primary text-secondary rounded-lg p-1",
+                    "bg-primary text-secondary rounded-lg p-1 hover:opacity-50",
                     (!userInput || isUploading) &&
                       "opacity-md cursor-not-allowed"
                   )}
