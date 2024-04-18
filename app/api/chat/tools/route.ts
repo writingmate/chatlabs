@@ -168,7 +168,7 @@ export async function POST(request: Request) {
     const toolCalls = message.tool_calls || []
 
     if (toolCalls.length === 0) {
-      return new Response(`0:"${message.content?.replace(/\n/g, "\\n")}"`, {
+      return new Response(`0:"${message.content?.replace(/\n/g, "\\n")}"\n`, {
         headers: {
           "Content-Type": "application/json"
         }

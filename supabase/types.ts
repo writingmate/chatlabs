@@ -1177,6 +1177,7 @@ export interface Database {
           prompt_command: string | null
           send_message_on_enter: boolean | null
           stripe_customer_id: string | null
+          system_prompt_template: string | null
           tools_command: string | null
           updated_at: string | null
           use_azure_openai: boolean
@@ -1213,6 +1214,7 @@ export interface Database {
           prompt_command?: string | null
           send_message_on_enter?: boolean | null
           stripe_customer_id?: string | null
+          system_prompt_template?: string | null
           tools_command?: string | null
           updated_at?: string | null
           use_azure_openai: boolean
@@ -1249,6 +1251,7 @@ export interface Database {
           prompt_command?: string | null
           send_message_on_enter?: boolean | null
           stripe_customer_id?: string | null
+          system_prompt_template?: string | null
           tools_command?: string | null
           updated_at?: string | null
           use_azure_openai?: boolean

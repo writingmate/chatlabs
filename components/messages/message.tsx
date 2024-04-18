@@ -228,7 +228,7 @@ export const Message: FC<MessageProps> = ({
       )}
       onKeyDown={handleKeyDown}
     >
-      <div className="relative flex w-[300px] flex-col py-6 sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]">
+      <div className="relative flex w-full flex-col px-4 py-6 md:w-[500px] md:px-0 lg:w-[600px] xl:w-[700px]">
         <div className="absolute right-0 top-7">
           <MessageActions
             onCopy={handleCopy}

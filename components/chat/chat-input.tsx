@@ -8,7 +8,9 @@ import {
   IconPaperclip,
   IconPlayerStopFilled,
   IconSend,
-  IconX
+  IconX,
+  IconMicrophone,
+  IconPlayerRecordFilled
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -28,18 +30,26 @@ interface ChatInputProps {}
 
 export const ChatInput: FC<ChatInputProps> = ({}) => {
   const { t } = useTranslation()
-
   useHotkey("l", () => {
     handleFocusChatInput()
   })
 
   const [isTyping, setIsTyping] = useState<boolean>(false)
-
+  const [transcript, setTranscript] = useState("")
+  const [listening, setListening] = useState(false)
+  const [
+    browserSupportsSpeechRecognition,
+    setBrowserSupportsSpeechRecognition
+  ] = useState(false)
+  const recognition = window.webkitSpeechRecognition
+    ? new window.webkitSpeechRecognition()
+    : null
   const {
     isAssistantPickerOpen,
     focusAssistant,
     setFocusAssistant,
     userInput,
+    setUserInput,
     chatMessages,
     isGenerating,
     selectedPreset,
@@ -82,6 +92,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    if ("webkitSpeechRecognition" in window) {
+      setBrowserSupportsSpeechRecognition(true)
+    }
     setTimeout(() => {
       handleFocusChatInput()
     }, 200) // FIX: hacky
@@ -179,6 +192,28 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       }
     }
   }
+  const startListening = () => {
+    if (recognition) {
+      recognition.onresult = (event: any) => {
+        setTranscript(event.results[0][0].transcript)
+        setUserInput(
+          prevState => prevState + " " + event.results[0][0].transcript
+        )
+      }
+      recognition.onend = () => {
+        setListening(false)
+      }
+      recognition.start()
+      setListening(true)
+    }
+  }
+
+  const stopListening = () => {
+    if (recognition) {
+      recognition.stop()
+      setListening(false)
+    }
+  }
 
   return (
     <>
@@ -263,24 +298,34 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               onCompositionStart={() => setIsTyping(true)}
               onCompositionEnd={() => setIsTyping(false)}
             />
-
-            <div className="absolute bottom-[6px] right-3 cursor-pointer hover:opacity-50">
+            <div className="absolute bottom-[6px] right-3 flex cursor-pointer justify-end space-x-2">
+              {browserSupportsSpeechRecognition && (
+                <button onClick={listening ? stopListening : startListening}>
+                  {listening ? (
+                    <IconPlayerRecordFilled
+                      className={"animate-pulse text-red-500"}
+                      size={24}
+                    />
+                  ) : (
+                    <IconMicrophone size={24} />
+                  )}
+                </button>
+              )}
               {isGenerating ? (
                 <IconPlayerStopFilled
-                  className="hover:bg-background animate-pulse rounded bg-transparent p-1"
+                  className="hover:bg-background animate-pulse rounded bg-transparent p-1 hover:opacity-50"
                   onClick={handleStopMessage}
                   size={30}
                 />
               ) : (
                 <IconSend
                   className={cn(
-                    "bg-primary text-secondary rounded-lg p-1",
+                    "bg-primary text-secondary rounded-lg p-1 hover:opacity-50",
                     (!userInput || isUploading) &&
                       "opacity-md cursor-not-allowed"
                   )}
                   onClick={() => {
                     if (!userInput || isUploading) return
-
                     handleSendMessage(userInput, chatMessages, false)
                   }}
                   size={30}
