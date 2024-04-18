@@ -299,16 +299,18 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               onCompositionEnd={() => setIsTyping(false)}
             />
             <div className="absolute bottom-[6px] right-3 flex cursor-pointer justify-end space-x-2">
-              <button onClick={listening ? stopListening : startListening}>
-                {listening ? (
-                  <IconPlayerRecordFilled
-                    className={"animate-pulse text-red-500"}
-                    size={24}
-                  />
-                ) : (
-                  <IconMicrophone size={24} />
-                )}
-              </button>
+              {browserSupportsSpeechRecognition && (
+                <button onClick={listening ? stopListening : startListening}>
+                  {listening ? (
+                    <IconPlayerRecordFilled
+                      className={"animate-pulse text-red-500"}
+                      size={24}
+                    />
+                  ) : (
+                    <IconMicrophone size={24} />
+                  )}
+                </button>
+              )}
               {isGenerating ? (
                 <IconPlayerStopFilled
                   className="hover:bg-background animate-pulse rounded bg-transparent p-1 hover:opacity-50"
