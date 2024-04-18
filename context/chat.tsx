@@ -40,6 +40,8 @@ interface ChatbotUIChatContext {
   isGenerating: boolean
   setIsGenerating: Dispatch<SetStateAction<boolean>>
 
+  requestTokensTotal: number
+  setRequestTokensTotal: Dispatch<SetStateAction<number>>
   responseTimeToFirstToken: number
   setResponseTimeToFirstToken: Dispatch<SetStateAction<number>>
   responseTimeTotal: number
@@ -70,6 +72,8 @@ export const ChatbotUIChatContext = createContext<ChatbotUIChatContext>({
   abortController: null,
   setAbortController: () => {},
 
+  requestTokensTotal: 0,
+  setRequestTokensTotal: () => {},
   responseTimeToFirstToken: 0,
   setResponseTimeToFirstToken: () => {},
   responseTimeTotal: 0,
@@ -124,6 +128,7 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
     useState<number>(0)
   const [responseTimeTotal, setResponseTimeTotal] = useState<number>(0)
   const [responseTokensTotal, setResponseTokensTotal] = useState<number>(0)
+  const [requestTokensTotal, setRequestTokensTotal] = useState<number>(0)
 
   useEffect(() => {
     if (chatSettings) {
@@ -157,7 +162,9 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
         responseTimeTotal,
         setResponseTimeTotal,
         responseTokensTotal,
-        setResponseTokensTotal
+        setResponseTokensTotal,
+        requestTokensTotal,
+        setRequestTokensTotal
       }}
     >
       {children}

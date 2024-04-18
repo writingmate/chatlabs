@@ -228,17 +228,17 @@ export const handleToolsChat = async (
   selectedTools: Tables<"tools">[],
   setResponseTimeToFirstToken?: React.Dispatch<React.SetStateAction<number>>,
   setResponseTimeTotal?: React.Dispatch<React.SetStateAction<number>>,
-  setResponseTokensTotal?: React.Dispatch<React.SetStateAction<number>>
+  setResponseTokensTotal?: React.Dispatch<React.SetStateAction<number>>,
+  setRequestTokensTotal?: React.Dispatch<React.SetStateAction<number>>
 ) => {
   setToolInUse("plugins")
 
   const startTime = Date.now()
 
-  const formattedMessages = await buildFinalMessages(
-    payload,
-    profile!,
-    chatImages
-  )
+  const { finalMessages: formattedMessages, usedTokens } =
+    await buildFinalMessages(payload, profile!, chatImages)
+
+  setRequestTokensTotal?.(usedTokens)
 
   const response = await fetchChatResponse(
     "/api/chat/tools",
@@ -287,7 +287,8 @@ export const handleHostedChat = async (
   setToolInUse: React.Dispatch<React.SetStateAction<string>>,
   setResponseTimeToFirstToken?: React.Dispatch<React.SetStateAction<number>>,
   setResponseTimeTotal?: React.Dispatch<React.SetStateAction<number>>,
-  setResponseTokensTotal?: React.Dispatch<React.SetStateAction<number>>
+  setResponseTokensTotal?: React.Dispatch<React.SetStateAction<number>>,
+  setRequestTokensTotal?: React.Dispatch<React.SetStateAction<number>>
 ) => {
   const provider =
     modelData.provider === "openai" && profile.use_azure_openai
@@ -295,21 +296,17 @@ export const handleHostedChat = async (
       : modelData.provider
 
   let formattedMessages = []
+  let usedTokens = 0
 
   if (provider === "google") {
-    formattedMessages = await buildGoogleGeminiFinalMessages(
-      payload,
-      profile,
-      newMessageImages
-    )
+    ;({ finalMessages: formattedMessages, usedTokens } =
+      await buildGoogleGeminiFinalMessages(payload, profile, newMessageImages))
   } else if (provider === "anthropic") {
-    formattedMessages = await buildClaudeFinalMessages(
-      payload,
-      profile,
-      chatImages
-    )
+    ;({ finalMessages: formattedMessages, usedTokens } =
+      await buildClaudeFinalMessages(payload, profile, chatImages))
   } else {
-    formattedMessages = await buildFinalMessages(payload, profile, chatImages)
+    ;({ finalMessages: formattedMessages, usedTokens } =
+      await buildFinalMessages(payload, profile, chatImages))
   }
 
   const apiEndpoint =
@@ -320,6 +317,8 @@ export const handleHostedChat = async (
     messages: formattedMessages,
     customModelId: provider === "custom" ? modelData.hostedId : ""
   }
+
+  setRequestTokensTotal?.(usedTokens)
 
   const startTime = Date.now()
 

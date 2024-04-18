@@ -80,7 +80,8 @@ export const useChatHandler = () => {
     setChatSettings,
     setResponseTimeTotal,
     setResponseTokensTotal,
-    setResponseTimeToFirstToken
+    setResponseTimeToFirstToken,
+    setRequestTokensTotal
   } = useContext(ChatbotUIChatContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -208,7 +209,8 @@ export const useChatHandler = () => {
   const handleSendMessage = async (
     messageContent: string,
     chatMessages: ChatMessage[],
-    isRegeneration: boolean
+    isRegeneration: boolean,
+    saveMessages = true
   ) => {
     const startingInput = messageContent
 
@@ -247,10 +249,6 @@ export const useChatHandler = () => {
       )
 
       let currentChat = selectedChat ? { ...selectedChat } : null
-
-      let tokensTotal = 0
-      let timeStart = Date.now()
-      let timeToFirstToken = 0
 
       const b64Images = newMessageImages.map(image => image.base64)
 
@@ -311,7 +309,8 @@ export const useChatHandler = () => {
           selectedTools,
           setResponseTimeToFirstToken,
           setResponseTimeTotal,
-          setResponseTokensTotal
+          setResponseTokensTotal,
+          setRequestTokensTotal
         ))
       } else {
         if (modelData!.provider === "ollama") {
@@ -343,10 +342,13 @@ export const useChatHandler = () => {
             setToolInUse,
             setResponseTimeToFirstToken,
             setResponseTimeTotal,
-            setResponseTokensTotal
+            setResponseTokensTotal,
+            setRequestTokensTotal
           ))
         }
       }
+
+      if (!saveMessages) return
 
       if (!currentChat) {
         currentChat = await handleCreateChat(
@@ -393,18 +395,15 @@ export const useChatHandler = () => {
         data,
         isGenerating
       )
-
-      setIsGenerating(false)
-      setFirstTokenReceived(false)
-      // setUserInput("")
     } catch (error) {
       if (error instanceof SubscriptionRequiredError) {
         setIsPaywallOpen(true)
       }
       console.error(error)
+      setUserInput(startingInput)
+    } finally {
       setIsGenerating(false)
       setFirstTokenReceived(false)
-      setUserInput(startingInput)
     }
   }
 

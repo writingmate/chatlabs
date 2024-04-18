@@ -18,6 +18,7 @@ import { LLMID, ModelProvider } from "@/types"
 import { ChatbotUIContext } from "@/context/context"
 import { cn } from "@/lib/utils"
 import { IconGauge } from "@tabler/icons-react"
+import { WithTooltip } from "@/components/ui/with-tooltip"
 
 interface ChatUIProps {}
 
@@ -61,6 +62,7 @@ const ChatWrapper = forwardRef(
       isGenerating,
       chatMessages,
       chatSettings,
+      requestTokensTotal,
       responseTimeToFirstToken,
       responseTokensTotal,
       responseTimeTotal
@@ -74,7 +76,8 @@ const ChatWrapper = forwardRef(
         hostedId: model.id,
         platformLink: "",
         imageInput: false,
-        tools: false
+        tools: false,
+        pricing: null
       })),
       ...availableHostedModels,
       ...availableLocalModels,
@@ -89,7 +92,7 @@ const ChatWrapper = forwardRef(
         handleSendEdit,
         handleStopMessage,
         handleSendMessage: (input: string, isRegeneration: boolean) =>
-          handleSendMessage(input, chatMessages, isRegeneration)
+          handleSendMessage(input, chatMessages, isRegeneration, false)
       }),
       [selectedModel]
     )
@@ -98,6 +101,16 @@ const ChatWrapper = forwardRef(
       onGeneratingChange?.(isGenerating)
       onModelChange?.(selectedModel)
     }, [isGenerating, chatSettings])
+
+    const cost = (
+      (requestTokensTotal * (selectedModel?.pricing?.inputCost || 0)) /
+        1000000 +
+      (responseTokensTotal *
+        (selectedModel?.pricing?.outputCost ||
+          selectedModel?.pricing?.inputCost ||
+          0)) /
+        10000
+    ).toFixed(6)
 
     return (
       <div className={"flex w-full flex-col"}>
@@ -131,9 +144,29 @@ const ChatWrapper = forwardRef(
             {responseTokensTotal}{" "}
             <span className={"text-foreground/70"}>tokens</span>
           </div>
-          <div className={"px-2"}>
+          <div className={"border-r px-2"}>
             {responseTimeTotal.toFixed(1)}{" "}
             <span className={"text-foreground/70"}>sec</span>
+          </div>
+          <div className={"px-2"}>
+            <WithTooltip
+              display={
+                <div className={"flex items-center"}>
+                  {responseTokensTotal} output tokens * ¢
+                  {(
+                    (selectedModel?.pricing?.outputCost ||
+                      selectedModel?.pricing?.inputCost ||
+                      0) / 10000
+                  ).toFixed(6)}{" "}
+                  + {requestTokensTotal} input tokens * ¢
+                  {((selectedModel?.pricing?.inputCost || 0) / 10000).toFixed(
+                    6
+                  )}{" "}
+                  = ¢{cost}
+                </div>
+              }
+              trigger={<>¢{cost}</>}
+            />
           </div>
         </div>
       </div>

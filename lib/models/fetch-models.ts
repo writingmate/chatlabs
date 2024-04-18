@@ -162,6 +162,11 @@ export const fetchOpenRouterModels = async () => {
           id: string
           name: string
           context_length: number
+          pricing: {
+            completion: string
+            image: string
+            prompt: string
+          }
         }): OpenRouterLLM => ({
           modelId: model.id as LLMID,
           modelName: model.name,
@@ -169,7 +174,13 @@ export const fetchOpenRouterModels = async () => {
           hostedId: model.id,
           platformLink: "https://openrouter.dev",
           imageInput: false,
-          maxContext: model.context_length
+          maxContext: model.context_length,
+          pricing: {
+            currency: "USD",
+            inputCost: parseFloat(model.pricing.prompt) * 1000000,
+            outputCost: parseFloat(model.pricing.completion) * 1000000,
+            unit: "1M tokens"
+          }
         })
       )
       .filter(({ modelId }: { modelId: string }) =>
