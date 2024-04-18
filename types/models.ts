@@ -9,3 +9,4 @@ export type ModelProvider =
   | "openrouter"
   | "custom"
   | "databricks"
+  | "meta"

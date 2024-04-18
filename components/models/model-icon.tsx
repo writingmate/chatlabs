@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import mistral from "@/public/providers/mistral.png"
 import groq from "@/public/providers/groq.png"
+import meta from "@/public/providers/meta.png"
 import perplexity from "@/public/providers/perplexity.png"
 import databricks from "@/public/providers/databricks.png"
 import { ModelProvider } from "@/types"
@@ -114,6 +115,19 @@ export const ModelIcon: FC<ModelIconProps> = ({
           )}
           src={databricks.src}
           alt="Databricks"
+          width={width}
+          height={height}
+        />
+      )
+    case "meta":
+      return (
+        <Image
+          className={cn(
+            "rounded-sm p-1",
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+          )}
+          src={meta.src}
+          alt="Meta Llama"
           width={width}
           height={height}
         />

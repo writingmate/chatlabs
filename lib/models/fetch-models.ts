@@ -23,7 +23,7 @@ const KNOWN_MODEL_NAMES: {
   },
   "meta-llama/llama-3-70b-instruct": {
     modelProvider: "meta",
-    modelName: "LLAMA 3 70B"
+    modelName: "Meta Llama 3 70B"
   }
 }
 
