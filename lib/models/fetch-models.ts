@@ -20,6 +20,10 @@ const KNOWN_MODEL_NAMES: {
   "mistralai/mixtral-8x22b": {
     modelProvider: "mistral",
     modelName: "Mixtral 8x22B"
+  },
+  "meta-llama/llama-3-70b-instruct": {
+    modelProvider: "meta",
+    modelName: "LLAMA 3 70B"
   }
 }
 
@@ -43,7 +47,8 @@ function parseSupportedModelsFromEnv() {
   let SUPPORTED_OPENROUTER_MODELS = [
     "databricks/dbrx-instruct",
     "cohere/command-r-plus",
-    "mistralai/mixtral-8x22b"
+    "mistralai/mixtral-8x22b",
+    "meta-llama/llama-3-70b-instruct"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {
