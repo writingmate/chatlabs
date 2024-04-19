@@ -19,7 +19,11 @@ const KNOWN_MODEL_NAMES: {
   },
   "mistralai/mixtral-8x22b-instruct": {
     modelProvider: "mistral",
-    modelName: "Mixtral 8x22B Instruct"
+    modelName: "Mixtral 8x22B"
+  },
+  "meta-llama/llama-3-70b-instruct": {
+    modelProvider: "meta",
+    modelName: "Meta Llama 3 70B"
   },
   "microsoft/wizardlm-2-8x22b": {
     modelProvider: "microsoft",
@@ -48,7 +52,8 @@ function parseSupportedModelsFromEnv() {
     "databricks/dbrx-instruct",
     "cohere/command-r-plus",
     "mistralai/mixtral-8x22b-instruct",
-    "microsoft/wizardlm-2-8x22b"
+    "microsoft/wizardlm-2-8x22b",
+    "meta-llama/llama-3-70b-instruct"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {
@@ -154,6 +159,8 @@ export const fetchOpenRouterModels = async () => {
 
     const { data } = await response.json()
 
+    console.log(data)
+
     let SUPPORTED_OPENROUTER_MODELS = parseSupportedModelsFromEnv()
 
     const openRouterModels = data
@@ -194,6 +201,7 @@ export const fetchOpenRouterModels = async () => {
         }
       })
 
+    console.log(openRouterModels)
     return openRouterModels
   } catch (error) {
     console.error("Error fetching Open Router models: " + error)

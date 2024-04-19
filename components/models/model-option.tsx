@@ -1,4 +1,4 @@
-import { LLM } from "@/types"
+import { LLM, OpenRouterLLM } from "@/types"
 import { FC } from "react"
 import { ModelIcon } from "./model-icon"
 import {
@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
 
 interface ModelOptionProps {
-  model: LLM
+  model: LLM | OpenRouterLLM
   onSelect: () => void
   selected: boolean
   recent?: boolean
@@ -28,6 +28,14 @@ export const ModelOption: FC<ModelOptionProps> = ({
   recent
 }) => {
   const { theme } = useTheme()
+
+  let contextLength =
+    CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH || 0
+
+  console.log(model)
+  if ("maxContext" in model) {
+    contextLength = model.maxContext
+  }
   return (
     <div
       className="hover:bg-accent flex w-full cursor-pointer justify-start space-x-3 truncate rounded p-2 hover:opacity-50"
@@ -85,25 +93,16 @@ export const ModelOption: FC<ModelOptionProps> = ({
               }
             />
           )}
-          {!!CHAT_SETTING_LIMITS[model.modelId] && (
+          {contextLength && (
             <WithTooltip
               side="top"
               display={
-                "Context length: " +
-                (
-                  (CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH ||
-                    0) / 1000
-                ).toFixed(0) +
-                "k"
+                "Context length: " + (contextLength / 1000).toFixed(0) + "k"
               }
               trigger={
                 <div className="flex w-12 text-xs font-normal opacity-75">
                   <IconBrain stroke={2} size={16} />
-                  {(
-                    (CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH ||
-                      0) / 1000
-                  ).toFixed(0)}
-                  k
+                  {(contextLength / 1000).toFixed(0)}k
                 </div>
               }
             />

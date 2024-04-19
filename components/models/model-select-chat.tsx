@@ -74,7 +74,8 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
       hostedId: model.id,
       platformLink: "",
       imageInput: false,
-      paid: "paid" in model ? !!model.paid : false
+      paid: "paid" in model ? !!model.paid : false,
+      maxContext: null
     })),
     ...availableHostedModels,
     ...availableLocalModels,
