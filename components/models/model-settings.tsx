@@ -58,7 +58,8 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "mistral-7b-instruct": false,
   "llama-2-70b-chat": false,
   "codellama-34b-instruct": false,
-  "codellama-70b-instruct": false
+  "codellama-70b-instruct": false,
+  "llama3-70b-8192": false
 }
 
 const SYSTEM_PROMPT_DESCRIPTION = `
