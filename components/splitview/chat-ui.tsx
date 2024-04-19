@@ -14,7 +14,7 @@ import { ChatMessages } from "@/components/splitview/chat-messages"
 import { useScroll } from "@/components/splitview/splitview-hooks/use-scroll"
 import { ChatSettings } from "@/components/splitview/chat-settings"
 import { ChatbotUIChatContext, ChatbotUIChatProvider } from "@/context/chat"
-import { LLMID, ModelProvider } from "@/types"
+import { ChatMessage, LLMID, ModelProvider } from "@/types"
 import { ChatbotUIContext } from "@/context/context"
 import { cn } from "@/lib/utils"
 import { IconGauge } from "@tabler/icons-react"
@@ -23,27 +23,20 @@ import { WithTooltip } from "@/components/ui/with-tooltip"
 interface ChatUIProps {}
 
 interface ChatMessagesRef {
-  isGenerating: boolean
-  selectedModel: {
-    modelId: LLMID
-    modelName: string
-    provider: ModelProvider
-    hostedId: string
-    platformLink: string
-    imageInput: boolean
-    tools: boolean
-  }
   handleSendEdit: (message: string) => void
   handleStopMessage: () => void
   handleSendMessage: (input: string, isRegeneration: boolean) => void
+  handleReset: () => void
 }
 
 const ChatWrapper = forwardRef(
   (
     {
       onGeneratingChange,
-      onModelChange
+      onModelChange,
+      onChatMessagesChange
     }: {
+      onChatMessagesChange?: (chatMessages: ChatMessage[]) => void
       onGeneratingChange?: (isGenerating: boolean) => void
       onModelChange?: (model: any) => void
     },
@@ -65,7 +58,12 @@ const ChatWrapper = forwardRef(
       requestTokensTotal,
       responseTimeToFirstToken,
       responseTokensTotal,
-      responseTimeTotal
+      responseTimeTotal,
+      setChatMessages,
+      setResponseTimeTotal,
+      setResponseTokensTotal,
+      setRequestTokensTotal,
+      setResponseTimeToFirstToken
     } = useContext(ChatbotUIChatContext)
 
     const allModels = [
@@ -92,7 +90,14 @@ const ChatWrapper = forwardRef(
         handleSendEdit,
         handleStopMessage,
         handleSendMessage: (input: string, isRegeneration: boolean) =>
-          handleSendMessage(input, chatMessages, isRegeneration, false)
+          handleSendMessage(input, chatMessages, isRegeneration, false),
+        handleReset: () => {
+          setResponseTimeTotal(0)
+          setResponseTokensTotal(0)
+          setRequestTokensTotal(0)
+          setResponseTimeToFirstToken(0)
+          setChatMessages([])
+        }
       }),
       [selectedModel]
     )
@@ -100,7 +105,8 @@ const ChatWrapper = forwardRef(
     useEffect(() => {
       onGeneratingChange?.(isGenerating)
       onModelChange?.(selectedModel)
-    }, [isGenerating, chatSettings])
+      onChatMessagesChange?.(chatMessages)
+    }, [isGenerating, chatSettings, chatMessages])
 
     const cost = (
       (requestTokensTotal * (selectedModel?.pricing?.inputCost || 0)) /
@@ -184,6 +190,11 @@ export const ChatUI: FC<ChatUIProps> = () => {
   const [chatsSize, setChatsSize] = useState(2)
   const { newMessageImages, newMessageFiles, chatImages, chatFiles } =
     useContext(ChatbotUIContext)
+
+  const [hasMessagesArray, setHasMessagesArray] = useState<boolean[]>(
+    new Array(chatsSize).fill(false)
+  )
+
   const [isGeneratingArray, setIsGeneratingArray] = useState<boolean[]>(
     new Array(chatsSize).fill(false)
   )
@@ -199,6 +210,12 @@ export const ChatUI: FC<ChatUIProps> = () => {
   const handleSendMessage = (input: string, isRegeneration: boolean) => {
     chatMessagesRef.current.forEach(ref => {
       ref.handleSendMessage(input, isRegeneration)
+    })
+  }
+
+  const handleReset = () => {
+    chatMessagesRef.current.forEach(ref => {
+      ref.handleReset()
     })
   }
 
@@ -234,6 +251,13 @@ export const ChatUI: FC<ChatUIProps> = () => {
                 ref={(ref: ChatMessagesRef) => {
                   chatMessagesRef.current[i] = ref
                 }}
+                onChatMessagesChange={(chatMessages: ChatMessage[]) => {
+                  setHasMessagesArray(prevState => {
+                    const newState = [...prevState]
+                    newState[i] = chatMessages.length > 0
+                    return newState
+                  })
+                }}
                 onGeneratingChange={isGenerating => {
                   setIsGeneratingArray(prevState => {
                     const newState = [...prevState]
@@ -260,11 +284,13 @@ export const ChatUI: FC<ChatUIProps> = () => {
       </div>
       <div className="relative mx-auto w-full px-4 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[800px]">
         <ChatInput
+          hasMessages={hasMessagesArray.some(x => x)}
           toolsAllowed={toolsAllowedArray.every(x => x)}
           imagesAllowed={imagesAllowedArray.every(x => x)}
           isGenerating={isGeneratingArray.some(x => x)}
           handleSendMessage={handleSendMessage}
           handleStopMessage={handleStopMessage}
+          handleReset={handleReset}
         />
       </div>
     </div>

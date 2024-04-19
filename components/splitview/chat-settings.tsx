@@ -69,6 +69,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
     >
       <div className={"max-w-[360px]"}>
         <ModelSelectChat
+          // showModelSettings={false}
           selectedModelId={chatSettings.model}
           onSelectModel={handleSelectModel}
         />
