@@ -37,6 +37,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const [isTyping, setIsTyping] = useState<boolean>(false)
   const [transcript, setTranscript] = useState("")
   const [listening, setListening] = useState(false)
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | undefined>()
+
   const [
     browserSupportsSpeechRecognition,
     setBrowserSupportsSpeechRecognition
@@ -192,8 +194,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       }
     }
   }
-  let timeoutId: NodeJS.Timeout | undefined
-  let isListening = false
   const startListening = () => {
     if (recognition) {
       recognition.onresult = (event: any) => {
@@ -202,58 +202,51 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           prevState => prevState + " " + event.results[0][0].transcript
         )
 
-        // Reset the timeout whenever new speech is detected
-        if (timeoutId) {
-          clearTimeout(timeoutId)
-        }
-        // Set a new timeout to stop the recognition after 30 seconds of silence
-        timeoutId = setTimeout(() => {
-          if (recognition) {
-            recognition.stop()
-          }
-        }, 30 * 1000) // 30 seconds
+        // Reset and set a new timeout to stop the recognition after 30 seconds of silence
+        if (timeoutId) clearTimeout(timeoutId)
+        setTimeoutId(
+          setTimeout(() => {
+            if (recognition) recognition.stop()
+          }, 30 * 1000)
+        ) // 30 seconds
       }
 
       recognition.onend = (event: any) => {
         setListening(false)
-        // Check if the recognition was stopped due to a timeout
         if (event.error === "no-speech") {
-          // Restart the recognition
           startListening()
-          isListening = false
         }
       }
 
       recognition.start()
       setListening(true)
-      isListening = true
       recognition.continuous = true
       recognition.interimResults = true
 
       // Initial timeout to stop the recognition after 30 seconds of silence
-      timeoutId = setTimeout(() => {
-        if (recognition) {
-          recognition.stop()
-        }
-      }, 30 * 1000) // 30 seconds
+      setTimeoutId(
+        setTimeout(() => {
+          if (recognition) recognition.stop()
+        }, 30 * 1000)
+      ) // 30 seconds
     }
   }
 
   const stopListening = () => {
     if (recognition) {
-      clearTimeout(timeoutId)
+      if (timeoutId) clearTimeout(timeoutId)
       recognition.stop()
       setListening(false)
-      isListening = false
     }
   }
 
   // Function to manually restart the recognition
   const restartListening = () => {
-    if (!isListening) {
+    if (!listening) {
       startListening()
     }
   }
+
   return (
     <>
       <div className="flex flex-col flex-wrap justify-center gap-2">
