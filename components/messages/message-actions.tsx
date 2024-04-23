@@ -89,11 +89,9 @@ export const MessageActions: FC<MessageActionsProps> = ({
       <WithTooltip
         delayDuration={1000}
         side="bottom"
-        display={<div>Text to Voice</div>}
+        display={<div>Play message</div>}
         trigger={
-          showCheckmark ? (
-            <IconCheck size={MESSAGE_ICON_SIZE} />
-          ) : isVoiceToTextPlaying ? (
+          isVoiceToTextPlaying ? (
             <IconPlayerStop
               className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
               size={MESSAGE_ICON_SIZE}

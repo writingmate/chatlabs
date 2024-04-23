@@ -106,15 +106,12 @@ export const Message: FC<MessageProps> = ({
   const handleSpeakMessage = () => {
     if ("speechSynthesis" in window) {
       if (window.speechSynthesis.paused) {
-        setIsVoiceToTextPlaying(true)
         // If speech synthesis is paused, resume it
         window.speechSynthesis.resume()
       } else if (!window.speechSynthesis.speaking) {
-        setIsVoiceToTextPlaying(true)
         // If speech synthesis is not speaking, start speaking the message
         speakMessage()
       } else {
-        setIsVoiceToTextPlaying(false)
         // If speech synthesis is speaking, pause it
         handlePauseSpeech()
       }
@@ -126,6 +123,22 @@ export const Message: FC<MessageProps> = ({
   const speakMessage = () => {
     if ("speechSynthesis" in window) {
       const utterance = new SpeechSynthesisUtterance(message.content)
+      utterance.onerror = () => {
+        console.error("An error occurred while speaking the message.")
+        setIsVoiceToTextPlaying(false)
+      }
+      utterance.onend = () => {
+        setIsVoiceToTextPlaying(false)
+      }
+      utterance.onpause = () => {
+        setIsVoiceToTextPlaying(false)
+      }
+      utterance.onresume = () => {
+        setIsVoiceToTextPlaying(true)
+      }
+      utterance.onstart = () => {
+        setIsVoiceToTextPlaying(true)
+      }
       window.speechSynthesis.speak(utterance)
     } else {
       console.error("Speech synthesis is not supported in this browser.")
