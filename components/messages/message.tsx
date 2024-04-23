@@ -31,6 +31,7 @@ import { YouTube } from "@/components/messages/annotations/youtube"
 import { WebSearch } from "@/components/messages/annotations/websearch"
 import AnnotationImage from "@/components/messages/annotations/image"
 import { Annotation } from "@/types/annotation"
+import { any } from "zod"
 
 const ICON_SIZE = 32
 
@@ -86,6 +87,8 @@ export const Message: FC<MessageProps> = ({
 
   const [viewSources, setViewSources] = useState(false)
 
+  const [isVoiceToTextPlaying, setIsVoiceToTextPlaying] = useState(false)
+
   const handleCopy = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(message.content)
@@ -97,6 +100,54 @@ export const Message: FC<MessageProps> = ({
       textArea.select()
       document.execCommand("copy")
       document.body.removeChild(textArea)
+    }
+  }
+
+  const handleSpeakMessage = () => {
+    if ("speechSynthesis" in window) {
+      if (window.speechSynthesis.paused) {
+        // If speech synthesis is paused, resume it
+        window.speechSynthesis.resume()
+      } else if (!window.speechSynthesis.speaking) {
+        // If speech synthesis is not speaking, start speaking the message
+        speakMessage()
+      } else {
+        // If speech synthesis is speaking, pause it
+        handlePauseSpeech()
+      }
+    } else {
+      console.error("Speech synthesis is not supported in this browser.")
+    }
+  }
+
+  const speakMessage = () => {
+    if ("speechSynthesis" in window) {
+      const utterance = new SpeechSynthesisUtterance(message.content)
+      utterance.onerror = () => {
+        console.error("An error occurred while speaking the message.")
+        setIsVoiceToTextPlaying(false)
+      }
+      utterance.onend = () => {
+        setIsVoiceToTextPlaying(false)
+      }
+      utterance.onpause = () => {
+        setIsVoiceToTextPlaying(false)
+      }
+      utterance.onresume = () => {
+        setIsVoiceToTextPlaying(true)
+      }
+      utterance.onstart = () => {
+        setIsVoiceToTextPlaying(true)
+      }
+      window.speechSynthesis.speak(utterance)
+    } else {
+      console.error("Speech synthesis is not supported in this browser.")
+    }
+  }
+
+  const handlePauseSpeech = () => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.pause()
     }
   }
 
@@ -237,6 +288,8 @@ export const Message: FC<MessageProps> = ({
             isLast={isLast}
             isEditing={isEditing}
             onRegenerate={handleRegenerate}
+            isVoiceToTextPlaying={isVoiceToTextPlaying}
+            onVoiceToText={handleSpeakMessage}
           />
         </div>
         <div className="space-y-3">

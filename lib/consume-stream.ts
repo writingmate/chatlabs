@@ -68,7 +68,6 @@ export function parseDataStream(line: string): { text: string; data: any } {
   const code = prefix as keyof typeof streamPartsByCode
 
   const textValue = line.slice(firstSeparatorIndex + 1)
-  console.log("textValue", textValue)
   const jsonValue: JSONValue = JSON.parse(textValue)
 
   return streamPartsByCode[code].parse(jsonValue)
