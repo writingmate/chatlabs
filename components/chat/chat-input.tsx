@@ -35,17 +35,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   })
 
   const [isTyping, setIsTyping] = useState<boolean>(false)
-  const [transcript, setTranscript] = useState("")
+  const [userInputBeforeRecording, setUserInputBeforeRecording] = useState("")
+  const [transcript, setTranscript] = useState<string>("")
+  const [recognition, setRecognition] = useState<any>(null)
   const [listening, setListening] = useState(false)
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | undefined>()
 
-  const [
-    browserSupportsSpeechRecognition,
-    setBrowserSupportsSpeechRecognition
-  ] = useState(false)
-  const recognition = window.webkitSpeechRecognition
-    ? new window.webkitSpeechRecognition()
-    : null
   const {
     isAssistantPickerOpen,
     focusAssistant,
@@ -95,12 +90,49 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
-      setBrowserSupportsSpeechRecognition(true)
+      const recognition = new window.webkitSpeechRecognition()
+      recognition.continuous = true
+      recognition.interimResults = true
+      recognition.lang = "en-US"
+
+      recognition.onresult = (event: any) => {
+        const array: SpeechRecognitionResult[] = Array.from(event.results)
+        const transcript = array
+          .map((result: SpeechRecognitionResult) => result[0].transcript)
+          .join("")
+        setTranscript(transcript)
+
+        // Reset and set a new timeout to stop the recognition after 30 seconds of silence
+        if (timeoutId) clearTimeout(timeoutId)
+        setTimeoutId(
+          setTimeout(() => {
+            setTranscript("")
+            if (recognition) recognition.stop()
+          }, 30 * 1000)
+        ) // 30 seconds
+      }
+
+      recognition.onend = (event: any) => {
+        setListening(false)
+        if (event.error === "no-speech") {
+          startListening()
+        }
+      }
+
+      setRecognition(recognition)
     }
     setTimeout(() => {
       handleFocusChatInput()
     }, 200) // FIX: hacky
   }, [selectedPreset, selectedAssistant])
+
+  useEffect(() => {
+    if (listening) {
+      setUserInput((userInputBeforeRecording + " " + transcript).trim())
+    } else {
+      setUserInputBeforeRecording(userInput)
+    }
+  }, [listening, transcript, userInputBeforeRecording])
 
   function isSendShortcut(event: React.KeyboardEvent) {
     if (isGenerating) {
@@ -196,32 +228,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   }
   const startListening = () => {
     if (recognition) {
-      recognition.onresult = (event: any) => {
-        setTranscript(event.results[0][0].transcript)
-        setUserInput(
-          prevState => prevState + " " + event.results[0][0].transcript
-        )
-
-        // Reset and set a new timeout to stop the recognition after 30 seconds of silence
-        if (timeoutId) clearTimeout(timeoutId)
-        setTimeoutId(
-          setTimeout(() => {
-            if (recognition) recognition.stop()
-          }, 30 * 1000)
-        ) // 30 seconds
-      }
-
-      recognition.onend = (event: any) => {
-        setListening(false)
-        if (event.error === "no-speech") {
-          startListening()
-        }
-      }
-
-      recognition.start()
       setListening(true)
-      recognition.continuous = true
-      recognition.interimResults = true
+      recognition.start()
 
       // Initial timeout to stop the recognition after 30 seconds of silence
       setTimeoutId(
@@ -236,6 +244,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     if (recognition) {
       if (timeoutId) clearTimeout(timeoutId)
       recognition.stop()
+      setTranscript("")
       setListening(false)
     }
   }
@@ -331,7 +340,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               onCompositionEnd={() => setIsTyping(false)}
             />
             <div className="absolute bottom-[6px] right-3 flex cursor-pointer justify-end space-x-2">
-              {browserSupportsSpeechRecognition && (
+              {recognition && (
                 <button onClick={listening ? stopListening : restartListening}>
                   {listening ? (
                     <IconPlayerRecordFilled

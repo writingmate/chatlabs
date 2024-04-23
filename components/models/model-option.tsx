@@ -32,7 +32,6 @@ export const ModelOption: FC<ModelOptionProps> = ({
   let contextLength =
     CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH || 0
 
-  console.log(model)
   if ("maxContext" in model) {
     contextLength = model.maxContext
   }

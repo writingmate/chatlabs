@@ -87,6 +87,8 @@ export const Message: FC<MessageProps> = ({
 
   const [viewSources, setViewSources] = useState(false)
 
+  const [isVoiceToTextPlaying, setIsVoiceToTextPlaying] = useState(false)
+
   const handleCopy = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(message.content)
@@ -104,12 +106,15 @@ export const Message: FC<MessageProps> = ({
   const handleSpeakMessage = () => {
     if ("speechSynthesis" in window) {
       if (window.speechSynthesis.paused) {
+        setIsVoiceToTextPlaying(true)
         // If speech synthesis is paused, resume it
         window.speechSynthesis.resume()
       } else if (!window.speechSynthesis.speaking) {
+        setIsVoiceToTextPlaying(true)
         // If speech synthesis is not speaking, start speaking the message
         speakMessage()
       } else {
+        setIsVoiceToTextPlaying(false)
         // If speech synthesis is speaking, pause it
         handlePauseSpeech()
       }
@@ -270,6 +275,7 @@ export const Message: FC<MessageProps> = ({
             isLast={isLast}
             isEditing={isEditing}
             onRegenerate={handleRegenerate}
+            isVoiceToTextPlaying={isVoiceToTextPlaying}
             onVoiceToText={handleSpeakMessage}
           />
         </div>

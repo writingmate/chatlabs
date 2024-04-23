@@ -5,7 +5,9 @@ import {
   IconEdit,
   IconRepeat,
   IconMicrophone,
-  IconPlayerRecordFilled
+  IconPlayerRecordFilled,
+  IconPlayerPlay,
+  IconPlayerStop
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
@@ -20,6 +22,7 @@ interface MessageActionsProps {
   onEdit: () => void
   onRegenerate: () => void
   onVoiceToText: () => void
+  isVoiceToTextPlaying?: boolean
 }
 
 export const MessageActions: FC<MessageActionsProps> = ({
@@ -29,7 +32,8 @@ export const MessageActions: FC<MessageActionsProps> = ({
   onCopy,
   onEdit,
   onRegenerate,
-  onVoiceToText
+  onVoiceToText,
+  isVoiceToTextPlaying
 }) => {
   const { isGenerating } = useContext(ChatbotUIContext)
 
@@ -89,8 +93,14 @@ export const MessageActions: FC<MessageActionsProps> = ({
         trigger={
           showCheckmark ? (
             <IconCheck size={MESSAGE_ICON_SIZE} />
+          ) : isVoiceToTextPlaying ? (
+            <IconPlayerStop
+              className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
+              size={MESSAGE_ICON_SIZE}
+              onClick={onVoiceToText}
+            />
           ) : (
-            <IconMicrophone
+            <IconPlayerPlay
               className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
               size={MESSAGE_ICON_SIZE}
               onClick={onVoiceToText}
