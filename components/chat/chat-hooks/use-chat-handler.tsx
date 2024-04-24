@@ -275,7 +275,7 @@ export const useChatHandler = () => {
         chatMessages: isRegeneration
           ? [...chatMessages]
           : [...chatMessages, tempUserChatMessage],
-        assistant: selectedChat?.assistant_id ? selectedAssistant : null,
+        assistant: selectedAssistant,
         messageFileItems: retrievedFileItems,
         chatFileItems: chatFileItems
       }
