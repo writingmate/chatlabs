@@ -59,7 +59,7 @@ Follow these steps to get your own ChatLabs instance running locally.
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/writingmate/webapp.git
+git clone https://github.com/writingmate/chatlabs.git
 ```
 
 ### 2. Install Dependencies
