@@ -1,5 +1,14 @@
 import { ChatbotUIContext } from "@/context/context"
-import { IconCheck, IconCopy, IconEdit, IconRepeat } from "@tabler/icons-react"
+import {
+  IconCheck,
+  IconCopy,
+  IconEdit,
+  IconRepeat,
+  IconMicrophone,
+  IconPlayerRecordFilled,
+  IconPlayerPlay,
+  IconPlayerStop
+} from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
 
@@ -12,6 +21,8 @@ interface MessageActionsProps {
   onCopy: () => void
   onEdit: () => void
   onRegenerate: () => void
+  onVoiceToText: () => void
+  isVoiceToTextPlaying?: boolean
 }
 
 export const MessageActions: FC<MessageActionsProps> = ({
@@ -20,7 +31,9 @@ export const MessageActions: FC<MessageActionsProps> = ({
   isEditing,
   onCopy,
   onEdit,
-  onRegenerate
+  onRegenerate,
+  onVoiceToText,
+  isVoiceToTextPlaying
 }) => {
   const { isGenerating } = useContext(ChatbotUIContext)
 
@@ -70,6 +83,27 @@ export const MessageActions: FC<MessageActionsProps> = ({
             size={MESSAGE_ICON_SIZE}
             onClick={onEdit}
           />
+        }
+      />
+
+      <WithTooltip
+        delayDuration={1000}
+        side="bottom"
+        display={<div>Play message</div>}
+        trigger={
+          isVoiceToTextPlaying ? (
+            <IconPlayerStop
+              className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
+              size={MESSAGE_ICON_SIZE}
+              onClick={onVoiceToText}
+            />
+          ) : (
+            <IconPlayerPlay
+              className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
+              size={MESSAGE_ICON_SIZE}
+              onClick={onVoiceToText}
+            />
+          )
         }
       />
 

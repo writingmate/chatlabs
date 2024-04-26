@@ -68,6 +68,16 @@ function getProviderCaller(model: string, profile: Tables<"profiles">) {
     )
   }
 
+  if (provider === "groq") {
+    checkApiKey(profile.groq_api_key, "Groq")
+    return new OpenAIFunctionCaller(
+      new OpenAI({
+        apiKey: profile.groq_api_key || "",
+        baseURL: "https://api.groq.com/openai/v1"
+      })
+    )
+  }
+
   throw new Error(`Provider not supported: ${provider}`)
 }
 

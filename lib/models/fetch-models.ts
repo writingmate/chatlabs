@@ -159,8 +159,6 @@ export const fetchOpenRouterModels = async () => {
 
     const { data } = await response.json()
 
-    console.log(data)
-
     let SUPPORTED_OPENROUTER_MODELS = parseSupportedModelsFromEnv()
 
     const openRouterModels = data
@@ -201,7 +199,6 @@ export const fetchOpenRouterModels = async () => {
         }
       })
 
-    console.log(openRouterModels)
     return openRouterModels
   } catch (error) {
     console.error("Error fetching Open Router models: " + error)

@@ -8,20 +8,7 @@ import {
 import Anthropic from "@anthropic-ai/sdk"
 import ChatCompletionMessage = OpenAI.Chat.Completions.ChatCompletionMessage
 import { Parameter, Parameter as OpenAIParameter } from "@/types/platformTools"
-
-interface FunctionCaller {
-  findFunctionCalls: (params: {
-    model: string
-    messages: any[]
-    tools?: OpenAI.Chat.Completions.ChatCompletionTool[]
-  }) => Promise<ChatCompletionMessage>
-  createResponseStream: (params: {
-    model: string
-    messages: any[]
-    tools: OpenAI.Chat.Completions.ChatCompletionTool[]
-    streamData: experimental_StreamData
-  }) => Promise<ReadableStream>
-}
+import { FunctionCaller } from "@/types/function-callers"
 
 export class OpenAIFunctionCaller implements FunctionCaller {
   constructor(private readonly client: OpenAI) {

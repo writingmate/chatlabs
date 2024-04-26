@@ -106,7 +106,7 @@ const ChatWrapper = forwardRef(
       onGeneratingChange?.(isGenerating)
       onModelChange?.(selectedModel)
       onChatMessagesChange?.(chatMessages)
-    }, [isGenerating, chatSettings, chatMessages])
+    }, [selectedModel, isGenerating, chatSettings, chatMessages])
 
     const cost = (
       (requestTokensTotal * (selectedModel?.pricing?.inputCost || 0)) /

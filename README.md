@@ -6,7 +6,7 @@
 ChatLabs is all-in-one LLM chat platform with access to over 20+ LLMs in one place. 
 It comes with Web Search and Image Generation plugins included.
 
-ChatLabs is a fork of the [Chatbotui](https://github.com/mckaywrigley/chatbot-ui) project.
+ChatLabs is a fork of the [ChatbotUI](https://github.com/mckaywrigley/chatbot-ui) project.
 
 ## Demo
 
@@ -22,7 +22,7 @@ Find the official hosted version of ChatLabs [here](https://labs.writingmate.ai)
 
 We restrict "Issues" to actual issues related to the codebase.
 
-We're getting escessive amounts of issues that amount to things like feature requests, cloud provider issues, etc.
+We're getting excessive amounts of issues that amount to things like feature requests, cloud provider issues, etc.
 
 If you are having issues with things like setup, please refer to the "Help" section in the "Discussions" tab above.
 
@@ -59,7 +59,7 @@ Follow these steps to get your own ChatLabs instance running locally.
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/writingmate/webapp.git
+git clone https://github.com/writingmate/chatlabs.git
 ```
 
 ### 2. Install Dependencies
@@ -141,7 +141,7 @@ This prevents issues with storage files not being deleted properly.
 
 ### 5. Install Ollama (optional for local models)
 
-Follow the instructions [here](https://github.com/jmorganca/ollama#macos).
+Follow the instructions [here](https://github.com/ollama/ollama#macos).
 
 ### 6. Run app locally
 
@@ -163,7 +163,7 @@ Video tutorial coming soon.
 
 ### 1. Follow Local Quickstart
 
-Repeat steps 1-4 in "Local Quickstart" above.
+Repeat steps 1-4 in "Local Quickstart" above. If you want to use Ollama, also follow the instructions linked in step 5.
 
 You will want separate repositories for your local and hosted instances.
 

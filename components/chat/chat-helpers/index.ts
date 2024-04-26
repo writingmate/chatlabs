@@ -414,8 +414,6 @@ export const processResponse = async (
         setFirstTokenReceived(true)
         setToolInUse("none")
 
-        console.log("chunk", chunk, selectedTools.length)
-
         try {
           contentToAdd = isHosted
             ? chunk
@@ -431,25 +429,15 @@ export const processResponse = async (
                   ""
                 )
 
-          console.log("contentToAdd", contentToAdd)
-
           if (contentToAdd === "") {
             return
           }
-
-          console.log(
-            "contentToAdd !== ''",
-            contentToAdd,
-            selectedTools.length > 0
-          )
 
           if (selectedTools.length > 0) {
             chunks.push(contentToAdd)
             if (chunk[chunk.length - 1] !== "\n") {
               return
             }
-
-            console.log("chunks", chunks)
 
             const streamParts = chunks
               .join("")
