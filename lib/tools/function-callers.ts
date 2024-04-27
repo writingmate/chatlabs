@@ -278,3 +278,45 @@ export class AnthropicFunctionCaller implements FunctionCaller {
     }
   }
 }
+
+export class GroqFunctionCaller extends OpenAIFunctionCaller {
+  async createResponseStream({
+    model,
+    messages,
+    tools,
+    streamData
+  }: {
+    model: string
+    messages: any[]
+    tools: OpenAI.Chat.Completions.ChatCompletionTool[]
+    streamData: experimental_StreamData
+  }) {
+    const updatedMessages = messages.map(x => {
+      if (x.role === "tool") {
+        return {
+          role: "user",
+          content: `
+          You called a function named ${x.name} and got the following result. 
+          Answer the user's question using this information.
+      <function_results>
+          <result>
+          <tool_name>${x.name}</tool_name>
+          <stdout>
+          ${JSON.stringify(x.content)}
+          </stdout>
+          </result>
+          </function_results>
+        `
+        }
+      }
+      return x
+    })
+
+    return super.createResponseStream({
+      model,
+      messages: updatedMessages,
+      tools,
+      streamData
+    })
+  }
+}

@@ -22,6 +22,23 @@ import { WithTooltip } from "@/components/ui/with-tooltip"
 
 interface ChatUIProps {}
 
+function getResponseTimePadding(annotations: any) {
+  if (!annotations?.length) return 0
+  return (
+    annotations
+      ?.map((annotation: any) =>
+        Object.keys(annotation).map(x => {
+          if ("responseTime" in annotation[x]) {
+            return parseInt(annotation[x].responseTime)
+          }
+          return 0
+        })
+      )
+      .flat()
+      .reduce((a: number, b: number) => a + b, 0) / 1000
+  )
+}
+
 interface ChatMessagesRef {
   handleSendEdit: (message: string) => void
   handleStopMessage: () => void
@@ -82,6 +99,12 @@ const ChatWrapper = forwardRef(
       ...availableOpenRouterModels
     ]
 
+    const responseTimePadding = getResponseTimePadding(
+      chatMessages[chatMessages.length - 1]?.message.annotation
+    )
+
+    console.log(responseTimePadding)
+
     const selectedModel = allModels.find(x => x.modelId === chatSettings?.model)
 
     useImperativeHandle(
@@ -136,14 +159,14 @@ const ChatWrapper = forwardRef(
             <IconGauge stroke={1.5} size={18} />
           </div>
           <div className={"border-r px-2"}>
-            {responseTimeToFirstToken.toFixed(1)}{" "}
+            {(responseTimeToFirstToken - responseTimePadding).toFixed(1)}{" "}
             <span className={"text-foreground/70"}>sec to first token</span>
           </div>
           <div className={"border-r px-2"}>
             {(responseTokensTotal > 0
-              ? responseTokensTotal / responseTimeTotal
+              ? responseTokensTotal / (responseTimeTotal - responseTimePadding)
               : 0
-            ).toFixed(1)}{" "}
+            ).toFixed(2)}{" "}
             <span className={"text-foreground/70"}>tokens/sec</span>
           </div>
           <div className={"border-r px-2"}>
@@ -151,7 +174,7 @@ const ChatWrapper = forwardRef(
             <span className={"text-foreground/70"}>tokens</span>
           </div>
           <div className={"border-r px-2"}>
-            {responseTimeTotal.toFixed(1)}{" "}
+            {(responseTimeTotal - responseTimePadding).toFixed(2)}{" "}
             <span className={"text-foreground/70"}>sec</span>
           </div>
           <div className={"px-2"}>

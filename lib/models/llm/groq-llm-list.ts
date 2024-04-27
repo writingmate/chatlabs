@@ -39,6 +39,7 @@ const META_LLAMA_3_70B_8192: LLM = {
   hostedId: "llama3-70b-8192",
   platformLink: GROQ_PLATORM_LINK,
   imageInput: false,
+  tools: true,
   pricing: {
     currency: "USD",
     unit: "1M tokens",

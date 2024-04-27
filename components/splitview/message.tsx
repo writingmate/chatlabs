@@ -28,6 +28,7 @@ import { Annotation } from "@/types/annotation"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { MessageActions } from "@/components/messages/message-actions"
 import { MessageMarkdown } from "@/components/messages/message-markdown"
+import { ToolCalls } from "@/components/messages/annotations/toolCalls"
 
 const ICON_SIZE = 32
 
@@ -202,7 +203,8 @@ export const Message: FC<MessageProps> = ({
     } = {
       imageGenerator__generateImage: AnnotationImage,
       webScraper__youtubeCaptions: YouTube,
-      webScraper__googleSearch: WebSearch
+      webScraper__googleSearch: WebSearch,
+      toolCalls: ToolCalls
     }
 
     return Object.keys(annotation).map(key => {
@@ -232,7 +234,6 @@ export const Message: FC<MessageProps> = ({
                 className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
                 size={ICON_SIZE}
               />
-
               <div className="text-lg font-semibold">Prompt</div>
             </div>
           ) : (
@@ -297,6 +298,7 @@ export const Message: FC<MessageProps> = ({
                   isLast={isLast}
                   isEditing={isEditing}
                   onRegenerate={handleRegenerate}
+                  onVoiceToText={() => {}}
                 />
               </div>
             </div>

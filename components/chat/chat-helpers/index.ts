@@ -231,7 +231,7 @@ export const handleToolsChat = async (
   setResponseTokensTotal?: React.Dispatch<React.SetStateAction<number>>,
   setRequestTokensTotal?: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  setToolInUse("plugins")
+  // setToolInUse("plugins")
 
   const startTime = Date.now()
 

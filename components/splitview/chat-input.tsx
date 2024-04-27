@@ -212,6 +212,7 @@ export const ChatInput: FC<ChatInputProps> = ({
               <PromptCatalog onSelect={setUserInput} />
               {toolsAllowed && (
                 <ToolSelect
+                  className={"px-0"}
                   selectedTools={selectedTools}
                   onSelectTools={setSelectedTools}
                 />
@@ -234,7 +235,7 @@ export const ChatInput: FC<ChatInputProps> = ({
               // textareaRef={chatInputRef}
               className={cn(
                 "ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 pl-20 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-                toolsAllowed && "pl-28"
+                toolsAllowed && "pl-32"
               )}
               placeholder={t(
                 `Ask anything. `
