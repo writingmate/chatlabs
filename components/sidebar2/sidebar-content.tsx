@@ -3,8 +3,10 @@ import { ContentType, DataListType } from "@/types"
 import { FC, useState } from "react"
 import { SidebarCreateButtons } from "./sidebar-create-buttons"
 import { SidebarDataList } from "./sidebar-data-list"
-import { SidebarSearch } from "./sidebar-search"
 import { SidebarSwitcher } from "@/components/sidebar2/sidebar-switcher"
+import { IconSearch } from "@tabler/icons-react"
+import { Input } from "@/components/ui/input"
+import { SidebarSearch } from "@/components/sidebar2/sidebar-search"
 
 interface SidebarContentProps {
   contentType: ContentType
@@ -27,16 +29,21 @@ export const SidebarContent: FC<SidebarContentProps> = ({
 
   return (
     // Subtract 50px for the height of the workspace settings
-    <div className="flex max-h-[calc(100%-50px)] grow flex-col overflow-auto">
-      <div className="mt-2 flex items-center">
+    <div className="flex max-h-full grow flex-col overflow-auto">
+      <div className="mt-1 flex items-center">
         <SidebarCreateButtons
           name={name}
           contentType={contentType}
           hasData={data.length > 0}
         />
       </div>
-
-      <SidebarSwitcher onContentTypeChange={() => {}} />
+      <SidebarSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      {!searchTerm && (
+        <SidebarSwitcher
+          onSearchChange={setSearchTerm}
+          onContentTypeChange={() => {}}
+        />
+      )}
 
       {/*<div className="mt-2">*/}
       {/*  <SidebarSearch*/}

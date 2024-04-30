@@ -337,7 +337,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild className={"w-full border-t px-2 pt-3"}>
+      <SheetTrigger asChild className={"w-full border-t px-2 pt-2"}>
         {profile.image_url ? (
           <div className={"flex w-full items-center justify-between text-sm"}>
             <div className={"flex items-center space-x-2"}>

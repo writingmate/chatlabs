@@ -6,8 +6,10 @@ import {
   IconFolderPlus,
   IconMessage2,
   IconMessageChatbot,
+  IconPencil,
   IconPlus,
   IconSearch,
+  IconWritingSign,
   IconX
 } from "@tabler/icons-react"
 import { FC, useContext, useState } from "react"
@@ -118,10 +120,10 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
     <div className="flex w-full">
       {!showSearch && (
         <Button
-          className="flex h-[36px] grow justify-start rounded-r-none"
+          className="flex h-auto grow justify-start rounded-r-none px-2 py-1.5"
           onClick={getCreateFunction()}
         >
-          <IconMessage2 stroke={1.5} size={SIDEBAR_ICON_SIZE} />
+          <IconPencil stroke={1.5} size={SIDEBAR_ICON_SIZE} />
           <div className="ml-3">
             New{" "}
             {resolvedName.charAt(0).toUpperCase() +
@@ -131,13 +133,13 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       )}
       {showSearch && (
         <Input
-          className={"border-foreground h-[36px] rounded-r-none px-2"}
+          className={"border-foreground h-auto rounded-r-none px-2"}
           placeholder="Search messages..."
         />
       )}
       <Button
         onClick={() => setShowSearch(!showSearch)}
-        className="flex h-[36px] rounded-l-none px-2"
+        className="flex  h-auto rounded-l-none px-2"
       >
         {showSearch ? (
           <IconX stroke={1.5} size={20} />
