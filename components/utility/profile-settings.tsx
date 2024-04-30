@@ -19,6 +19,7 @@ import {
   IconFileDownload,
   IconLoader2,
   IconLogout,
+  IconSettings,
   IconUser
 } from "@tabler/icons-react"
 import Image from "next/image"
@@ -336,18 +337,30 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
+      <SheetTrigger asChild className={"w-full border-t px-2 pt-3"}>
         {profile.image_url ? (
-          <Image
-            className="mt-2 size-[34px] cursor-pointer rounded hover:opacity-50"
-            src={profile.image_url}
-            height={34}
-            width={34}
-            alt={profile.display_name || "Profile image"}
-          />
+          <div className={"flex w-full items-center justify-between text-sm"}>
+            <div className={"flex items-center space-x-2"}>
+              <Image
+                className="mr-2 size-[30px] cursor-pointer rounded hover:opacity-50"
+                src={profile.image_url}
+                height={30}
+                width={30}
+                alt={profile.display_name || "Profile image"}
+              />
+              {profile.display_name}
+            </div>
+
+            <IconSettings
+              stroke={1.5}
+              size={20}
+              className={"text-foreground/50"}
+            />
+          </div>
         ) : (
           <Button size="icon" variant="ghost">
             <IconUser size={SIDEBAR_ICON_SIZE} />
+            {profile.display_name}
           </Button>
         )}
       </SheetTrigger>

@@ -15,8 +15,9 @@ import { CommandK } from "../utility/command-k"
 import { PlanPicker } from "@/components/upgrade/plan-picker"
 import { useTheme } from "next-themes"
 import { ChatbotUIContext } from "@/context/context"
+import { Sidebar2 } from "@/components/sidebar2/sidebar"
 
-export const SIDEBAR_WIDTH = 350
+export const SIDEBAR_WIDTH = 300
 
 interface DashboardProps {
   children: React.ReactNode
@@ -103,18 +104,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         }}
       >
         {showSidebar && (
-          <Tabs
-            className="flex h-full"
-            value={contentType}
-            onValueChange={tabValue => {
-              setContentType(tabValue as ContentType)
-              router.replace(`${pathname}?tab=${tabValue}`)
-            }}
-          >
-            <SidebarSwitcher onContentTypeChange={setContentType} />
-
-            <Sidebar contentType={contentType} showSidebar={showSidebar} />
-          </Tabs>
+          <Sidebar2 contentType={"chats"} showSidebar={showSidebar} />
         )}
       </div>
 
