@@ -118,34 +118,16 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
 
   return (
     <div className="flex w-full">
-      {!showSearch && (
-        <Button
-          className="flex h-auto grow justify-start rounded-r-none px-2 py-1.5"
-          onClick={getCreateFunction()}
-        >
-          <IconPencil stroke={1.5} size={SIDEBAR_ICON_SIZE} />
-          <div className="ml-3">
-            New{" "}
-            {resolvedName.charAt(0).toUpperCase() +
-              resolvedName.slice(1, resolvedName.length - 1)}
-          </div>
-        </Button>
-      )}
-      {showSearch && (
-        <Input
-          className={"border-foreground h-auto rounded-r-none px-2"}
-          placeholder="Search messages..."
-        />
-      )}
       <Button
-        onClick={() => setShowSearch(!showSearch)}
-        className="flex  h-auto rounded-l-none px-2"
+        className="flex h-auto grow justify-start p-2"
+        onClick={getCreateFunction()}
       >
-        {showSearch ? (
-          <IconX stroke={1.5} size={20} />
-        ) : (
-          <IconSearch stroke={1.5} size={20} />
-        )}
+        <IconPencil stroke={1.5} size={SIDEBAR_ICON_SIZE} />
+        <div className="ml-3">
+          New{" "}
+          {resolvedName.charAt(0).toUpperCase() +
+            resolvedName.slice(1, resolvedName.length - 1)}
+        </div>
       </Button>
 
       {/*{hasData && (*/}
