@@ -101,11 +101,11 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     presets: async (item: any) => {},
     prompts: async (item: any) => {
       handleSelectPromptWithVariables(item)
-      setIsSidebarDialogOpen(false)
+      return router.back()
     },
     files: async (item: any) => {
       handleSelectUserFile(item)
-      setIsSidebarDialogOpen(false)
+      return router.back()
     },
     collections: async (item: any) => {},
     assistants: async (assistant: Tables<"assistants">) => {
@@ -115,9 +115,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         return
       }
       handleSelectAssistant(assistant)
-      setIsSidebarDialogOpen(false)
-
-      return router.push(`/${selectedWorkspace.id}/chat`)
+      return router.back()
     },
     tools: async (item: any) => {
       if (!validatePlanForTools(profile, [item])) {
@@ -164,7 +162,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         isActiveMap[contentType]?.(item) && "bg-accent"
       )}
       tabIndex={0}
-      onClick={contentType === "prompts" ? undefined : handleClickAction}
+      onClick={handleClickAction}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
@@ -180,7 +178,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         <SidebarUpdateItem
           name={name}
           item={item}
-          isActive={isActiveMap[contentType](item)}
+          isActive={false}
           isHovering={isHovering}
           isTyping={isTyping}
           contentType={contentType}
