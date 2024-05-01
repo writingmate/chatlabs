@@ -376,10 +376,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setIsPaywallOpen,
 
         showSidebar,
-        setShowSidebar,
-
-        isSidebarDialogOpen,
-        setIsSidebarDialogOpen
+        setShowSidebar
       }}
     >
       {children}
