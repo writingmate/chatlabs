@@ -347,19 +347,21 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
             "hover:bg-accent/60 flex h-[40px] w-full items-center justify-between space-x-2 rounded-md px-2 text-left"
           }
         >
-          {profile.image_url ? (
-            <Image
-              className="mr-2 size-[30px] cursor-pointer rounded hover:opacity-50"
-              src={profile.image_url}
-              height={30}
-              width={30}
-              alt={profile.display_name || "Profile image"}
-            />
-          ) : (
-            <IconUser size={SIDEBAR_ICON_SIZE} />
-          )}
+          <div className={"flex items-center"}>
+            {profile.image_url ? (
+              <Image
+                className="mr-2 size-[30px] cursor-pointer rounded hover:opacity-50"
+                src={profile.image_url}
+                height={30}
+                width={30}
+                alt={profile.display_name || "Profile image"}
+              />
+            ) : (
+              <IconUser size={SIDEBAR_ICON_SIZE} />
+            )}
 
-          {profile.display_name}
+            {profile.display_name}
+          </div>
 
           <IconSettings
             stroke={1.5}
