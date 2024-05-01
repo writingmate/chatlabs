@@ -42,7 +42,9 @@ export const SidebarDialog: FC<SidebarContentProps> = ({
       <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className={"min-h-[200px] min-w-[300px]"}>
         <DialogHeader
-          className={"flex w-full flex-row justify-between space-y-0"}
+          className={
+            "flex w-full flex-row items-center justify-between space-y-0"
+          }
         >
           <DialogTitle className={"capitalize"}>{name}</DialogTitle>
           <SidebarCreateButtons

@@ -116,7 +116,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       <Button
         size={"sm"}
         variant={"outline"}
-        className="flex h-auto justify-start p-1 px-2 py-0"
+        className="flex justify-start p-1 px-2 py-0"
         onClick={getCreateFunction()}
       >
         <IconPlus stroke={1.5} size={SIDEBAR_ICON_SIZE} />
