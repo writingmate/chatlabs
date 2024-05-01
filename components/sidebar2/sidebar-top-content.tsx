@@ -13,7 +13,6 @@ import {
   IconPencil,
   IconSearch
 } from "@tabler/icons-react"
-import { Input } from "@/components/ui/input"
 import { SidebarSearch } from "@/components/sidebar2/sidebar-search"
 import { Button } from "@/components/ui/button"
 import { isMobileScreen } from "@/lib/mobile"
