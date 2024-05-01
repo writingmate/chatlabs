@@ -18,59 +18,67 @@ import { FC, useContext } from "react"
 import { TabsList } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "../utility/profile-settings"
-import { SidebarSwitchItem } from "./sidebar-switch-item"
 import { ChatbotUIContext } from "@/context/context"
 import { validateProPlan } from "@/lib/subscription"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
+import { SidebarSwitchItem } from "@/components/sidebar2/sidebar-switch-item"
 
 export const SIDEBAR_ICON_SIZE = 20
 
 interface SidebarSwitcherProps {
-  onSearchChange: (search: string) => void
+  className?: string
+  contentType: ContentType
   onContentTypeChange: (contentType: ContentType) => void
 }
 
-type SidebarContentItemProps = {
-  icon: React.ReactNode
-  label: string
-  onClick: () => void
-}
-
-function SidebarContentItem({ icon, label, onClick }: SidebarContentItemProps) {
-  return (
-    <div
-      onClick={onClick}
-      className={
-        "hover:bg-accent focus:bg-accent group flex w-full cursor-pointer items-center rounded px-2 py-1.5 hover:opacity-50 focus:outline-none"
-      }
-    >
-      {icon}
-      <div className={"ml-3 flex-1 truncate text-sm"}>{label}</div>
-    </div>
-  )
-}
-
 export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
-  onSearchChange,
+  className,
+  contentType,
   onContentTypeChange
 }) => {
+  const { files, prompts, assistants, folders } = useContext(ChatbotUIContext)
+
+  const menuItems = [
+    {
+      icon: <IconRobotFace size={SIDEBAR_ICON_SIZE} stroke={1.5} />,
+      label: "Assistants",
+      contentType: "assistants",
+      data: assistants,
+      folders: folders.filter(folder => folder.type === "assistants")
+    },
+    {
+      icon: <IconTerminal2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />,
+      label: "Prompts",
+      contentType: "prompts",
+      data: prompts,
+      folders: folders.filter(folder => folder.type === "prompts")
+    },
+    {
+      icon: <IconFile size={SIDEBAR_ICON_SIZE} stroke={1.5} />,
+      label: "Files",
+      contentType: "files",
+      data: files,
+      folders: folders.filter(folder => folder.type === "files")
+    }
+  ]
+
   return (
-    <div className="flex flex-col text-sm">
-      <SidebarContentItem
-        icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
-        label={"Assistants"}
-        onClick={() => onContentTypeChange("assistants")}
-      />
-      <SidebarContentItem
-        icon={<IconTerminal2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
-        label={"Prompts"}
-        onClick={() => onContentTypeChange("prompts")}
-      />
-      <SidebarContentItem
-        icon={<IconFile size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
-        label={"Files"}
-        onClick={() => onContentTypeChange("files")}
-      />
+    <div
+      className={cn("z-10 mb-2 flex flex-col border-b pb-2 text-sm", className)}
+    >
+      {menuItems.map((item, index) => (
+        <SidebarSwitchItem
+          contentType={item.contentType as ContentType}
+          folders={item.folders}
+          key={index}
+          // active={contentType === item.contentType}
+          icon={item.icon}
+          label={item.label}
+          data={item.data}
+          onClick={() => onContentTypeChange(item.contentType as ContentType)}
+        />
+      ))}
     </div>
   )
 }

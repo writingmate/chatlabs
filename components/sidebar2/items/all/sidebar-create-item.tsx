@@ -28,6 +28,13 @@ import { Tables, TablesInsert } from "@/supabase/types"
 import { ContentType } from "@/types"
 import { FC, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
 
 interface SidebarCreateItemProps {
   isOpen: boolean
@@ -222,24 +229,25 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent
-        className="min-w-3/4 flex flex-col justify-between overflow-auto sm:min-w-[450px]"
-        side="left"
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent
+        // className="min-w-3/4 flex flex-col justify-between sm:min-w-[450px]"
+        className="min-w-3/4 flex flex-col justify-between sm:min-w-[450px]"
+        // side="left"
         onKeyDown={handleKeyDown}
       >
         <div className="grow overflow-auto">
-          <SheetHeader>
-            <SheetTitle className="text-2xl font-bold">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">
               Create{" "}
               {resolvedName.charAt(0).toUpperCase() + resolvedName.slice(1, -1)}
-            </SheetTitle>
-          </SheetHeader>
+            </DialogTitle>
+          </DialogHeader>
 
           <div className="mt-4 space-y-3">{renderInputs()}</div>
         </div>
 
-        <SheetFooter className="mt-2 flex justify-between">
+        <DialogFooter className="mt-2 flex justify-between">
           <div className="flex grow justify-end space-x-2">
             <Button
               disabled={creating}
@@ -253,8 +261,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
               {creating ? "Creating..." : "Create"}
             </Button>
           </div>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

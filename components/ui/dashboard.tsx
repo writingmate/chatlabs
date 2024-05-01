@@ -76,7 +76,6 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
     <div className="flex size-full">
       <CommandK />
       <PlanPicker />
-
       <Button
         className={cn(
           "absolute left-[4px] top-[50%] z-10 size-[32px] cursor-pointer"
@@ -104,7 +103,11 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         }}
       >
         {showSidebar && (
-          <Sidebar2 contentType={"chats"} showSidebar={showSidebar} />
+          <Sidebar2
+            contentType={contentType}
+            onContentTypeChange={setContentType}
+            showSidebar={showSidebar}
+          />
         )}
       </div>
 

@@ -86,6 +86,13 @@ import { toast } from "sonner"
 import { SidebarDeleteItem } from "./sidebar-delete-item"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { IconEdit, IconTrash } from "@tabler/icons-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
 
 interface SidebarUpdateItemProps {
   isTyping: boolean
@@ -654,7 +661,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   const resolvedName = name || contentType
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       {children}
       {isHovering && (
         <div
@@ -695,17 +702,17 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
           />
         </div>
       )}
-      <SheetContent
+      <DialogContent
         className="min-w-3/4 flex flex-col justify-between sm:min-w-[450px]"
-        side="left"
+        // side="left"
         onKeyDown={handleKeyDown}
       >
         <div className="grow overflow-auto">
-          <SheetHeader>
-            <SheetTitle className="text-2xl font-bold">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">
               Edit {resolvedName.slice(0, -1)}
-            </SheetTitle>
-          </SheetHeader>
+            </DialogTitle>
+          </DialogHeader>
 
           <div className="mt-4 space-y-3">
             {workspaces.length > 1 && (
@@ -723,7 +730,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
           </div>
         </div>
 
-        <SheetFooter className="mt-2 flex justify-between">
+        <DialogFooter className="mt-2 flex justify-between">
           <SidebarDeleteItem
             item={item}
             name={name}
@@ -743,8 +750,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
               Save
             </Button>
           </div>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

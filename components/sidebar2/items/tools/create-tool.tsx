@@ -1,4 +1,4 @@
-import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
+import { SidebarCreateItem } from "@/components/sidebar2/items/all/sidebar-create-item"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"

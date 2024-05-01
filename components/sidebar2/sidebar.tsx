@@ -1,7 +1,7 @@
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
-import { FC, useContext } from "react"
+import { FC, useContext, useState } from "react"
 import { SIDEBAR_WIDTH } from "../ui/dashboard"
 import { TabsContent } from "../ui/tabs"
 import { WorkspaceSwitcher } from "../utility/workspace-switcher"
@@ -12,13 +12,21 @@ import { WithTooltip } from "@/components/ui/with-tooltip"
 import { IconDiamondFilled } from "@tabler/icons-react"
 import { ProfileSettings } from "@/components/utility/profile-settings"
 import { SIDEBAR_ICON_SIZE } from "@/components/sidebar2/sidebar-switcher"
+import { SidebarTopContent } from "@/components/sidebar2/sidebar-top-content"
+import { SidebarDataList } from "@/components/sidebar2/sidebar-data-list"
+import { SidebarDialog } from "@/components/sidebar2/sidebar-dialog"
 
 interface SidebarProps {
   contentType: ContentType
+  onContentTypeChange: (contentType: ContentType) => void
   showSidebar: boolean
 }
 
-export const Sidebar2: FC<SidebarProps> = ({ contentType, showSidebar }) => {
+export const Sidebar2: FC<SidebarProps> = ({
+  contentType,
+  onContentTypeChange,
+  showSidebar
+}) => {
   const {
     folders,
     chats,
@@ -34,6 +42,8 @@ export const Sidebar2: FC<SidebarProps> = ({ contentType, showSidebar }) => {
     workspaces
   } = useContext(ChatbotUIContext)
 
+  const [searchTerm, setSearchTerm] = useState("")
+
   const chatFolders = folders.filter(folder => folder.type === "chats")
   const presetFolders = folders.filter(folder => folder.type === "presets")
   const promptFolders = folders.filter(folder => folder.type === "prompts")
@@ -47,22 +57,9 @@ export const Sidebar2: FC<SidebarProps> = ({ contentType, showSidebar }) => {
   const toolFolders = folders.filter(folder => folder.type === "tools")
   const modelFolders = folders.filter(folder => folder.type === "models")
 
-  const renderSidebarContent = (
-    contentType: ContentType,
-    data: any[],
-    folders: Tables<"folders">[],
-    name?: string
-  ) => {
-    return (
-      <SidebarContent
-        name={name}
-        contentType={contentType}
-        data={data}
-        folders={folders}
-      />
-    )
-  }
-
+  const filteredChats = chats.filter(
+    chat => chat.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+  )
   return (
     <div
       className="m-0 w-full space-y-2"
@@ -76,21 +73,28 @@ export const Sidebar2: FC<SidebarProps> = ({ contentType, showSidebar }) => {
       }
       // value={contentType}
     >
-      <div className="flex h-screen flex-col p-2">
+      <div className="flex h-screen flex-col p-3">
         {workspaces?.length > 1 && (
           <div className="flex items-center border-b pb-2">
             <WorkspaceSwitcher />
             <WorkspaceSettings />
           </div>
         )}
-        {renderSidebarContent("chats", chats, chatFolders)}
+        <div className="flex max-h-full grow flex-col overflow-auto">
+          <SidebarTopContent
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            contentType={contentType}
+            onContentTypeChange={onContentTypeChange}
+          />
+          <SidebarDataList
+            contentType={"chats"}
+            data={filteredChats}
+            folders={folders}
+          />
+        </div>
 
         <div className="flex w-full flex-col space-y-4">
-          {/* TODO */}
-          {/* <WithTooltip display={<div>Import</div>} trigger={<Import />} /> */}
-
-          {/* TODO */}
-          {/* <Alerts /> */}
           {!validateProPlan(profile) && (
             <WithTooltip
               display={

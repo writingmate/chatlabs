@@ -11,12 +11,12 @@ import { useParams, useRouter } from "next/navigation"
 import { FC, useContext, useRef } from "react"
 import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
-import { SIDEBAR_ICON_SIZE } from "@/components/sidebar/sidebar-switcher"
+import { SIDEBAR_ICON_SIZE } from "@/components/sidebar2/sidebar-switcher"
 import {
   SIDEBAR_ITEM_ICON_SIZE,
   SIDEBAR_ITEM_ICON_STROKE
-} from "@/components/sidebar/items/all/sidebar-display-item"
-import { PinChat } from "@/components/sidebar/items/chat/pin-chat"
+} from "@/components/sidebar2/items/all/sidebar-display-item"
+import { PinChat } from "@/components/sidebar2/items/chat/pin-chat"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -63,7 +63,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     <div
       ref={itemRef}
       className={cn(
-        "hover:bg-accent focus:bg-accent group flex w-full cursor-pointer items-center rounded px-2 py-1.5 hover:opacity-50 focus:outline-none",
+        "hover:bg-accent/60 focus:bg-accent group flex h-[32px] w-full cursor-pointer items-center rounded px-2 focus:outline-none",
         isActive && "bg-accent"
       )}
       tabIndex={0}

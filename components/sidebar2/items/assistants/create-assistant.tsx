@@ -1,4 +1,4 @@
-import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
+import { SidebarCreateItem } from "@/components/sidebar2/items/all/sidebar-create-item"
 import { ChatSettingsForm } from "@/components/ui/chat-settings-form"
 import ImagePicker from "@/components/ui/image-picker"
 import { Input } from "@/components/ui/input"

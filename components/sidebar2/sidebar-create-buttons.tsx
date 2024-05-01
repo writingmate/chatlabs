@@ -69,12 +69,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   const getCreateFunction = () => {
     switch (contentType) {
       case "chats":
-        return async () => {
-          handleNewChat()
-          if (isMobileScreen()) {
-            setShowSidebar(false)
-          }
-        }
+        return async () => {}
 
       case "presets":
         return async () => {
@@ -117,13 +112,15 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   }
 
   return (
-    <div className="flex w-full">
+    <div>
       <Button
-        className="flex h-auto grow justify-start p-2"
+        size={"sm"}
+        variant={"outline"}
+        className="flex h-auto justify-start p-1 px-2 py-0"
         onClick={getCreateFunction()}
       >
-        <IconPencil stroke={1.5} size={SIDEBAR_ICON_SIZE} />
-        <div className="ml-3">
+        <IconPlus stroke={1.5} size={SIDEBAR_ICON_SIZE} />
+        <div className="ml-2">
           New{" "}
           {resolvedName.charAt(0).toUpperCase() +
             resolvedName.slice(1, resolvedName.length - 1)}

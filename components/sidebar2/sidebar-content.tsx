@@ -29,35 +29,11 @@ export const SidebarContent: FC<SidebarContentProps> = ({
 
   return (
     // Subtract 50px for the height of the workspace settings
-    <div className="flex max-h-full grow flex-col overflow-auto">
-      <div className="mt-1 flex items-center">
-        <SidebarCreateButtons
-          name={name}
-          contentType={contentType}
-          hasData={data.length > 0}
-        />
-      </div>
-      <SidebarSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      {!searchTerm && (
-        <SidebarSwitcher
-          onSearchChange={setSearchTerm}
-          onContentTypeChange={() => {}}
-        />
-      )}
 
-      {/*<div className="mt-2">*/}
-      {/*  <SidebarSearch*/}
-      {/*    contentType={contentType}*/}
-      {/*    searchTerm={searchTerm}*/}
-      {/*    setSearchTerm={setSearchTerm}*/}
-      {/*  />*/}
-      {/*</div>*/}
-
-      <SidebarDataList
-        contentType={contentType}
-        data={filteredData}
-        folders={folders}
-      />
-    </div>
+    <SidebarDataList
+      contentType={contentType}
+      data={filteredData}
+      folders={folders}
+    />
   )
 }
