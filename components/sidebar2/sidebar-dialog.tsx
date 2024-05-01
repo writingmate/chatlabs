@@ -40,7 +40,7 @@ export const SidebarDialog: FC<SidebarContentProps> = ({
     // Subtract 50px for the height of the workspace settings
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>{children}</DialogTrigger>
-      <DialogContent className={"min-h-[200px] min-w-[300px]"}>
+      <DialogContent className={"min-h-[200px] min-w-[400px]"}>
         <DialogHeader
           className={
             "flex w-full flex-row items-center justify-between space-y-0"

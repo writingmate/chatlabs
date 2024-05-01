@@ -94,21 +94,28 @@ export const Sidebar2: FC<SidebarProps> = ({
           />
         </div>
 
-        <div className="flex w-full flex-col space-y-4">
+        <div className="flex w-full flex-col space-y-2">
           {!validateProPlan(profile) && (
-            <WithTooltip
-              display={
-                <div>Upgrade to paid plans to get access to all features.</div>
-              }
-              trigger={
+            <div
+              onClick={() => setIsPaywallOpen(true)}
+              className={"hover:bg-accent/60 cursor-pointer rounded-md p-2"}
+            >
+              <div
+                className={
+                  "text-md flex items-center font-semibold text-violet-700"
+                }
+              >
                 <IconDiamondFilled
-                  onClick={() => setIsPaywallOpen(true)}
-                  className="cursor-pointer pt-[4px] text-violet-700 hover:opacity-50"
+                  className="mr-2 cursor-pointer"
                   stroke={1.5}
-                  size={SIDEBAR_ICON_SIZE}
-                />
-              }
-            />
+                  size={24}
+                />{" "}
+                Try Pro
+              </div>
+              <div className={"text-muted-foreground text-sm"}>
+                Upgrade to paid plan to get access to all features.
+              </div>
+            </div>
           )}
 
           <WithTooltip

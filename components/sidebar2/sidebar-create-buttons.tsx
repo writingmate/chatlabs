@@ -114,7 +114,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   return (
     <div>
       <Button
-        size={"sm"}
+        size={"xs"}
         variant={"outline"}
         className="flex justify-start p-1 px-2 py-0"
         onClick={getCreateFunction()}

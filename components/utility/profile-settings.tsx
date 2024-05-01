@@ -337,32 +337,36 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild className={"w-full border-t px-2 pt-2"}>
-        {profile.image_url ? (
-          <div className={"flex w-full items-center justify-between text-sm"}>
-            <div className={"flex items-center space-x-2"}>
-              <Image
-                className="mr-2 size-[30px] cursor-pointer rounded hover:opacity-50"
-                src={profile.image_url}
-                height={30}
-                width={30}
-                alt={profile.display_name || "Profile image"}
-              />
-              {profile.display_name}
-            </div>
-
-            <IconSettings
-              stroke={1.5}
-              size={20}
-              className={"text-foreground/50"}
+      <SheetTrigger
+        className={
+          "flex w-full items-center justify-between border-t pt-2 text-sm"
+        }
+      >
+        <div
+          className={
+            "hover:bg-accent/60 flex h-[40px] w-full items-center justify-between space-x-2 rounded-md px-2 text-left"
+          }
+        >
+          {profile.image_url ? (
+            <Image
+              className="mr-2 size-[30px] cursor-pointer rounded hover:opacity-50"
+              src={profile.image_url}
+              height={30}
+              width={30}
+              alt={profile.display_name || "Profile image"}
             />
-          </div>
-        ) : (
-          <Button size="icon" variant="ghost">
+          ) : (
             <IconUser size={SIDEBAR_ICON_SIZE} />
-            {profile.display_name}
-          </Button>
-        )}
+          )}
+
+          {profile.display_name}
+
+          <IconSettings
+            stroke={1.5}
+            size={20}
+            className={"text-foreground/50"}
+          />
+        </div>
       </SheetTrigger>
 
       <SheetContent
