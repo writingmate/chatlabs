@@ -50,7 +50,7 @@ export const SidebarTopContent: FC<SidebarTopContentProps> = ({
       <div className={"bg-background z-50"}>
         <div className="mt-1 flex items-center">
           <Button
-            className="flex h-auto grow justify-start p-2"
+            className="flex h-auto grow justify-center p-2"
             onClick={handleCreateChat}
           >
             <IconMessageCirclePlus stroke={1.5} size={SIDEBAR_ICON_SIZE} />
