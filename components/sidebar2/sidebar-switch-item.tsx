@@ -11,7 +11,7 @@ type SidebarSwitchItemProps = {
   folders?: any
   label: string
   data: any
-  onClick: () => void
+  onClick: (e: any) => void
   // active: boolean
 }
 

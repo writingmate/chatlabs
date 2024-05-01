@@ -14,7 +14,7 @@ import {
   IconSparkles,
   IconTerminal2
 } from "@tabler/icons-react"
-import { FC, useContext } from "react"
+import { FC, useContext, useEffect } from "react"
 import { TabsList } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "../utility/profile-settings"
@@ -23,6 +23,7 @@ import { validateProPlan } from "@/lib/subscription"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { SidebarSwitchItem } from "@/components/sidebar2/sidebar-switch-item"
+import { useRouter } from "next/navigation"
 
 export const SIDEBAR_ICON_SIZE = 20
 
@@ -63,6 +64,12 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
     }
   ]
 
+  const router = useRouter()
+
+  useEffect(() => {
+    menuItems.map(x => router.prefetch(`./${x.contentType}`))
+  }, [])
+
   return (
     <div
       className={cn("z-10 mb-2 flex flex-col border-b pb-2 text-sm", className)}
@@ -76,7 +83,11 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           icon={item.icon}
           label={item.label}
           data={item.data}
-          onClick={() => onContentTypeChange(item.contentType as ContentType)}
+          onClick={e => {
+            e.preventDefault()
+            e.stopPropagation()
+            router.push(`./${item.contentType}`)
+          }}
         />
       ))}
     </div>

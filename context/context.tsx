@@ -164,6 +164,9 @@ interface ChatbotUIContext {
   // SIDEBAR
   showSidebar: boolean
   setShowSidebar: Dispatch<SetStateAction<boolean>>
+
+  isSidebarDialogOpen: boolean
+  setIsSidebarDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
@@ -305,5 +308,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
 
   // SIDEBAR
   showSidebar: false,
-  setShowSidebar: () => {}
+  setShowSidebar: () => {},
+
+  isSidebarDialogOpen: false,
+  setIsSidebarDialogOpen: () => {}
 })

@@ -49,7 +49,8 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     selectedTools,
     chatFiles,
     newMessageFiles,
-    setIsPaywallOpen
+    setIsPaywallOpen,
+    setIsSidebarDialogOpen
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
@@ -100,9 +101,11 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     presets: async (item: any) => {},
     prompts: async (item: any) => {
       handleSelectPromptWithVariables(item)
+      setIsSidebarDialogOpen(false)
     },
     files: async (item: any) => {
       handleSelectUserFile(item)
+      setIsSidebarDialogOpen(false)
     },
     collections: async (item: any) => {},
     assistants: async (assistant: Tables<"assistants">) => {
@@ -112,6 +115,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         return
       }
       handleSelectAssistant(assistant)
+      setIsSidebarDialogOpen(false)
 
       return router.push(`/${selectedWorkspace.id}/chat`)
     },

@@ -154,6 +154,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     () => !isMobileScreen()
   )
 
+  const [isSidebarDialogOpen, setIsSidebarDialogOpen] = useState<boolean>(false)
+
   useEffect(() => {
     ;(async () => {
       const profile = await fetchStartingData()
@@ -374,7 +376,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setIsPaywallOpen,
 
         showSidebar,
-        setShowSidebar
+        setShowSidebar,
+
+        isSidebarDialogOpen,
+        setIsSidebarDialogOpen
       }}
     >
       {children}

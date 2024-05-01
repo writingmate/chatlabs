@@ -61,8 +61,9 @@ export const SidebarTopContent: FC<SidebarTopContentProps> = ({
       </div>
       <SidebarSwitcher
         className={cn(
-          "transition-[margin] duration-1000",
-          searchTerm && `-mt-[${32 * 3}px]`
+          "transition-[margin] duration-300",
+          // searchTerm && `-mt-[${32 * 3}px]`
+          searchTerm && `-mt-24`
         )}
         contentType={contentType}
         onContentTypeChange={onContentTypeChange}
