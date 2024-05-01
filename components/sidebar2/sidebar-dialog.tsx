@@ -30,8 +30,7 @@ export const SidebarDialog: FC<SidebarContentProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("")
 
-  const { isSidebarDialogOpen, setIsSidebarDialogOpen } =
-    useContext(ChatbotUIContext)
+  const [isOpen, setIsOpen] = useState(false)
 
   const filteredData: any = data.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -41,7 +40,7 @@ export const SidebarDialog: FC<SidebarContentProps> = ({
 
   return (
     // Subtract 50px for the height of the workspace settings
-    <Dialog open={isSidebarDialogOpen} onOpenChange={setIsSidebarDialogOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className={"min-h-[200px] min-w-[400px]"}>
         <DialogHeader

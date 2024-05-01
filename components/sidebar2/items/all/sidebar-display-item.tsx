@@ -49,8 +49,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     selectedTools,
     chatFiles,
     newMessageFiles,
-    setIsPaywallOpen,
-    setIsSidebarDialogOpen
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
