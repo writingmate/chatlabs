@@ -1,17 +1,45 @@
 import OpenAI from "openai"
-import { experimental_StreamData } from "ai"
+import {
+  CreateMessage,
+  experimental_StreamData,
+  FunctionCallPayload,
+  JSONValue
+} from "ai"
 import ChatCompletionMessage = OpenAI.Chat.ChatCompletionMessage
 
+export interface FindFunctionCallsStreamParams {
+  model: string
+  messages: any[]
+  tools?: OpenAI.Chat.Completions.ChatCompletionTool[]
+  onFunctionCall: (
+    functionCallPayload: FunctionCallPayload,
+    createFunctionCallMessages: (
+      functionCallResult: JSONValue
+    ) => CreateMessage[]
+  ) => any
+}
+
+export interface FindFunctionCallsParams {
+  model: string
+  messages: any[]
+  tools?: OpenAI.Chat.Completions.ChatCompletionTool[]
+}
+
+export interface CreateResponseStreamParams {
+  model: string
+  messages: any[]
+  tools: OpenAI.Chat.Completions.ChatCompletionTool[]
+  streamData: experimental_StreamData
+}
+
 export interface FunctionCaller {
-  findFunctionCalls: (params: {
-    model: string
-    messages: any[]
-    tools?: OpenAI.Chat.Completions.ChatCompletionTool[]
-  }) => Promise<ChatCompletionMessage>
-  createResponseStream: (params: {
-    model: string
-    messages: any[]
-    tools: OpenAI.Chat.Completions.ChatCompletionTool[]
-    streamData: experimental_StreamData
-  }) => Promise<ReadableStream>
+  findFunctionCallsStream: (
+    params: FindFunctionCallsStreamParams
+  ) => Promise<ReadableStream>
+  findFunctionCalls: (
+    params: FindFunctionCallsParams
+  ) => Promise<ChatCompletionMessage>
+  createResponseStream: (
+    params: CreateResponseStreamParams
+  ) => Promise<ReadableStream>
 }

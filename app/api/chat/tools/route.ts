@@ -175,6 +175,9 @@ export async function POST(request: Request) {
       }
     }
 
+    if (client.supportsFunctionCallStreaming) {
+    }
+
     const message = await client.findFunctionCalls({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages,
@@ -191,7 +194,7 @@ export async function POST(request: Request) {
     const toolCalls = message.tool_calls || []
 
     if (toolCalls.length === 0) {
-      return new Response(`0:"${message.content?.replace(/\n/g, "\\n")}"\n`, {
+      return new Response(`0:${JSON.stringify(message.content)}\n`, {
         headers: {
           "Content-Type": "application/json"
         }

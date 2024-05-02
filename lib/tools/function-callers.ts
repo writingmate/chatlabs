@@ -3,16 +3,49 @@ import {
   AnthropicStream,
   experimental_StreamData,
   OpenAIStream,
+  OpenAIStreamCallbacks,
   StreamingTextResponse
 } from "ai"
 import Anthropic from "@anthropic-ai/sdk"
 import ChatCompletionMessage = OpenAI.Chat.Completions.ChatCompletionMessage
 import { Parameter, Parameter as OpenAIParameter } from "@/types/platformTools"
-import { FunctionCaller } from "@/types/function-callers"
+import {
+  FindFunctionCallsStreamParams,
+  FunctionCaller
+} from "@/types/function-callers"
 
 export class OpenAIFunctionCaller implements FunctionCaller {
-  constructor(private readonly client: OpenAI) {
+  constructor(
+    private readonly client: OpenAI,
+    public readonly supportsFunctionCallStreaming = false
+  ) {
+    this.supportsFunctionCallStreaming = supportsFunctionCallStreaming
     this.client = client
+  }
+
+  async findFunctionCallsStream({
+    model,
+    messages,
+    tools,
+    onFunctionCall
+  }: FindFunctionCallsStreamParams): Promise<ReadableStream> {
+    if (!this.supportsFunctionCallStreaming) {
+      throw new Error("This function caller does not support streaming")
+    }
+
+    const response = await this.client.chat.completions.create({
+      model: model,
+      messages: messages,
+      tools: tools,
+      tool_choice: "auto",
+      stream: true
+    })
+
+    const stream = OpenAIStream(response, {
+      experimental_onFunctionCall: onFunctionCall
+    })
+
+    return stream
   }
 
   async findFunctionCalls({
@@ -27,7 +60,8 @@ export class OpenAIFunctionCaller implements FunctionCaller {
     const response = await this.client.chat.completions.create({
       model: model,
       messages: messages,
-      tools: tools
+      tools: tools,
+      tool_choice: "auto"
     })
 
     return response.choices[0].message
@@ -62,6 +96,15 @@ export class OpenAIFunctionCaller implements FunctionCaller {
 export class AnthropicFunctionCaller implements FunctionCaller {
   constructor(private readonly client: Anthropic) {
     this.client = client
+  }
+
+  async findFunctionCallsStream({
+    model,
+    messages,
+    tools,
+    onFunctionCall
+  }: FindFunctionCallsStreamParams): Promise<ReadableStream> {
+    throw new Error("This function caller does not support streaming")
   }
 
   async findFunctionCalls({
