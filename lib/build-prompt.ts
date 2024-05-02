@@ -13,6 +13,7 @@ export function validateSystemPromptTemplate(template: string) {
     template.includes("{assistant}")
   )
 }
+
 export const buildBasePrompt = (
   profileContext: string,
   assistant: Tables<"assistants"> | null,
@@ -168,7 +169,9 @@ export async function buildFinalMessages(
 
           return {
             type: "image_url",
-            image_url: formedUrl
+            image_url: {
+              url: formedUrl
+            }
           }
         })
       ]
@@ -193,7 +196,7 @@ export async function buildFinalMessages(
     }
   }
 
-  return finalMessages
+  return { finalMessages, usedTokens }
 }
 
 function buildRetrievalText(fileItems: Tables<"file_items">[]) {
@@ -324,7 +327,10 @@ export async function buildGoogleGeminiFinalMessages(
       ...imageParts
     )
 
-    return GOOGLE_FORMATTED_MESSAGES
+    return {
+      finalMessages: GOOGLE_FORMATTED_MESSAGES,
+      usedTokens
+    }
   } else if (chatSettings.model === "gemini-pro-vision") {
     // Gemini Pro Vision doesn't currently support messages
     let prompt = ""
@@ -341,15 +347,18 @@ export async function buildGoogleGeminiFinalMessages(
     )
 
     // FIX: Hacky until chat messages are supported
-    return [
-      {
-        prompt,
-        imageParts
-      }
-    ]
+    return {
+      finalMessages: [
+        {
+          prompt,
+          imageParts
+        }
+      ],
+      usedTokens: encode(prompt).length
+    }
   }
 
-  return finalMessages
+  return { finalMessages, usedTokens }
 }
 
 // Anthropic API requires first assistant message to be user
@@ -358,7 +367,11 @@ export async function buildClaudeFinalMessages(
   profile: Tables<"profiles">,
   chatImages: MessageImage[]
 ) {
-  const finalMessages = await buildFinalMessages(payload, profile, chatImages)
+  const { finalMessages, usedTokens } = await buildFinalMessages(
+    payload,
+    profile,
+    chatImages
+  )
 
   // Remove first assistant message
   if (
@@ -366,8 +379,11 @@ export async function buildClaudeFinalMessages(
     finalMessages[1].role !== "user" &&
     finalMessages[0].role === "system"
   ) {
-    return finalMessages.toSpliced(1, 1)
+    return {
+      finalMessages: finalMessages.toSpliced(1, 1),
+      usedTokens: usedTokens - encode(finalMessages[1].content as string).length
+    }
   }
 
-  return finalMessages
+  return { finalMessages, usedTokens }
 }

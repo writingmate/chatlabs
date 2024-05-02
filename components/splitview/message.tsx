@@ -5,15 +5,12 @@ import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { LLM, LLMID, MessageImage, ModelProvider } from "@/types"
 import {
-  IconBolt,
+  IconApi,
   IconCaretDownFilled,
   IconCaretRightFilled,
   IconCircleFilled,
   IconFileText,
   IconMoodSmile,
-  IconPencil,
-  IconPlayerPlay,
-  IconPlayerPlayFilled,
   IconPuzzle,
   IconTerminal2
 } from "@tabler/icons-react"
@@ -25,13 +22,17 @@ import { FileIcon } from "../ui/file-icon"
 import { FilePreview } from "../ui/file-preview"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
-import { MessageActions } from "./message-actions"
-import { MessageMarkdown } from "./message-markdown"
 import { YouTube } from "@/components/messages/annotations/youtube"
 import { WebSearch } from "@/components/messages/annotations/websearch"
 import AnnotationImage from "@/components/messages/annotations/image"
 import { Annotation } from "@/types/annotation"
-import { any } from "zod"
+import { ChatbotUIChatContext } from "@/context/chat"
+import { MessageActions } from "@/components/messages/message-actions"
+import { MessageMarkdown } from "@/components/messages/message-markdown"
+import {
+  ResponseTime,
+  ToolCalls
+} from "@/components/messages/annotations/toolCalls"
 
 const ICON_SIZE = 32
 
@@ -57,12 +58,8 @@ export const Message: FC<MessageProps> = ({
   const {
     assistants,
     profile,
-    isGenerating,
-    setIsGenerating,
-    firstTokenReceived,
     availableLocalModels,
     availableOpenRouterModels,
-    chatMessages,
     selectedAssistant,
     chatImages,
     assistantImages,
@@ -70,6 +67,9 @@ export const Message: FC<MessageProps> = ({
     files,
     models
   } = useContext(ChatbotUIContext)
+
+  const { isGenerating, setIsGenerating, firstTokenReceived, chatMessages } =
+    useContext(ChatbotUIChatContext)
 
   const { handleSendMessage } = useChatHandler()
 
@@ -87,8 +87,6 @@ export const Message: FC<MessageProps> = ({
 
   const [viewSources, setViewSources] = useState(false)
 
-  const [isVoiceToTextPlaying, setIsVoiceToTextPlaying] = useState(false)
-
   const handleCopy = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(message.content)
@@ -100,54 +98,6 @@ export const Message: FC<MessageProps> = ({
       textArea.select()
       document.execCommand("copy")
       document.body.removeChild(textArea)
-    }
-  }
-
-  const handleSpeakMessage = () => {
-    if ("speechSynthesis" in window) {
-      if (window.speechSynthesis.paused) {
-        // If speech synthesis is paused, resume it
-        window.speechSynthesis.resume()
-      } else if (!window.speechSynthesis.speaking) {
-        // If speech synthesis is not speaking, start speaking the message
-        speakMessage()
-      } else {
-        // If speech synthesis is speaking, pause it
-        handlePauseSpeech()
-      }
-    } else {
-      console.error("Speech synthesis is not supported in this browser.")
-    }
-  }
-
-  const speakMessage = () => {
-    if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(message.content)
-      utterance.onerror = () => {
-        console.error("An error occurred while speaking the message.")
-        setIsVoiceToTextPlaying(false)
-      }
-      utterance.onend = () => {
-        setIsVoiceToTextPlaying(false)
-      }
-      utterance.onpause = () => {
-        setIsVoiceToTextPlaying(false)
-      }
-      utterance.onresume = () => {
-        setIsVoiceToTextPlaying(true)
-      }
-      utterance.onstart = () => {
-        setIsVoiceToTextPlaying(true)
-      }
-      window.speechSynthesis.speak(utterance)
-    } else {
-      console.error("Speech synthesis is not supported in this browser.")
-    }
-  }
-
-  const handlePauseSpeech = () => {
-    if (window.speechSynthesis) {
-      window.speechSynthesis.pause()
     }
   }
 
@@ -257,15 +207,36 @@ export const Message: FC<MessageProps> = ({
     } = {
       imageGenerator__generateImage: AnnotationImage,
       webScraper__youtubeCaptions: YouTube,
-      webScraper__googleSearch: WebSearch
+      webScraper__googleSearch: WebSearch,
+      toolCalls: ToolCalls
+    }
+
+    const annotationResponseTimeLabelMap: {
+      [key: string]: string
+    } = {
+      imageGenerator__generateImage: "Image",
+      webScraper__youtubeCaptions: "YouTube",
+      webScraper__googleSearch: "Google Search"
     }
 
     return Object.keys(annotation).map(key => {
       if (!annotationMap[key]) {
         return null
       }
+      const responseTimeLabel = annotationResponseTimeLabelMap[key]
       const AnnotationComponent = annotationMap[key]!
-      return <AnnotationComponent key={key} annotation={annotation} />
+      return (
+        <div key={key} className={"flex flex-col space-y-3"}>
+          <AnnotationComponent annotation={annotation} />
+          {responseTimeLabel && (
+            <ResponseTime
+              icon={<IconApi stroke={1.5} size={18} />}
+              label={responseTimeLabel}
+              value={annotation.webScraper__googleSearch?.responseTime!}
+            />
+          )}
+        </div>
+      )
     })
   }
 
@@ -279,7 +250,7 @@ export const Message: FC<MessageProps> = ({
       )}
       onKeyDown={handleKeyDown}
     >
-      <div className="relative flex w-full flex-col px-4 py-6 md:w-[500px] md:px-0 lg:w-[600px] xl:w-[700px]">
+      <div className="relative flex w-full flex-col">
         <div className="space-y-3">
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
@@ -287,7 +258,6 @@ export const Message: FC<MessageProps> = ({
                 className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
                 size={ICON_SIZE}
               />
-
               <div className="text-lg font-semibold">Prompt</div>
             </div>
           ) : (

@@ -8,7 +8,7 @@ export function WebSearch({ annotation }: { annotation: Annotation }) {
   const [showAll, setShowAll] = useState(false)
 
   return (
-    <div className={"grid grid-cols-2 gap-2 pb-4 md:grid-cols-4"}>
+    <div className={"grid grid-cols-2 gap-2 md:grid-cols-4"}>
       {(showAll ? organic : organic.slice(0, 4)).map((item, index) => {
         const hostname = new URL(item.link).hostname
         const displayHostname = hostname.replace("www.", "")

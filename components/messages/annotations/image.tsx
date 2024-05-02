@@ -17,8 +17,6 @@ export default function AnnotationImage({
   let width = 0,
     height = 0
 
-  console.log(imageParams.size)
-
   if (imageParams.size) {
     width = parseInt(imageParams.size?.split("x")[0]) * scale
     height = parseInt(imageParams.size?.split("x")[1]) * scale

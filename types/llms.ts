@@ -70,6 +70,12 @@ export interface LLM {
   imageInput: boolean
   paid?: boolean
   tools?: boolean
+  pricing?: {
+    currency: string
+    unit: string
+    inputCost: number
+    outputCost?: number
+  }
 }
 
 export interface OpenRouterLLM extends LLM {

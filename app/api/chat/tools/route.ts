@@ -22,6 +22,7 @@ import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completion
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import {
   AnthropicFunctionCaller,
+  GroqFunctionCaller,
   OpenAIFunctionCaller
 } from "@/lib/tools/function-callers"
 
@@ -68,11 +69,25 @@ function getProviderCaller(model: string, profile: Tables<"profiles">) {
     )
   }
 
+  if (provider === "groq") {
+    checkApiKey(profile.groq_api_key, "Groq")
+    return new GroqFunctionCaller(
+      new OpenAI({
+        apiKey: profile.groq_api_key || "",
+        baseURL: "https://api.groq.com/openai/v1"
+      })
+    )
+  }
+
   throw new Error(`Provider not supported: ${provider}`)
 }
 
 const SYSTEM_PROMPT = `
 Today is ${new Date().toLocaleDateString()}.
+
+You are an expert in composing functions. You are given a question and a set of possible functions. 
+Based on the question, you will need to make one or more function/tool calls to achieve the purpose. 
+You should only return the function call in tools call sections.
 
 Always break down youtube captions in to three sentence paragraphs and add links to time codes like this:
 <paragraph1>[1](https://youtube.com/watch?v=VIDEO_ID&t=START1s).
@@ -86,7 +101,7 @@ Always add references for google search results at the end of each sentence like
 Each unique link has unique reference number.
 
 Never include image url in the response for generated images. Do not say you can't display image. 
-Do not use semi-colons when describing the image. 
+Do not use semi-colons when describing the image. Never use html, always use Markdown.
 `
 
 export async function POST(request: Request) {
@@ -112,6 +127,8 @@ export async function POST(request: Request) {
     const profile = await getServerProfile()
 
     await validateModelAndMessageCount(chatSettings.model, new Date())
+
+    const functionCallStartTime = new Date().getTime()
 
     const client = getProviderCaller(chatSettings.model, profile)
 
@@ -164,11 +181,17 @@ export async function POST(request: Request) {
       tools: allTools.length > 0 ? allTools : undefined
     })
 
+    streamData.appendMessageAnnotation({
+      toolCalls: {
+        responseTime: new Date().getTime() - functionCallStartTime + ""
+      }
+    })
+
     messages.push(message)
     const toolCalls = message.tool_calls || []
 
     if (toolCalls.length === 0) {
-      return new Response(`0:"${message.content?.replace(/\n/g, "\\n")}"\n`, {
+      return new Response(`0:${JSON.stringify(message.content)}\n`, {
         headers: {
           "Content-Type": "application/json"
         }
@@ -194,6 +217,7 @@ export async function POST(request: Request) {
           throw new Error(`Function ${functionName} not found in any schema`)
         }
 
+        const functionCallStartTime = new Date().getTime()
         // Reroute to local executor for local tools
         if (schemaDetail.url === "local://executor") {
           const toolFunction = platformToolFunction(functionName)
@@ -204,7 +228,10 @@ export async function POST(request: Request) {
           const data = await toolFunction(parsedArgs)
 
           streamData.appendMessageAnnotation({
-            [`${functionName}`]: data
+            [`${functionName}`]: {
+              ...data,
+              responseTime: new Date().getTime() - functionCallStartTime
+            }
           })
 
           messages.push({

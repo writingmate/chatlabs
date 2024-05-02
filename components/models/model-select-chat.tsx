@@ -24,11 +24,13 @@ import { validatePlanForModel } from "@/lib/subscription"
 interface ModelSelectProps {
   selectedModelId: string
   onSelectModel: (modelId: LLMID) => void
+  showModelSettings?: boolean
 }
 
 export const ModelSelectChat: FC<ModelSelectProps> = ({
   selectedModelId,
-  onSelectModel
+  onSelectModel,
+  showModelSettings = true
 }) => {
   const {
     profile,
@@ -226,8 +228,12 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
             })}
           </div>
         </div>
-        <Separator className={"opacity-75"} />
-        <ModelSettings models={allModels} />
+        {showModelSettings && (
+          <>
+            <Separator className={"opacity-75"} />
+            <ModelSettings models={allModels} />
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

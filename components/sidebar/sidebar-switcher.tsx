@@ -6,6 +6,8 @@ import {
   IconDiamond,
   IconDiamondFilled,
   IconFile,
+  IconLayoutBoardSplit,
+  IconLayoutColumns,
   IconMessage,
   IconPencil,
   IconPuzzle,
@@ -14,12 +16,14 @@ import {
   IconTerminal2
 } from "@tabler/icons-react"
 import { FC, useContext } from "react"
-import { TabsList } from "../ui/tabs"
+import { TabsList, TabsTrigger } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "../utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
 import { ChatbotUIContext } from "@/context/context"
 import { validateProPlan } from "@/lib/subscription"
+import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 export const SIDEBAR_ICON_SIZE = 28
 
@@ -32,6 +36,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 }) => {
   const { profile, setIsPaywallOpen } = useContext(ChatbotUIContext)
 
+  const router = useRouter()
   return (
     <div className="flex flex-col justify-between border-r pb-5">
       <TabsList className="bg-background grid h-[440px] grid-rows-7">
@@ -83,6 +88,17 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           name="Plugins"
           onContentTypeChange={onContentTypeChange}
         />
+
+        <Button
+          className="mx-auto hover:opacity-50"
+          variant="ghost"
+          size="icon"
+          onClick={e => {
+            window.open("./splitview", "_blank")
+          }}
+        >
+          <IconLayoutColumns size={SIDEBAR_ICON_SIZE} stroke={1.5} />
+        </Button>
       </TabsList>
 
       <div className="flex flex-col items-center space-y-4">

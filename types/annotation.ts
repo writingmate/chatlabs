@@ -2,6 +2,7 @@ import {
   GetYoutubeCaptionsResult,
   GoogleSearchResult,
   ImageGeneratorResult,
+  ToolsCallResult,
   WebScraperResult
 } from "@/types/platformTools"
 
@@ -10,4 +11,5 @@ export type Annotation = {
   webScraper__youtubeCaptions?: GetYoutubeCaptionsResult
   webScraper__googleSearch?: GoogleSearchResult
   webScraper__webScraper?: WebScraperResult
+  toolCalls?: ToolsCallResult
 }
