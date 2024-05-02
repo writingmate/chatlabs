@@ -104,20 +104,29 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           .map((result: SpeechRecognitionResult) => result[0].transcript)
           .join("")
         setTranscript(transcript)
-
-        // Reset and set a new timeout to stop the recognition after 30 seconds of silence
-        if (timeoutId) clearTimeout(timeoutId)
-        setTimeoutId(
-          setTimeout(() => {
-            setTranscript("")
-            if (recognition) recognition.stop()
-          }, 30 * 1000)
-        ) // 30 seconds
+        // Check for silence
+        const isSilent = transcript.trim() === ""
+        if (isSilent) {
+          // Reset and set a new timeout to stop the recognition after 30 seconds of silence
+          if (timeoutId) clearTimeout(timeoutId)
+          setTimeoutId(
+            setTimeout(() => {
+              setTranscript("")
+              if (recognition) recognition.stop()
+            }, 30 * 1000)
+          ) // 30 seconds
+        } else {
+          // Reset the timeout if the user is speaking
+          if (timeoutId) clearTimeout(timeoutId)
+        }
       }
 
       recognition.onend = (event: any) => {
         setListening(false)
         if (event.error === "no-speech") {
+          startListening()
+        } else if (transcript.trim() !== "") {
+          // Restart the recognition if the user is still speaking
           startListening()
         }
       }
@@ -233,13 +242,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     if (recognition) {
       setListening(true)
       recognition.start()
-
-      // Initial timeout to stop the recognition after 30 seconds of silence
-      setTimeoutId(
-        setTimeout(() => {
-          if (recognition) recognition.stop()
-        }, 30 * 1000)
-      ) // 30 seconds
     }
   }
 
