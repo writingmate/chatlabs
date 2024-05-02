@@ -96,7 +96,7 @@ function mergeSubtitleChunks(chunks: any[], n: number) {
 
 async function getYoutubeCaptions(
   params: any
-): Promise<GetYoutubeCaptionsResult> {
+): Promise<Omit<GetYoutubeCaptionsResult, "responseTime">> {
   let videoId = params.videoId || params.parameters?.videoId || ""
 
   if (!videoId) {
