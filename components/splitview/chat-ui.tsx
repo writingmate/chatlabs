@@ -103,8 +103,6 @@ const ChatWrapper = forwardRef(
       chatMessages[chatMessages.length - 1]?.message.annotation
     )
 
-    console.log(responseTimePadding)
-
     const selectedModel = allModels.find(x => x.modelId === chatSettings?.model)
 
     useImperativeHandle(
@@ -247,7 +245,7 @@ export const ChatUI: FC<ChatUIProps> = () => {
       try {
         ref.handleStopMessage()
       } catch (e) {
-        console.log(e)
+        console.error(e)
       }
     })
   }

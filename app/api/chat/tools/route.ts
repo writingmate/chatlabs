@@ -112,8 +112,6 @@ export async function POST(request: Request) {
     selectedTools: Tables<"tools">[]
   }
 
-  console.log("chatSettings", messages)
-
   if (messages[0].role == "system") {
     messages[0].content += SYSTEM_PROMPT
   } else {
