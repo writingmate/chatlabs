@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { LLM, LLMID, MessageImage, ModelProvider } from "@/types"
 import {
+  IconApi,
   IconCaretDownFilled,
   IconCaretRightFilled,
   IconCircleFilled,
@@ -28,7 +29,10 @@ import { Annotation } from "@/types/annotation"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { MessageActions } from "@/components/messages/message-actions"
 import { MessageMarkdown } from "@/components/messages/message-markdown"
-import { ToolCalls } from "@/components/messages/annotations/toolCalls"
+import {
+  ResponseTime,
+  ToolCalls
+} from "@/components/messages/annotations/toolCalls"
 
 const ICON_SIZE = 32
 
@@ -207,12 +211,32 @@ export const Message: FC<MessageProps> = ({
       toolCalls: ToolCalls
     }
 
+    const annotationResponseTimeLabelMap: {
+      [key: string]: string
+    } = {
+      imageGenerator__generateImage: "Image",
+      webScraper__youtubeCaptions: "YouTube",
+      webScraper__googleSearch: "Google Search"
+    }
+
     return Object.keys(annotation).map(key => {
       if (!annotationMap[key]) {
         return null
       }
+      const responseTimeLabel = annotationResponseTimeLabelMap[key]
       const AnnotationComponent = annotationMap[key]!
-      return <AnnotationComponent key={key} annotation={annotation} />
+      return (
+        <div key={key} className={"flex flex-col space-y-3"}>
+          <AnnotationComponent annotation={annotation} />
+          {responseTimeLabel && (
+            <ResponseTime
+              icon={<IconApi stroke={1.5} size={18} />}
+              label={responseTimeLabel}
+              value={annotation.webScraper__googleSearch?.responseTime!}
+            />
+          )}
+        </div>
+      )
     })
   }
 

@@ -112,6 +112,8 @@ export async function POST(request: Request) {
     selectedTools: Tables<"tools">[]
   }
 
+  console.log("chatSettings", messages)
+
   if (messages[0].role == "system") {
     messages[0].content += SYSTEM_PROMPT
   } else {
@@ -173,9 +175,6 @@ export async function POST(request: Request) {
       } catch (error: any) {
         console.error("Error converting schema", error)
       }
-    }
-
-    if (client.supportsFunctionCallStreaming) {
     }
 
     const message = await client.findFunctionCalls({

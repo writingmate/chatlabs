@@ -19,6 +19,7 @@ import {
   handleHostedChat,
   handleLocalChat,
   handleRetrieval,
+  handleToolsChat,
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
@@ -284,35 +285,14 @@ export const useChatHandler = () => {
       let data = null
 
       if (selectedTools.length > 0) {
-        setToolInUse("none")
-
-        const formattedMessages = await buildFinalMessages(
+        ;({ generatedText, data } = await handleToolsChat(
           payload,
           profile!,
-          chatImages
-        )
-
-        const response = await fetchChatResponse(
-          "/api/chat/tools",
-          {
-            chatSettings: payload.chatSettings,
-            messages: formattedMessages,
-            selectedTools
-          },
-          true,
+          tempAssistantChatMessage,
+          isRegeneration,
           newAbortController,
+          chatImages,
           setIsGenerating,
-          setChatMessages
-        )
-
-        setToolInUse("none")
-        ;({ generatedText, data } = await processResponse(
-          response,
-          isRegeneration
-            ? payload.chatMessages[payload.chatMessages.length - 1]
-            : tempAssistantChatMessage,
-          true,
-          newAbortController,
           setFirstTokenReceived,
           setChatMessages,
           setToolInUse,
