@@ -185,7 +185,8 @@ export const webScraperTool: PlatformTool = {
     {
       id: "FetchDataFromUrl", // This is the unique identifier of the tool function.
       toolFunction: webScraper, // This is the function that will be called when the tool function is executed.
-      description: "Fetch data from a URL and return it in markdown format.", // This is the description of the tool function.
+      description:
+        "Fetch data from a URL and return it in markdown format. Only use it with results from googleSearch function or when user specifies url to scrape", // This is the description of the tool function.
       parameters: [
         // These are the parameters of the tool function.
         {

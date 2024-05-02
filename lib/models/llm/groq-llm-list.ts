@@ -26,7 +26,8 @@ const META_LLAMA_3_70B_8192: LLM = {
   provider: "groq",
   hostedId: "llama3-70b-8192",
   platformLink: GROQ_PLATORM_LINK,
-  imageInput: false
+  imageInput: false,
+  tools: true
 }
 
 export const GROQ_LLM_LIST: LLM[] = [
