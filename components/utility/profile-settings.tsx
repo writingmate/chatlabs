@@ -349,8 +349,12 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           }
         >
           <div className={"flex items-center"}>
-            <Avatar>
-              <AvatarImage src={profile.image_url!} height={34} width={34} />
+            <Avatar className={"mr-2 size-7"}>
+              <AvatarImage
+                src={profile.image_url!}
+                height={SIDEBAR_ICON_SIZE}
+                width={SIDEBAR_ICON_SIZE}
+              />
               <AvatarFallback>
                 <IconUser size={SIDEBAR_ICON_SIZE} />
               </AvatarFallback>
