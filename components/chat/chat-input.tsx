@@ -10,7 +10,9 @@ import {
   IconSend,
   IconX,
   IconMicrophone,
-  IconPlayerRecordFilled
+  IconPlayerRecordFilled,
+  IconRepeat,
+  IconArrowUp
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -25,6 +27,7 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { Button } from "@/components/ui/button"
 
 interface ChatInputProps {}
 
@@ -361,7 +364,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                   size={30}
                 />
               ) : (
-                <IconSend
+                <IconArrowUp
                   className={cn(
                     "bg-primary text-secondary rounded-lg p-1 hover:opacity-50",
                     (!userInput || isUploading) &&

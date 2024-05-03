@@ -50,6 +50,7 @@ import {
 import { PLAN_FREE } from "@/lib/stripe/config"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface ProfileSettingsProps {}
 
@@ -348,17 +349,12 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           }
         >
           <div className={"flex items-center"}>
-            {profile.image_url ? (
-              <Image
-                className="mr-2 size-[30px] cursor-pointer rounded hover:opacity-50"
-                src={profile.image_url}
-                height={30}
-                width={30}
-                alt={profile.display_name || "Profile image"}
-              />
-            ) : (
-              <IconUser size={SIDEBAR_ICON_SIZE} />
-            )}
+            <Avatar>
+              <AvatarImage src={profile.image_url!} height={34} width={34} />
+              <AvatarFallback>
+                <IconUser size={SIDEBAR_ICON_SIZE} />
+              </AvatarFallback>
+            </Avatar>
 
             {profile.display_name}
           </div>

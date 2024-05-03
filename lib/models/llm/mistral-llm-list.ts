@@ -22,7 +22,13 @@ const MIXTRAL: LLM = {
   hostedId: "mistral-small",
   platformLink: MISTRAL_PLATORM_LINK,
   imageInput: false,
-  paid: true
+  paid: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 2,
+    outputCost: 6
+  }
 }
 
 // Mistral Medium (UPDATED 12/21/23)
@@ -33,7 +39,13 @@ const MISTRAL_MEDIUM: LLM = {
   hostedId: "mistral-medium",
   platformLink: MISTRAL_PLATORM_LINK,
   imageInput: false,
-  paid: true
+  paid: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 2.7,
+    outputCost: 8.1
+  }
 }
 
 // Mistral Large (UPDATED 03/05/24)
@@ -45,7 +57,13 @@ const MISTRAL_LARGE: LLM = {
   platformLink: MISTRAL_PLATORM_LINK,
   imageInput: false,
   paid: true,
-  tools: true
+  tools: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 8,
+    outputCost: 24
+  }
 }
 
 export const MISTRAL_LLM_LIST: LLM[] = [

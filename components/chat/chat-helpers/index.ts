@@ -26,6 +26,7 @@ import { v4 as uuidv4 } from "uuid"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { JSONValue } from "ai"
 import { validateProPlan } from "@/lib/subscription"
+import { encode } from "gpt-tokenizer"
 
 export const validateChatSettings = (
   chatSettings: ChatSettings | null,
@@ -213,6 +214,65 @@ export const handleLocalChat = async (
   )
 }
 
+export const handleToolsChat = async (
+  payload: ChatPayload,
+  profile: Tables<"profiles">,
+  tempAssistantChatMessage: ChatMessage,
+  isRegeneration: boolean,
+  newAbortController: AbortController,
+  chatImages: MessageImage[],
+  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
+  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  setToolInUse: React.Dispatch<React.SetStateAction<string>>,
+  selectedTools: Tables<"tools">[],
+  supportsStreaming = false,
+  setResponseTimeToFirstToken?: React.Dispatch<React.SetStateAction<number>>,
+  setResponseTimeTotal?: React.Dispatch<React.SetStateAction<number>>,
+  setResponseTokensTotal?: React.Dispatch<React.SetStateAction<number>>,
+  setRequestTokensTotal?: React.Dispatch<React.SetStateAction<number>>
+) => {
+  // setToolInUse("plugins")
+
+  const startTime = Date.now()
+
+  const { finalMessages: formattedMessages, usedTokens } =
+    await buildFinalMessages(payload, profile!, chatImages)
+
+  setRequestTokensTotal?.(usedTokens)
+
+  const response = await fetchChatResponse(
+    supportsStreaming ? "/api/chat/tools-stream" : "/api/chat/tools",
+    {
+      chatSettings: payload.chatSettings,
+      messages: formattedMessages,
+      selectedTools
+    },
+    true,
+    newAbortController,
+    setIsGenerating,
+    setChatMessages
+  )
+
+  setToolInUse("none")
+  return await processResponse(
+    response,
+    isRegeneration
+      ? payload.chatMessages[payload.chatMessages.length - 1]
+      : tempAssistantChatMessage,
+    true,
+    newAbortController,
+    setFirstTokenReceived,
+    setChatMessages,
+    setToolInUse,
+    selectedTools,
+    setResponseTimeToFirstToken,
+    setResponseTimeTotal,
+    setResponseTokensTotal,
+    startTime
+  )
+}
+
 export const handleHostedChat = async (
   payload: ChatPayload,
   profile: Tables<"profiles">,
@@ -225,7 +285,11 @@ export const handleHostedChat = async (
   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setToolInUse: React.Dispatch<React.SetStateAction<string>>
+  setToolInUse: React.Dispatch<React.SetStateAction<string>>,
+  setResponseTimeToFirstToken?: React.Dispatch<React.SetStateAction<number>>,
+  setResponseTimeTotal?: React.Dispatch<React.SetStateAction<number>>,
+  setResponseTokensTotal?: React.Dispatch<React.SetStateAction<number>>,
+  setRequestTokensTotal?: React.Dispatch<React.SetStateAction<number>>
 ) => {
   const provider =
     modelData.provider === "openai" && profile.use_azure_openai
@@ -233,21 +297,17 @@ export const handleHostedChat = async (
       : modelData.provider
 
   let formattedMessages = []
+  let usedTokens = 0
 
   if (provider === "google") {
-    formattedMessages = await buildGoogleGeminiFinalMessages(
-      payload,
-      profile,
-      newMessageImages
-    )
+    ;({ finalMessages: formattedMessages, usedTokens } =
+      await buildGoogleGeminiFinalMessages(payload, profile, newMessageImages))
   } else if (provider === "anthropic") {
-    formattedMessages = await buildClaudeFinalMessages(
-      payload,
-      profile,
-      chatImages
-    )
+    ;({ finalMessages: formattedMessages, usedTokens } =
+      await buildClaudeFinalMessages(payload, profile, chatImages))
   } else {
-    formattedMessages = await buildFinalMessages(payload, profile, chatImages)
+    ;({ finalMessages: formattedMessages, usedTokens } =
+      await buildFinalMessages(payload, profile, chatImages))
   }
 
   const apiEndpoint =
@@ -258,6 +318,10 @@ export const handleHostedChat = async (
     messages: formattedMessages,
     customModelId: provider === "custom" ? modelData.hostedId : ""
   }
+
+  setRequestTokensTotal?.(usedTokens)
+
+  const startTime = Date.now()
 
   const response = await fetchChatResponse(
     apiEndpoint,
@@ -277,7 +341,12 @@ export const handleHostedChat = async (
     newAbortController,
     setFirstTokenReceived,
     setChatMessages,
-    setToolInUse
+    setToolInUse,
+    [],
+    setResponseTimeToFirstToken,
+    setResponseTimeTotal,
+    setResponseTokensTotal,
+    startTime
   )
 }
 
@@ -321,7 +390,11 @@ export const processResponse = async (
   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setToolInUse: React.Dispatch<React.SetStateAction<string>>,
-  selectedTools: Tables<"tools">[] = []
+  selectedTools: Tables<"tools">[] = [],
+  setResponseTimeToFirstToken?: React.Dispatch<React.SetStateAction<number>>,
+  setResponseTimeTotal?: React.Dispatch<React.SetStateAction<number>>,
+  setResponseTokensTotal?: React.Dispatch<React.SetStateAction<number>>,
+  startTime = Date.now()
 ) => {
   let fullText = ""
   let contentToAdd = ""
@@ -333,6 +406,12 @@ export const processResponse = async (
     await consumeReadableStream(
       response.body,
       chunk => {
+        setResponseTimeToFirstToken?.(prev => {
+          if (prev === 0) {
+            return (Date.now() - startTime) / 1000
+          }
+          return prev
+        })
         setFirstTokenReceived(true)
         setToolInUse("none")
 
@@ -381,6 +460,9 @@ export const processResponse = async (
         } catch (error) {
           console.error("Error parsing JSON:", error)
         }
+
+        setResponseTimeTotal?.(prev => (Date.now() - startTime) / 1000)
+        setResponseTokensTotal?.(prev => prev + encode(contentToAdd).length)
 
         setChatMessages(prev =>
           prev.map(chatMessage => {

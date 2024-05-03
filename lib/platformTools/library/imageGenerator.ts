@@ -13,7 +13,7 @@ const imageGenerator = async (
         prompt: string
         format: ImageFormat
       }
-): Promise<ImageGeneratorResult> => {
+): Promise<Omit<ImageGeneratorResult, "responseTime">> => {
   if ("parameters" in params) {
     params = params.parameters
   }

@@ -17,13 +17,17 @@ const KNOWN_MODEL_NAMES: {
     modelProvider: "cohere",
     modelName: "Command R Plus"
   },
-  "mistralai/mixtral-8x22b": {
+  "mistralai/mixtral-8x22b-instruct": {
     modelProvider: "mistral",
     modelName: "Mixtral 8x22B"
   },
   "meta-llama/llama-3-70b-instruct": {
     modelProvider: "meta",
     modelName: "Meta Llama 3 70B"
+  },
+  "microsoft/wizardlm-2-8x22b": {
+    modelProvider: "microsoft",
+    modelName: "WizardLM 2 8x22B"
   }
 }
 
@@ -47,7 +51,8 @@ function parseSupportedModelsFromEnv() {
   let SUPPORTED_OPENROUTER_MODELS = [
     "databricks/dbrx-instruct",
     "cohere/command-r-plus",
-    "mistralai/mixtral-8x22b",
+    "mistralai/mixtral-8x22b-instruct",
+    "microsoft/wizardlm-2-8x22b",
     "meta-llama/llama-3-70b-instruct"
   ]
 
@@ -162,14 +167,25 @@ export const fetchOpenRouterModels = async () => {
           id: string
           name: string
           context_length: number
+          pricing: {
+            completion: string
+            image: string
+            prompt: string
+          }
         }): OpenRouterLLM => ({
           modelId: model.id as LLMID,
-          modelName: model.id,
+          modelName: model.name,
           provider: "openrouter",
-          hostedId: model.name,
+          hostedId: model.id,
           platformLink: "https://openrouter.dev",
           imageInput: false,
-          maxContext: model.context_length
+          maxContext: model.context_length,
+          pricing: {
+            currency: "USD",
+            inputCost: parseFloat(model.pricing.prompt) * 1000000,
+            outputCost: parseFloat(model.pricing.completion) * 1000000,
+            unit: "1M tokens"
+          }
         })
       )
       .filter(({ modelId }: { modelId: string }) =>
