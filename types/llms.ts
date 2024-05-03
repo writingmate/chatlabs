@@ -70,6 +70,7 @@ export interface LLM {
   imageInput: boolean
   paid?: boolean
   tools?: boolean
+  supportsStreaming?: boolean
   pricing?: {
     currency: string
     unit: string
