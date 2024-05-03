@@ -231,7 +231,8 @@ export const useChatHandler = () => {
           provider: "custom" as ModelProvider,
           hostedId: model.id,
           platformLink: "",
-          imageInput: false
+          imageInput: false,
+          supportsStreaming: false
         })),
         ...LLM_LIST,
         ...availableLocalModels,
@@ -307,6 +308,7 @@ export const useChatHandler = () => {
           setChatMessages,
           setToolInUse,
           selectedTools,
+          modelData!.supportsStreaming,
           setResponseTimeToFirstToken,
           setResponseTimeTotal,
           setResponseTokensTotal,

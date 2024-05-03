@@ -162,23 +162,6 @@ export const useChatHandler = () => {
           | "openai"
           | "local"
       })
-    } else if (selectedWorkspace) {
-      // setChatSettings({
-      //   model: (selectedWorkspace.default_model ||
-      //     "gpt-4-1106-preview") as LLMID,
-      //   prompt:
-      //     selectedWorkspace.default_prompt ||
-      //     "You are a friendly, helpful AI assistant.",
-      //   temperature: selectedWorkspace.default_temperature || 0.5,
-      //   contextLength: selectedWorkspace.default_context_length || 4096,
-      //   includeProfileContext:
-      //     selectedWorkspace.include_profile_context || true,
-      //   includeWorkspaceInstructions:
-      //     selectedWorkspace.include_workspace_instructions || true,
-      //   embeddingsProvider:
-      //     (selectedWorkspace.embeddings_provider as "openai" | "local") ||
-      //     "openai"
-      // })
     }
 
     return router.push(`/${selectedWorkspace.id}/chat`)
@@ -221,7 +204,8 @@ export const useChatHandler = () => {
           provider: "custom" as ModelProvider,
           hostedId: model.id,
           platformLink: "",
-          imageInput: false
+          imageInput: false,
+          supportsStreaming: false
         })),
         ...LLM_LIST,
         ...availableLocalModels,
@@ -296,7 +280,8 @@ export const useChatHandler = () => {
           setFirstTokenReceived,
           setChatMessages,
           setToolInUse,
-          selectedTools
+          selectedTools,
+          modelData!.supportsStreaming
         ))
       } else {
         if (modelData!.provider === "ollama") {

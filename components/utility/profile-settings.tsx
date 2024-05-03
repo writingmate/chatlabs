@@ -49,6 +49,7 @@ import {
 import { PLAN_FREE } from "@/lib/stripe/config"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface ProfileSettingsProps {}
 
@@ -337,19 +338,12 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        {profile.image_url ? (
-          <Image
-            className="mt-2 size-[34px] cursor-pointer rounded hover:opacity-50"
-            src={profile.image_url}
-            height={34}
-            width={34}
-            alt={profile.display_name || "Profile image"}
-          />
-        ) : (
-          <Button size="icon" variant="ghost">
+        <Avatar>
+          <AvatarImage src={profile.image_url!} height={34} width={34} />
+          <AvatarFallback>
             <IconUser size={SIDEBAR_ICON_SIZE} />
-          </Button>
-        )}
+          </AvatarFallback>
+        </Avatar>
       </SheetTrigger>
 
       <SheetContent

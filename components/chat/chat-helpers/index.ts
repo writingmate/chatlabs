@@ -226,6 +226,7 @@ export const handleToolsChat = async (
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setToolInUse: React.Dispatch<React.SetStateAction<string>>,
   selectedTools: Tables<"tools">[],
+  supportsStreaming = false,
   setResponseTimeToFirstToken?: React.Dispatch<React.SetStateAction<number>>,
   setResponseTimeTotal?: React.Dispatch<React.SetStateAction<number>>,
   setResponseTokensTotal?: React.Dispatch<React.SetStateAction<number>>,
@@ -241,7 +242,7 @@ export const handleToolsChat = async (
   setRequestTokensTotal?.(usedTokens)
 
   const response = await fetchChatResponse(
-    "/api/chat/tools",
+    supportsStreaming ? "/api/chat/tools-stream" : "/api/chat/tools",
     {
       chatSettings: payload.chatSettings,
       messages: formattedMessages,

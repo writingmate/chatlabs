@@ -14,6 +14,7 @@ const GPT4TurboPreview: LLM = {
   imageInput: false,
   paid: true,
   tools: true,
+  supportsStreaming: true,
   pricing: {
     currency: "USD",
     unit: "1M tokens",
@@ -31,6 +32,7 @@ const GPT4Turbo: LLM = {
   imageInput: true,
   paid: true,
   tools: true,
+  supportsStreaming: true,
   pricing: {
     currency: "USD",
     unit: "1M tokens",
@@ -49,6 +51,7 @@ const GPT4Vision: LLM = {
   imageInput: true,
   paid: true,
   tools: false,
+  supportsStreaming: true,
   pricing: {
     currency: "USD",
     unit: "1M tokens",
@@ -66,6 +69,7 @@ const GPT4: LLM = {
   imageInput: false,
   paid: true,
   tools: true,
+  supportsStreaming: true,
   pricing: {
     currency: "USD",
     unit: "1M tokens",
@@ -83,6 +87,7 @@ const GPT3_5Turbo: LLM = {
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: false,
   tools: true,
+  supportsStreaming: true,
   pricing: {
     currency: "USD",
     unit: "1M tokens",
