@@ -89,16 +89,21 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           onContentTypeChange={onContentTypeChange}
         />
 
-        <Button
-          className="mx-auto hover:opacity-50"
-          variant="ghost"
-          size="icon"
-          onClick={e => {
-            window.open("./splitview", "_blank")
-          }}
-        >
-          <IconLayoutColumns size={SIDEBAR_ICON_SIZE} stroke={1.5} />
-        </Button>
+        <WithTooltip
+          display={"Split Screen"}
+          trigger={
+            <Button
+              className="mx-auto hover:opacity-50"
+              variant="ghost"
+              size="icon"
+              onClick={e => {
+                window.open("./splitview", "_blank")
+              }}
+            >
+              <IconLayoutColumns size={SIDEBAR_ICON_SIZE} stroke={1.5} />
+            </Button>
+          }
+        />
       </TabsList>
 
       <div className="flex flex-col items-center space-y-4">
