@@ -18,6 +18,10 @@ import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 import { ChatScrollButtons } from "./chat-scroll-buttons"
 import { ChatSecondaryButtons } from "./chat-secondary-buttons"
+import { QuickSettings } from "@/components/chat/quick-settings"
+import { ChatSettings } from "@/components/chat/chat-settings"
+import { Brand } from "@/components/ui/brand"
+import { useTheme } from "next-themes"
 
 interface ChatUIProps {}
 
@@ -58,7 +62,13 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
   const [loading, setLoading] = useState(true)
 
+  const { theme } = useTheme()
+
   useEffect(() => {
+    if (!params.chatid) {
+      setLoading(false)
+      return
+    }
     const fetchData = async () => {
       await Promise.all([fetchMessages(), fetchChat()])
 
@@ -74,7 +84,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     } else {
       setLoading(false)
     }
-  }, [])
+  }, [params])
 
   const fetchMessages = async () => {
     const fetchedMessages = await getMessagesByChatId(params.chatid as string)
@@ -188,42 +198,37 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
   return (
     <div className="relative flex h-full flex-col items-center">
-      <div className="absolute left-4 top-2.5 flex justify-center">
-        {/*<ChatScrollButtons*/}
-        {/*  isAtTop={isAtTop}*/}
-        {/*  isAtBottom={isAtBottom}*/}
-        {/*  isOverflowing={isOverflowing}*/}
-        {/*  scrollToTop={scrollToTop}*/}
-        {/*  scrollToBottom={scrollToBottom}*/}
-        {/*/>*/}
+      <div className="sticky top-0 flex w-full justify-between p-2">
+        <QuickSettings />
+        <ChatSettings />
       </div>
 
-      <div className="absolute right-4 top-1 flex h-[40px] items-center space-x-2">
-        <ChatSecondaryButtons />
-      </div>
+      {chatMessages.length == 0 ? (
+        <>
+          <div className="absolute left-1/2 top-1/2 mb-20 -translate-x-1/2 -translate-y-1/2">
+            <Brand theme={theme === "dark" ? "dark" : "light"} />
+          </div>
 
-      <div className="bg-secondary flex max-h-[50px] min-h-[50px] w-full items-center justify-center border-b px-20 font-bold">
-        <div className="max-w-[300px] truncate sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[700px]">
-          {selectedChat?.name || "Chat"}
-        </div>
-      </div>
-
-      <div
-        className="flex size-full flex-col overflow-auto pt-4"
-        onScroll={handleScroll}
-      >
-        <div ref={messagesStartRef} />
-
+          <div className="flex grow flex-col items-center justify-center" />
+        </>
+      ) : (
         <div
-          className={
-            "mx-auto w-[300px] sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]"
-          }
+          className="flex size-full flex-col overflow-auto pt-4"
+          onScroll={handleScroll}
         >
-          <ChatMessages />
-        </div>
+          <div ref={messagesStartRef} />
 
-        <div ref={messagesEndRef} />
-      </div>
+          <div
+            className={
+              "mx-auto w-[300px] sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]"
+            }
+          >
+            <ChatMessages />
+          </div>
+
+          <div ref={messagesEndRef} />
+        </div>
+      )}
 
       <div className="relative w-full items-end px-4 pb-8 md:w-[500px] lg:w-[660px] xl:w-[800px]">
         <ChatInput />
