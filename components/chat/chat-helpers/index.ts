@@ -241,7 +241,7 @@ export const handleToolsChat = async (
   setRequestTokensTotal?.(usedTokens)
 
   const response = await fetchChatResponse(
-    "/api/chat/tools",
+    "/api/chat/tools-stream",
     {
       chatSettings: payload.chatSettings,
       messages: formattedMessages,
