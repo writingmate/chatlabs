@@ -22,6 +22,8 @@ import { QuickSettings } from "@/components/chat/quick-settings"
 import { ChatSettings } from "@/components/chat/chat-settings"
 import { Brand } from "@/components/ui/brand"
 import { useTheme } from "next-themes"
+import { IconMessagePlus } from "@tabler/icons-react"
+import { WithTooltip } from "@/components/ui/with-tooltip"
 
 interface ChatUIProps {}
 
@@ -43,7 +45,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setChatFiles,
     setShowFilesDisplay,
     setUseRetrieval,
-    setSelectedTools
+    setSelectedTools,
+    showSidebar
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -199,7 +202,23 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   return (
     <div className="relative flex h-full flex-col items-center">
       <div className="sticky top-0 flex w-full justify-between p-2">
-        <QuickSettings />
+        <div className="flex items-center">
+          {!showSidebar && (
+            <WithTooltip
+              delayDuration={200}
+              display={<div>Start a new chat</div>}
+              trigger={
+                <IconMessagePlus
+                  className="ml-2 cursor-pointer hover:opacity-50"
+                  size={24}
+                  stroke={1.5}
+                  onClick={handleNewChat}
+                />
+              }
+            />
+          )}
+          <QuickSettings />
+        </div>
         <ChatSettings />
       </div>
 
