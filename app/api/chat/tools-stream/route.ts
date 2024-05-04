@@ -90,7 +90,8 @@ export async function POST(request: Request) {
     const response = await client.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages,
-      tools: allTools.length > 0 ? allTools : undefined,
+      tools: allTools,
+      tool_choice: "auto",
       stream: true
     })
 

@@ -220,7 +220,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
           <div
             className={
-              "mx-auto w-[300px] sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]"
+              "mx-auto w-[300px] pb-8 sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]"
             }
           >
             <ChatMessages />
