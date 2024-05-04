@@ -272,14 +272,14 @@ export const Message: FC<MessageProps> = ({
   return (
     <div
       className={cn(
-        "group flex w-full justify-center py-3",
+        "group flex w-full justify-center",
         // message.role === "user" ? "" : "bg-secondary",
         "role-" + message.role,
         isLast ? "is-last" : ""
       )}
       onKeyDown={handleKeyDown}
     >
-      <div className="relative flex w-full flex-col px-4 py-6 md:w-[500px] md:px-0 lg:w-[600px] xl:w-[700px]">
+      <div className="relative flex w-full flex-col p-4 md:w-[500px] md:px-0 lg:w-[600px] xl:w-[700px]">
         <div className="space-y-3">
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
@@ -468,34 +468,38 @@ export const Message: FC<MessageProps> = ({
           </div>
         )}
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          {message.image_paths.map((path, index) => {
-            const item = chatImages.find(image => image.path === path)
+        {message.image_paths.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {message.image_paths.map((path, index) => {
+              const item = chatImages.find(image => image.path === path)
 
-            return (
-              <Image
-                key={index}
-                className="cursor-pointer rounded hover:opacity-50"
-                src={path.startsWith("data") ? path : item?.base64}
-                alt="message image"
-                width={300}
-                height={300}
-                onClick={() => {
-                  setSelectedImage({
-                    messageId: message.id,
-                    path,
-                    base64: path.startsWith("data") ? path : item?.base64 || "",
-                    url: path.startsWith("data") ? "" : item?.url || "",
-                    file: null
-                  })
+              return (
+                <Image
+                  key={index}
+                  className="cursor-pointer rounded hover:opacity-50"
+                  src={path.startsWith("data") ? path : item?.base64}
+                  alt="message image"
+                  width={300}
+                  height={300}
+                  onClick={() => {
+                    setSelectedImage({
+                      messageId: message.id,
+                      path,
+                      base64: path.startsWith("data")
+                        ? path
+                        : item?.base64 || "",
+                      url: path.startsWith("data") ? "" : item?.url || "",
+                      file: null
+                    })
 
-                  setShowImagePreview(true)
-                }}
-                loading="lazy"
-              />
-            )
-          })}
-        </div>
+                    setShowImagePreview(true)
+                  }}
+                  loading="lazy"
+                />
+              )
+            })}
+          </div>
+        )}
         {isEditing && (
           <div className="mt-4 flex justify-center space-x-2">
             <Button size="sm" onClick={handleSendEdit}>
