@@ -137,7 +137,10 @@ export async function POST(request: Request) {
       for (const toolCall of toolCalls) {
         const functionCallStartTime = new Date().getTime()
         // Reroute to local executor for local tools
-        const data = await executeTool(schemaDetails, toolCall.function as any)
+        const { result: data } = await executeTool(
+          schemaDetails,
+          toolCall.function as any
+        )
 
         streamData.appendMessageAnnotation({
           [`${toolCall.function.name}`]: {

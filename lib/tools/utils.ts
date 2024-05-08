@@ -1,5 +1,5 @@
 import { FunctionCallPayload } from "ai"
-import { platformToolFunction } from "@/lib/platformTools/utils/platformToolsUtils"
+import { platformToolFunctionSpec } from "@/lib/platformTools/utils/platformToolsUtils"
 import { Tables } from "@/supabase/types"
 import OpenAI from "openai"
 import { openapiToFunctions } from "@/lib/openapi-conversion"
@@ -42,6 +42,7 @@ export async function executeTool(
   functionCall: FunctionCallPayload
 ) {
   const functionName = functionCall.name
+  const resultProcessingMode = "send_to_llm"
 
   let parsedArgs = functionCall.arguments as any
   if (typeof functionCall.arguments === "string") {
@@ -59,12 +60,15 @@ export async function executeTool(
 
   // Reroute to local executor for local tools
   if (schemaDetail.url === "local://executor") {
-    const toolFunction = platformToolFunction(functionName)
-    if (!toolFunction) {
+    const toolFunctionSpec = platformToolFunctionSpec(functionName)
+    if (!toolFunctionSpec) {
       throw new Error(`Function ${functionName} not found`)
     }
 
-    return toolFunction(parsedArgs)
+    return {
+      result: await toolFunctionSpec.toolFunction(parsedArgs),
+      resultProcessingMode: toolFunctionSpec.resultProcessingMode
+    }
   }
 
   const pathTemplate = Object.keys(schemaDetail.routeMap).find(
@@ -154,15 +158,13 @@ export async function executeTool(
 
     if (!response.ok) {
       console.error("Error:", response.statusText, response.status)
-      data = {
-        error: response.statusText
-      }
+      throw new Error(`Error: ${response.statusText}`)
     } else {
       data = await response.json()
     }
   }
 
-  return data
+  return { result: data, resultProcessingMode }
 }
 
 export async function buildSchemaDetails(selectedTools: Tables<"tools">[]) {
