@@ -261,12 +261,7 @@ export const ChatUI: FC<ChatUIProps> = () => {
         )}
       >
         {range(chatsSize).map(i => (
-          <div
-            key={i}
-            className={
-              "flex size-full rounded-xl border sm:w-[200px] md:w-[250px] lg:w-[400px] xl:w-[640px]"
-            }
-          >
+          <div key={i} className={"flex grow rounded-xl border"}>
             <ChatbotUIChatProvider id={i.toString()}>
               <ChatWrapper
                 ref={(ref: ChatMessagesRef) => {
