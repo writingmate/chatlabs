@@ -12,9 +12,13 @@ import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatSettingsProps {
   className?: string
+  detailsLocation?: "left" | "right"
 }
 
-export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
+export const ChatSettings: FC<ChatSettingsProps> = ({
+  className,
+  detailsLocation
+}) => {
   useHotkey("i", () => handleClick())
 
   const { chatSettings, setChatSettings } = useContext(ChatbotUIChatContext)
@@ -72,6 +76,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
           // showModelSettings={false}
           selectedModelId={chatSettings.model}
           onSelectModel={handleSelectModel}
+          detailsLocation={detailsLocation}
         />
       </div>
     </div>

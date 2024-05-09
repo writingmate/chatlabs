@@ -31,6 +31,7 @@ import ReactMarkdown from "react-markdown"
 
 interface ModelSelectProps {
   selectedModelId: string
+  detailsLocation?: "left" | "right"
   onSelectModel: (modelId: LLMID) => void
   showModelSettings?: boolean
 }
@@ -136,6 +137,7 @@ function ModelDetails({ model }: { model: LLM }) {
 export const ModelSelectChat: FC<ModelSelectProps> = ({
   selectedModelId,
   onSelectModel,
+  detailsLocation = "left",
   showModelSettings = true
 }) => {
   const {
@@ -271,9 +273,10 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="mx-2 flex items-start justify-between overflow-visible border-0 bg-transparent p-0 shadow-none"
-        // style={{ width: triggerRef.current?.offsetWidth }}
-        // align="start"
+        className={cn(
+          "mx-2 flex items-start justify-between overflow-visible border-0 bg-transparent p-0 shadow-none",
+          detailsLocation === "left" ? "flex-row" : "flex-row-reverse"
+        )}
       >
         <DropdownMenuSubContent
           className={
@@ -282,7 +285,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
         >
           <ModelDetails model={hoveredModel || filteredModels[0]} />
         </DropdownMenuSubContent>
-        <DropdownMenuSubContent className="relative flex w-[340px] flex-col space-y-2 overflow-auto p-2">
+        <DropdownMenuSubContent className="relative mr-2 flex w-[340px] flex-col space-y-2 overflow-auto p-2">
           {availableLocalModels.length > 0 && (
             <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
               <TabsList defaultValue="hosted" className="grid grid-cols-2">
