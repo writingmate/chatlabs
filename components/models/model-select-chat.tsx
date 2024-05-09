@@ -1,6 +1,11 @@
 import { ChatbotUIContext } from "@/context/context"
 import { LLM, LLMID, ModelProvider } from "@/types"
-import { IconCheck, IconChevronDown, IconSquarePlus } from "@tabler/icons-react"
+import {
+  IconCheck,
+  IconChevronDown,
+  IconSquarePlus,
+  IconX
+} from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,16 +25,119 @@ import {
   ModelSettings
 } from "@/components/models/model-settings"
 import { validatePlanForModel } from "@/lib/subscription"
+import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
+import { cn } from "@/lib/utils"
+import ReactMarkdown from "react-markdown"
 
 interface ModelSelectProps {
   selectedModelId: string
+  detailsLocation?: "left" | "right"
   onSelectModel: (modelId: LLMID) => void
   showModelSettings?: boolean
+}
+
+function DropdownMenuSubContent({
+  className,
+  children
+}: {
+  className: string
+  children: React.ReactNode
+}) {
+  return (
+    <div
+      className={cn(
+        "bg-popover text-popover-foreground z-50 min-w-[8rem] overflow-y-auto rounded-md border shadow-md",
+        className
+      )}
+    >
+      {children}
+    </div>
+  )
+}
+
+function ModelDetails({ model }: { model: LLM }) {
+  let contextLength =
+    CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH || 0
+
+  if ("maxContext" in model) {
+    contextLength = model.maxContext as number
+  }
+
+  const formattedContextLength = contextLength.toLocaleString()
+  const inputCost = model.pricing?.inputCost?.toLocaleString()
+  const outputCost = model.pricing?.outputCost?.toLocaleString()
+
+  function Row({
+    label,
+    value
+  }: {
+    label: string
+    value: string | JSX.Element
+  }) {
+    return (
+      <div className={"flex grow"}>
+        <div className={"w-2/5 py-2 font-semibold"}>{label}</div>
+        <div className={"py-2"}>{value}</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex w-[320px] flex-col">
+      <div className={"flex items-center space-x-2"}>
+        <ModelIcon
+          provider={model?.provider}
+          modelId={model?.modelId}
+          width={26}
+          height={26}
+        />
+        <span className={"capitalize"}>{model.provider}</span>
+        <span>/</span>
+        <span className={"font-semibold"}>{model.modelName}</span>
+      </div>
+      <div className="grid grid-cols-1 divide-y pt-4 text-xs">
+        <Row label={"Context"} value={formattedContextLength + " tokens"} />
+        {model.pricing && (
+          <>
+            <Row
+              label={"Input pricing"}
+              value={"$" + inputCost + " / million tokens"}
+            />
+            <Row
+              label={"Output pricing"}
+              value={"$" + outputCost + " / million tokens"}
+            />
+          </>
+        )}
+        <Row
+          label={"Supports plugins"}
+          value={
+            model.tools ? (
+              <IconCheck size={18} stroke={1.5} />
+            ) : (
+              <IconX size={18} stroke={1.5} />
+            )
+          }
+        />
+        <Row
+          label={"Supports vision"}
+          value={
+            model.imageInput ? (
+              <IconCheck size={18} stroke={1.5} />
+            ) : (
+              <IconX size={18} stroke={1.5} />
+            )
+          }
+        />
+      </div>
+    </div>
+  )
 }
 
 export const ModelSelectChat: FC<ModelSelectProps> = ({
   selectedModelId,
   onSelectModel,
+  detailsLocation = "left",
   showModelSettings = true
 }) => {
   const {
@@ -50,6 +158,8 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   const [mostRecentModels, setMostRecentModels] = useState<
     Tables<"recent_models">[]
   >([])
+
+  const [hoveredModel, setHoveredModel] = useState<LLM | null>(null)
 
   useEffect(() => {
     if (isOpen) {
@@ -163,77 +273,89 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="w-[300px] space-y-2 overflow-auto p-2 sm:w-[350px] md:w-[400px] lg:w-[500px]"
-        // style={{ width: triggerRef.current?.offsetWidth }}
-        align="start"
+        className={cn(
+          "mx-2 flex items-start justify-between overflow-visible border-0 bg-transparent p-0 shadow-none",
+          detailsLocation === "left" ? "flex-row" : "flex-row-reverse"
+        )}
       >
-        <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
+        <DropdownMenuSubContent
+          className={
+            "relative mr-2 hidden h-auto flex-col justify-between border-r p-4 lg:flex"
+          }
+        >
+          <ModelDetails model={hoveredModel || filteredModels[0]} />
+        </DropdownMenuSubContent>
+        <DropdownMenuSubContent className="relative mr-2 flex w-[340px] flex-col space-y-2 overflow-auto p-2">
           {availableLocalModels.length > 0 && (
-            <TabsList defaultValue="hosted" className="grid grid-cols-2">
-              <TabsTrigger value="hosted">Hosted</TabsTrigger>
-              <TabsTrigger value="local">Local</TabsTrigger>
-            </TabsList>
+            <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
+              <TabsList defaultValue="hosted" className="grid grid-cols-2">
+                <TabsTrigger value="hosted">Hosted</TabsTrigger>
+                <TabsTrigger value="local">Local</TabsTrigger>
+              </TabsList>
+            </Tabs>
           )}
-        </Tabs>
 
-        <Input
-          ref={inputRef}
-          className="w-full"
-          placeholder="Search models..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+          <Input
+            ref={inputRef}
+            className="w-full"
+            placeholder="Search models..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
 
-        <div className="max-h-[300px] overflow-auto">
-          {!search && mostRecentModels.length > 0 && (
-            <div>
-              {mostRecentModels.map(recentModel => {
-                const model = allModels.find(
-                  model => model.modelId === recentModel.model
-                )
-                if (!model) return null
+          <div className="max-h-[300px] overflow-auto">
+            {!search && mostRecentModels.length > 0 && (
+              <div>
+                {mostRecentModels.map(recentModel => {
+                  const model = allModels.find(
+                    model => model.modelId === recentModel.model
+                  )
+                  if (!model) return null
+                  return (
+                    <div
+                      onMouseEnter={() => setHoveredModel(model)}
+                      key={model.modelId}
+                      className="flex items-center space-x-1"
+                    >
+                      <ModelOption
+                        recent={true}
+                        key={model.modelId}
+                        model={model}
+                        selected={false}
+                        onSelect={() => handleSelectModel(model.modelId)}
+                      />
+                    </div>
+                  )
+                })}
+                <Separator className={"opacity-75"} />
+              </div>
+            )}
+            <div className="mb-1">
+              {filteredModels.map(model => {
                 return (
                   <div
                     key={model.modelId}
                     className="flex items-center space-x-1"
+                    onMouseEnter={() => setHoveredModel(model)}
                   >
                     <ModelOption
-                      recent={true}
                       key={model.modelId}
                       model={model}
-                      selected={false}
+                      selected={selectedModelId === model.modelId}
                       onSelect={() => handleSelectModel(model.modelId)}
                     />
                   </div>
                 )
               })}
-              <Separator className={"opacity-75"} />
             </div>
-          )}
-          <div className="mb-4">
-            {filteredModels.map(model => {
-              return (
-                <div
-                  key={model.modelId}
-                  className="flex items-center space-x-1"
-                >
-                  <ModelOption
-                    key={model.modelId}
-                    model={model}
-                    selected={selectedModelId === model.modelId}
-                    onSelect={() => handleSelectModel(model.modelId)}
-                  />
-                </div>
-              )
-            })}
           </div>
-        </div>
-        {showModelSettings && (
-          <>
-            <Separator className={"opacity-75"} />
-            <ModelSettings models={allModels} />
-          </>
-        )}
+          {showModelSettings && (
+            <>
+              <Separator className={"opacity-75"} />
+              <ModelSettings models={allModels} />
+            </>
+          )}
+        </DropdownMenuSubContent>
       </DropdownMenuContent>
     </DropdownMenu>
   )

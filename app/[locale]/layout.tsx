@@ -65,7 +65,10 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#FFFFFF"
+  themeColor: "#FFFFFF",
+  width: "device-width",
+  initialScale: 1,
+  interactiveWidget: "resizes-content"
 }
 
 const i18nNamespaces = ["translation"]

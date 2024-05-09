@@ -102,32 +102,44 @@ export async function POST(request: Request) {
         toolCallPayload,
         appendToolCallMessage
       ) => {
-        for (const toolCall of toolCallPayload.tools) {
-          const functionResponse = await executeTool(
-            schemaDetails,
-            toolCall.func
-          )
+        try {
+          for (const toolCall of toolCallPayload.tools) {
+            let functionResponse, resultProcessingMode
 
-          const newMessages = appendToolCallMessage({
-            tool_call_id: toolCall.id,
-            tool_call_result: functionResponse,
-            function_name: toolCall.func.name
-          })
-
-          streamData.appendMessageAnnotation({
-            [`${toolCall.func.name}`]: {
-              ...functionResponse,
-              requestTime: new Date().getTime() - functionCallStartTime
+            try {
+              ;({ result: functionResponse, resultProcessingMode } =
+                await executeTool(schemaDetails, toolCall.func))
+            } catch (error: any) {
+              functionResponse = error.message
             }
-          })
 
-          return client.chat.completions.create({
-            model:
-              chatSettings.model as ChatCompletionCreateParamsBase["model"],
-            messages: [...messages, ...newMessages],
-            tools: allTools,
-            stream: true
-          })
+            if (resultProcessingMode === "render_markdown") {
+              return functionResponse
+            }
+
+            const newMessages = appendToolCallMessage({
+              tool_call_id: toolCall.id,
+              tool_call_result: functionResponse,
+              function_name: toolCall.func.name
+            })
+
+            streamData.appendMessageAnnotation({
+              [`${toolCall.func.name}`]: {
+                ...functionResponse,
+                requestTime: new Date().getTime() - functionCallStartTime
+              }
+            })
+
+            return client.chat.completions.create({
+              model:
+                chatSettings.model as ChatCompletionCreateParamsBase["model"],
+              messages: [...messages, ...newMessages],
+              tools: allTools,
+              stream: true
+            })
+          }
+        } catch (error: any) {
+          return error.message || "An unexpected error occurred"
         }
       },
       experimental_streamData: true,

@@ -10,6 +10,8 @@ const GPT4TurboPreview: LLM = {
   modelName: "GPT-4 Turbo Preview",
   provider: "openai",
   hostedId: "gpt-4-turbo-preview",
+  description:
+    "GPT-4 Turbo Preview is a powerful language model that is designed to generate human-like text.",
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: false,
   paid: true,

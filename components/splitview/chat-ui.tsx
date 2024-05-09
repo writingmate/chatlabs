@@ -141,7 +141,10 @@ const ChatWrapper = forwardRef(
 
     return (
       <div className={"flex w-full flex-col"}>
-        <ChatSettings className="w-auto border-b pr-2 pt-1" />
+        <ChatSettings
+          detailsLocation={"right"}
+          className="w-auto border-b pr-2 pt-1"
+        />
         <div
           className="flex grow flex-col overflow-auto p-4"
           onScroll={handleScroll}
@@ -261,12 +264,7 @@ export const ChatUI: FC<ChatUIProps> = () => {
         )}
       >
         {range(chatsSize).map(i => (
-          <div
-            key={i}
-            className={
-              "flex size-full rounded-xl border sm:w-[200px] md:w-[250px] lg:w-[400px] xl:w-[640px]"
-            }
-          >
+          <div key={i} className={"flex grow rounded-xl border"}>
             <ChatbotUIChatProvider id={i.toString()}>
               <ChatWrapper
                 ref={(ref: ChatMessagesRef) => {

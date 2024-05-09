@@ -331,7 +331,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
             <TextareaAutosize
               textareaRef={chatInputRef}
-              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 pr-[70px] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               placeholder={t(
                 `Ask anything. Type "${profile?.assistant_command}" for assistants, "${profile?.prompt_command}" for prompts, "${profile?.files_command}" for files, and "${profile?.tools_command}" for plugins.`
               )}
