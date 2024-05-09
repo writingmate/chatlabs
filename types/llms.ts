@@ -71,6 +71,7 @@ export interface LLM {
   paid?: boolean
   tools?: boolean
   supportsStreaming?: boolean
+  description?: string
   pricing?: {
     currency: string
     unit: string

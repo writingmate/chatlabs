@@ -124,8 +124,8 @@ function ModelSettings({ models }: { models?: LLM[] }) {
             "hover:bg-accent flex w-full cursor-pointer items-center justify-start space-x-3 truncate rounded p-2 text-sm hover:opacity-50"
           }
         >
-          <IconSettings stroke={1.5} className={"mr-2"} size={24} /> Manage
-          models
+          <IconSettings stroke={1.5} className={"mr-2 opacity-50"} size={24} />{" "}
+          Manage models
         </div>
       </DialogTrigger>
       <DialogContent>
