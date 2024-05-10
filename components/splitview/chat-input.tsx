@@ -210,13 +210,13 @@ export const ChatInput: FC<ChatInputProps> = ({
                 onClick={() => fileInputRef.current?.click()}
               />
               <PromptCatalog onSelect={setUserInput} />
-              {toolsAllowed && (
-                <ToolSelect
-                  className={"px-0"}
-                  selectedTools={selectedTools}
-                  onSelectTools={setSelectedTools}
-                />
-              )}
+              {/*{toolsAllowed && (*/}
+              {/*  <ToolSelect*/}
+              {/*    className={"px-0"}*/}
+              {/*    selectedTools={selectedTools}*/}
+              {/*    onSelectTools={setSelectedTools}*/}
+              {/*  />*/}
+              {/*)}*/}
             </div>
 
             {/* Hidden input to select files from device */}

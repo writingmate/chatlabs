@@ -1,13 +1,23 @@
-import { Annotation } from "@/types/annotation"
+import { Annotation, Annotation2 } from "@/types/annotation"
 import { forwardRef, useRef } from "react"
 import { IconPlayerPlay } from "@tabler/icons-react"
 
 type YouTubeProps = {
-  annotation: Annotation
+  annotation: Annotation | Annotation2
 }
 const YouTube = forwardRef<HTMLAnchorElement, YouTubeProps>(
-  ({ annotation }: { annotation: Annotation }, ref) => {
-    const { videoUrl, imageUrl } = annotation.webScraper__youtubeCaptions!
+  ({ annotation }: { annotation: Annotation | Annotation2 }, ref) => {
+    let result = annotation.webScraper__youtubeCaptions
+
+    if (!result) {
+      return null
+    }
+
+    if ("result" in result) {
+      result = result.result
+    }
+
+    const { videoUrl, imageUrl } = result
 
     return (
       <a

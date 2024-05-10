@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuSubContent2,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
@@ -28,110 +29,13 @@ import { validatePlanForModel } from "@/lib/subscription"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { cn } from "@/lib/utils"
 import ReactMarkdown from "react-markdown"
+import { ModelDetails } from "@/components/models/model-details"
 
 interface ModelSelectProps {
   selectedModelId: string
   detailsLocation?: "left" | "right"
   onSelectModel: (modelId: LLMID) => void
   showModelSettings?: boolean
-}
-
-function DropdownMenuSubContent({
-  className,
-  children
-}: {
-  className: string
-  children: React.ReactNode
-}) {
-  return (
-    <div
-      className={cn(
-        "bg-popover text-popover-foreground z-50 min-w-[8rem] overflow-y-auto rounded-md border shadow-md",
-        className
-      )}
-    >
-      {children}
-    </div>
-  )
-}
-
-function ModelDetails({ model }: { model: LLM }) {
-  let contextLength =
-    CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH || 0
-
-  if ("maxContext" in model) {
-    contextLength = model.maxContext as number
-  }
-
-  const formattedContextLength = contextLength.toLocaleString()
-  const inputCost = model.pricing?.inputCost?.toLocaleString()
-  const outputCost = model.pricing?.outputCost?.toLocaleString()
-
-  function Row({
-    label,
-    value
-  }: {
-    label: string
-    value: string | JSX.Element
-  }) {
-    return (
-      <div className={"flex grow"}>
-        <div className={"w-2/5 py-2 font-semibold"}>{label}</div>
-        <div className={"py-2"}>{value}</div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex w-[320px] flex-col">
-      <div className={"flex items-center space-x-2"}>
-        <ModelIcon
-          provider={model?.provider}
-          modelId={model?.modelId}
-          width={26}
-          height={26}
-        />
-        <span className={"capitalize"}>{model.provider}</span>
-        <span>/</span>
-        <span className={"font-semibold"}>{model.modelName}</span>
-      </div>
-      <div className="grid grid-cols-1 divide-y pt-4 text-xs">
-        <Row label={"Context"} value={formattedContextLength + " tokens"} />
-        {model.pricing && (
-          <>
-            <Row
-              label={"Input pricing"}
-              value={"$" + inputCost + " / million tokens"}
-            />
-            <Row
-              label={"Output pricing"}
-              value={"$" + outputCost + " / million tokens"}
-            />
-          </>
-        )}
-        <Row
-          label={"Supports plugins"}
-          value={
-            model.tools ? (
-              <IconCheck size={18} stroke={1.5} />
-            ) : (
-              <IconX size={18} stroke={1.5} />
-            )
-          }
-        />
-        <Row
-          label={"Supports vision"}
-          value={
-            model.imageInput ? (
-              <IconCheck size={18} stroke={1.5} />
-            ) : (
-              <IconX size={18} stroke={1.5} />
-            )
-          }
-        />
-      </div>
-    </div>
-  )
 }
 
 export const ModelSelectChat: FC<ModelSelectProps> = ({
@@ -278,14 +182,14 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
           detailsLocation === "left" ? "flex-row" : "flex-row-reverse"
         )}
       >
-        <DropdownMenuSubContent
+        <DropdownMenuSubContent2
           className={
             "relative mr-2 hidden h-auto flex-col justify-between border-r p-4 lg:flex"
           }
         >
           <ModelDetails model={hoveredModel || filteredModels[0]} />
-        </DropdownMenuSubContent>
-        <DropdownMenuSubContent className="relative mr-2 flex w-[340px] flex-col space-y-2 overflow-auto p-2">
+        </DropdownMenuSubContent2>
+        <DropdownMenuSubContent2 className="relative mr-2 flex w-[340px] flex-col space-y-2 overflow-auto p-2">
           {availableLocalModels.length > 0 && (
             <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
               <TabsList defaultValue="hosted" className="grid grid-cols-2">
@@ -355,7 +259,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
               <ModelSettings models={allModels} />
             </>
           )}
-        </DropdownMenuSubContent>
+        </DropdownMenuSubContent2>
       </DropdownMenuContent>
     </DropdownMenu>
   )

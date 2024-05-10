@@ -113,6 +113,14 @@ export async function POST(request: Request) {
               functionResponse = error.message
             }
 
+            streamData.appendMessageAnnotation({
+              [`${toolCall.func.name}`]: {
+                result: functionResponse,
+                skipTokenCount: resultProcessingMode === "render_markdown",
+                requestTime: new Date().getTime() - functionCallStartTime
+              }
+            })
+
             if (resultProcessingMode === "render_markdown") {
               return functionResponse
             }
@@ -121,13 +129,6 @@ export async function POST(request: Request) {
               tool_call_id: toolCall.id,
               tool_call_result: functionResponse,
               function_name: toolCall.func.name
-            })
-
-            streamData.appendMessageAnnotation({
-              [`${toolCall.func.name}`]: {
-                ...functionResponse,
-                requestTime: new Date().getTime() - functionCallStartTime
-              }
             })
 
             return client.chat.completions.create({
