@@ -21,7 +21,8 @@ export const ChatSettings: FC<ChatSettingsProps> = ({
 }) => {
   useHotkey("i", () => handleClick())
 
-  const { chatSettings, setChatSettings } = useContext(ChatbotUIChatContext)
+  const { chatSettings, setChatSettings, selectedTools, setSelectedTools } =
+    useContext(ChatbotUIChatContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -79,6 +80,10 @@ export const ChatSettings: FC<ChatSettingsProps> = ({
           detailsLocation={detailsLocation}
         />
       </div>
+      <ToolSelect
+        selectedTools={selectedTools}
+        onSelectTools={setSelectedTools}
+      />
     </div>
   )
 }

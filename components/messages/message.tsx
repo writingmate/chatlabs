@@ -30,7 +30,7 @@ import { MessageMarkdown } from "./message-markdown"
 import { YouTube } from "@/components/messages/annotations/youtube"
 import { WebSearch } from "@/components/messages/annotations/websearch"
 import AnnotationImage from "@/components/messages/annotations/image"
-import { Annotation } from "@/types/annotation"
+import { Annotation, Annotation2 } from "@/types/annotation"
 import { any } from "zod"
 
 const ICON_SIZE = 32
@@ -253,7 +253,7 @@ export const Message: FC<MessageProps> = ({
     }
 
     const annotationMap: {
-      [key: string]: React.FC<{ annotation: Annotation }>
+      [key: string]: React.FC<{ annotation: Annotation | Annotation2 }>
     } = {
       imageGenerator__generateImage: AnnotationImage,
       webScraper__youtubeCaptions: YouTube,

@@ -78,11 +78,12 @@ const imageGenerator = async (
 // This is the definition of the webscrapping tool.
 export const imageGeneratorTool: PlatformTool = {
   id: "b3f07a6e-5e01-423e-1f05-ee51830608be", // This is the unique identifier of the tool.
-  name: "Image Generation", // This is the name of the tool.
+  name: "DALL-E 3", // This is the name of the tool.
   toolName: "imageGenerator", // This is the name of the tool in the code.
   version: "v1.0.0", // This is the version of the tool.
   // This is the description of the tool.
-  description: "This tool allows you to generate images from a prompt.",
+  description:
+    "This tool allows you to generate images from a using OpenAI DALL-E 3 model.",
   toolsFunctions: [
     {
       id: "generateImage", // This is the unique identifier of the tool function.

@@ -90,7 +90,8 @@ async function generateImageFromStabilityAPI(
     (output_format || "png") +
     ";base64," +
     data.image +
-    ")"
+    ") \n\n" +
+    prompt
   )
 }
 

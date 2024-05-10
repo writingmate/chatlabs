@@ -30,8 +30,9 @@ export interface PlatformTool {
   toolsFunctions: ToolFunction[]
 }
 
-interface ToolResultBase {
+export interface ToolResultBase {
   responseTime: string
+  skipTokenCount?: boolean
 }
 
 export interface ToolsCallResult extends ToolResultBase {

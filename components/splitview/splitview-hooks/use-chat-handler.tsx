@@ -37,7 +37,7 @@ export const useChatHandler = () => {
     profile,
     selectedWorkspace,
     setChats,
-    setSelectedTools,
+    // setSelectedTools,
     availableLocalModels,
     availableOpenRouterModels,
     newMessageImages,
@@ -53,7 +53,7 @@ export const useChatHandler = () => {
     sourceCount,
     setIsPromptPickerOpen,
     setIsFilePickerOpen,
-    selectedTools,
+    // selectedTools,
     selectedPreset,
     models,
     isPromptPickerOpen,
@@ -81,7 +81,9 @@ export const useChatHandler = () => {
     setResponseTimeTotal,
     setResponseTokensTotal,
     setResponseTimeToFirstToken,
-    setRequestTokensTotal
+    setRequestTokensTotal,
+    selectedTools,
+    setSelectedTools
   } = useContext(ChatbotUIChatContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)

@@ -7,6 +7,7 @@ import { LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { validateProPlan } from "@/lib/subscription"
+import { PLAN_FREE } from "@/lib/stripe/config"
 
 function createClient() {
   return createServerClient<Database>(
@@ -95,14 +96,22 @@ export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
   }
 }
 
+const FREE_MESSAGE_DAILY_LIMIT = process.env.FREE_MESSAGE_LIMIT
+  ? parseInt(process.env.FREE_MESSAGE_LIMIT + "")
+  : 30
+const PRO_MESSAGE_DAILY_LIMIT = process.env.PRO_MESSAGE_LIMIT
+  ? parseInt(process.env.PRO_MESSAGE_LIMIT + "")
+  : 50
+
 export async function validateMessageCount(
   profile: Tables<"profiles">,
+  model: LLMID,
   date: Date,
   supabase: SupabaseClient
 ) {
   const { plan } = profile
 
-  if (validateProPlan(profile)) {
+  if (plan.startsWith("byok_")) {
     return
   }
 
@@ -111,15 +120,26 @@ export async function validateMessageCount(
     .select("*", {
       count: "exact"
     })
+    .eq("role", "user")
+    .eq("model", model)
     .gte("created_at", date.toISOString())
 
   if (count === null) {
     throw new Error("Could not fetch message count")
   }
 
-  if (count > 30) {
+  if (
+    (plan === PLAN_FREE || plan.startsWith("premium_")) &&
+    count > FREE_MESSAGE_DAILY_LIMIT
+  ) {
     throw new SubscriptionRequiredError(
-      "You have reached daily message limit. Upgrade to Pro plan to continue come back tomorrow."
+      `You have reached daily message limit for ${model}. Upgrade to Pro plan to continue come back tomorrow.`
+    )
+  }
+
+  if (plan.startsWith("pro_") && count > PRO_MESSAGE_DAILY_LIMIT) {
+    throw new SubscriptionRequiredError(
+      `You have reached daily message limit for Pro plan for ${model}`
     )
   }
 }
@@ -128,5 +148,5 @@ export async function validateModelAndMessageCount(model: LLMID, date: Date) {
   const client = createClient()
   const profile = await getServerProfile()
   await validateModel(profile, model)
-  await validateMessageCount(profile, date, client)
+  await validateMessageCount(profile, model, date, client)
 }

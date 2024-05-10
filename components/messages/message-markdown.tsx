@@ -1,9 +1,12 @@
-import React, { FC } from "react"
+import React, { FC, useState } from "react"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import { MessageCodeBlock } from "./message-codeblock"
 import { MessageMarkdownMemoized } from "./message-markdown-memoized"
 import { defaultUrlTransform } from "react-markdown"
+import { FilePreview } from "@/components/ui/file-preview"
+import { ImageWithPreview } from "@/components/image/image-with-preview"
+import { sr } from "date-fns/locale"
 
 interface MessageMarkdownProps {
   content: string
@@ -44,8 +47,8 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({ content }) => {
             <p className="mb-2 whitespace-pre-wrap last:mb-0">{children}</p>
           )
         },
-        img({ node, ...props }) {
-          return <img className="max-w-[67%]" {...props} />
+        img({ node, src, ...props }) {
+          return <ImageWithPreview src={src!} alt={props.alt || "image"} />
         },
         code({ node, className, children, ...props }) {
           const childArray = React.Children.toArray(children)

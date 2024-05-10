@@ -25,7 +25,7 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { YouTube } from "@/components/messages/annotations/youtube"
 import { WebSearch } from "@/components/messages/annotations/websearch"
 import AnnotationImage from "@/components/messages/annotations/image"
-import { Annotation } from "@/types/annotation"
+import { Annotation, Annotation2 } from "@/types/annotation"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { MessageActions } from "@/components/messages/message-actions"
 import { MessageMarkdown } from "@/components/messages/message-markdown"
@@ -203,7 +203,7 @@ export const Message: FC<MessageProps> = ({
     }
 
     const annotationMap: {
-      [key: string]: React.FC<{ annotation: Annotation }>
+      [key: string]: React.FC<{ annotation: Annotation | Annotation2 }>
     } = {
       imageGenerator__generateImage: AnnotationImage,
       webScraper__youtubeCaptions: YouTube,
@@ -225,14 +225,17 @@ export const Message: FC<MessageProps> = ({
       }
       const responseTimeLabel = annotationResponseTimeLabelMap[key]
       const AnnotationComponent = annotationMap[key]!
+      // @ts-ignore
+      const responseTime = responseTimeLabel ? annotation[key]?.responseTime : 0
       return (
         <div key={key} className={"flex flex-col space-y-3"}>
           <AnnotationComponent annotation={annotation} />
-          {responseTimeLabel && (
+          {responseTime && (
             <ResponseTime
               icon={<IconApi stroke={1.5} size={18} />}
               label={responseTimeLabel}
-              value={annotation.webScraper__googleSearch?.responseTime!}
+              // @ts-ignore
+              value={responseTime}
             />
           )}
         </div>
