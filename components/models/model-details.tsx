@@ -3,13 +3,17 @@ import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { ModelIcon } from "@/components/models/model-icon"
 import { IconCheck, IconX } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { Tables } from "@/supabase/types"
+import { Badge } from "@/components/ui/badge"
 
 export function ModelDetails({
   className,
-  model
+  model,
+  selectedTools
 }: {
   className?: string
   model: LLM
+  selectedTools?: Tables<"tools">[]
 }) {
   let contextLength =
     CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH || 0
@@ -30,9 +34,9 @@ export function ModelDetails({
     value: string | JSX.Element
   }) {
     return (
-      <div className={"flex grow"}>
+      <div className={"flex h-[36px] grow items-center"}>
         <div className={"w-2/5 py-2 font-semibold"}>{label}</div>
-        <div className={"py-2"}>{value}</div>
+        <div className={"w-3/5 overflow-hidden py-2"}>{value}</div>
       </div>
     )
   }
@@ -65,16 +69,6 @@ export function ModelDetails({
           </>
         )}
         <Row
-          label={"Supports plugins"}
-          value={
-            model.tools ? (
-              <IconCheck size={18} stroke={1.5} />
-            ) : (
-              <IconX size={18} stroke={1.5} />
-            )
-          }
-        />
-        <Row
           label={"Supports vision"}
           value={
             model.imageInput ? (
@@ -84,6 +78,35 @@ export function ModelDetails({
             )
           }
         />
+        {!model.tools || !selectedTools || selectedTools?.length === 0 ? (
+          <Row
+            label={"Supports plugins"}
+            value={
+              model.tools ? (
+                <IconCheck size={18} stroke={1.5} />
+              ) : (
+                <IconX size={18} stroke={1.5} />
+              )
+            }
+          />
+        ) : (
+          <Row
+            label={"Plugins selected"}
+            value={
+              <div
+                className={
+                  "flex w-[200px] flex-nowrap space-x-1 overflow-hidden"
+                }
+              >
+                {selectedTools.map(tool => (
+                  <Badge className={"text-nowrap py-0.5"} key={tool.id}>
+                    {tool.name}
+                  </Badge>
+                ))}
+              </div>
+            }
+          />
+        )}
       </div>
     </div>
   )

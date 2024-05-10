@@ -73,6 +73,7 @@ const ChatWrapper = forwardRef(
       isGenerating,
       chatMessages,
       chatSettings,
+      selectedTools,
       requestTokensTotal,
       responseTimeToFirstToken,
       responseTokensTotal,
@@ -158,6 +159,7 @@ const ChatWrapper = forwardRef(
               <ModelDetails
                 className={"m-auto rounded-md border p-4"}
                 model={selectedModel}
+                selectedTools={selectedTools}
               />
             )
           )}
