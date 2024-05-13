@@ -1,7 +1,5 @@
 import type { Stripe } from "stripe"
-
 import { NextResponse } from "next/server"
-
 import { stripe } from "@/lib/stripe"
 import { Database } from "@/supabase/types"
 import {
@@ -17,8 +15,9 @@ import {
   updateProfileByUserId
 } from "@/db/profile"
 
-// try 5 times before giving up retrieving profile
-const MAX_RETRIES = 5
+// try 10 times before giving up retrieving profile
+const MAX_RETRIES = 10
+const RETRY_DELAY_MS = 2000
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -38,7 +37,7 @@ async function waitGetProfileByStripeCustomerId(
       return profile
     }
     retries++
-    await sleep(1000)
+    await sleep(RETRY_DELAY_MS)
   }
   return null
 }
@@ -55,9 +54,10 @@ const waitForProfileByUserId = async (
         return profile
       }
     } catch (error) {
-      retries++
-      await sleep(1000)
+      console.error(`Error retrieving profile for user ${userId}:`, error)
     }
+    retries++
+    await sleep(RETRY_DELAY_MS)
   }
   return null
 }
@@ -69,7 +69,6 @@ async function registerUser(
 ) {
   const { data, error } = await supabaseAdmin.auth.admin.createUser({
     email: customer.email!,
-    // password: "password",
     email_confirm: true
   })
 
@@ -151,6 +150,7 @@ export async function POST(req: Request) {
       try {
         userId = await registerUser(supabaseAdmin, customer, stripeCustomerId)
       } catch (error) {
+        console.error("Error during user registration:", error)
         // User already exists, retrieve the profile
         const profile = await waitGetProfileByStripeCustomerId(
           supabaseAdmin,
@@ -158,7 +158,7 @@ export async function POST(req: Request) {
         )
 
         if (!profile) {
-          console.error("Profile not found")
+          console.error("Profile not found after user registration error")
           return createErrorResponse("Webhook handler failed", 500)
         }
 
@@ -194,7 +194,7 @@ export async function POST(req: Request) {
           break
       }
     } catch (error) {
-      console.error(error)
+      console.error("Error updating profile:", error)
       return createErrorResponse("Webhook handler failed", 500)
     }
   }
