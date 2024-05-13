@@ -4,6 +4,7 @@ import { stripe } from "@/lib/stripe"
 import { Database } from "@/supabase/types"
 import { createClient, SupabaseClient } from "@supabase/supabase-js"
 import { ACTIVE_PLAN_STATUSES, PLAN_FREE, PLANS } from "@/lib/stripe/config"
+import { kv } from "@vercel/kv"
 import { buffer } from "node:stream/consumers"
 import {
   getProfileByStripeCustomerId,
@@ -105,6 +106,37 @@ function createErrorResponse(message: string, status: number) {
   return NextResponse.json({ message }, { status })
 }
 
+// redis based lock
+class Lock {
+  constructor(
+    private kvv: typeof kv,
+    private key: string
+  ) {
+    this.kvv = kvv
+    this.key = key
+  }
+
+  // only acquire the lock if it's not already taken
+  // wait MAX_RETRIES for the lock to be released
+  async acquire() {
+    let retries = 0
+    while (retries < MAX_RETRIES) {
+      const value = await this.kvv.get(this.key)
+      if (value === "locked") {
+        retries++
+        await sleep(RETRY_DELAY_MS)
+      } else {
+        await this.kvv.set(this.key, "locked")
+        return true
+      }
+    }
+    return false
+  }
+  async release() {
+    await this.kvv.del(this.key)
+  }
+}
+
 export async function POST(req: Request) {
   let event: Stripe.Event
   let subscription: Stripe.Subscription
@@ -141,8 +173,8 @@ export async function POST(req: Request) {
 
   const permittedEvents: string[] = [
     "customer.subscription.deleted",
-    "customer.subscription.updated"
-    // "customer.subscription.created"
+    "customer.subscription.updated",
+    "customer.subscription.created"
   ]
 
   if (permittedEvents.includes(event.type)) {
@@ -201,8 +233,18 @@ export async function POST(req: Request) {
 
     logger.log(`User ID ${userId}, Stripe ID (${stripeCustomerId})`)
 
+    const lock = new Lock(kv, `stripe-webhook-${stripeCustomerId}`)
+
     // Scenario 3: Update the profile record accordingly
     try {
+      logger.log("Acquiring lock")
+      if (!(await lock.acquire())) {
+        logger.log("Unable to acquire lock")
+        return createErrorResponse("Webhook handler failed", 500)
+      }
+
+      logger.log("Lock acquired")
+
       switch (event.type) {
         case "customer.subscription.deleted":
           await updateProfileByUserId(supabaseAdmin, userId, {
@@ -233,6 +275,10 @@ export async function POST(req: Request) {
     } catch (error) {
       logger.error("Error updating profile", error)
       return createErrorResponse("Webhook handler failed", 500)
+    } finally {
+      logger.log("Releasing lock")
+      await lock.release()
+      logger.log("Lock released")
     }
   }
 
