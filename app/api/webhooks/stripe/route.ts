@@ -29,14 +29,18 @@ async function waitGetProfileByStripeCustomerId(
 ) {
   let retries = 0
   while (retries < MAX_RETRIES) {
+    console.log(`Retrieving profile for customer ${stripeCustomerId}`)
     const { data: profile } = await getProfileByStripeCustomerId(
       supabaseAdmin,
       stripeCustomerId
     )
     if (profile) {
+      console.log(`Profile found for customer ${stripeCustomerId}`)
       return profile
     }
+    console.log(`Profile not found for customer ${stripeCustomerId}`)
     retries++
+    console.log(`Retrying in ${RETRY_DELAY_MS}ms`)
     await sleep(RETRY_DELAY_MS)
   }
   return null
@@ -150,7 +154,7 @@ export async function POST(req: Request) {
       try {
         userId = await registerUser(supabaseAdmin, customer, stripeCustomerId)
       } catch (error) {
-        console.error("Error during user registration:", error)
+        console.warn("Error during user registration:", error)
         // User already exists, retrieve the profile
         const profile = await waitGetProfileByStripeCustomerId(
           supabaseAdmin,
