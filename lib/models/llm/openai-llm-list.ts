@@ -106,6 +106,7 @@ const GPT4O: LLM = {
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: true,
   tools: true,
+  paid: true,
   supportsStreaming: true,
   pricing: {
     currency: "USD",
