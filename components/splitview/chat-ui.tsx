@@ -142,7 +142,7 @@ const ChatWrapper = forwardRef(
     ).toFixed(6)
 
     return (
-      <div className={"flex grow flex-col"}>
+      <div className={"flex grow flex-col overflow-hidden"}>
         <ChatSettings
           detailsLocation={"right"}
           className="w-auto border-b py-1 pr-2"
@@ -297,7 +297,13 @@ export const ChatUI: FC<ChatUIProps> = () => {
         )}
       >
         {range(chatsSize).map(i => (
-          <div key={i} className={"flex flex-1 rounded-xl border"}>
+          <div
+            key={i}
+            style={{
+              containerType: "inline-size"
+            }}
+            className={"flex flex-1 shrink-0 rounded-xl border md:shrink"}
+          >
             <ChatbotUIChatProvider id={i.toString()}>
               <ChatWrapper
                 ref={(ref: ChatMessagesRef) => {
