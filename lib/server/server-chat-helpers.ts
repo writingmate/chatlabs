@@ -82,6 +82,11 @@ export function checkApiKey(apiKey: string | null, keyName: string) {
   }
 }
 
+function isPaidModel(model: LLMID) {
+  const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
+  return paidLLMS.includes(model)
+}
+
 export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
   const { plan } = profile
 
@@ -89,19 +94,25 @@ export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
     return
   }
 
-  const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
-
-  if (paidLLMS.includes(model)) {
+  if (isPaidModel(model)) {
     throw new SubscriptionRequiredError("Pro plan required to use this model")
   }
 }
 
-const FREE_MESSAGE_DAILY_LIMIT = process.env.FREE_MESSAGE_LIMIT
-  ? parseInt(process.env.FREE_MESSAGE_LIMIT + "")
-  : 30
-const PRO_MESSAGE_DAILY_LIMIT = process.env.PRO_MESSAGE_LIMIT
-  ? parseInt(process.env.PRO_MESSAGE_LIMIT + "")
-  : 50
+function getEnvInt(varName: string, def: number) {
+  if (varName in process.env) {
+    return parseInt(process.env[varName] + "")
+  }
+
+  return def
+}
+
+const FREE_MESSAGE_DAILY_LIMIT = getEnvInt("FREE_MESSAGE_LIMIT", 30)
+const PRO_MESSAGE_DAILY_LIMIT = getEnvInt("PRO_MESSAGE_LIMIT", 50)
+const CATCHALL_MESSAGE_DAILY_LIMIT = getEnvInt(
+  "CATCHALL_MESSAGE_DAILY_LIMIT",
+  300
+)
 
 export async function validateMessageCount(
   profile: Tables<"profiles">,
@@ -141,9 +152,19 @@ export async function validateMessageCount(
     )
   }
 
-  if (plan.startsWith("pro_") && count > PRO_MESSAGE_DAILY_LIMIT) {
+  if (
+    isPaidModel(model) &&
+    plan.startsWith("pro_") &&
+    count > PRO_MESSAGE_DAILY_LIMIT
+  ) {
     throw new SubscriptionRequiredError(
       `You have reached daily message limit for Pro plan for ${model}`
+    )
+  }
+
+  if (count > CATCHALL_MESSAGE_DAILY_LIMIT) {
+    throw new SubscriptionRequiredError(
+      `You have reached hard daily message limit for model ${model}`
     )
   }
 }
