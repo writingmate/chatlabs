@@ -10,7 +10,7 @@ export default function SubscriptionSuccessPage() {
   useEffect(() => {
     if (profile && profile.plan != "free") {
       const event = `purchase_${profile.plan}`
-      window.gtag && window.gtag("event", event)
+      window.gtag?.("event", event)
     }
   }, [profile])
 

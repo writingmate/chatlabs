@@ -25,6 +25,8 @@ export default function HomePage() {
         return router.push("/login")
       }
       const userId = data.session.user.id
+      window.gtag?.("set", { user_id: userId })
+      window.dataLayer?.push({ user_id: userId })
       Promise.all([
         getProfileByUserId(userId),
         getWorkspacesByUserId(userId)
