@@ -9,7 +9,7 @@ import { Metadata, Viewport } from "next"
 import { DM_Sans, Inter } from "next/font/google"
 import { cookies } from "next/headers"
 import { ReactNode } from "react"
-import { GoogleAnalytics } from "@next/third-parties/google"
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
@@ -111,6 +111,7 @@ export default async function RootLayout({
         <Analytics />
         <SpeedInsights />
         <GoogleAnalytics gaId="G-Y14R2TP0QH" />
+        <GoogleTagManager gtmId={"GTM-5SBXJ23Q"} />
       </body>
     </html>
   )
