@@ -11,6 +11,7 @@ export default function SubscriptionSuccessPage() {
     if (profile && profile.plan != "free") {
       const event = `purchase_${profile.plan}`
       window.gtag?.("event", event)
+      window.dataLayer?.push({ event })
     }
   }, [profile])
 

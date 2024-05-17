@@ -53,8 +53,8 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
 
   const handleClick = (plan: string) => {
     const event = `click_${plan}_${billingCycle}`
-    window.gtag && window.gtag("event", event)
-    // sendGAEvent("event", event);
+    window.gtag?.("event", event)
+    window.dataLayer?.push({ event })
     setLoading(plan)
   }
 
