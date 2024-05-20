@@ -311,11 +311,10 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
                     return (
                       sortedData.length > 0 && (
-                        <div key={dateCategory}>
-                          <div className="text-muted-foreground bg-background sticky top-0 w-full py-2 pl-2 text-sm font-bold first:pt-0">
+                        <div className={"pt-2 first:pt-0"} key={dateCategory}>
+                          <div className="text-muted-foreground bg-background sticky top-0 w-full pb-1 pl-2 text-sm font-semibold">
                             {dateCategory}
                           </div>
-
                           <div
                             className={cn(
                               "flex grow flex-col",
