@@ -49,7 +49,7 @@ export default function HomePage() {
       <Dashboard>
         <ChatUI />
       </Dashboard>
-      <LoginDialog open={needLogin} />
+      <LoginDialog />
     </>
   )
 }
