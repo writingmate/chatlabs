@@ -17,7 +17,7 @@ export default function LoginDialog() {
       <DialogTrigger asChild>
         <div
           id={"dialog"}
-          className={"size-screen absolute right-0 top-0 z-[100] cursor-auto"}
+          className={"absolute right-0 top-0 z-[100] size-full cursor-auto"}
         ></div>
       </DialogTrigger>
       <DialogContent className={"rounded-xl"}>
