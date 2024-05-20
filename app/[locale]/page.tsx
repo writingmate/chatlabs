@@ -17,15 +17,18 @@ import {
 import { getProfileByUserId } from "@/db/profile"
 import { ChatUI } from "@/components/chat/chat-ui"
 import { Dashboard } from "@/components/ui/dashboard"
+import LoginDialog from "@/components/login/login-dialog"
 
 export default function HomePage() {
   const router = useRouter()
+  const [needLogin, setNeedLogin] = useState(true)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
         return router.push("/")
       }
+      setNeedLogin(false)
       const userId = data.session.user.id
       window.gtag?.("set", { user_id: userId })
       window.dataLayer?.push({ user_id: userId })
@@ -42,9 +45,11 @@ export default function HomePage() {
   }, [])
 
   return (
-    <Dashboard>
-      <ChatUI />
-    </Dashboard>
+    <>
+      <Dashboard>
+        <ChatUI />
+      </Dashboard>
+      <LoginDialog open={needLogin} />
+    </>
   )
-  // </Dashboard>
 }
