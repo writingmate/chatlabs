@@ -17,12 +17,14 @@ export type OpenAILLMID =
   // | "gpt-3.5-turbo-1106" // GPT-3.5
   | "gpt-3.5-turbo-0125" // GPT-3.5
   | "gpt-4-turbo" // GPT-4 Turbo
+  | "gpt-4o" // GPT-4o
 
 // Google Models
 export type GoogleLLMID =
   | "gemini-pro" // Gemini Pro
   | "gemini-pro-vision" // Gemini Pro Vision
   | "gemini-1.5-pro-latest" // Gemini 1.5 Pro
+  | "gemini-1.5-flash-latest" // Gemini 1.5 Latest
 
 // Anthropic Models
 export type AnthropicLLMID =
@@ -40,7 +42,7 @@ export type MistralLLMID =
   | "mistral-large-latest" // Mistral Large
 
 export type GroqLLMID =
-  | "llama2-70b-4096" // LLaMA2-70b
+  // | "llama2-70b-4096" // LLaMA2-70b
   | "mixtral-8x7b-32768" // Mixtral-8x7b
   | "llama3-70b-8192" // LLaMA3-70b
 
@@ -71,6 +73,7 @@ export interface LLM {
   paid?: boolean
   tools?: boolean
   supportsStreaming?: boolean
+  description?: string
   pricing?: {
     currency: string
     unit: string

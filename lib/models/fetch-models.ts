@@ -167,6 +167,7 @@ export const fetchOpenRouterModels = async () => {
           id: string
           name: string
           context_length: number
+          description: string
           pricing: {
             completion: string
             image: string
@@ -180,6 +181,7 @@ export const fetchOpenRouterModels = async () => {
           platformLink: "https://openrouter.dev",
           imageInput: false,
           maxContext: model.context_length,
+          description: model.description,
           pricing: {
             currency: "USD",
             inputCost: parseFloat(model.pricing.prompt) * 1000000,

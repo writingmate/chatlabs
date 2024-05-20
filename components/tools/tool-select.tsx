@@ -26,6 +26,15 @@ interface ToolSelectProps {
   onSelectTools: (tools: Tables<"tools">[]) => void
 }
 
+function ToolDetails({ tool }: { tool: Tables<"tools"> }) {
+  return (
+    <div className="mr-2 hidden w-[240px] flex-col space-y-1 border-r px-2 py-1 sm:flex">
+      <div className="font-semibold">{tool.name}</div>
+      <div className="text-xs">{tool.description}</div>
+    </div>
+  )
+}
+
 export const ToolSelect: FC<ToolSelectProps> = ({
   selectedTools,
   onSelectTools,
@@ -39,6 +48,8 @@ export const ToolSelect: FC<ToolSelectProps> = ({
   const [flash, setFlash] = useState(false)
 
   const [isOpen, setIsOpen] = useState(false)
+
+  const [hoveredTool, setHoveredTool] = useState<Tables<"tools">>(tools[0])
 
   useEffect(() => {
     if (isOpen) {
@@ -105,14 +116,16 @@ export const ToolSelect: FC<ToolSelectProps> = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="mx-2 space-y-2 overflow-auto p-2"
+        className="relative mx-2 -ml-[140px] flex max-h-[300px] overflow-auto p-2"
         // style={{ width: triggerRef.current?.offsetWidth }}
       >
-        <div className="max-h-[300px] overflow-auto">
+        <ToolDetails tool={hoveredTool} />
+        <div>
           {tools.map(tool => {
             return (
               <DropdownMenuItem
                 key={tool.id}
+                onMouseEnter={() => setHoveredTool(tool as Tables<"tools">)}
                 className={"flex w-full justify-between space-x-3"}
               >
                 <div>{tool.name}</div>

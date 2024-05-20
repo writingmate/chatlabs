@@ -48,6 +48,9 @@ interface ChatbotUIChatContext {
   setResponseTimeTotal: Dispatch<SetStateAction<number>>
   responseTokensTotal: number
   setResponseTokensTotal: Dispatch<SetStateAction<number>>
+
+  selectedTools: Tables<"tools">[]
+  setSelectedTools: Dispatch<SetStateAction<Tables<"tools">[]>>
 }
 
 export const ChatbotUIChatContext = createContext<ChatbotUIChatContext>({
@@ -79,7 +82,10 @@ export const ChatbotUIChatContext = createContext<ChatbotUIChatContext>({
   responseTimeTotal: 0,
   setResponseTimeTotal: () => {},
   responseTokensTotal: 0,
-  setResponseTokensTotal: () => {}
+  setResponseTokensTotal: () => {},
+
+  selectedTools: [],
+  setSelectedTools: () => {}
 })
 
 interface ChatbotUIChatProviderProps {
@@ -130,6 +136,8 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
   const [responseTokensTotal, setResponseTokensTotal] = useState<number>(0)
   const [requestTokensTotal, setRequestTokensTotal] = useState<number>(0)
 
+  const [selectedTools, setSelectedTools] = useState<Tables<"tools">[]>([])
+
   useEffect(() => {
     if (chatSettings) {
       localStorage.setItem(chatSettingsKey, JSON.stringify(chatSettings))
@@ -164,7 +172,10 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
         responseTokensTotal,
         setResponseTokensTotal,
         requestTokensTotal,
-        setRequestTokensTotal
+        setRequestTokensTotal,
+
+        selectedTools,
+        setSelectedTools
       }}
     >
       {children}

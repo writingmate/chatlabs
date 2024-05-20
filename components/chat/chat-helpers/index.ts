@@ -462,7 +462,6 @@ export const processResponse = async (
         }
 
         setResponseTimeTotal?.(prev => (Date.now() - startTime) / 1000)
-        setResponseTokensTotal?.(prev => prev + encode(contentToAdd).length)
 
         setChatMessages(prev =>
           prev.map(chatMessage => {
@@ -485,6 +484,31 @@ export const processResponse = async (
       },
       controller.signal
     )
+
+    function findSkipTokenCount(
+      data: { [key: string]: { skipTokenCount: boolean } }[]
+    ): boolean {
+      if (!data) return false
+
+      console.log(data)
+
+      return data.some(x => {
+        for (const key in x) {
+          if (x[key].skipTokenCount) {
+            return true
+          }
+        }
+      })
+    }
+
+    if (setResponseTokensTotal) {
+      setResponseTokensTotal(prev => {
+        if (!findSkipTokenCount(data)) {
+          return prev + encode(fullText).length
+        }
+        return prev
+      })
+    }
 
     return {
       generatedText: fullText,

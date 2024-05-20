@@ -1,11 +1,26 @@
 import { Card } from "@/components/ui/card"
 import Image from "next/image"
-import { Annotation } from "@/types/annotation"
+import { Annotation, Annotation2 } from "@/types/annotation"
 import { useState } from "react"
 
-export function WebSearch({ annotation }: { annotation: Annotation }) {
-  const { organic } = annotation.webScraper__googleSearch!
+export function WebSearch({
+  annotation
+}: {
+  annotation: Annotation | Annotation2
+}) {
   const [showAll, setShowAll] = useState(false)
+
+  let result = annotation.webScraper__googleSearch
+
+  if (!result) {
+    return null
+  }
+
+  if ("result" in result) {
+    result = result.result
+  }
+
+  const { organic } = result
 
   return (
     <div className={"grid grid-cols-2 gap-2 md:grid-cols-4"}>

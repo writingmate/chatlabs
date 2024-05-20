@@ -59,7 +59,12 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TOKEN_OUTPUT_LENGTH: 4096,
     MAX_CONTEXT_LENGTH: 1000000
   },
-
+  "gemini-1.5-flash-latest": {
+    MIN_TEMPERATURE: 0.0,
+    MAX_TEMPERATURE: 1.0,
+    MAX_TOKEN_OUTPUT_LENGTH: 4096,
+    MAX_CONTEXT_LENGTH: 1000000
+  },
   // MISTRAL MODELS
   "mistral-tiny": {
     MIN_TEMPERATURE: 0.0,
@@ -87,12 +92,12 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
   },
 
   // GROQ MODELS
-  "llama2-70b-4096": {
-    MIN_TEMPERATURE: 0.0,
-    MAX_TEMPERATURE: 1.0,
-    MAX_TOKEN_OUTPUT_LENGTH: 4096,
-    MAX_CONTEXT_LENGTH: 4096
-  },
+  // "llama2-70b-4096": {
+  //   MIN_TEMPERATURE: 0.0,
+  //   MAX_TEMPERATURE: 1.0,
+  //   MAX_TOKEN_OUTPUT_LENGTH: 4096,
+  //   MAX_CONTEXT_LENGTH: 4096
+  // },
   "mixtral-8x7b-32768": {
     MIN_TEMPERATURE: 0.0,
     MAX_TEMPERATURE: 1.0,
@@ -128,6 +133,12 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_CONTEXT_LENGTH: 128000
   },
   "gpt-4-turbo": {
+    MIN_TEMPERATURE: 0.0,
+    MAX_TEMPERATURE: 2.0,
+    MAX_TOKEN_OUTPUT_LENGTH: 4096,
+    MAX_CONTEXT_LENGTH: 128000
+  },
+  "gpt-4o": {
     MIN_TEMPERATURE: 0.0,
     MAX_TEMPERATURE: 2.0,
     MAX_TOKEN_OUTPUT_LENGTH: 4096,

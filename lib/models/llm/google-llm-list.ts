@@ -36,8 +36,19 @@ const GEMINI_PRO_15: LLM = {
   paid: true
 }
 
+const GEMINI_15_FLASH: LLM = {
+  modelId: "gemini-1.5-flash-latest",
+  modelName: "Gemini 1.5 Flash",
+  provider: "google",
+  hostedId: "gemini-1.5-flash-latest",
+  platformLink: GOOGLE_PLATORM_LINK,
+  imageInput: true,
+  paid: false
+}
+
 export const GOOGLE_LLM_LIST: LLM[] = [
   GEMINI_PRO,
   GEMINI_PRO_VISION,
-  GEMINI_PRO_15
+  GEMINI_PRO_15,
+  GEMINI_15_FLASH
 ]

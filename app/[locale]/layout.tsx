@@ -9,7 +9,7 @@ import { Metadata, Viewport } from "next"
 import { DM_Sans, Inter } from "next/font/google"
 import { cookies } from "next/headers"
 import { ReactNode } from "react"
-import { GoogleAnalytics } from "@next/third-parties/google"
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
@@ -65,7 +65,10 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#FFFFFF"
+  themeColor: "#FFFFFF",
+  width: "device-width",
+  initialScale: 1,
+  interactiveWidget: "resizes-content"
 }
 
 const i18nNamespaces = ["translation"]
@@ -108,6 +111,7 @@ export default async function RootLayout({
         <Analytics />
         <SpeedInsights />
         <GoogleAnalytics gaId="G-Y14R2TP0QH" />
+        <GoogleTagManager gtmId={"GTM-5SBXJ23Q"} />
       </body>
     </html>
   )

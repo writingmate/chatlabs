@@ -1,9 +1,9 @@
-import { Annotation } from "@/types/annotation"
+import { Annotation, Annotation2 } from "@/types/annotation"
 import { forwardRef, useRef } from "react"
 import { IconFunction, IconPlayerPlay } from "@tabler/icons-react"
 
-type YouTubeProps = {
-  annotation: Annotation
+type ToolCallsProps = {
+  annotation: Annotation | Annotation2
 }
 
 type ResponseTimeProps = {
@@ -28,8 +28,8 @@ export function ResponseTime({ icon, label, value }: ResponseTimeProps) {
   )
 }
 
-const ToolCalls = forwardRef<HTMLAnchorElement, YouTubeProps>(
-  ({ annotation }: { annotation: Annotation }, ref) => {
+const ToolCalls = forwardRef<HTMLAnchorElement, ToolCallsProps>(
+  ({ annotation }: { annotation: Annotation | Annotation2 }, ref) => {
     return (
       annotation.toolCalls?.responseTime && (
         <ResponseTime

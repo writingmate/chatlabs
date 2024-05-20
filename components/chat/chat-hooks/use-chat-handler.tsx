@@ -205,7 +205,8 @@ export const useChatHandler = () => {
           hostedId: model.id,
           platformLink: "",
           imageInput: false,
-          supportsStreaming: false
+          supportsStreaming: false,
+          tools: false
         })),
         ...LLM_LIST,
         ...availableLocalModels,
@@ -268,7 +269,7 @@ export const useChatHandler = () => {
       let generatedText = ""
       let data = null
 
-      if (selectedTools.length > 0) {
+      if (selectedTools.length > 0 && modelData!.tools) {
         ;({ generatedText, data } = await handleToolsChat(
           payload,
           profile!,

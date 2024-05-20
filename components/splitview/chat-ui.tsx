@@ -19,6 +19,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { cn } from "@/lib/utils"
 import { IconGauge } from "@tabler/icons-react"
 import { WithTooltip } from "@/components/ui/with-tooltip"
+import { ModelDetails } from "@/components/models/model-details"
 
 interface ChatUIProps {}
 
@@ -72,6 +73,7 @@ const ChatWrapper = forwardRef(
       isGenerating,
       chatMessages,
       chatSettings,
+      selectedTools,
       requestTokensTotal,
       responseTimeToFirstToken,
       responseTokensTotal,
@@ -92,7 +94,7 @@ const ChatWrapper = forwardRef(
         platformLink: "",
         imageInput: false,
         tools: false,
-        pricing: null
+        pricing: undefined
       })),
       ...availableHostedModels,
       ...availableLocalModels,
@@ -140,14 +142,28 @@ const ChatWrapper = forwardRef(
     ).toFixed(6)
 
     return (
-      <div className={"flex w-full flex-col"}>
-        <ChatSettings className="w-auto border-b pr-2 pt-1" />
+      <div className={"flex grow flex-col overflow-hidden"}>
+        <ChatSettings
+          detailsLocation={"right"}
+          className="w-auto border-b py-1 pr-2"
+        />
         <div
           className="flex grow flex-col overflow-auto p-4"
           onScroll={handleScroll}
         >
           <div ref={messagesStartRef} />
-          <ChatMessages />
+          {chatMessages.length > 0 ? (
+            <ChatMessages />
+          ) : (
+            selectedModel && (
+              <ModelDetails
+                className={"m-auto rounded-md border p-4"}
+                model={selectedModel}
+                selectedTools={selectedTools}
+              />
+            )
+          )}
+
           <div ref={messagesEndRef} />
         </div>
         <div
@@ -156,26 +172,46 @@ const ChatWrapper = forwardRef(
           <div className={"border-r px-2"}>
             <IconGauge stroke={1.5} size={18} />
           </div>
-          <div className={"border-r px-2"}>
+          <div
+            className={
+              "hidden max-w-[25%] overflow-hidden text-ellipsis text-nowrap border-r px-2 xl:block"
+            }
+          >
             {(responseTimeToFirstToken - responseTimePadding).toFixed(1)}{" "}
             <span className={"text-foreground/70"}>sec to first token</span>
           </div>
-          <div className={"border-r px-2"}>
+          <div
+            className={
+              "max-w-[25%] overflow-hidden text-ellipsis text-nowrap border-r px-2 xl:max-w-[20%]"
+            }
+          >
             {(responseTokensTotal > 0
               ? responseTokensTotal / (responseTimeTotal - responseTimePadding)
               : 0
             ).toFixed(2)}{" "}
             <span className={"text-foreground/70"}>tokens/sec</span>
           </div>
-          <div className={"border-r px-2"}>
+          <div
+            className={
+              "max-w-[25%] overflow-hidden text-ellipsis text-nowrap border-r px-2 xl:max-w-[15%]"
+            }
+          >
             {responseTokensTotal}{" "}
             <span className={"text-foreground/70"}>tokens</span>
           </div>
-          <div className={"border-r px-2"}>
+          <div
+            className={
+              "max-w-[25%] overflow-hidden text-ellipsis text-nowrap border-r px-2 xl:max-w-[15%]"
+            }
+          >
             {(responseTimeTotal - responseTimePadding).toFixed(2)}{" "}
             <span className={"text-foreground/70"}>sec</span>
           </div>
-          <div className={"px-2"}>
+          <div
+            className={
+              "max-w-[25%] overflow-hidden text-ellipsis text-nowrap px-2 xl:max-w-[15%]"
+            }
+          >
             <WithTooltip
               display={
                 <div className={"flex items-center"}>
@@ -263,9 +299,10 @@ export const ChatUI: FC<ChatUIProps> = () => {
         {range(chatsSize).map(i => (
           <div
             key={i}
-            className={
-              "flex size-full rounded-xl border sm:w-[200px] md:w-[250px] lg:w-[400px] xl:w-[640px]"
-            }
+            style={{
+              containerType: "inline-size"
+            }}
+            className={"flex flex-1 shrink-0 rounded-xl border md:shrink"}
           >
             <ChatbotUIChatProvider id={i.toString()}>
               <ChatWrapper
@@ -306,7 +343,7 @@ export const ChatUI: FC<ChatUIProps> = () => {
       <div className="relative mx-auto w-full px-4 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[800px]">
         <ChatInput
           hasMessages={hasMessagesArray.some(x => x)}
-          toolsAllowed={toolsAllowedArray.every(x => x)}
+          toolsAllowed={false}
           imagesAllowed={imagesAllowedArray.every(x => x)}
           isGenerating={isGeneratingArray.some(x => x)}
           handleSendMessage={handleSendMessage}
