@@ -13,7 +13,7 @@ export default function LoginDialog({ open = false }: { open: boolean }) {
   const [dialogOpen, setOpen] = useState(open)
 
   return (
-    <Dialog defaultOpen={dialogOpen} onOpenChange={setOpen}>
+    <Dialog open={dialogOpen} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {open && (
           <div
