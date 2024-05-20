@@ -82,12 +82,6 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           // active={contentType === item.contentType}
           icon={item.icon}
           label={item.label}
-          data={item.data}
-          onClick={e => {
-            e.preventDefault()
-            e.stopPropagation()
-            router.push(`./${item.contentType}`)
-          }}
         />
       ))}
     </div>

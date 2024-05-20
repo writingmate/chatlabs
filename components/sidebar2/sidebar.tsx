@@ -1,20 +1,14 @@
 import { ChatbotUIContext } from "@/context/context"
-import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
 import { FC, useContext, useState } from "react"
-import { SIDEBAR_WIDTH } from "../ui/dashboard"
-import { TabsContent } from "../ui/tabs"
 import { WorkspaceSwitcher } from "../utility/workspace-switcher"
 import { WorkspaceSettings } from "../workspace/workspace-settings"
-import { SidebarContent } from "./sidebar-content"
 import { validateProPlan } from "@/lib/subscription"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { IconDiamondFilled } from "@tabler/icons-react"
 import { ProfileSettings } from "@/components/utility/profile-settings"
-import { SIDEBAR_ICON_SIZE } from "@/components/sidebar2/sidebar-switcher"
 import { SidebarTopContent } from "@/components/sidebar2/sidebar-top-content"
 import { SidebarDataList } from "@/components/sidebar2/sidebar-data-list"
-import { SidebarDialog } from "@/components/sidebar2/sidebar-dialog"
 
 interface SidebarProps {
   contentType: ContentType
