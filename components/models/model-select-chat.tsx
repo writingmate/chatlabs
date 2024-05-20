@@ -108,7 +108,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
     model => model.modelId === selectedModelId
   )
 
-  if (!profile) return null
+  // if (!profile) return null
 
   const filteredModels = allModels
     .filter(model => {
@@ -119,7 +119,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
     .filter(
       model =>
         (
-          (profile.model_visibility || DEFAULT_MODEL_VISIBILITY) as Record<
+          (profile?.model_visibility || DEFAULT_MODEL_VISIBILITY) as Record<
             LLMID,
             boolean
           >

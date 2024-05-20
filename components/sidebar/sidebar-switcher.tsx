@@ -91,6 +91,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 
         <WithTooltip
           display={"Split Screen"}
+          asChild
           trigger={
             <Button
               className="mx-auto hover:opacity-50"

@@ -11,21 +11,23 @@ export function validatePlanForModel(
   profile: Tables<"profiles"> | null,
   model?: LLMID
 ) {
-  if (!profile) {
+  if (!model) {
     return false
   }
 
-  if (!model) {
+  const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
+
+  if (!paidLLMS.includes(model)) {
+    return true
+  }
+
+  if (!profile) {
     return false
   }
 
   if (validateProPlan(profile)) {
     return true
   }
-
-  const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
-
-  return !paidLLMS.includes(model)
 }
 
 export function validatePlanForAssistant(

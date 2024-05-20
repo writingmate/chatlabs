@@ -73,11 +73,13 @@ function humanize(str: string) {
   return str.replace(/\b\w/g, l => l.toUpperCase())
 }
 
-export const fetchHostedModels = async (profile: Tables<"profiles">) => {
+export const fetchHostedModels = async (
+  profile: Tables<"profiles"> | null | undefined
+) => {
   try {
     const providers = ["google", "anthropic", "mistral", "groq", "perplexity"]
 
-    if (profile.use_azure_openai) {
+    if (profile?.use_azure_openai) {
       providers.push("azure")
     } else {
       providers.push("openai")
@@ -94,22 +96,31 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
     let modelsToAdd: LLM[] = []
 
     for (const provider of providers) {
-      let providerKey: keyof typeof profile
+      const models = LLM_LIST_MAP[provider]
 
-      if (provider === "google") {
-        providerKey = "google_gemini_api_key"
-      } else if (provider === "azure") {
-        providerKey = "azure_openai_api_key"
-      } else {
-        providerKey = `${provider}_api_key` as keyof typeof profile
+      if (!Array.isArray(models)) {
+        continue
       }
 
-      if (profile?.[providerKey] || data.isUsingEnvKeyMap[provider]) {
-        const models = LLM_LIST_MAP[provider]
+      if (profile) {
+        let providerKey: keyof typeof profile
 
-        if (Array.isArray(models)) {
-          modelsToAdd.push(...models)
+        if (provider === "google") {
+          providerKey = "google_gemini_api_key"
+        } else if (provider === "azure") {
+          providerKey = "azure_openai_api_key"
+        } else {
+          providerKey = `${provider}_api_key` as keyof typeof profile
         }
+
+        if (!profile?.[providerKey]) {
+          modelsToAdd.push(...models)
+          continue
+        }
+      }
+
+      if (data.isUsingEnvKeyMap[provider]) {
+        modelsToAdd.push(...models)
       }
     }
 

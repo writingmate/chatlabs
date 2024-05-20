@@ -15,6 +15,8 @@ import {
   getWorkspacesByUserId
 } from "@/db/workspaces"
 import { getProfileByUserId } from "@/db/profile"
+import { ChatUI } from "@/components/chat/chat-ui"
+import { Dashboard } from "@/components/ui/dashboard"
 
 export default function HomePage() {
   const router = useRouter()
@@ -22,7 +24,7 @@ export default function HomePage() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
-        return router.push("/login")
+        return router.push("/")
       }
       const userId = data.session.user.id
       window.gtag?.("set", { user_id: userId })
@@ -39,5 +41,10 @@ export default function HomePage() {
     })
   }, [])
 
-  return <Loading />
+  return (
+    <Dashboard>
+      <ChatUI />
+    </Dashboard>
+  )
+  // </Dashboard>
 }

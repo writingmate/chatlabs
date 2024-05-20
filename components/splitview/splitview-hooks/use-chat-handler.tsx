@@ -285,7 +285,7 @@ export const useChatHandler = () => {
 
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
-        workspaceInstructions: selectedWorkspace!.instructions || "",
+        // workspaceInstructions: selectedWorkspace!.instructions || "",
         chatMessages: isRegeneration
           ? [...chatMessages]
           : [...chatMessages, tempUserChatMessage],

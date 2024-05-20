@@ -3,6 +3,7 @@ import { createResponse } from "@/lib/server/server-utils"
 import { EnvKey } from "@/types/key-type"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
+import { Tables } from "@/supabase/types"
 
 export async function GET() {
   const envKeyMap: Record<string, VALID_ENV_KEYS> = {
@@ -24,14 +25,18 @@ export async function GET() {
     azure_embeddings_name: VALID_ENV_KEYS.AZURE_EMBEDDINGS_NAME
   }
 
-  const profile = await getServerProfile()
+  let profile: Tables<"profiles"> | null = null
+
+  try {
+    profile = await getServerProfile()
+  } catch (error) {}
 
   const isUsingEnvKeyMap = Object.keys(envKeyMap).reduce<
     Record<string, boolean>
   >((acc, provider) => {
     const key = envKeyMap[provider]
 
-    if (profile.plan.startsWith("byok_")) {
+    if (profile?.plan.startsWith("byok_")) {
       return acc
     }
 

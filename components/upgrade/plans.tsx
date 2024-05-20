@@ -7,6 +7,7 @@ import { useContext, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { supabase } from "@/lib/supabase/browser-client"
 import { createCheckoutSession } from "@/actions/stripe"
+import { router } from "next/client"
 
 const BYOK_PLAN_PREFIX = "byok"
 const PRO_PLAN_PREFIX = "pro"
@@ -32,7 +33,7 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
     const user = (await supabase.auth.getUser()).data.user
 
     if (!user) {
-      throw new Error("User not found")
+      return window.location.assign("/login")
     }
 
     data.set("email", user?.email as string)
