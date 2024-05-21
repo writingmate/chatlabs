@@ -257,7 +257,7 @@ export const useChatHandler = () => {
 
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
-        workspaceInstructions: selectedWorkspace!.instructions || "",
+        // workspaceInstructions: selectedWorkspace?.instructions || "",
         chatMessages: isRegeneration
           ? [...chatMessages]
           : [...chatMessages, tempUserChatMessage],
@@ -399,7 +399,7 @@ export const useChatHandler = () => {
 
   return {
     chatInputRef,
-    prompt,
+    // prompt,
     handleNewChat,
     handleSendMessage,
     handleFocusChatInput,

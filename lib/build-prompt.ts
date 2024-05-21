@@ -42,9 +42,9 @@ export async function buildFinalMessages(
   } = payload
 
   const BUILT_PROMPT = buildBasePrompt(
-    profile.profile_context || "",
+    profile?.profile_context || "",
     assistant,
-    profile.system_prompt_template || DEFAULT_SYSTEM_PROMPT
+    profile?.system_prompt_template || DEFAULT_SYSTEM_PROMPT
   )
 
   const CHUNK_SIZE = chatSettings.contextLength
@@ -212,13 +212,12 @@ export async function buildGoogleGeminiFinalMessages(
   profile: Tables<"profiles">,
   messageImageFiles: MessageImage[]
 ) {
-  const { chatSettings, workspaceInstructions, chatMessages, assistant } =
-    payload
+  const { chatSettings, chatMessages, assistant } = payload
 
   const BUILT_PROMPT = buildBasePrompt(
-    profile.profile_context || "",
+    profile?.profile_context || "",
     assistant,
-    profile.system_prompt_template || DEFAULT_SYSTEM_PROMPT
+    profile?.system_prompt_template || DEFAULT_SYSTEM_PROMPT
   )
 
   let finalMessages = []

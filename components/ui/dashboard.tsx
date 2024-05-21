@@ -102,20 +102,18 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
           width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"
         }}
       >
-        {showSidebar && (
-          <Tabs
-            className="flex h-full"
-            value={contentType}
-            onValueChange={tabValue => {
-              setContentType(tabValue as ContentType)
-              router.replace(`${pathname}?tab=${tabValue}`)
-            }}
-          >
-            <SidebarSwitcher onContentTypeChange={setContentType} />
+        <Tabs
+          className={cn("h-full", showSidebar ? "flex" : "hidden")}
+          value={contentType}
+          onValueChange={tabValue => {
+            setContentType(tabValue as ContentType)
+            router.replace(`${pathname}?tab=${tabValue}`)
+          }}
+        >
+          <SidebarSwitcher onContentTypeChange={setContentType} />
 
-            <Sidebar contentType={contentType} showSidebar={showSidebar} />
-          </Tabs>
-        )}
+          <Sidebar contentType={contentType} showSidebar={showSidebar} />
+        </Tabs>
       </div>
 
       <div

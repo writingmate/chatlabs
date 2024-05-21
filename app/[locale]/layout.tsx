@@ -104,14 +104,18 @@ export default async function RootLayout({
           >
             <Toaster richColors position="top-center" duration={3000} />
             <div className="bg-background text-foreground flex h-full flex-col items-center sm:h-screen">
-              {session ? <GlobalState>{children}</GlobalState> : children}
+              <GlobalState>{children}</GlobalState>
             </div>
           </TranslationsProvider>
         </Providers>
-        <Analytics />
-        <SpeedInsights />
-        <GoogleAnalytics gaId="G-Y14R2TP0QH" />
-        <GoogleTagManager gtmId={"GTM-5SBXJ23Q"} />
+        {process.env.NODE_ENV === "production" && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+            <GoogleAnalytics gaId="G-Y14R2TP0QH" />
+            <GoogleTagManager gtmId={"GTM-5SBXJ23Q"} />
+          </>
+        )}
       </body>
     </html>
   )

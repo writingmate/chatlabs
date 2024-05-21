@@ -17,9 +17,9 @@ export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
 
       <div className="text-4xl font-semibold tracking-wide">ChatLabs</div>
       <div className="flex flex-col items-center py-2">
-        <div className="text-sm">More than 20 AI models in one place.</div>
+        <div className="text-sm">More than 30 AI models in one place.</div>
         <div className="text-sm">
-          Featuring GPT-4, Claude, Gemini and LLaMa.
+          Featuring GPT-4o, Claude 3, Gemini Pro, and LLaMa 3.
         </div>
       </div>
     </div>

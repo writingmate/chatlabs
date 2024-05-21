@@ -9,7 +9,7 @@ import {
 interface WithTooltipProps {
   display: React.ReactNode
   trigger: React.ReactNode
-
+  asChild?: boolean
   delayDuration?: number
   side?: "left" | "right" | "top" | "bottom"
 }
@@ -17,14 +17,14 @@ interface WithTooltipProps {
 export const WithTooltip: FC<WithTooltipProps> = ({
   display,
   trigger,
-
+  asChild = false,
   delayDuration = 500,
   side = "right"
 }) => {
   return (
     <TooltipProvider delayDuration={delayDuration}>
       <Tooltip>
-        <TooltipTrigger>{trigger}</TooltipTrigger>
+        <TooltipTrigger asChild={asChild}>{trigger}</TooltipTrigger>
 
         <TooltipContent side={side}>{display}</TooltipContent>
       </Tooltip>

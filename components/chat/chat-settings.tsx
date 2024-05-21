@@ -75,15 +75,6 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
     })
   }
 
-  const handleSelectTools = () => {
-    setChatSettings(prev => {
-      return {
-        ...prev,
-        tools: !prev
-      }
-    })
-  }
-
   const selectedModel = allModels.find(x => x.modelId == chatSettings.model)
 
   return (
