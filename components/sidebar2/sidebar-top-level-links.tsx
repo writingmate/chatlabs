@@ -77,7 +77,7 @@ export const SidebarTopLevelLinks: FC<SidebarTopLevelLinksProps> = ({
     >
       {menuItems.map((item, index) => (
         <SidebarTopLevelLink
-          href={`/${selectedWorkspace?.id}/chat/${item.contentType}`}
+          href={`/${selectedWorkspace?.id}/${item.contentType}`}
           folders={item.folders}
           key={index}
           // active={contentType === item.contentType}
