@@ -121,7 +121,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       >
         <IconPlus stroke={1.5} size={SIDEBAR_ICON_SIZE} />
         <div className="ml-2">
-          New{" "}
+          Create{" "}
           {resolvedName.charAt(0).toUpperCase() +
             resolvedName.slice(1, resolvedName.length - 1)}
         </div>

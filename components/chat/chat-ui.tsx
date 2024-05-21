@@ -29,6 +29,9 @@ interface ChatUIProps {}
 
 export const ChatUI: FC<ChatUIProps> = ({}) => {
   useHotkey("o", () => handleNewChat())
+  useHotkey("l", () => {
+    handleFocusChatInput()
+  })
 
   const params = useParams()
 

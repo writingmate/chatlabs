@@ -11,34 +11,36 @@ import {
 import { SidebarCreateButtons } from "@/components/sidebar2/sidebar-create-buttons"
 import { SidebarDataList } from "@/components/sidebar2/sidebar-data-list"
 import { useRouter } from "next/navigation"
+import PageContent from "@/components/page/page-content"
+import PageHeader from "@/components/page/page-header"
+import PageTitle from "@/components/page/page-title"
+import { Dashboard } from "@/components/ui/dashboard"
 
-export default function AssistantsPage() {
+export default function PromptsPage() {
   const { assistants: data, folders } = useContext(ChatbotUIContext)
 
   const filteredFolders = folders.filter(folder => folder.type === "assistants")
 
-  const router = useRouter()
-
   return (
-    <Dialog open={true} onOpenChange={() => router.push("./chat")}>
-      <DialogContent className={"min-h-[200px] min-w-[400px]"}>
-        <DialogHeader
+    <Dashboard>
+      <PageContent>
+        <PageHeader
           className={
             "flex w-full flex-row items-center justify-between space-y-0"
           }
         >
-          <DialogTitle className={"capitalize"}>Assistants</DialogTitle>
+          <PageTitle className={"capitalize"}>Prompts</PageTitle>
           <SidebarCreateButtons
-            contentType={"assistants"}
+            contentType={"prompts"}
             hasData={data.length > 0}
           />
-        </DialogHeader>
+        </PageHeader>
         <SidebarDataList
-          contentType={"assistants"}
+          contentType={"prompts"}
           data={data}
           folders={filteredFolders}
         />
-      </DialogContent>
-    </Dialog>
+      </PageContent>
+    </Dashboard>
   )
 }
