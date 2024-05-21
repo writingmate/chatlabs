@@ -21,14 +21,14 @@ import LoginDialog from "@/components/login/login-dialog"
 
 export default function HomePage() {
   const router = useRouter()
-  const [needLogin, setNeedLogin] = useState(true)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
-        return router.push("/")
+        setLoading(false)
+        return
       }
-      setNeedLogin(false)
       const userId = data.session.user.id
       window.gtag?.("set", { user_id: userId })
       window.dataLayer?.push({ user_id: userId })
@@ -43,6 +43,8 @@ export default function HomePage() {
       })
     })
   }, [])
+
+  if (loading) return <Loading />
 
   return (
     <>
