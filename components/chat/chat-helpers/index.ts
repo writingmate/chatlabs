@@ -45,13 +45,13 @@ export const validateChatSettings = (
     throw new Error("Model not found")
   }
 
-  if (!profile) {
-    throw new Error("Profile not found")
-  }
-
-  if (!selectedWorkspace) {
-    throw new Error("Workspace not found")
-  }
+  // if (!profile) {
+  //   throw new Error("Profile not found")
+  // }
+  //
+  // if (!selectedWorkspace) {
+  //   throw new Error("Workspace not found")
+  // }
 
   if (!messageContent) {
     throw new Error("Message content not found")
