@@ -11,7 +11,7 @@ import { useParams, useRouter } from "next/navigation"
 import { FC, useContext, useRef } from "react"
 import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
-import { SIDEBAR_ICON_SIZE } from "@/components/sidebar2/sidebar-switcher"
+import { SIDEBAR_ICON_SIZE } from "@/components/sidebar2/sidebar-top-level-links"
 import {
   SIDEBAR_ITEM_ICON_SIZE,
   SIDEBAR_ITEM_ICON_STROKE

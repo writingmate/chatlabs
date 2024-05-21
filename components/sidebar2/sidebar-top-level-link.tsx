@@ -3,20 +3,20 @@ import Link from "next/link"
 
 type SidebarSwitchItemProps = {
   icon: React.ReactNode
-  contentType: ContentType
   folders?: any
+  href: string
   label: string
   // active: boolean
 }
 
-export function SidebarSwitchItem({
+export function SidebarTopLevelLink({
   icon,
-  contentType,
+  href,
   label
 }: SidebarSwitchItemProps) {
   return (
     <Link
-      href={`./${contentType}`}
+      href={href}
       className={
         "hover:bg-accent/60 flex-start focus:bg-accent group flex h-[36px] w-full cursor-pointer items-center rounded px-2 focus:outline-none"
       }

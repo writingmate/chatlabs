@@ -1,12 +1,9 @@
-import { Tables } from "@/supabase/types"
-import { ContentType, DataListType } from "@/types"
-import { FC, useContext, useState } from "react"
-import { SidebarCreateButtons } from "./sidebar-create-buttons"
-import { SidebarDataList } from "./sidebar-data-list"
+import { ContentType } from "@/types"
+import { FC, useContext } from "react"
 import {
   SIDEBAR_ICON_SIZE,
-  SidebarSwitcher
-} from "@/components/sidebar2/sidebar-switcher"
+  SidebarTopLevelLinks
+} from "@/components/sidebar2/sidebar-top-level-links"
 import {
   IconMessageCircle,
   IconMessageCirclePlus,
@@ -58,7 +55,7 @@ export const SidebarTopContent: FC<SidebarTopContentProps> = ({
         </div>
         <SidebarSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </div>
-      <SidebarSwitcher
+      <SidebarTopLevelLinks
         className={cn(
           "transition-[margin] duration-300",
           // searchTerm && `-mt-[${32 * 3}px]`

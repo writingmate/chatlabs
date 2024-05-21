@@ -22,7 +22,7 @@ import { CreatePreset } from "./items/presets/create-preset"
 import { CreatePrompt } from "./items/prompts/create-prompt"
 import { CreateTool } from "./items/tools/create-tool"
 import { isMobileScreen } from "@/lib/mobile"
-import { SIDEBAR_ICON_SIZE } from "@/components/sidebar2/sidebar-switcher"
+import { SIDEBAR_ICON_SIZE } from "@/components/sidebar2/sidebar-top-level-links"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 

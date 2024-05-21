@@ -22,23 +22,24 @@ import { ChatbotUIContext } from "@/context/context"
 import { validateProPlan } from "@/lib/subscription"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { SidebarSwitchItem } from "@/components/sidebar2/sidebar-switch-item"
+import { SidebarTopLevelLink } from "@/components/sidebar2/sidebar-top-level-link"
 import { useRouter } from "next/navigation"
 
 export const SIDEBAR_ICON_SIZE = 20
 
-interface SidebarSwitcherProps {
+interface SidebarTopLevelLinksProps {
   className?: string
   contentType: ContentType
   onContentTypeChange: (contentType: ContentType) => void
 }
 
-export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
+export const SidebarTopLevelLinks: FC<SidebarTopLevelLinksProps> = ({
   className,
   contentType,
   onContentTypeChange
 }) => {
-  const { files, prompts, assistants, folders } = useContext(ChatbotUIContext)
+  const { selectedWorkspace, files, prompts, assistants, folders } =
+    useContext(ChatbotUIContext)
 
   const menuItems = [
     {
@@ -75,8 +76,8 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
       className={cn("z-10 mb-2 flex flex-col border-b pb-2 text-sm", className)}
     >
       {menuItems.map((item, index) => (
-        <SidebarSwitchItem
-          contentType={item.contentType as ContentType}
+        <SidebarTopLevelLink
+          href={`/${selectedWorkspace?.id}/chat/${item.contentType}`}
           folders={item.folders}
           key={index}
           // active={contentType === item.contentType}
