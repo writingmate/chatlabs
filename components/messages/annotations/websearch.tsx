@@ -24,7 +24,7 @@ export function WebSearch({
 
   return (
     <div className={"grid grid-cols-2 gap-2 md:grid-cols-4"}>
-      {(showAll ? organic : organic.slice(0, 4)).map((item, index) => {
+      {(showAll ? organic || [] : organic?.slice(0, 4))?.map((item, index) => {
         const hostname = new URL(item.link).hostname
         const displayHostname = hostname.replace("www.", "")
         return (
