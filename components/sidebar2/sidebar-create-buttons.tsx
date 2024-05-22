@@ -112,7 +112,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   }
 
   return (
-    <div>
+    <div className={"flex flex-nowrap space-x-1"}>
       <Button
         size={"xs"}
         variant={"outline"}
@@ -128,8 +128,8 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       </Button>
 
       {/*{hasData && (*/}
-      {/*  <Button className="size-[36px] p-1" onClick={handleCreateFolder}>*/}
-      {/*    <IconFolderPlus size={20} />*/}
+      {/*  <Button size={"xs"} variant={"outline"} className="flex p-1 px-2 py-0" onClick={handleCreateFolder}>*/}
+      {/*    <IconFolderPlus stroke={1.5} size={SIDEBAR_ICON_SIZE} />*/}
       {/*  </Button>*/}
       {/*)}*/}
 

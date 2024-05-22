@@ -17,9 +17,9 @@ import PageTitle from "@/components/page/page-title"
 import { Dashboard } from "@/components/ui/dashboard"
 
 export default function FilesPage() {
-  const { assistants: data, folders } = useContext(ChatbotUIContext)
+  const { files: data, folders } = useContext(ChatbotUIContext)
 
-  const filteredFolders = folders.filter(folder => folder.type === "assistants")
+  const filteredFolders = folders.filter(folder => folder.type === "files")
 
   return (
     <Dashboard>

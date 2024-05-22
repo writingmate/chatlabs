@@ -17,9 +17,9 @@ import PageTitle from "@/components/page/page-title"
 import { Dashboard } from "@/components/ui/dashboard"
 
 export default function PromptsPage() {
-  const { assistants: data, folders } = useContext(ChatbotUIContext)
+  const { prompts: data, folders } = useContext(ChatbotUIContext)
 
-  const filteredFolders = folders.filter(folder => folder.type === "assistants")
+  const filteredFolders = folders.filter(folder => folder.type === "prompts")
 
   return (
     <Dashboard>
