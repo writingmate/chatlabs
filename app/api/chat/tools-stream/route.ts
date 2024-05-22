@@ -12,9 +12,9 @@ import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import {
   experimental_StreamData,
-  FunctionCallPayload,
   OpenAIStream,
-  StreamingTextResponse
+  StreamingTextResponse,
+  OpenAIStreamCallbacks
 } from "ai"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
@@ -54,6 +54,14 @@ function getClient(model: string, profile: Tables<"profiles">) {
     })
   }
 
+  if (provider === "groq") {
+    checkApiKey(profile.groq_api_key, "Groq")
+    return new OpenAI({
+      apiKey: profile.groq_api_key || "",
+      baseURL: "https://api.groq.com/openai/v1"
+    })
+  }
+
   if (provider === undefined) {
     // special case for openrouter
     checkApiKey(profile.openrouter_api_key, "OpenRouter")
@@ -64,6 +72,74 @@ function getClient(model: string, profile: Tables<"profiles">) {
   }
 
   throw new Error(`Provider not supported: ${provider}`)
+}
+
+async function* fixGroqStream(response: AsyncIterable<any>) {
+  for await (let chunk of response) {
+    // Assuming chunk is an object and we need to extract text from it
+
+    if (
+      chunk.choices?.[0]?.delta?.tool_calls?.[0]?.function.name &&
+      chunk.choices?.[0]?.delta?.tool_calls?.[0]?.function?.arguments
+    ) {
+      const toolCalls = chunk.choices?.[0]?.delta?.tool_calls
+      try {
+        const newChunk = {
+          id: chunk.id,
+          object: chunk.object,
+          created: chunk.created,
+          model: chunk.model,
+          choices: [
+            {
+              delta: {
+                content: null,
+                index: 0,
+                role: "assistant",
+                tool_calls: toolCalls.map((toolCall: any) => ({
+                  ...toolCall,
+                  function: {
+                    name: toolCall.function.name,
+                    arguments: ""
+                  }
+                })),
+                finish_reason: null
+              }
+            }
+          ]
+        }
+
+        yield newChunk
+
+        const newChunk2 = {
+          id: chunk.id,
+          object: chunk.object,
+          created: chunk.created,
+          model: chunk.model,
+          choices: [
+            {
+              delta: {
+                index: 0,
+                tool_calls: toolCalls.map((toolCall: any) => ({
+                  ...toolCall,
+                  function: {
+                    arguments: toolCall.function.arguments
+                  }
+                }))
+              },
+              finish_reason: null
+            }
+          ]
+        }
+
+        yield newChunk2
+
+        continue
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    yield chunk
+  }
 }
 
 export async function POST(request: Request) {
@@ -97,11 +173,8 @@ export async function POST(request: Request) {
 
     const functionCallStartTime = new Date().getTime()
 
-    const stream = OpenAIStream(response, {
-      experimental_onToolCall: async (
-        toolCallPayload,
-        appendToolCallMessage
-      ) => {
+    const onToolCallCallback: OpenAIStreamCallbacks["experimental_onToolCall"] =
+      async (toolCallPayload, appendToolCallMessage) => {
         try {
           for (const toolCall of toolCallPayload.tools) {
             let functionResponse, resultProcessingMode
@@ -142,7 +215,10 @@ export async function POST(request: Request) {
         } catch (error: any) {
           return error.message || "An unexpected error occurred"
         }
-      },
+      }
+
+    let stream = OpenAIStream(fixGroqStream(response), {
+      experimental_onToolCall: onToolCallCallback,
       experimental_streamData: true,
       onFinal(completion) {
         streamData.close()
