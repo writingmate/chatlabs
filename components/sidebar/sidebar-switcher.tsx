@@ -34,7 +34,8 @@ interface SidebarSwitcherProps {
 export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   onContentTypeChange
 }) => {
-  const { profile, setIsPaywallOpen } = useContext(ChatbotUIContext)
+  const { profile, selectedWorkspace, setIsPaywallOpen } =
+    useContext(ChatbotUIContext)
 
   const router = useRouter()
   return (
@@ -98,7 +99,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
               variant="ghost"
               size="icon"
               onClick={e => {
-                window.open("./splitview", "_blank")
+                window.open(`/${selectedWorkspace?.id}/splitview`, "_blank")
               }}
             >
               <IconLayoutColumns size={SIDEBAR_ICON_SIZE} stroke={1.5} />
