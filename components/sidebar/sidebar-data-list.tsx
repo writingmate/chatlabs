@@ -10,7 +10,7 @@ import { updateTool } from "@/db/tools"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, DataListType } from "@/types"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { Separator } from "../ui/separator"
 import { AssistantItem } from "./items/assistants/assistant-item"
 import { ChatItem } from "./items/chat/chat-item"
@@ -50,10 +50,13 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
   const [isOverflowing, setIsOverflowing] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
 
-  const getDataListComponent = (
-    contentType: ContentType,
+  const DataListComponent = ({
+    contentType,
+    item
+  }: {
+    contentType: ContentType
     item: DataItemType
-  ) => {
+  }) => {
     switch (contentType) {
       case "chats":
         return <ChatItem key={item.id} chat={item as Tables<"chats">} />
@@ -224,6 +227,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         divRef.current.scrollHeight > divRef.current.clientHeight
       )
     }
+    console.log("data", data)
   }, [data])
 
   const dataWithFolders = data.filter(item => item.folder_id)
@@ -251,54 +255,63 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     }
   }
 
-  return (
-    <>
-      <div
-        ref={divRef}
-        className="mt-2 flex flex-col overflow-auto"
-        onDrop={handleDrop}
-      >
-        {data.length === 0 && (
-          <div className="flex grow flex-col items-center justify-center">
-            <div className="text-centertext-muted-foreground p-3 italic">
-              {getDescription(contentType)}
+  return useMemo(
+    () => (
+      <>
+        <div
+          ref={divRef}
+          className="mt-2 flex flex-col overflow-auto"
+          onDrop={handleDrop}
+        >
+          {data.length === 0 && (
+            <div className="flex grow flex-col items-center justify-center">
+              <div className="text-centertext-muted-foreground p-3 italic">
+                {getDescription(contentType)}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {(dataWithFolders.length > 0 || dataWithoutFolders.length > 0) && (
-          <div
-            className={`h-full ${
-              isOverflowing ? "w-[calc(100%-8px)]" : "w-full"
-            } space-y-2 pt-2 ${isOverflowing ? "mr-2" : ""}`}
-          >
-            {folders.map(folder => (
-              <Folder
-                key={folder.id}
-                folder={folder}
-                onUpdateFolder={updateFolder}
-                contentType={contentType}
-              >
-                {dataWithFolders
-                  .filter(item => item.folder_id === folder.id)
-                  .map(item => (
-                    <div
-                      key={item.id}
-                      draggable
-                      onDragStart={e => handleDragStart(e, item.id)}
-                    >
-                      {getDataListComponent(contentType, item)}
-                    </div>
-                  ))}
-              </Folder>
-            ))}
+          {(dataWithFolders.length > 0 || dataWithoutFolders.length > 0) && (
+            <div
+              className={`h-full ${
+                isOverflowing ? "w-[calc(100%-8px)]" : "w-full"
+              } space-y-2 pt-2 ${isOverflowing ? "mr-2" : ""}`}
+            >
+              {folders.map(folder => (
+                <Folder
+                  key={folder.id}
+                  folder={folder}
+                  onUpdateFolder={updateFolder}
+                  contentType={contentType}
+                >
+                  {dataWithFolders
+                    .filter(item => item.folder_id === folder.id)
+                    .map(item => (
+                      <div
+                        key={item.id}
+                        draggable
+                        onDragStart={e => handleDragStart(e, item.id)}
+                      >
+                        <DataListComponent
+                          contentType={contentType}
+                          item={item}
+                        />
+                      </div>
+                    ))}
+                </Folder>
+              ))}
 
-            {folders.length > 0 && <Separator />}
+              {folders.length > 0 && <Separator />}
 
-            {contentType === "chats" ? (
-              <>
-                {["Pinned", "Today", "Yesterday", "Previous Week", "Older"].map(
-                  dateCategory => {
+              {contentType === "chats" ? (
+                <>
+                  {[
+                    "Pinned",
+                    "Today",
+                    "Yesterday",
+                    "Previous Week",
+                    "Older"
+                  ].map(dateCategory => {
                     const sortedData = getSortedData(
                       dataWithoutFolders,
                       dateCategory as
@@ -332,48 +345,58 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                                 draggable
                                 onDragStart={e => handleDragStart(e, item.id)}
                               >
-                                {getDataListComponent(contentType, item)}
+                                <DataListComponent
+                                  contentType={contentType}
+                                  item={item}
+                                />
                               </div>
                             ))}
                           </div>
                         </div>
                       )
                     )
-                  }
-                )}
-              </>
-            ) : (
-              <div
-                className={cn("flex grow flex-col", isDragOver && "bg-accent")}
-                onDrop={handleDrop}
-                onDragEnter={handleDragEnter}
-                onDragLeave={handleDragLeave}
-                onDragOver={handleDragOver}
-              >
-                {dataWithoutFolders.map(item => {
-                  return (
-                    <div
-                      key={item.id}
-                      draggable
-                      onDragStart={e => handleDragStart(e, item.id)}
-                    >
-                      {getDataListComponent(contentType, item)}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+                  })}
+                </>
+              ) : (
+                <div
+                  className={cn(
+                    "flex grow flex-col",
+                    isDragOver && "bg-accent"
+                  )}
+                  onDrop={handleDrop}
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                  onDragOver={handleDragOver}
+                >
+                  {dataWithoutFolders.map(item => {
+                    return (
+                      <div
+                        key={item.id}
+                        draggable
+                        onDragStart={e => handleDragStart(e, item.id)}
+                      >
+                        <DataListComponent
+                          contentType={contentType}
+                          item={item}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
-      <div
-        className={cn("flex grow", isDragOver && "bg-accent")}
-        onDrop={handleDrop}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDragOver={handleDragOver}
-      />
-    </>
+        <div
+          className={cn("flex grow", isDragOver && "bg-accent")}
+          onDrop={handleDrop}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+        />
+      </>
+    ),
+    [data, folders, contentType, isOverflowing, isDragOver]
   )
 }

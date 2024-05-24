@@ -23,6 +23,7 @@ import { QuickSettingOption } from "./quick-setting-option"
 import { set } from "date-fns"
 import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
 import { validatePlanForAssistant } from "@/lib/subscription"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface QuickSettingsProps {}
 
@@ -37,17 +38,16 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     assistants,
     selectedAssistant,
     selectedPreset,
-    chatSettings,
     setSelectedPreset,
     setSelectedAssistant,
-    setChatSettings,
     assistantImages,
     setChatFiles,
-    setSelectedTools,
-    setShowFilesDisplay,
     selectedWorkspace,
     setIsPaywallOpen
   } = useContext(ChatbotUIContext)
+
+  const { chatSettings, setChatSettings, setSelectedTools } =
+    useContext(ChatbotUIChatContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
 

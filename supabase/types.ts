@@ -872,6 +872,7 @@ export interface Database {
           sequence_number: number
           updated_at: string | null
           user_id: string
+          word_count: number | null
         }
         Insert: {
           annotation?: Json | null
@@ -886,6 +887,7 @@ export interface Database {
           sequence_number: number
           updated_at?: string | null
           user_id: string
+          word_count?: number | null
         }
         Update: {
           annotation?: Json | null
@@ -900,6 +902,7 @@ export interface Database {
           sequence_number?: number
           updated_at?: string | null
           user_id?: string
+          word_count?: number | null
         }
         Relationships: [
           {

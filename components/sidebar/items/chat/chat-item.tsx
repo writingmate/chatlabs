@@ -8,7 +8,7 @@ import { LLM } from "@/types"
 import { IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
-import { FC, useContext, useRef } from "react"
+import { FC, useContext, useMemo, useRef } from "react"
 import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
 import { SIDEBAR_ICON_SIZE } from "@/components/sidebar/sidebar-switcher"
@@ -28,7 +28,8 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     selectedChat,
     availableLocalModels,
     assistantImages,
-    availableOpenRouterModels
+    availableOpenRouterModels,
+    setChats
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
@@ -59,73 +60,79 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     image => image.assistantId === chat.assistant_id
   )?.base64
 
-  return (
-    <div
-      ref={itemRef}
-      className={cn(
-        "hover:bg-accent focus:bg-accent group flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none",
-        isActive && "bg-accent"
-      )}
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-      onClick={handleClick}
-    >
-      {chat.assistant_id ? (
-        assistantImage ? (
-          <Image
-            style={{ width: "30px", height: "30px" }}
-            className="rounded"
-            src={assistantImage}
-            alt="Assistant image"
-            width={SIDEBAR_ITEM_ICON_SIZE}
-            height={SIDEBAR_ITEM_ICON_SIZE}
-          />
-        ) : (
-          <IconRobotFace
-            className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-            size={SIDEBAR_ITEM_ICON_SIZE}
-            stroke={SIDEBAR_ITEM_ICON_STROKE}
-          />
-        )
-      ) : (
-        <WithTooltip
-          delayDuration={200}
-          display={<div>{MODEL_DATA?.modelName}</div>}
-          trigger={
-            <ModelIcon
-              provider={MODEL_DATA?.provider}
-              modelId={MODEL_DATA?.modelId}
-              height={SIDEBAR_ITEM_ICON_SIZE}
-              width={SIDEBAR_ITEM_ICON_SIZE}
-            />
-          }
-        />
-      )}
-
-      <div className="ml-3 flex-1 truncate text-sm">{chat.name}</div>
-
+  return useMemo(
+    () => (
       <div
-        onClick={e => {
-          e.stopPropagation()
-          e.preventDefault()
-        }}
-        className={`ml-2 flex space-x-2`}
+        ref={itemRef}
+        className={cn(
+          "hover:bg-accent focus:bg-accent group flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none",
+          isActive && "bg-accent"
+        )}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        onClick={handleClick}
       >
-        <UpdateChat
-          className={!isActive ? " hidden group-hover:flex" : ""}
-          chat={chat}
-        />
-        <DeleteChat
-          className={!isActive ? " hidden group-hover:flex" : ""}
-          chat={chat}
-        />
-        <PinChat
-          className={
-            !isActive && !chat.pinned ? " hidden group-hover:flex" : ""
-          }
-          chat={chat}
-        />
+        {chat.assistant_id ? (
+          assistantImage ? (
+            <Image
+              style={{ width: "30px", height: "30px" }}
+              className="rounded"
+              src={assistantImage}
+              alt="Assistant image"
+              width={SIDEBAR_ITEM_ICON_SIZE}
+              height={SIDEBAR_ITEM_ICON_SIZE}
+            />
+          ) : (
+            <IconRobotFace
+              className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+              size={SIDEBAR_ITEM_ICON_SIZE}
+              stroke={SIDEBAR_ITEM_ICON_STROKE}
+            />
+          )
+        ) : (
+          <WithTooltip
+            delayDuration={200}
+            display={<div>{MODEL_DATA?.modelName}</div>}
+            trigger={
+              <ModelIcon
+                provider={MODEL_DATA?.provider}
+                modelId={MODEL_DATA?.modelId}
+                height={SIDEBAR_ITEM_ICON_SIZE}
+                width={SIDEBAR_ITEM_ICON_SIZE}
+              />
+            }
+          />
+        )}
+
+        <div className="ml-3 flex-1 truncate text-sm">{chat.name}</div>
+
+        <div
+          onClick={e => {
+            e.stopPropagation()
+            e.preventDefault()
+          }}
+          className={`ml-2 flex space-x-2`}
+        >
+          <UpdateChat
+            className={!isActive ? " hidden group-hover:flex" : ""}
+            chat={chat}
+            setChats={setChats}
+          />
+          <DeleteChat
+            className={!isActive ? " hidden group-hover:flex" : ""}
+            chat={chat}
+            setChats={setChats}
+          />
+          <PinChat
+            className={
+              !isActive && !chat.pinned ? " hidden group-hover:flex" : ""
+            }
+            setChats={setChats}
+            chat={chat}
+          />
+        </div>
       </div>
-    </div>
+    ),
+    [chat, isActive]
   )
 }

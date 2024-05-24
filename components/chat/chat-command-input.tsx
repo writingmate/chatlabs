@@ -7,6 +7,7 @@ import { PromptPicker } from "./prompt-picker"
 import { ToolPicker } from "./tool-picker"
 import { cn } from "@/lib/utils"
 import { MessageHistoryPicker } from "@/components/message-history-picker"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatCommandInputProps {}
 

@@ -20,12 +20,17 @@ import { cn } from "@/lib/utils"
 interface DeleteChatProps {
   chat: Tables<"chats">
   className?: string
+  setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>
 }
 
-export const DeleteChat: FC<DeleteChatProps> = ({ chat, className }) => {
+export const DeleteChat: FC<DeleteChatProps> = ({
+  chat,
+  className,
+  setChats
+}) => {
   useHotkey("Backspace", () => setShowChatDialog(true))
 
-  const { setChats } = useContext(ChatbotUIContext)
+  // const { setChats } = useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
 
   const buttonRef = useRef<HTMLButtonElement>(null)

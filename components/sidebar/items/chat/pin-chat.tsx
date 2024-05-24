@@ -19,10 +19,11 @@ import { cn } from "@/lib/utils"
 interface UpdateChatProps {
   chat: Tables<"chats">
   className?: string
+  setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>
 }
 
-export const PinChat: FC<UpdateChatProps> = ({ chat, className }) => {
-  const { setChats } = useContext(ChatbotUIContext)
+export const PinChat: FC<UpdateChatProps> = ({ chat, className, setChats }) => {
+  // const { setChats } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 

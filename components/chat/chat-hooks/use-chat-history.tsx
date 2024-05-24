@@ -1,5 +1,6 @@
 import { ChatbotUIContext } from "@/context/context"
 import { useContext, useEffect, useState } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 /**
  * Custom hook for handling chat history in the chat component.
@@ -11,7 +12,7 @@ import { useContext, useEffect, useState } from "react"
  */
 export const useChatHistoryHandler = () => {
   const { setUserInput, chatMessages, isGenerating } =
-    useContext(ChatbotUIContext)
+    useContext(ChatbotUIChatContext)
   const userRoleString = "user"
 
   const [messageHistoryIndex, setMessageHistoryIndex] = useState<number>(

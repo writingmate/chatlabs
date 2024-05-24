@@ -24,6 +24,7 @@ import { Brand } from "@/components/ui/brand"
 import { useTheme } from "next-themes"
 import { IconMessagePlus } from "@tabler/icons-react"
 import { WithTooltip } from "@/components/ui/with-tooltip"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatUIProps {}
 
@@ -33,9 +34,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   const params = useParams()
 
   const {
-    chatMessages,
-    setChatMessages,
-    selectedChat,
     setSelectedChat,
     setChatSettings,
     setChatImages,
@@ -48,6 +46,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setSelectedTools,
     showSidebar
   } = useContext(ChatbotUIContext)
+
+  const { chatMessages, setChatMessages } = useContext(ChatbotUIChatContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
 
