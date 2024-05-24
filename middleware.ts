@@ -19,7 +19,7 @@ async function rateLimitMiddleware(supabase: SupabaseClient, session: any, reque
 
       if (!success) {
         return NextResponse.json({
-          message: "Rate limit exceeded",
+          message: "You are sending too many messages. Please try again in a few minutes.",
         }, {
           status: 429,
         })
