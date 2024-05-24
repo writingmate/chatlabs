@@ -21,8 +21,8 @@ import {
 
 interface ChatbotUIChatContext {
   // PASSIVE CHAT STORE
-  // userInput: string
-  // setUserInput: Dispatch<SetStateAction<string>>
+  userInput: string
+  setUserInput: Dispatch<SetStateAction<string>>
   chatMessages: ChatMessage[]
   setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>
   chatSettings: ChatSettings | null
@@ -55,9 +55,8 @@ interface ChatbotUIChatContext {
 
 export const ChatbotUIChatContext = createContext<ChatbotUIChatContext>({
   // PASSIVE CHAT STORE
-  // userInput: "",
-  // setUserInput: () => {
-  // },
+  userInput: "",
+  setUserInput: () => {},
   selectedChat: null,
   setSelectedChat: () => {},
   chatMessages: [],
@@ -121,6 +120,7 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
     }
   })
 
+  const [userInput, setUserInput] = useState<string>("")
   const [selectedChat, setSelectedChat] = useState<Tables<"chats"> | null>(null)
   const [chatFileItems, setChatFileItems] = useState<Tables<"file_items">[]>([])
 
@@ -148,6 +148,8 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
     <ChatbotUIChatContext.Provider
       value={{
         // PASSIVE CHAT STORE
+        userInput,
+        setUserInput,
         chatMessages,
         setChatMessages,
         chatSettings,

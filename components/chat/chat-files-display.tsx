@@ -22,6 +22,7 @@ import { FilePreview } from "../ui/file-preview"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ChatRetrievalSettings } from "./chat-retrieval-settings"
 import { XIcon } from "@/components/ui/x-icon"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatFilesDisplayProps {}
 

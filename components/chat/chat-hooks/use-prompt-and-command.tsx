@@ -6,14 +6,13 @@ import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
 import { useContext } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 export const usePromptAndCommand = () => {
   const {
     chatFiles,
     newMessageFiles,
     setNewMessageFiles,
-    userInput,
-    setUserInput,
     setShowFilesDisplay,
     setIsPromptPickerOpen,
     setIsFilePickerOpen,
@@ -22,17 +21,22 @@ export const usePromptAndCommand = () => {
     setUseRetrieval,
     setToolCommand,
     setIsToolPickerOpen,
-    selectedTools,
-    setSelectedTools,
     setAtCommand,
     setIsAssistantPickerOpen,
     setSelectedAssistant,
-    setChatSettings,
     setChatFiles,
     setPromptVariables,
     setShowPromptVariables,
     profile
   } = useContext(ChatbotUIContext)
+
+  const {
+    userInput,
+    setUserInput,
+    selectedTools,
+    setSelectedTools,
+    setChatSettings
+  } = useContext(ChatbotUIChatContext)
 
   const handleInputChange = (value: string) => {
     const assistantTextRegex = new RegExp(

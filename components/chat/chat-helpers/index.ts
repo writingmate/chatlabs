@@ -125,7 +125,8 @@ export const createTempMessages = (
       sequence_number: chatMessages.length,
       updated_at: "",
       user_id: "",
-      annotation: {}
+      annotation: {},
+      word_count: 0
     },
     fileItems: []
   }
@@ -143,7 +144,8 @@ export const createTempMessages = (
       sequence_number: chatMessages.length + 1,
       updated_at: "",
       user_id: "",
-      annotation: {}
+      annotation: {},
+      word_count: 0
     },
     fileItems: []
   }
@@ -368,6 +370,12 @@ export const fetchChatResponse = async (
     if (response.status === 404 && !isHosted) {
       toast.error(
         "Model not found. Make sure you have it downloaded via Ollama."
+      )
+    }
+
+    if (response.status === 429) {
+      toast.warning(
+        "You are sending too many messages. Please try again in a few minutes."
       )
     }
 

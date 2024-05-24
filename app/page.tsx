@@ -8,7 +8,7 @@ import { Brand } from "@/components/ui/brand"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase/browser-client"
-import Loading from "@/app/[locale]/loading"
+import Loading from "@/app/loading"
 import {
   getHomeWorkspaceByUserId,
   getWorkspaceById,

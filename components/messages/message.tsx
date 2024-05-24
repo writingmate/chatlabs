@@ -32,6 +32,7 @@ import { WebSearch } from "@/components/messages/annotations/websearch"
 import AnnotationImage from "@/components/messages/annotations/image"
 import { Annotation, Annotation2 } from "@/types/annotation"
 import { any } from "zod"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 const ICON_SIZE = 32
 
@@ -43,26 +44,30 @@ interface MessageProps {
   onStartEdit: (message: Tables<"messages">) => void
   onCancelEdit: () => void
   onSubmitEdit: (value: string, sequenceNumber: number) => void
+  onRegenerate: (editedMessage?: string) => void
+  isGenerating: boolean
+  firstTokenReceived: boolean
+  setIsGenerating: (value: boolean) => void
 }
 
 export const Message: FC<MessageProps> = ({
+  isGenerating,
+  firstTokenReceived,
+  setIsGenerating,
   message,
   fileItems,
   isEditing,
   isLast,
   onStartEdit,
   onCancelEdit,
+  onRegenerate,
   onSubmitEdit
 }) => {
   const {
     assistants,
     profile,
-    isGenerating,
-    setIsGenerating,
-    firstTokenReceived,
     availableLocalModels,
     availableOpenRouterModels,
-    chatMessages,
     selectedAssistant,
     chatImages,
     assistantImages,
@@ -164,11 +169,7 @@ export const Message: FC<MessageProps> = ({
 
   const handleRegenerate = async () => {
     setIsGenerating(true)
-    await handleSendMessage(
-      editedMessage || chatMessages[chatMessages.length - 2].message.content,
-      chatMessages,
-      true
-    )
+    onRegenerate(editedMessage)
   }
 
   const handleStartEdit = () => {
@@ -346,6 +347,7 @@ export const Message: FC<MessageProps> = ({
               </div>
               <div className={"absolute right-0"}>
                 <MessageActions
+                  isGenerating={isGenerating}
                   onCopy={handleCopy}
                   onEdit={handleStartEdit}
                   isAssistant={message.role === "assistant"}

@@ -6,6 +6,7 @@ import { FC, useContext, useEffect, useRef } from "react"
 import { ModelSelectChat } from "@/components/models/model-select-chat"
 import { ToolSelect } from "@/components/tools/tool-select"
 import { cn } from "@/lib/utils"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatSettingsProps {
   className?: string
@@ -15,15 +16,14 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
   useHotkey("i", () => handleClick())
 
   const {
-    chatSettings,
-    setChatSettings,
     models,
     availableHostedModels,
     availableLocalModels,
-    availableOpenRouterModels,
-    selectedTools,
-    setSelectedTools
+    availableOpenRouterModels
   } = useContext(ChatbotUIContext)
+
+  const { chatSettings, setChatSettings, selectedTools, setSelectedTools } =
+    useContext(ChatbotUIChatContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 

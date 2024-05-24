@@ -97,16 +97,16 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning className={"h-full"}>
       <body className={font.className + " h-full antialiased"}>
         <Providers attribute="class" defaultTheme="light">
-          <TranslationsProvider
-            namespaces={i18nNamespaces}
-            locale={locale}
-            resources={resources}
-          >
-            <Toaster richColors position="top-center" duration={3000} />
-            <div className="bg-background text-foreground flex h-full flex-col items-center sm:h-screen">
-              <GlobalState>{children}</GlobalState>
-            </div>
-          </TranslationsProvider>
+          {/*<TranslationsProvider*/}
+          {/*  namespaces={i18nNamespaces}*/}
+          {/*  locale={locale}*/}
+          {/*  resources={resources}*/}
+          {/*>*/}
+          <Toaster richColors position="top-center" duration={3000} />
+          <div className="bg-background text-foreground flex h-full flex-col items-center sm:h-screen">
+            <GlobalState>{children}</GlobalState>
+          </div>
+          {/*</TranslationsProvider>*/}
         </Providers>
         {process.env.NODE_ENV === "production" && (
           <>

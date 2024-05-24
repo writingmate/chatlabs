@@ -4,6 +4,7 @@ import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import mammoth from "mammoth"
 import { useContext, useEffect, useState } from "react"
 import { toast } from "sonner"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 export const ACCEPTED_FILE_TYPES = [
   "text/csv",
@@ -18,13 +19,14 @@ export const useSelectFileHandler = () => {
   const {
     selectedWorkspace,
     profile,
-    chatSettings,
     setNewMessageImages,
     setNewMessageFiles,
     setShowFilesDisplay,
     setFiles,
     setUseRetrieval
   } = useContext(ChatbotUIContext)
+
+  const { chatSettings } = useContext(ChatbotUIChatContext)
 
   const [filesToAccept, setFilesToAccept] = useState(ACCEPTED_FILE_TYPES)
   const [isUploading, setIsUploading] = useState<boolean>(false)

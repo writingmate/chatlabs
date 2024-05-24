@@ -11,10 +11,12 @@ import {
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 export const MESSAGE_ICON_SIZE = 18
 
 interface MessageActionsProps {
+  isGenerating: boolean
   isAssistant: boolean
   isLast: boolean
   isEditing: boolean
@@ -26,6 +28,7 @@ interface MessageActionsProps {
 }
 
 export const MessageActions: FC<MessageActionsProps> = ({
+  isGenerating,
   isAssistant,
   isLast,
   isEditing,
@@ -35,8 +38,6 @@ export const MessageActions: FC<MessageActionsProps> = ({
   onVoiceToText,
   isVoiceToTextPlaying
 }) => {
-  const { isGenerating } = useContext(ChatbotUIContext)
-
   const [showCheckmark, setShowCheckmark] = useState(false)
 
   const handleCopy = () => {

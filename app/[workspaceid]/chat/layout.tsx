@@ -2,6 +2,7 @@
 
 import { Dashboard } from "@/components/ui/dashboard"
 import { ReactNode, useContext, useEffect, useState } from "react"
+import { ChatbotUIChatProvider } from "@/context/chat"
 
 interface ChatLayoutProps {
   modal: ReactNode
@@ -10,9 +11,11 @@ interface ChatLayoutProps {
 
 export default function ChatLayout({ children, modal }: ChatLayoutProps) {
   return (
-    <Dashboard>
-      {modal}
-      {children}
-    </Dashboard>
+    <ChatbotUIChatProvider id={"one"}>
+      <Dashboard>
+        {modal}
+        {children}
+      </Dashboard>
+    </ChatbotUIChatProvider>
   )
 }

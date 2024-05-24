@@ -49,7 +49,8 @@ function getProviderCaller(model: string, profile: Tables<"profiles">) {
     return new OpenAIFunctionCaller(
       new OpenAI({
         apiKey: process.env.OPENAI_API_KEY || "",
-        organization: process.env.OPENAI_ORGANIZATION_ID
+        organization: process.env.OPENAI_ORGANIZATION_ID,
+        baseURL: process.env.OPENAI_BASE_URL || undefined
       })
     )
   }
@@ -69,7 +70,7 @@ function getProviderCaller(model: string, profile: Tables<"profiles">) {
     return new AnthropicFunctionCaller(
       new Anthropic({
         apiKey: profile.anthropic_api_key || "",
-        baseURL: "https://api.anthropic.com"
+        baseURL: process.env.ANTHROPIC_BASE_URL || undefined
       })
     )
   }

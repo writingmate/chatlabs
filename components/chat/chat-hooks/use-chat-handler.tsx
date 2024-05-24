@@ -5,7 +5,6 @@ import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { updateChat } from "@/db/chats"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
-import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
 import { useRouter } from "next/navigation"
@@ -25,55 +24,59 @@ import {
 } from "../chat-helpers"
 import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 export const useChatHandler = () => {
   const router = useRouter()
 
   const {
-    userInput,
     chatFiles,
-    setUserInput,
     setNewMessageImages,
     profile,
-    isGenerating,
-    setIsGenerating,
-    setChatMessages,
-    setFirstTokenReceived,
-    selectedChat,
     selectedWorkspace,
-    setSelectedChat,
     setChats,
-    setSelectedTools,
     availableLocalModels,
     availableOpenRouterModels,
-    abortController,
-    setAbortController,
-    chatSettings,
     newMessageImages,
     selectedAssistant,
-    chatMessages,
     chatImages,
     setChatImages,
     setChatFiles,
     setNewMessageFiles,
     setShowFilesDisplay,
     newMessageFiles,
-    chatFileItems,
-    setChatFileItems,
     setToolInUse,
     useRetrieval,
     sourceCount,
     setIsPromptPickerOpen,
     setIsFilePickerOpen,
-    selectedTools,
     selectedPreset,
-    setChatSettings,
     models,
     isPromptPickerOpen,
     isFilePickerOpen,
     isToolPickerOpen,
     setIsPaywallOpen
   } = useContext(ChatbotUIContext)
+
+  const {
+    userInput,
+    setUserInput,
+    isGenerating,
+    setIsGenerating,
+    setChatMessages,
+    setFirstTokenReceived,
+    selectedChat,
+    setSelectedChat,
+    setSelectedTools,
+    abortController,
+    setAbortController,
+    chatSettings,
+    chatMessages,
+    chatFileItems,
+    setChatFileItems,
+    selectedTools,
+    setChatSettings
+  } = useContext(ChatbotUIChatContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 

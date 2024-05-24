@@ -60,6 +60,7 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "codellama-34b-instruct": false,
   "codellama-70b-instruct": false,
   "llama3-70b-8192": false,
+  "llama3-8b-8192": false,
   "gpt-4o": true,
   "gemini-1.5-flash-latest": true
 }

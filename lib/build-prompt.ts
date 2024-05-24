@@ -113,7 +113,8 @@ export async function buildFinalMessages(
     sequence_number: processedChatMessages.length,
     updated_at: "",
     user_id: "",
-    annotation: {}
+    annotation: {},
+    word_count: 0
   }
 
   finalMessages.unshift(tempSystemMessage)
@@ -254,7 +255,8 @@ export async function buildGoogleGeminiFinalMessages(
     sequence_number: chatMessages.length,
     updated_at: "",
     user_id: "",
-    annotation: {}
+    annotation: {},
+    word_count: 0
   }
 
   finalMessages.unshift(tempSystemMessage)

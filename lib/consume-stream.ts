@@ -60,6 +60,11 @@ export function parseDataStream(line: string): { text: string; data: any } {
         return { text: jsonValue as string, data: null }
       }
     },
+    "7": {
+      parse: (jsonValue: JSONValue) => {
+        return { data: jsonValue as any, text: "" }
+      }
+    },
     "8": {
       parse: (jsonValue: JSONValue) => {
         return { data: jsonValue as any, text: "" }
