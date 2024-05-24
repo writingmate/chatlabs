@@ -130,6 +130,7 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
       files,
       models,
       tools,
+      prompts,
       assistants,
       showSidebar
     ]
