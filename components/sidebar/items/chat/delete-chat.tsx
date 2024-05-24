@@ -21,17 +21,19 @@ interface DeleteChatProps {
   chat: Tables<"chats">
   className?: string
   setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>
+  handleNewChat: () => void
 }
 
 export const DeleteChat: FC<DeleteChatProps> = ({
   chat,
   className,
-  setChats
+  setChats,
+  handleNewChat
 }) => {
   useHotkey("Backspace", () => setShowChatDialog(true))
 
   // const { setChats } = useContext(ChatbotUIContext)
-  const { handleNewChat } = useChatHandler()
+  // const { handleNewChat } = useChatHandler()
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 

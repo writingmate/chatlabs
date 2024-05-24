@@ -10,8 +10,8 @@ interface ChatLayoutProps {
 
 export default function ChatLayout({ children }: ChatLayoutProps) {
   return (
-    <Dashboard>
-      <ChatbotUIChatProvider id={"one"}>{children}</ChatbotUIChatProvider>
-    </Dashboard>
+    <ChatbotUIChatProvider id={"one"}>
+      <Dashboard>{children}</Dashboard>
+    </ChatbotUIChatProvider>
   )
 }

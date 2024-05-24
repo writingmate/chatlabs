@@ -17,6 +17,7 @@ import {
   SIDEBAR_ITEM_ICON_STROKE
 } from "@/components/sidebar/items/all/sidebar-display-item"
 import { PinChat } from "@/components/sidebar/items/chat/pin-chat"
+import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -31,6 +32,8 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     availableOpenRouterModels,
     setChats
   } = useContext(ChatbotUIContext)
+
+  const { handleNewChat } = useChatHandler()
 
   const router = useRouter()
   const params = useParams()
@@ -122,6 +125,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
             className={!isActive ? " hidden group-hover:flex" : ""}
             chat={chat}
             setChats={setChats}
+            handleNewChat={handleNewChat}
           />
           <PinChat
             className={
