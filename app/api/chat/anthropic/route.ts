@@ -28,7 +28,8 @@ export async function POST(request: NextRequest) {
     let ANTHROPIC_FORMATTED_MESSAGES: any = messages.slice(1)
 
     const anthropic = new Anthropic({
-      apiKey: profile.anthropic_api_key || ""
+      apiKey: profile.anthropic_api_key || "",
+      baseURL: process.env.ANTHROPIC_BASE_URL || undefined
     })
 
     const response = await anthropic.messages.create({
