@@ -373,6 +373,12 @@ export const fetchChatResponse = async (
       )
     }
 
+    if (response.status === 429) {
+      toast.warning(
+        "You are sending too many messages. Please try again in a few minutes."
+      )
+    }
+
     const errorData = await response.json()
 
     toast.error(errorData.message)
