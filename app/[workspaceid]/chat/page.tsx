@@ -14,20 +14,5 @@ import { useContext } from "react"
 import { Dashboard } from "@/components/ui/dashboard"
 
 export default function ChatPage() {
-  useHotkey("o", () => handleNewChat())
-  useHotkey("l", () => {
-    handleFocusChatInput()
-  })
-
-  const { chatMessages } = useContext(ChatbotUIContext)
-
-  const { handleNewChat, handleFocusChatInput } = useChatHandler()
-
-  const { theme } = useTheme()
-
-  return (
-    <>
-      <ChatUI />
-    </>
-  )
+  return <ChatUI />
 }

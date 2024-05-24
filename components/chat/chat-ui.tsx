@@ -34,20 +34,23 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   const params = useParams()
 
   const {
-    setSelectedChat,
-    setChatSettings,
     setChatImages,
     assistants,
     setSelectedAssistant,
-    setChatFileItems,
     setChatFiles,
     setShowFilesDisplay,
     setUseRetrieval,
-    setSelectedTools,
     showSidebar
   } = useContext(ChatbotUIContext)
 
-  const { chatMessages, setChatMessages } = useContext(ChatbotUIChatContext)
+  const {
+    setSelectedChat,
+    setChatSettings,
+    setChatFileItems,
+    setSelectedTools,
+    chatMessages,
+    setChatMessages
+  } = useContext(ChatbotUIChatContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
 
