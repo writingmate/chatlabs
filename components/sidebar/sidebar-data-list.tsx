@@ -227,7 +227,6 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         divRef.current.scrollHeight > divRef.current.clientHeight
       )
     }
-    console.log("data", data)
   }, [data])
 
   const dataWithFolders = data.filter(item => item.folder_id)
