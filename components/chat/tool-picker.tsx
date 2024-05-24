@@ -6,6 +6,7 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { validatePlanForTools } from "@/lib/subscription"
 import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
 import { LLM_LIST, LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ToolPickerProps {}
 
@@ -17,9 +18,10 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
     toolCommand,
     isToolPickerOpen,
     setIsToolPickerOpen,
-    setIsPaywallOpen,
-    chatSettings
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
+
+  const { chatSettings } = useContext(ChatbotUIChatContext)
 
   const { handleSelectTool } = usePromptAndCommand()
 

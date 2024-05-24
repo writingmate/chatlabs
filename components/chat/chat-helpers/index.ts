@@ -125,7 +125,8 @@ export const createTempMessages = (
       sequence_number: chatMessages.length,
       updated_at: "",
       user_id: "",
-      annotation: {}
+      annotation: {},
+      word_count: 0
     },
     fileItems: []
   }
@@ -143,7 +144,8 @@ export const createTempMessages = (
       sequence_number: chatMessages.length + 1,
       updated_at: "",
       user_id: "",
-      annotation: {}
+      annotation: {},
+      word_count: 0
     },
     fileItems: []
   }

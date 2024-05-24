@@ -7,6 +7,7 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useClickOutside } from "@/components/chat/picker-hooks/use-click-outside"
 import { validatePlanForAssistant } from "@/lib/subscription"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface AssistantPickerProps {}
 

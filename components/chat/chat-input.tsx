@@ -28,6 +28,7 @@ import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { Button } from "@/components/ui/button"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatInputProps {}
 
@@ -48,10 +49,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isAssistantPickerOpen,
     focusAssistant,
     setFocusAssistant,
-    userInput,
-    setUserInput,
-    chatMessages,
-    isGenerating,
     selectedPreset,
     selectedAssistant,
     setSelectedAssistant,
@@ -65,12 +62,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setIsPromptPickerOpen,
     isFilePickerOpen,
     setFocusFile,
-    chatSettings,
-    selectedTools,
-    setSelectedTools,
     assistantImages,
     profile
   } = useContext(ChatbotUIContext)
+
+  const { userInput, setUserInput, chatMessages, isGenerating, chatSettings } =
+    useContext(ChatbotUIChatContext)
 
   const {
     chatInputRef,

@@ -7,9 +7,10 @@ import {
   useRef,
   useState
 } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 export const useScroll = () => {
-  const { isGenerating, chatMessages } = useContext(ChatbotUIContext)
+  const { isGenerating, chatMessages } = useContext(ChatbotUIChatContext)
 
   const messagesStartRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
