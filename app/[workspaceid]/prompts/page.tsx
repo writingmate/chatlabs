@@ -15,6 +15,7 @@ import PageContent from "@/components/page/page-content"
 import PageHeader from "@/components/page/page-header"
 import PageTitle from "@/components/page/page-title"
 import { Dashboard } from "@/components/ui/dashboard"
+import { PromptItem } from "@/components/sidebar2/items/prompts/prompt-item"
 
 export default function PromptsPage() {
   const { prompts: data, folders } = useContext(ChatbotUIContext)
@@ -36,6 +37,7 @@ export default function PromptsPage() {
           />
         </PageHeader>
         <SidebarDataList
+          RowComponent={PromptItem}
           contentType={"prompts"}
           data={data}
           folders={filteredFolders}
