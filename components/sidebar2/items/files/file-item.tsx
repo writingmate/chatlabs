@@ -10,12 +10,14 @@ import {
   SIDEBAR_ITEM_ICON_STROKE,
   SidebarItem
 } from "../all/sidebar-display-item"
+import { RowComponentType } from "@/components/sidebar2/sidebar-data-list"
 
 interface FileItemProps {
   file: Tables<"files">
 }
 
-export const FileItem: FC<FileItemProps> = ({ file }) => {
+export const FileItem: RowComponentType = ({ item }) => {
+  const file = item as Tables<"files">
   const [name, setName] = useState(file.name)
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(file.description)

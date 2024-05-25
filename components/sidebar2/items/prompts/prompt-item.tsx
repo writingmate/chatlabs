@@ -10,12 +10,14 @@ import {
   SIDEBAR_ITEM_ICON_STROKE,
   SidebarItem
 } from "../all/sidebar-display-item"
+import { RowComponentType } from "@/components/sidebar2/sidebar-data-list"
 
 interface PromptItemProps {
   prompt: Tables<"prompts">
 }
 
-export const PromptItem: FC<PromptItemProps> = ({ prompt }) => {
+export const PromptItem: RowComponentType = ({ item }) => {
+  const prompt = item as Tables<"prompts">
   const [name, setName] = useState(prompt.name)
   const [content, setContent] = useState(prompt.content)
   const [isTyping, setIsTyping] = useState(false)

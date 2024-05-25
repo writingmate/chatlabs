@@ -19,7 +19,17 @@ export const getHomeWorkspaceByUserId = async (userId: string) => {
 export const getWorkspaceById = async (workspaceId: string) => {
   const { data: workspace, error } = await supabase
     .from("workspaces")
-    .select("*")
+    .select(
+      `*, 
+    chats(*),
+    assistants(*), 
+    folders(*), 
+    files(*), 
+    presets(*), 
+    prompts(*), 
+    tools(*), 
+    models(*)`
+    )
     .eq("id", workspaceId)
     .single()
 

@@ -9,6 +9,7 @@ import { IconDiamondFilled } from "@tabler/icons-react"
 import { ProfileSettings } from "@/components/utility/profile-settings"
 import { SidebarTopContent } from "@/components/sidebar2/sidebar-top-content"
 import { SidebarDataList } from "@/components/sidebar2/sidebar-data-list"
+import { ChatItem } from "@/components/sidebar2/items/chat/chat-item"
 
 interface SidebarProps {
   contentType: ContentType
@@ -82,6 +83,7 @@ export const Sidebar2: FC<SidebarProps> = ({
             onContentTypeChange={onContentTypeChange}
           />
           <SidebarDataList
+            RowComponent={ChatItem}
             contentType={"chats"}
             data={filteredChats}
             folders={folders}

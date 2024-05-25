@@ -6,13 +6,6 @@ import {
   getAssistantWorkspacesByWorkspaceId,
   getPublicAssistants
 } from "@/db/assistants"
-import { getChatsByWorkspaceId } from "@/db/chats"
-import { getCollectionWorkspacesByWorkspaceId } from "@/db/collections"
-import { getFileWorkspacesByWorkspaceId } from "@/db/files"
-import { getFoldersByWorkspaceId } from "@/db/folders"
-import { getModelWorkspacesByWorkspaceId } from "@/db/models"
-import { getPresetWorkspacesByWorkspaceId } from "@/db/presets"
-import { getPromptWorkspacesByWorkspaceId } from "@/db/prompts"
 import {
   getAssistantImageFromStorage,
   getAssistantPublicImageUrl
@@ -111,53 +104,53 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
     const [
       workspaceData,
-      assistantData,
+      // assistantData,
       publicAssistantData,
-      chats,
-      collectionData,
-      folders,
-      fileData,
-      presetData,
-      promptData,
-      toolData,
+      // chats,
+      // collectionData,
+      // folders,
+      // fileData,
+      // presetData,
+      // promptData,
+      // toolData,
       publicToolData,
-      platformToolData,
-      modelData
+      platformToolData
+      // modelData
     ] = await Promise.all([
       getWorkspaceById(workspaceId),
-      getAssistantWorkspacesByWorkspaceId(workspaceId),
+      // getAssistantWorkspacesByWorkspaceId(workspaceId),
       getPublicAssistants(),
-      getChatsByWorkspaceId(workspaceId),
-      getCollectionWorkspacesByWorkspaceId(workspaceId),
-      getFoldersByWorkspaceId(workspaceId),
-      getFileWorkspacesByWorkspaceId(workspaceId),
-      getPresetWorkspacesByWorkspaceId(workspaceId),
-      getPromptWorkspacesByWorkspaceId(workspaceId),
-      getToolWorkspacesByWorkspaceId(workspaceId),
+      // getChatsByWorkspaceId(workspaceId),
+      // getCollectionWorkspacesByWorkspaceId(workspaceId),
+      // getFoldersByWorkspaceId(workspaceId),
+      // getFileWorkspacesByWorkspaceId(workspaceId),
+      // getPresetWorkspacesByWorkspaceId(workspaceId),
+      // getPromptWorkspacesByWorkspaceId(workspaceId),
+      // getToolWorkspacesByWorkspaceId(workspaceId),
       getPublicTools(),
-      getPlatformTools(),
-      getModelWorkspacesByWorkspaceId(workspaceId)
+      getPlatformTools()
+      // getModelWorkspacesByWorkspaceId(workspaceId)
     ])
 
     setSelectedWorkspace(workspaceData)
     setAssistants(
-      [...assistantData.assistants, ...publicAssistantData].filter(
+      [...workspaceData.assistants, ...publicAssistantData].filter(
         onlyUniqueById
       )
     )
-    setChats(chats)
-    setCollections(collectionData.collections)
-    setFolders(folders)
-    setFiles(fileData.files)
-    setPresets(presetData.presets)
-    setPrompts(promptData.prompts)
+    setChats(workspaceData.chats)
+    // setCollections(collectionData.collections)
+    setFolders(workspaceData.folders)
+    setFiles(workspaceData.files)
+    // setPresets(presetData.presets)
+    setPrompts(workspaceData.prompts)
     setTools(
-      [...platformToolData, ...toolData.tools, ...publicToolData].filter(
+      [...platformToolData, ...workspaceData.tools, ...publicToolData].filter(
         onlyUniqueById
       )
     )
     setPlatformTools(platformToolData)
-    setModels(modelData.models)
+    setModels(workspaceData.models)
 
     const parallelize = async (array: any, callback: any) => {
       const promises = array.map((item: any) => callback(item))
@@ -165,7 +158,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     }
 
     await parallelize(
-      [...assistantData.assistants, ...publicAssistantData],
+      [...workspaceData.assistants, ...publicAssistantData],
       async (assistant: any) => {
         let url = assistant.image_path
           ? getAssistantPublicImageUrl(assistant.image_path)

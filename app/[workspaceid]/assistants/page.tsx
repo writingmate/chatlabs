@@ -15,6 +15,7 @@ import PageContent from "@/components/page/page-content"
 import PageHeader from "@/components/page/page-header"
 import PageTitle from "@/components/page/page-title"
 import { Dashboard } from "@/components/ui/dashboard"
+import { AssistantItem } from "@/components/sidebar2/items/assistants/assistant-item"
 
 export default function AssistantsPage() {
   const { assistants: data, folders } = useContext(ChatbotUIContext)
@@ -37,6 +38,7 @@ export default function AssistantsPage() {
         </PageHeader>
         <SidebarDataList
           contentType={"assistants"}
+          RowComponent={AssistantItem}
           data={data}
           folders={filteredFolders}
         />

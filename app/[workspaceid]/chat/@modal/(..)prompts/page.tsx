@@ -11,6 +11,7 @@ import {
 import { SidebarCreateButtons } from "@/components/sidebar2/sidebar-create-buttons"
 import { SidebarDataList } from "@/components/sidebar2/sidebar-data-list"
 import { useRouter } from "next/navigation"
+import { PromptItem } from "@/components/sidebar2/items/prompts/prompt-item"
 
 export default function PromptsPage() {
   const { prompts: data, folders } = useContext(ChatbotUIContext)
@@ -34,6 +35,7 @@ export default function PromptsPage() {
           />
         </DialogHeader>
         <SidebarDataList
+          RowComponent={PromptItem}
           contentType={"prompts"}
           data={data}
           folders={filteredFolders}

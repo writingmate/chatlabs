@@ -12,26 +12,23 @@ import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, DataListType } from "@/types"
 import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { Separator } from "../ui/separator"
-import { AssistantItem } from "./items/assistants/assistant-item"
-import { ChatItem } from "./items/chat/chat-item"
-import { CollectionItem } from "./items/collections/collection-item"
-import { FileItem } from "./items/files/file-item"
 import { Folder } from "./items/folders/folder-item"
-import { ModelItem } from "./items/models/model-item"
-import { PresetItem } from "./items/presets/preset-item"
-import { PromptItem } from "./items/prompts/prompt-item"
-import { ToolItem } from "./items/tools/tool-item"
+import { VList } from "virtua"
+
+export type RowComponentType = FC<{ item: DataItemType }>
 
 interface SidebarDataListProps {
   contentType: ContentType
   data: DataListType
   folders: Tables<"folders">[]
+  RowComponent: RowComponentType
 }
 
 export const SidebarDataList: FC<SidebarDataListProps> = ({
   contentType,
   data,
-  folders
+  folders,
+  RowComponent
 }) => {
   const {
     setChats,
@@ -49,53 +46,6 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const [isOverflowing, setIsOverflowing] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
-
-  const DataListComponent = ({
-    contentType,
-    item
-  }: {
-    contentType: ContentType
-    item: DataItemType
-  }) => {
-    switch (contentType) {
-      case "chats":
-        return <ChatItem key={item.id} chat={item as Tables<"chats">} />
-
-      case "presets":
-        return <PresetItem key={item.id} preset={item as Tables<"presets">} />
-
-      case "prompts":
-        return <PromptItem key={item.id} prompt={item as Tables<"prompts">} />
-
-      case "files":
-        return <FileItem key={item.id} file={item as Tables<"files">} />
-
-      case "collections":
-        return (
-          <CollectionItem
-            key={item.id}
-            collection={item as Tables<"collections">}
-          />
-        )
-
-      case "assistants":
-        return (
-          <AssistantItem
-            key={item.id}
-            assistant={item as Tables<"assistants">}
-          />
-        )
-
-      case "tools":
-        return <ToolItem key={item.id} tool={item as Tables<"tools">} />
-
-      case "models":
-        return <ModelItem key={item.id} model={item as Tables<"models">} />
-
-      default:
-        return null
-    }
-  }
 
   const getSortedData = (
     data: any,
@@ -256,12 +206,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   return useMemo(
     () => (
-      <>
-        <div
-          ref={divRef}
-          className="mt-2 flex flex-col overflow-auto"
-          onDrop={handleDrop}
-        >
+      <div className="flex min-h-[200px] flex-1 flex-col" onDrop={handleDrop}>
+        <VList className="mt-2 flex flex-col overflow-auto">
           {data.length === 0 && (
             <div className="flex grow flex-col items-center justify-center">
               <div className="text-centertext-muted-foreground p-3 italic">
@@ -291,10 +237,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                         draggable
                         onDragStart={e => handleDragStart(e, item.id)}
                       >
-                        <DataListComponent
-                          contentType={contentType}
-                          item={item}
-                        />
+                        <RowComponent item={item} />
                       </div>
                     ))}
                 </Folder>
@@ -343,10 +286,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                                 draggable
                                 onDragStart={e => handleDragStart(e, item.id)}
                               >
-                                <DataListComponent
-                                  contentType={contentType}
-                                  item={item}
-                                />
+                                <RowComponent item={item} />
                               </div>
                             ))}
                           </div>
@@ -373,10 +313,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                         draggable
                         onDragStart={e => handleDragStart(e, item.id)}
                       >
-                        <DataListComponent
-                          contentType={contentType}
-                          item={item}
-                        />
+                        <RowComponent item={item} />
                       </div>
                     )
                   })}
@@ -384,7 +321,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
               )}
             </div>
           )}
-        </div>
+        </VList>
 
         <div
           className={cn("flex grow", isDragOver && "bg-accent")}
@@ -393,7 +330,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
           onDragLeave={handleDragLeave}
           onDragOver={handleDragOver}
         />
-      </>
+      </div>
     ),
     [data, folders, contentType, isOverflowing, isDragOver]
   )

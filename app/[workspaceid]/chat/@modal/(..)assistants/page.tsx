@@ -11,6 +11,7 @@ import {
 import { SidebarCreateButtons } from "@/components/sidebar2/sidebar-create-buttons"
 import { SidebarDataList } from "@/components/sidebar2/sidebar-data-list"
 import { useRouter } from "next/navigation"
+import { AssistantItem } from "@/components/sidebar2/items/assistants/assistant-item"
 
 export default function AssistantsPage() {
   const { assistants: data, folders } = useContext(ChatbotUIContext)
@@ -34,6 +35,7 @@ export default function AssistantsPage() {
           />
         </DialogHeader>
         <SidebarDataList
+          RowComponent={AssistantItem}
           contentType={"assistants"}
           data={data}
           folders={filteredFolders}

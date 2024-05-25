@@ -1,10 +1,10 @@
+"use client"
+
 import Loading from "@/components/ui/loading"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getChatFilesByChatId } from "@/db/chat-files"
-import { getChatById } from "@/db/chats"
-import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
 import { getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
@@ -37,6 +37,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   const params = useParams()
 
   const {
+    chats,
     setChatImages,
     assistants,
     setSelectedAssistant,
@@ -130,18 +131,13 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     )
 
     const images: MessageImage[] = await Promise.all(imagePromises.flat())
+    //
+    // const messageFileItemPromises = fetchedMessages.map(
+    //   async message => await getMessageFileItemsByMessageId(message.id)
+    // )
+    // const messageFileItems = await Promise.all(messageFileItemPromises)
 
-    setChatImages(images)
-
-    const messageFileItemPromises = fetchedMessages.map(
-      async message => await getMessageFileItemsByMessageId(message.id)
-    )
-
-    const messageFileItems = await Promise.all(messageFileItemPromises)
-
-    const uniqueFileItems = messageFileItems.flatMap(item => item.file_items)
-    setChatFileItems(uniqueFileItems)
-
+    const uniqueFileItems = fetchedMessages.flatMap(item => item.file_items)
     const chatFiles = await getChatFilesByChatId(params.chatid as string)
 
     setChatFiles(
@@ -153,25 +149,24 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       }))
     )
 
-    setUseRetrieval(true)
-    setShowFilesDisplay(true)
-
     const fetchedChatMessages = fetchedMessages.map(message => {
+      const fileItems = message.file_items.map(fileItem => fileItem.id)
       return {
         message,
-        fileItems: messageFileItems
-          .filter(messageFileItem => messageFileItem.id === message.id)
-          .flatMap(messageFileItem =>
-            messageFileItem.file_items.map(fileItem => fileItem.id)
-          )
+        fileItems
       }
     })
+
+    setChatImages(images)
+    setChatFileItems(uniqueFileItems)
+    setUseRetrieval(true)
+    setShowFilesDisplay(true)
 
     setChatMessages(fetchedChatMessages)
   }
 
   const fetchChat = async () => {
-    const chat = await getChatById(params.chatid as string)
+    const chat = chats.find(chat => chat.id === params.chatid)
     if (!chat) return
 
     if (chat.assistant_id) {

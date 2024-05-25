@@ -15,6 +15,7 @@ import PageContent from "@/components/page/page-content"
 import PageHeader from "@/components/page/page-header"
 import PageTitle from "@/components/page/page-title"
 import { Dashboard } from "@/components/ui/dashboard"
+import { FileItem } from "@/components/sidebar2/items/files/file-item"
 
 export default function FilesPage() {
   const { files: data, folders } = useContext(ChatbotUIContext)
@@ -36,6 +37,7 @@ export default function FilesPage() {
           />
         </PageHeader>
         <SidebarDataList
+          RowComponent={FileItem}
           contentType={"files"}
           data={data}
           folders={filteredFolders}

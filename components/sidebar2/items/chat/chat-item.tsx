@@ -18,12 +18,13 @@ import {
 } from "@/components/sidebar2/items/all/sidebar-display-item"
 import { PinChat } from "@/components/sidebar2/items/chat/pin-chat"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { RowComponentType } from "@/components/sidebar2/sidebar-data-list"
 
 interface ChatItemProps {
   chat: Tables<"chats">
 }
 
-export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
+export const ChatItem: RowComponentType = ({ item }) => {
   const {
     selectedWorkspace,
     selectedChat,
@@ -32,6 +33,8 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     availableOpenRouterModels,
     setChats
   } = useContext(ChatbotUIContext)
+
+  const chat = item as Tables<"chats">
 
   const { handleNewChat } = useChatHandler()
 

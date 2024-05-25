@@ -28,8 +28,38 @@ async function rateLimitMiddleware(supabase: SupabaseClient, session: any, reque
   }
 }
 
+async function redirectToSetupMiddleware(supabase: SupabaseClient, session: any, request: NextRequest) {
+  if (!session) {
+    return NextResponse.redirect("/")
+  }
+
+  const redirectToChat = request.nextUrl.pathname === "/"
+
+  if (!redirectToChat) {
+    return
+  }
+
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("user_id", session.data.session?.user.id)
+    .single()
+
+  if (!profile) {
+    throw new Error(error?.message)
+  }
+
+  if (!profile.has_onboarded) {
+    return NextResponse.redirect("/setup")
+  }
+}
+
 async function redirectToChatMiddleware(supabase: SupabaseClient, session: any, request: NextRequest) {
-  const redirectToChat = session && request.nextUrl.pathname === "/"
+  if (!session) {
+    return
+  }
+
+  const redirectToChat = request.nextUrl.pathname === "/"
 
   if (redirectToChat) {
     const { data: homeWorkspace, error } = await supabase
@@ -51,6 +81,7 @@ async function redirectToChatMiddleware(supabase: SupabaseClient, session: any, 
 
 const middlewares = [
   rateLimitMiddleware,
+  redirectToSetupMiddleware,
   redirectToChatMiddleware
 ]
 
@@ -79,5 +110,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/((?!static|.*\\..*|_next|auth).*)"
+  matcher: "/"
 }

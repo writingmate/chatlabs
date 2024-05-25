@@ -11,6 +11,7 @@ import {
 import { SidebarCreateButtons } from "@/components/sidebar2/sidebar-create-buttons"
 import { SidebarDataList } from "@/components/sidebar2/sidebar-data-list"
 import { useRouter } from "next/navigation"
+import { FileItem } from "@/components/sidebar2/items/files/file-item"
 
 export default function FilesPage() {
   const { files: data, folders } = useContext(ChatbotUIContext)
@@ -34,6 +35,7 @@ export default function FilesPage() {
           />
         </DialogHeader>
         <SidebarDataList
+          RowComponent={FileItem}
           contentType={"files"}
           data={data}
           folders={filteredFolders}

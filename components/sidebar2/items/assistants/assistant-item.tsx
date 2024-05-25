@@ -16,12 +16,14 @@ import {
 } from "../all/sidebar-display-item"
 import { AssistantRetrievalSelect } from "./assistant-retrieval-select"
 import { AssistantToolSelect } from "./assistant-tool-select"
+import { RowComponentType } from "@/components/sidebar2/sidebar-data-list"
 
 interface AssistantItemProps {
   assistant: Tables<"assistants">
 }
 
-export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
+export const AssistantItem: RowComponentType = ({ item }) => {
+  const assistant = item as Tables<"assistants">
   const { selectedWorkspace, assistantImages } = useContext(ChatbotUIContext)
 
   const [name, setName] = useState(assistant.name)
