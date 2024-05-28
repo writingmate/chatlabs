@@ -94,7 +94,7 @@ async function registerUser(
   return userId
 }
 
-function createErrorResponse(message: string, status: number) {
+export function createErrorResponse(message: string, status: number) {
   return NextResponse.json({ message }, { status })
 }
 

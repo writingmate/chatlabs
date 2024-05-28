@@ -18,6 +18,12 @@ import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 import { ChatScrollButtons } from "./chat-scroll-buttons"
 import { ChatSecondaryButtons } from "./chat-secondary-buttons"
+import { Brand } from "@/components/ui/brand"
+import { ChatSettings } from "@/components/chat/chat-settings"
+import { QuickSettings } from "@/components/chat/quick-settings"
+import { WithTooltip } from "@/components/ui/with-tooltip"
+import { IconMessagePlus } from "@tabler/icons-react"
+import { useTheme } from "next-themes"
 
 interface ChatUIProps {}
 
@@ -27,6 +33,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   const params = useParams()
 
   const {
+    showSidebar,
     chatMessages,
     setChatMessages,
     selectedChat,
@@ -182,42 +189,59 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     })
   }
 
-  if (loading) {
-    return <Loading />
-  }
+  const { theme } = useTheme()
 
   return (
     <div className="relative flex h-full flex-col items-center">
-      <div className="absolute left-4 top-2.5 flex justify-center">
-        {/*<ChatScrollButtons*/}
-        {/*  isAtTop={isAtTop}*/}
-        {/*  isAtBottom={isAtBottom}*/}
-        {/*  isOverflowing={isOverflowing}*/}
-        {/*  scrollToTop={scrollToTop}*/}
-        {/*  scrollToBottom={scrollToBottom}*/}
-        {/*/>*/}
-      </div>
-
-      <div className="absolute right-4 top-1 flex h-[40px] items-center space-x-2">
-        <ChatSecondaryButtons />
-      </div>
-
-      <div className="bg-secondary flex max-h-[50px] min-h-[50px] w-full items-center justify-center border-b px-20 font-bold">
-        <div className="max-w-[300px] truncate sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[700px]">
-          {selectedChat?.name || "Chat"}
+      <div className="sticky top-0 flex w-full justify-between p-2">
+        <div className="flex items-center">
+          {!showSidebar && (
+            <WithTooltip
+              delayDuration={200}
+              display={<div>Start a new chat</div>}
+              trigger={
+                <IconMessagePlus
+                  className="ml-2 cursor-pointer hover:opacity-50"
+                  size={24}
+                  stroke={1.5}
+                  onClick={handleNewChat}
+                />
+              }
+            />
+          )}
+          <QuickSettings />
         </div>
+        <ChatSettings />
       </div>
 
-      <div
-        className="flex size-full flex-col overflow-auto"
-        onScroll={handleScroll}
-      >
-        <div ref={messagesStartRef} />
+      {loading && <Loading />}
+      {!loading &&
+        (chatMessages.length == 0 ? (
+          <>
+            <div className="absolute left-1/2 top-1/2 mb-20 -translate-x-1/2 -translate-y-1/2">
+              <Brand theme={theme === "dark" ? "dark" : "light"} />
+            </div>
 
-        <ChatMessages />
+            <div className="flex grow flex-col items-center justify-center" />
+          </>
+        ) : (
+          <div
+            className="flex size-full flex-col overflow-auto pt-4"
+            onScroll={handleScroll}
+          >
+            <div ref={messagesStartRef} />
 
-        <div ref={messagesEndRef} />
-      </div>
+            <div
+              className={
+                "mx-auto w-[300px] pb-8 sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]"
+              }
+            >
+              <ChatMessages />
+            </div>
+
+            <div ref={messagesEndRef} />
+          </div>
+        ))}
 
       <div className="relative w-full items-end px-4 pb-8 md:w-[500px] lg:w-[660px] xl:w-[800px]">
         <ChatInput />
