@@ -1,7 +1,6 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
 import mammoth from "mammoth"
-import { toast } from "sonner"
 import { uploadFile } from "./storage/files"
 
 export const getFileById = async (fileId: string) => {
@@ -128,13 +127,13 @@ export const createFile = async (
   })
 
   if (!response.ok) {
-    toast.error("Failed to process file.")
-    await deleteFile(createdFile.id)
+    const error = await response.json()
+    if (error) {
+      throw new Error(error.message)
+    }
   }
 
-  const fetchedFile = await getFileById(createdFile.id)
-
-  return fetchedFile
+  return await getFileById(createdFile.id)
 }
 
 // // Handle docx files
@@ -185,8 +184,9 @@ export const createDocXFile = async (
   })
 
   if (!response.ok) {
-    toast.error("Failed to process file.")
     await deleteFile(createdFile.id)
+    const error = await response.json()
+    throw new Error(error.message || "Failed to process file.")
   }
 
   const fetchedFile = await getFileById(createdFile.id)
