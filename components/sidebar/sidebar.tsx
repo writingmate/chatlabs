@@ -1,7 +1,7 @@
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
-import { FC, useContext } from "react"
+import { FC, useContext, useMemo } from "react"
 import { SIDEBAR_WIDTH } from "../ui/dashboard"
 import { TabsContent } from "../ui/tabs"
 import { WorkspaceSwitcher } from "../utility/workspace-switcher"
@@ -56,69 +56,83 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
     )
   }
 
-  return (
-    <TabsContent
-      className="m-0 w-full space-y-2"
-      style={{
-        // Sidebar - SidebarSwitcher
-        minWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-        maxWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-        width: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px"
-      }}
-      value={contentType}
-    >
-      <div className="flex h-full flex-col p-3">
-        {workspaces?.length > 1 && (
-          <div className="flex items-center border-b pb-2">
-            <WorkspaceSwitcher />
-            <WorkspaceSettings />
-          </div>
-        )}
+  return useMemo(
+    () => (
+      <TabsContent
+        className="m-0 w-full space-y-2"
+        style={{
+          // Sidebar - SidebarSwitcher
+          minWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
+          maxWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
+          width: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px"
+        }}
+        value={contentType}
+      >
+        <div className="flex h-full flex-col p-3">
+          {workspaces?.length > 1 && (
+            <div className="flex items-center border-b pb-2">
+              <WorkspaceSwitcher />
+              <WorkspaceSettings />
+            </div>
+          )}
 
-        {(() => {
-          switch (contentType) {
-            case "chats":
-              return renderSidebarContent("chats", chats, chatFolders)
+          {(() => {
+            switch (contentType) {
+              case "chats":
+                return renderSidebarContent("chats", chats, chatFolders)
 
-            case "presets":
-              return renderSidebarContent("presets", presets, presetFolders)
+              case "presets":
+                return renderSidebarContent("presets", presets, presetFolders)
 
-            case "prompts":
-              return renderSidebarContent("prompts", prompts, promptFolders)
+              case "prompts":
+                return renderSidebarContent("prompts", prompts, promptFolders)
 
-            case "files":
-              return renderSidebarContent("files", files, filesFolders)
+              case "files":
+                return renderSidebarContent("files", files, filesFolders)
 
-            case "collections":
-              return renderSidebarContent(
-                "collections",
-                collections,
-                collectionFolders
-              )
+              case "collections":
+                return renderSidebarContent(
+                  "collections",
+                  collections,
+                  collectionFolders
+                )
 
-            case "assistants":
-              return renderSidebarContent(
-                "assistants",
-                assistants,
-                assistantFolders
-              )
+              case "assistants":
+                return renderSidebarContent(
+                  "assistants",
+                  assistants,
+                  assistantFolders
+                )
 
-            case "tools":
-              return renderSidebarContent(
-                "tools",
-                tools,
-                toolFolders,
-                "Plugins"
-              )
+              case "tools":
+                return renderSidebarContent(
+                  "tools",
+                  tools,
+                  toolFolders,
+                  "Plugins"
+                )
 
-            case "models":
-              return renderSidebarContent("models", models, modelFolders)
+              case "models":
+                return renderSidebarContent("models", models, modelFolders)
 
-            default:
-              return null
-          }
-        })()}
-      </div>
-    </TabsContent>
+              default:
+                return null
+            }
+          })()}
+        </div>
+      </TabsContent>
+    ),
+    [
+      workspaces,
+      chats,
+      presets,
+      contentType,
+      files,
+      models,
+      tools,
+      prompts,
+      assistants,
+      showSidebar
+    ]
   )
 }

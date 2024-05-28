@@ -16,14 +16,13 @@ import { ChatHelp } from "./chat-help"
 import { useScroll } from "./chat-hooks/use-scroll"
 import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
-import { ChatScrollButtons } from "./chat-scroll-buttons"
-import { ChatSecondaryButtons } from "./chat-secondary-buttons"
-import { Brand } from "@/components/ui/brand"
-import { ChatSettings } from "@/components/chat/chat-settings"
 import { QuickSettings } from "@/components/chat/quick-settings"
-import { WithTooltip } from "@/components/ui/with-tooltip"
-import { IconMessagePlus } from "@tabler/icons-react"
+import { ChatSettings } from "@/components/chat/chat-settings"
+import { Brand } from "@/components/ui/brand"
 import { useTheme } from "next-themes"
+import { IconMessagePlus } from "@tabler/icons-react"
+import { WithTooltip } from "@/components/ui/with-tooltip"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatUIProps {}
 
@@ -33,21 +32,23 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   const params = useParams()
 
   const {
-    showSidebar,
-    chatMessages,
-    setChatMessages,
-    selectedChat,
-    setSelectedChat,
-    setChatSettings,
     setChatImages,
     assistants,
     setSelectedAssistant,
-    setChatFileItems,
     setChatFiles,
     setShowFilesDisplay,
     setUseRetrieval,
-    setSelectedTools
+    showSidebar
   } = useContext(ChatbotUIContext)
+
+  const {
+    setSelectedChat,
+    setChatSettings,
+    setChatFileItems,
+    setSelectedTools,
+    chatMessages,
+    setChatMessages
+  } = useContext(ChatbotUIChatContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
 
@@ -65,7 +66,13 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
   const [loading, setLoading] = useState(true)
 
+  const { theme } = useTheme()
+
   useEffect(() => {
+    if (!params.chatid) {
+      setLoading(false)
+      return
+    }
     const fetchData = async () => {
       await Promise.all([fetchMessages(), fetchChat()])
 
@@ -81,7 +88,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     } else {
       setLoading(false)
     }
-  }, [])
+  }, [params])
 
   const fetchMessages = async () => {
     const fetchedMessages = await getMessagesByChatId(params.chatid as string)
@@ -188,8 +195,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       embeddingsProvider: chat.embeddings_provider as "openai" | "local"
     })
   }
-
-  const { theme } = useTheme()
 
   return (
     <div className="relative flex h-full flex-col items-center">

@@ -1,15 +1,10 @@
 import type { Stripe } from "stripe"
-
 import { NextResponse } from "next/server"
-
 import { stripe } from "@/lib/stripe"
 import { Database } from "@/supabase/types"
-import {
-  AuthApiError,
-  createClient,
-  SupabaseClient
-} from "@supabase/supabase-js"
+import { createClient, SupabaseClient } from "@supabase/supabase-js"
 import { ACTIVE_PLAN_STATUSES, PLAN_FREE, PLANS } from "@/lib/stripe/config"
+import { kv } from "@vercel/kv"
 import { buffer } from "node:stream/consumers"
 import {
   getProfileByStripeCustomerId,
@@ -19,36 +14,47 @@ import {
 import { createErrorResponse } from "@/lib/response"
 import { kv } from "@vercel/kv"
 
-// try 5 times before giving up retrieving profile
-const MAX_RETRIES = 5
-const RETRY_DELAY_MS = 1000
+// try 10 times before giving up retrieving profile
+const MAX_RETRIES = 10
+const RETRY_DELAY_MS = 2000
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+type Logger = {
+  log: (...args: any[]) => void
+  error: (...args: any[]) => void
+}
+
 async function waitGetProfileByStripeCustomerId(
   supabaseAdmin: SupabaseClient,
-  stripeCustomerId: string
+  stripeCustomerId: string,
+  logger: Logger
 ) {
   let retries = 0
   while (retries < MAX_RETRIES) {
+    logger.log(`Retrieving profile for customer ${stripeCustomerId}`)
     const { data: profile } = await getProfileByStripeCustomerId(
       supabaseAdmin,
       stripeCustomerId
     )
     if (profile) {
+      logger.log(`Profile found for customer ${stripeCustomerId}`)
       return profile
     }
+    logger.log(`Profile not found for customer ${stripeCustomerId}`)
     retries++
-    await sleep(1000)
+    logger.log(`Retrying in ${RETRY_DELAY_MS}ms`)
+    await sleep(RETRY_DELAY_MS)
   }
   return null
 }
 
 const waitForProfileByUserId = async (
   supabaseAdmin: SupabaseClient,
-  userId: string
+  userId: string,
+  logger: Logger
 ) => {
   let retries = 0
   while (retries < MAX_RETRIES) {
@@ -58,9 +64,10 @@ const waitForProfileByUserId = async (
         return profile
       }
     } catch (error) {
-      retries++
-      await sleep(1000)
+      logger.error(`Error retrieving profile for user ${userId}:`, error)
     }
+    retries++
+    await sleep(RETRY_DELAY_MS)
   }
   return null
 }
@@ -68,11 +75,11 @@ const waitForProfileByUserId = async (
 async function registerUser(
   supabaseAdmin: SupabaseClient,
   customer: Stripe.Customer,
-  stripeCustomerId: string
+  stripeCustomerId: string,
+  logger: Logger
 ) {
   const { data, error } = await supabaseAdmin.auth.admin.createUser({
     email: customer.email!,
-    // password: "password",
     email_confirm: true
   })
 
@@ -88,13 +95,47 @@ async function registerUser(
     }
   })
 
-  const profile = await waitForProfileByUserId(supabaseAdmin, userId)
+  const profile = await waitForProfileByUserId(supabaseAdmin, userId, logger)
 
   if (!profile) {
     throw new Error("Profile not found after user registration")
   }
 
   return userId
+}
+
+// redis based lock
+class Lock {
+  constructor(
+    private kvv: typeof kv,
+    private key: string
+  ) {
+    this.kvv = kvv
+    this.key = key
+  }
+
+  // only acquire the lock if it's not already taken
+  // wait MAX_RETRIES for the lock to be released
+  async acquire() {
+    let retries = 0
+    while (retries < MAX_RETRIES * 2) {
+      const value = await this.kvv.set(this.key, "locked", {
+        nx: true,
+        ex: RETRY_DELAY_MS * MAX_RETRIES
+      })
+      if (value !== "OK") {
+        retries++
+        await sleep(RETRY_DELAY_MS)
+      } else {
+        return true
+      }
+    }
+    return false
+  }
+
+  async release() {
+    await this.kvv.del(this.key)
+  }
 }
 
 // redis based lock
@@ -150,11 +191,20 @@ export async function POST(req: Request) {
     )
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error"
-    console.log(`❌ Error message: ${errorMessage}`)
+    console.log(`❌ Error parsing event message: ${errorMessage}`)
     return createErrorResponse(`Webhook Error: ${errorMessage}`, 400)
   }
 
-  console.log("✅ Success:", event.id)
+  const logger: Logger = {
+    log(message: string) {
+      console.log(`[${event.id}][${event.type}]: ${message}`)
+    },
+    error(message: string, error?: any) {
+      console.error(`[${event.id}][${event.type}]: ${message}`, error)
+    }
+  }
+
+  logger.log("Success parsing event")
 
   const permittedEvents: string[] = [
     "customer.subscription.deleted",
@@ -167,46 +217,77 @@ export async function POST(req: Request) {
 
     const stripeCustomerId = subscription.customer as string
 
-    const customer = (await stripe.customers.retrieve(
-      stripeCustomerId
-    )) as Stripe.Customer
+    const lock = new Lock(kv, `stripe-webhook-${stripeCustomerId}`)
 
-    let userId = null
+    try {
+      logger.log("Acquiring lock")
+      if (!(await lock.acquire())) {
+        logger.log("Unable to acquire lock")
+        return createErrorResponse("Webhook handler failed", 500)
+      }
 
-    // Scenario 1: User and profile already exist
-    const existingProfileByStripeCustomerId =
-      await waitGetProfileByStripeCustomerId(supabaseAdmin, stripeCustomerId)
+      logger.log("Lock acquired")
 
-    if (existingProfileByStripeCustomerId) {
-      userId = existingProfileByStripeCustomerId.user_id
-    } else {
-      // Scenario 2: User is not registered, so register them first
-      try {
-        userId = await registerUser(supabaseAdmin, customer, stripeCustomerId)
-      } catch (error) {
-        // User already exists, retrieve the profile
-        const profile = await waitGetProfileByStripeCustomerId(
+      const customer = (await stripe.customers.retrieve(
+        stripeCustomerId
+      )) as Stripe.Customer
+
+      let userId = null
+
+      // Scenario 1: User and profile already exist
+      const existingProfileByStripeCustomerId =
+        await waitGetProfileByStripeCustomerId(
           supabaseAdmin,
-          stripeCustomerId
+          stripeCustomerId,
+          logger
         )
 
-        if (!profile) {
-          console.error("Profile not found")
-          return createErrorResponse("Webhook handler failed", 500)
+      if (existingProfileByStripeCustomerId) {
+        userId = existingProfileByStripeCustomerId.user_id
+      } else {
+        // Scenario 2: User is not registered, so register them first
+        try {
+          userId = await registerUser(
+            supabaseAdmin,
+            customer,
+            stripeCustomerId,
+            logger
+          )
+        } catch (error) {
+          logger.error("Error during user registration", error)
+          // console.warn("Error during user registration:", error)
+          // User already exists, retrieve the profile
+
+          logger.log(`Retrieving profile for customer ${stripeCustomerId}`)
+
+          const profile = await waitGetProfileByStripeCustomerId(
+            supabaseAdmin,
+            stripeCustomerId,
+            logger
+          )
+
+          if (!profile) {
+            logger.error("Profile not found after user registration error")
+            return createErrorResponse("Webhook handler failed", 500)
+          }
+
+          logger.log(`Profile found for customer ${stripeCustomerId}`)
+
+          userId = profile.user_id
         }
-
-        userId = profile.user_id
       }
-    }
 
-    // Scenario 3: Update the profile record accordingly
-    try {
+      logger.log(`User ID ${userId}, Stripe ID (${stripeCustomerId})`)
+
+      // Scenario 3: Update the profile record accordingly
+
       switch (event.type) {
         case "customer.subscription.deleted":
           await updateProfileByUserId(supabaseAdmin, userId, {
             stripe_customer_id: stripeCustomerId,
             plan: PLAN_FREE
           })
+          logger.log("Profile updated with free plan")
           break
         case "customer.subscription.created":
         case "customer.subscription.updated":
@@ -224,13 +305,20 @@ export async function POST(req: Request) {
             stripe_customer_id: stripeCustomerId,
             plan
           })
+          logger.log(`Profile updated with plan ${plan}`)
           break
       }
     } catch (error) {
-      console.error(error)
+      logger.error("Error updating profile", error)
       return createErrorResponse("Webhook handler failed", 500)
+    } finally {
+      logger.log("Releasing lock")
+      await lock.release()
+      logger.log("Lock released")
     }
   }
+
+  logger.log("Success handling event")
 
   return NextResponse.json({ message: "Received" }, { status: 200 })
 }

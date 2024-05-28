@@ -4,6 +4,8 @@ export interface ToolFunction {
   id: string
   toolFunction: Function
   description: string
+  // a parameter that tells whether to send the results of the tool back to LLM or return as is to the client
+  resultProcessingMode?: "send_to_llm" | "render_markdown" | "render_html"
   parameters: Parameter[]
 }
 
@@ -28,12 +30,22 @@ export interface PlatformTool {
   toolsFunctions: ToolFunction[]
 }
 
-export interface ImageGeneratorResult {
+export interface ToolResultBase {
+  responseTime: string
+  skipTokenCount?: boolean
+}
+
+export interface ToolsCallResult extends ToolResultBase {
+  toolName: string
+  responseTime: string
+}
+
+export interface ImageGeneratorResult extends ToolResultBase {
   url: string
   prompt: string
   size: "1024x1024" | "1792x1024" | "1024x1792"
 }
-export interface GetYoutubeCaptionsResult {
+export interface GetYoutubeCaptionsResult extends ToolResultBase {
   subtitles: {
     start: string | number
     dur: string | number
@@ -83,7 +95,7 @@ interface RelatedSearches {
   query: string
 }
 
-export type GoogleSearchResult = {
+export interface GoogleSearchResult extends ToolResultBase {
   searchParameters: {
     q: string
     gl: string

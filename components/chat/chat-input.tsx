@@ -10,7 +10,9 @@ import {
   IconSend,
   IconX,
   IconMicrophone,
-  IconPlayerRecordFilled
+  IconPlayerRecordFilled,
+  IconRepeat,
+  IconArrowUp
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -25,6 +27,8 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { Button } from "@/components/ui/button"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatInputProps {}
 
@@ -45,10 +49,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isAssistantPickerOpen,
     focusAssistant,
     setFocusAssistant,
-    userInput,
-    setUserInput,
-    chatMessages,
-    isGenerating,
     selectedPreset,
     selectedAssistant,
     setSelectedAssistant,
@@ -62,12 +62,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setIsPromptPickerOpen,
     isFilePickerOpen,
     setFocusFile,
-    chatSettings,
-    selectedTools,
-    setSelectedTools,
     assistantImages,
     profile
   } = useContext(ChatbotUIContext)
+
+  const { userInput, setUserInput, chatMessages, isGenerating, chatSettings } =
+    useContext(ChatbotUIChatContext)
 
   const {
     chatInputRef,
@@ -101,20 +101,29 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           .map((result: SpeechRecognitionResult) => result[0].transcript)
           .join("")
         setTranscript(transcript)
-
-        // Reset and set a new timeout to stop the recognition after 30 seconds of silence
-        if (timeoutId) clearTimeout(timeoutId)
-        setTimeoutId(
-          setTimeout(() => {
-            setTranscript("")
-            if (recognition) recognition.stop()
-          }, 30 * 1000)
-        ) // 30 seconds
+        // Check for silence
+        const isSilent = transcript.trim() === ""
+        if (isSilent) {
+          // Reset and set a new timeout to stop the recognition after 30 seconds of silence
+          if (timeoutId) clearTimeout(timeoutId)
+          setTimeoutId(
+            setTimeout(() => {
+              setTranscript("")
+              if (recognition) recognition.stop()
+            }, 30 * 1000)
+          ) // 30 seconds
+        } else {
+          // Reset the timeout if the user is speaking
+          if (timeoutId) clearTimeout(timeoutId)
+        }
       }
 
       recognition.onend = (event: any) => {
         setListening(false)
         if (event.error === "no-speech") {
+          startListening()
+        } else if (transcript.trim() !== "") {
+          // Restart the recognition if the user is still speaking
           startListening()
         }
       }
@@ -230,13 +239,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     if (recognition) {
       setListening(true)
       recognition.start()
-
-      // Initial timeout to stop the recognition after 30 seconds of silence
-      setTimeoutId(
-        setTimeout(() => {
-          if (recognition) recognition.stop()
-        }, 30 * 1000)
-      ) // 30 seconds
     }
   }
 
@@ -326,9 +328,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
             <TextareaAutosize
               textareaRef={chatInputRef}
-              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 pr-[70px] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               placeholder={t(
-                `Ask anything. Type "${profile?.assistant_command}" for assistants, "${profile?.prompt_command}" for prompts, "${profile?.files_command}" for files, and "${profile?.tools_command}" for plugins.`
+                `Ask anything. Type "${profile?.assistant_command || "@"}" for assistants, "${profile?.prompt_command || "/"}" for prompts, "${profile?.files_command || "#"}" for files, and "${profile?.tools_command || "!"}" for plugins.`
               )}
               onValueChange={handleInputChange}
               value={userInput}
@@ -359,7 +361,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                   size={30}
                 />
               ) : (
-                <IconSend
+                <IconArrowUp
                   className={cn(
                     "bg-primary text-secondary rounded-lg p-1 hover:opacity-50",
                     (!userInput || isUploading) &&

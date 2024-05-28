@@ -7,6 +7,7 @@ import { LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { validateProPlan } from "@/lib/subscription"
+import { PLAN_FREE } from "@/lib/stripe/config"
 
 function createClient() {
   return createServerClient<Database>(
@@ -81,6 +82,11 @@ export function checkApiKey(apiKey: string | null, keyName: string) {
   }
 }
 
+function isPaidModel(model: LLMID) {
+  const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
+  return paidLLMS.includes(model)
+}
+
 export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
   const { plan } = profile
 
@@ -88,38 +94,77 @@ export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
     return
   }
 
-  const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
-
-  if (paidLLMS.includes(model)) {
+  if (isPaidModel(model)) {
     throw new SubscriptionRequiredError("Pro plan required to use this model")
   }
 }
 
+function getEnvInt(varName: string, def: number) {
+  if (varName in process.env) {
+    return parseInt(process.env[varName] + "")
+  }
+
+  return def
+}
+
+const FREE_MESSAGE_DAILY_LIMIT = getEnvInt("FREE_MESSAGE_LIMIT", 30)
+const PRO_MESSAGE_DAILY_LIMIT = getEnvInt("PRO_MESSAGE_LIMIT", 50)
+const CATCHALL_MESSAGE_DAILY_LIMIT = getEnvInt(
+  "CATCHALL_MESSAGE_DAILY_LIMIT",
+  300
+)
+
 export async function validateMessageCount(
   profile: Tables<"profiles">,
+  model: LLMID,
   date: Date,
   supabase: SupabaseClient
 ) {
   const { plan } = profile
 
-  if (validateProPlan(profile)) {
+  if (plan.startsWith("byok_")) {
     return
   }
+
+  // subtract 24 hours
+
+  let previousDate = new Date(date.getTime() - 24 * 60 * 60 * 1000)
 
   const { count, data, error } = await supabase
     .from("messages")
     .select("*", {
       count: "exact"
     })
-    .gte("created_at", date.toISOString())
+    .eq("role", "user")
+    .eq("model", model)
+    .gte("created_at", previousDate.toISOString())
 
   if (count === null) {
     throw new Error("Could not fetch message count")
   }
 
-  if (count > 30) {
+  if (
+    (plan === PLAN_FREE || plan.startsWith("premium_")) &&
+    count > FREE_MESSAGE_DAILY_LIMIT
+  ) {
     throw new SubscriptionRequiredError(
-      "You have reached daily message limit. Upgrade to Pro plan to continue come back tomorrow."
+      `You have reached daily message limit for ${model}. Upgrade to Pro plan to continue come back tomorrow.`
+    )
+  }
+
+  if (
+    isPaidModel(model) &&
+    plan.startsWith("pro_") &&
+    count > PRO_MESSAGE_DAILY_LIMIT
+  ) {
+    throw new SubscriptionRequiredError(
+      `You have reached daily message limit for Pro plan for ${model}`
+    )
+  }
+
+  if (count > CATCHALL_MESSAGE_DAILY_LIMIT) {
+    throw new SubscriptionRequiredError(
+      `You have reached hard daily message limit for model ${model}`
     )
   }
 }
@@ -128,5 +173,5 @@ export async function validateModelAndMessageCount(model: LLMID, date: Date) {
   const client = createClient()
   const profile = await getServerProfile()
   await validateModel(profile, model)
-  await validateMessageCount(profile, date, client)
+  await validateMessageCount(profile, model, date, client)
 }

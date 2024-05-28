@@ -8,7 +8,17 @@ export async function consumeReadableStream(
   const reader = stream.getReader()
   const decoder = new TextDecoder()
 
-  signal.addEventListener("abort", () => reader.cancel(), { once: true })
+  signal.addEventListener(
+    "abort",
+    () => {
+      try {
+        reader.cancel()
+      } catch (error) {
+        console.error("Error canceling stream reader:", error)
+      }
+    },
+    { once: true }
+  )
 
   try {
     while (true) {
@@ -48,6 +58,11 @@ export function parseDataStream(line: string): { text: string; data: any } {
     "0": {
       parse: (jsonValue: JSONValue) => {
         return { text: jsonValue as string, data: null }
+      }
+    },
+    "7": {
+      parse: (jsonValue: JSONValue) => {
+        return { data: jsonValue as any, text: "" }
       }
     },
     "8": {

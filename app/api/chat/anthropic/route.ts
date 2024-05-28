@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from "next/server"
 export const runtime = "edge"
 
 export const maxDuration = 300
+
 export async function POST(request: NextRequest) {
   const json = await request.json()
   const { chatSettings, messages } = json as {
@@ -27,48 +28,22 @@ export async function POST(request: NextRequest) {
     let ANTHROPIC_FORMATTED_MESSAGES: any = messages.slice(1)
 
     const anthropic = new Anthropic({
-      apiKey: profile.anthropic_api_key || ""
+      apiKey: profile.anthropic_api_key || "",
+      baseURL: process.env.ANTHROPIC_BASE_URL || undefined
     })
 
-    try {
-      const response = await anthropic.messages.create({
-        model: chatSettings.model,
-        messages: ANTHROPIC_FORMATTED_MESSAGES,
-        temperature: chatSettings.temperature,
-        system: messages[0].content,
-        max_tokens:
-          CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
-        stream: true
-      })
+    const response = await anthropic.messages.create({
+      model: chatSettings.model,
+      messages: ANTHROPIC_FORMATTED_MESSAGES,
+      temperature: chatSettings.temperature,
+      system: messages[0].content,
+      max_tokens:
+        CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
+      stream: true
+    })
 
-      try {
-        const stream = AnthropicStream(response)
-        return new StreamingTextResponse(stream)
-      } catch (error: any) {
-        const errorCode = error.status || 500
-        console.error("Error parsing Anthropic API response:", error, {
-          payload: json
-        })
-        return new NextResponse(
-          JSON.stringify({
-            message:
-              "An error occurred while parsing the Anthropic API response"
-          }),
-          { status: errorCode }
-        )
-      }
-    } catch (error: any) {
-      const errorCode = error.status || 500
-      console.error("Error calling Anthropic API:", error, {
-        payload: json
-      })
-      return new NextResponse(
-        JSON.stringify({
-          message: "An error occurred while calling the Anthropic API"
-        }),
-        { status: errorCode }
-      )
-    }
+    const stream = AnthropicStream(response)
+    return new StreamingTextResponse(stream)
   } catch (error: any) {
     console.error("Error processing request:", error, { payload: json })
     let errorMessage = error.message || "An unexpected error occurred"

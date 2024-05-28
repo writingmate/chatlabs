@@ -23,6 +23,7 @@ import { QuickSettingOption } from "./quick-setting-option"
 import { set } from "date-fns"
 import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
 import { validatePlanForAssistant } from "@/lib/subscription"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface QuickSettingsProps {}
 
@@ -37,17 +38,16 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     assistants,
     selectedAssistant,
     selectedPreset,
-    chatSettings,
     setSelectedPreset,
     setSelectedAssistant,
-    setChatSettings,
     assistantImages,
     setChatFiles,
-    setSelectedTools,
-    setShowFilesDisplay,
     selectedWorkspace,
     setIsPaywallOpen
   } = useContext(ChatbotUIContext)
+
+  const { chatSettings, setChatSettings, setSelectedTools } =
+    useContext(ChatbotUIChatContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -177,7 +177,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
       }}
     >
       <DropdownMenuTrigger asChild className="max-w-1/2" disabled={loading}>
-        <Button variant="ghost" className="flex space-x-3 text-lg">
+        <Button variant="ghost" className="hidden space-x-3 text-lg sm:flex">
           {selectedPreset && (
             <ModelIcon
               provider={modelDetails?.provider || "custom"}

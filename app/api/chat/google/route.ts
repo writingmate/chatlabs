@@ -27,7 +27,8 @@ export async function POST(request: Request) {
 
     if (
       chatSettings.model === "gemini-pro" ||
-      chatSettings.model === "gemini-1.5-pro-latest"
+      chatSettings.model === "gemini-1.5-pro-latest" ||
+      chatSettings.model === "gemini-1.5-flash-latest"
     ) {
       const lastMessage = messages.pop()
 

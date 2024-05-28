@@ -3,29 +3,49 @@ import {
   AnthropicStream,
   experimental_StreamData,
   OpenAIStream,
+  OpenAIStreamCallbacks,
   StreamingTextResponse
 } from "ai"
 import Anthropic from "@anthropic-ai/sdk"
 import ChatCompletionMessage = OpenAI.Chat.Completions.ChatCompletionMessage
 import { Parameter, Parameter as OpenAIParameter } from "@/types/platformTools"
-
-interface FunctionCaller {
-  findFunctionCalls: (params: {
-    model: string
-    messages: any[]
-    tools?: OpenAI.Chat.Completions.ChatCompletionTool[]
-  }) => Promise<ChatCompletionMessage>
-  createResponseStream: (params: {
-    model: string
-    messages: any[]
-    tools: OpenAI.Chat.Completions.ChatCompletionTool[]
-    streamData: experimental_StreamData
-  }) => Promise<ReadableStream>
-}
+import {
+  FindFunctionCallsStreamParams,
+  FunctionCaller
+} from "@/types/function-callers"
 
 export class OpenAIFunctionCaller implements FunctionCaller {
-  constructor(private readonly client: OpenAI) {
+  constructor(
+    private readonly client: OpenAI,
+    public readonly supportsFunctionCallStreaming = false
+  ) {
+    this.supportsFunctionCallStreaming = supportsFunctionCallStreaming
     this.client = client
+  }
+
+  async findFunctionCallsStream({
+    model,
+    messages,
+    tools,
+    onFunctionCall
+  }: FindFunctionCallsStreamParams): Promise<ReadableStream> {
+    if (!this.supportsFunctionCallStreaming) {
+      throw new Error("This function caller does not support streaming")
+    }
+
+    const response = await this.client.chat.completions.create({
+      model: model,
+      messages: messages,
+      tools: tools,
+      tool_choice: "auto",
+      stream: true
+    })
+
+    const stream = OpenAIStream(response, {
+      experimental_onFunctionCall: onFunctionCall
+    })
+
+    return stream
   }
 
   async findFunctionCalls({
@@ -40,7 +60,8 @@ export class OpenAIFunctionCaller implements FunctionCaller {
     const response = await this.client.chat.completions.create({
       model: model,
       messages: messages,
-      tools: tools
+      tools: tools,
+      tool_choice: "auto"
     })
 
     return response.choices[0].message
@@ -75,6 +96,15 @@ export class OpenAIFunctionCaller implements FunctionCaller {
 export class AnthropicFunctionCaller implements FunctionCaller {
   constructor(private readonly client: Anthropic) {
     this.client = client
+  }
+
+  async findFunctionCallsStream({
+    model,
+    messages,
+    tools,
+    onFunctionCall
+  }: FindFunctionCallsStreamParams): Promise<ReadableStream> {
+    throw new Error("This function caller does not support streaming")
   }
 
   async findFunctionCalls({
@@ -289,5 +319,47 @@ export class AnthropicFunctionCaller implements FunctionCaller {
     return {
       parameters: result
     }
+  }
+}
+
+export class GroqFunctionCaller extends OpenAIFunctionCaller {
+  async createResponseStream({
+    model,
+    messages,
+    tools,
+    streamData
+  }: {
+    model: string
+    messages: any[]
+    tools: OpenAI.Chat.Completions.ChatCompletionTool[]
+    streamData: experimental_StreamData
+  }) {
+    const updatedMessages = messages.map(x => {
+      if (x.role === "tool") {
+        return {
+          role: "user",
+          content: `
+          You called a function named ${x.name} and got the following result. 
+          Answer the user's question using this information.
+      <function_results>
+          <result>
+          <tool_name>${x.name}</tool_name>
+          <stdout>
+          ${JSON.stringify(x.content)}
+          </stdout>
+          </result>
+          </function_results>
+        `
+        }
+      }
+      return x
+    })
+
+    return super.createResponseStream({
+      model,
+      messages: updatedMessages,
+      tools,
+      streamData
+    })
   }
 }

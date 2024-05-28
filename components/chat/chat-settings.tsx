@@ -5,22 +5,25 @@ import { LLMID, ModelProvider } from "@/types"
 import { FC, useContext, useEffect, useRef } from "react"
 import { ModelSelectChat } from "@/components/models/model-select-chat"
 import { ToolSelect } from "@/components/tools/tool-select"
+import { cn } from "@/lib/utils"
+import { ChatbotUIChatContext } from "@/context/chat"
 
-interface ChatSettingsProps {}
+interface ChatSettingsProps {
+  className?: string
+}
 
-export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
+export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
   useHotkey("i", () => handleClick())
 
   const {
-    chatSettings,
-    setChatSettings,
     models,
     availableHostedModels,
     availableLocalModels,
-    availableOpenRouterModels,
-    selectedTools,
-    setSelectedTools
+    availableOpenRouterModels
   } = useContext(ChatbotUIContext)
+
+  const { chatSettings, setChatSettings, selectedTools, setSelectedTools } =
+    useContext(ChatbotUIChatContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -72,19 +75,10 @@ export const ChatSettings: FC<ChatSettingsProps> = ({}) => {
     })
   }
 
-  const handleSelectTools = () => {
-    setChatSettings(prev => {
-      return {
-        ...prev,
-        tools: !prev
-      }
-    })
-  }
-
   const selectedModel = allModels.find(x => x.modelId == chatSettings.model)
 
   return (
-    <div className="flex items-center space-x-1">
+    <div className={cn("flex items-center space-x-1", className)}>
       {selectedModel?.tools && (
         <ToolSelect
           selectedTools={selectedTools}

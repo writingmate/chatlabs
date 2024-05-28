@@ -74,6 +74,25 @@ const DropdownMenuContent = React.forwardRef<
 ))
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
+export const DropdownMenuSubContent2 = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => {
+  return (
+    <div
+      className={cn(
+        "bg-popover text-popover-foreground z-50 min-w-[8rem] overflow-y-auto rounded-md border shadow-md",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+})
+
+DropdownMenuSubContent2.displayName = "DropdownMenuSubContent2"
+
 const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {

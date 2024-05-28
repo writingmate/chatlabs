@@ -10,3 +10,5 @@ export type ModelProvider =
   | "custom"
   | "databricks"
   | "meta"
+  | "cohere"
+  | "microsoft"

@@ -49,7 +49,7 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "mistral-tiny": false,
   "mistral-small": false,
   "mistral-medium": false,
-  "llama2-70b-4096": false,
+  // "llama2-70b-4096": false,
   "pplx-7b-online": false,
   "pplx-70b-online": false,
   "pplx-7b-chat": false,
@@ -59,7 +59,10 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "llama-2-70b-chat": false,
   "codellama-34b-instruct": false,
   "codellama-70b-instruct": false,
-  "llama3-70b-8192": false
+  "llama3-70b-8192": false,
+  "llama3-8b-8192": false,
+  "gpt-4o": true,
+  "gemini-1.5-flash-latest": true
 }
 
 const SYSTEM_PROMPT_DESCRIPTION = `
@@ -124,8 +127,8 @@ function ModelSettings({ models }: { models?: LLM[] }) {
             "hover:bg-accent flex w-full cursor-pointer items-center justify-start space-x-3 truncate rounded p-2 text-sm hover:opacity-50"
           }
         >
-          <IconSettings stroke={1.5} className={"mr-2"} size={24} /> Manage
-          models
+          <IconSettings stroke={1.5} className={"mr-2 opacity-50"} size={24} />{" "}
+          Manage models
         </div>
       </DialogTrigger>
       <DialogContent>
