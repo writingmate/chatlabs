@@ -11,6 +11,7 @@ import {
   getProfileByUserId,
   updateProfileByUserId
 } from "@/db/profile"
+import { createErrorResponse } from "@/lib/response"
 
 // try 10 times before giving up retrieving profile
 const MAX_RETRIES = 10
@@ -100,10 +101,6 @@ async function registerUser(
   }
 
   return userId
-}
-
-export function createErrorResponse(message: string, status: number) {
-  return NextResponse.json({ message }, { status })
 }
 
 // redis based lock

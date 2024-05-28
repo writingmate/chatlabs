@@ -12,7 +12,7 @@ import { FileItemChunk } from "@/types"
 import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
-import { createErrorResponse } from "@/app/api/webhooks/stripe/route"
+import { createErrorResponse } from "@/lib/response"
 
 const maxDuration = 300
 export async function POST(req: Request) {
