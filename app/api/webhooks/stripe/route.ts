@@ -12,7 +12,6 @@ import {
   updateProfileByUserId
 } from "@/db/profile"
 import { createErrorResponse } from "@/lib/response"
-import { kv } from "@vercel/kv"
 
 // try 10 times before giving up retrieving profile
 const MAX_RETRIES = 10
