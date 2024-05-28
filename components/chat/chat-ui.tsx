@@ -196,10 +196,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     })
   }
 
-  if (loading) {
-    return <Loading />
-  }
-
   return (
     <div className="relative flex h-full flex-col items-center">
       <div className="sticky top-0 flex w-full justify-between p-2">
@@ -223,32 +219,34 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <ChatSettings />
       </div>
 
-      {chatMessages.length == 0 ? (
-        <>
-          <div className="absolute left-1/2 top-1/2 mb-20 -translate-x-1/2 -translate-y-1/2">
-            <Brand theme={theme === "dark" ? "dark" : "light"} />
-          </div>
+      {loading && <Loading />}
+      {!loading &&
+        (chatMessages.length == 0 ? (
+          <>
+            <div className="absolute left-1/2 top-1/2 mb-20 -translate-x-1/2 -translate-y-1/2">
+              <Brand theme={theme === "dark" ? "dark" : "light"} />
+            </div>
 
-          <div className="flex grow flex-col items-center justify-center" />
-        </>
-      ) : (
-        <div
-          className="flex size-full flex-col overflow-auto pt-4"
-          onScroll={handleScroll}
-        >
-          <div ref={messagesStartRef} />
-
+            <div className="flex grow flex-col items-center justify-center" />
+          </>
+        ) : (
           <div
-            className={
-              "mx-auto w-[300px] pb-8 sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]"
-            }
+            className="flex size-full flex-col overflow-auto pt-4"
+            onScroll={handleScroll}
           >
-            <ChatMessages />
-          </div>
+            <div ref={messagesStartRef} />
 
-          <div ref={messagesEndRef} />
-        </div>
-      )}
+            <div
+              className={
+                "mx-auto w-[300px] pb-8 sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]"
+              }
+            >
+              <ChatMessages />
+            </div>
+
+            <div ref={messagesEndRef} />
+          </div>
+        ))}
 
       <div className="relative w-full items-end px-4 pb-8 md:w-[500px] lg:w-[660px] xl:w-[800px]">
         <ChatInput />

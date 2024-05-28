@@ -12,6 +12,7 @@ import { FileItemChunk } from "@/types"
 import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
+import { createErrorResponse } from "@/app/api/webhooks/stripe/route"
 
 const maxDuration = 300
 export async function POST(req: Request) {
@@ -60,9 +61,17 @@ export async function POST(req: Request) {
         chunks = await processTxt(blob)
         break
       default:
-        return new NextResponse("Unsupported file type", {
-          status: 400
-        })
+        return createErrorResponse("Unsupported file type", 400)
+    }
+
+    if (chunks.length === 0) {
+      if (fileExtension === "pdf") {
+        return createErrorResponse(
+          "No text content found in PDF. If your PDF file contains images or screenshots, process those images with models like GPT-4o, or Google 1.5 Pro.",
+          400
+        )
+      }
+      return createErrorResponse("No text content found in file.", 400)
     }
 
     let embeddings: any = []
@@ -97,7 +106,6 @@ export async function POST(req: Request) {
           return await generateLocalEmbedding(chunk.content)
         } catch (error) {
           console.error(`Error generating embedding for chunk: ${chunk}`, error)
-
           return null
         }
       })
@@ -135,8 +143,6 @@ export async function POST(req: Request) {
   } catch (error: any) {
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
-    return new Response(JSON.stringify({ message: errorMessage }), {
-      status: errorCode
-    })
+    return createErrorResponse(errorMessage, errorCode)
   }
 }
