@@ -138,40 +138,6 @@ class Lock {
   }
 }
 
-// redis based lock
-class Lock {
-  constructor(
-    private kvv: typeof kv,
-    private key: string
-  ) {
-    this.kvv = kvv
-    this.key = key
-  }
-
-  // only acquire the lock if it's not already taken
-  // wait MAX_RETRIES for the lock to be released
-  async acquire() {
-    let retries = 0
-    while (retries < MAX_RETRIES * 2) {
-      const value = await this.kvv.set(this.key, "locked", {
-        nx: true,
-        ex: RETRY_DELAY_MS * MAX_RETRIES
-      })
-      if (value !== "OK") {
-        retries++
-        await sleep(RETRY_DELAY_MS)
-      } else {
-        return true
-      }
-    }
-    return false
-  }
-
-  async release() {
-    await this.kvv.del(this.key)
-  }
-}
-
 export async function POST(req: Request) {
   let event: Stripe.Event
   let subscription: Stripe.Subscription
