@@ -53,7 +53,7 @@ export default function AssistantsPage() {
             >
               <CardContent className={"flex space-x-3 p-4"}>
                 <AssistantIcon
-                  className={"size-16 rounded-xl"}
+                  className={"size-[76px] rounded-xl"}
                   assistant={assistant}
                   size={50}
                 />
