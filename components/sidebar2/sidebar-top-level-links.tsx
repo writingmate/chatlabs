@@ -3,6 +3,7 @@ import {
   IconAdjustmentsHorizontal,
   IconBolt,
   IconBooks,
+  IconColumns2,
   IconDiamond,
   IconDiamondFilled,
   IconFile,
@@ -24,6 +25,7 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { SidebarTopLevelLink } from "@/components/sidebar2/sidebar-top-level-link"
 import { useRouter } from "next/navigation"
+import { ColumnsIcon } from "lucide-react"
 
 export const SIDEBAR_ICON_SIZE = 20
 
@@ -62,6 +64,13 @@ export const SidebarTopLevelLinks: FC<SidebarTopLevelLinksProps> = ({
       contentType: "files",
       data: files,
       folders: folders.filter(folder => folder.type === "files")
+    },
+    {
+      icon: <IconColumns2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />,
+      label: "Compare models",
+      contentType: "splitview",
+      data: [],
+      folders: []
     }
   ]
 
