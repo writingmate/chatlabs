@@ -38,7 +38,13 @@ export function AssistantIcon({
   className?: string
 }) {
   const { assistantImages } = useContext(ChatbotUIContext)
-  const backgroundColor = COLOR_CLASSES[getColorIndex(assistant.id)]
+  const imageUrl =
+    assistantImages.find(image => image.path === assistant.image_path)?.url ||
+    ""
+  const backgroundColor = imageUrl
+    ? ""
+    : COLOR_CLASSES[getColorIndex(assistant.id)]
+
   return (
     <div
       className={cn(
@@ -48,12 +54,9 @@ export function AssistantIcon({
         backgroundColor
       )}
     >
-      {assistant.image_path ? (
+      {imageUrl ? (
         <Image
-          src={
-            assistantImages.find(image => image.path === assistant.image_path)
-              ?.url || ""
-          }
+          src={imageUrl}
           alt={assistant.name}
           width={size}
           height={size}
