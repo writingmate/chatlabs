@@ -42,7 +42,8 @@ export function AssistantIcon({
   return (
     <div
       className={cn(
-        `items-center justify-center rounded`,
+        `flex shrink-0 items-center justify-center overflow-hidden rounded`,
+        `w-[${size}px] h-[${size}px]`,
         className,
         backgroundColor
       )}
@@ -56,7 +57,7 @@ export function AssistantIcon({
           alt={assistant.name}
           width={size}
           height={size}
-          className={`max-w-[${size}px] rounded`}
+          className={`size-full`}
         />
       ) : (
         <IconRobotFace

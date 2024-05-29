@@ -53,14 +53,14 @@ export default function AssistantsPage() {
             >
               <CardContent className={"flex space-x-3 p-4"}>
                 <AssistantIcon
-                  className={
-                    "shrink-0 justify-center overflow-hidden rounded-xl p-4"
-                  }
+                  className={"size-16 rounded-xl"}
                   assistant={assistant}
                   size={50}
                 />
                 <div className={"flex flex-col"}>
-                  <CardTitle className={"text-lg"}>{assistant.name}</CardTitle>
+                  <CardTitle className={"text-md line-clamp-1"}>
+                    {assistant.name}
+                  </CardTitle>
                   <CardDescription className={"line-clamp-3 text-xs"}>
                     {assistant.description}
                   </CardDescription>
