@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
+import { SupabaseClient } from "@supabase/supabase-js"
 
 export const getAssistantById = async (assistantId: string) => {
   const { data: assistant, error } = await supabase
@@ -37,8 +38,8 @@ export const getAssistantWorkspacesByWorkspaceId = async (
   return workspace
 }
 
-export const getPublicAssistants = async () => {
-  const { data: assistants, error } = await supabase
+export const getPublicAssistants = async (client?: SupabaseClient) => {
+  const { data: assistants, error } = await (client || supabase)
     .from("assistants")
     .select("*")
     .neq("sharing", "private")

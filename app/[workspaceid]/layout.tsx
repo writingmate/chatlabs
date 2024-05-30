@@ -1,18 +1,10 @@
 "use client"
 
-import { Dashboard } from "@/components/ui/dashboard"
 import { ChatbotUIContext } from "@/context/context"
-import {
-  getAssistantWorkspacesByWorkspaceId,
-  getPublicAssistants
-} from "@/db/assistants"
-import {
-  getAssistantImageFromStorage,
-  getAssistantPublicImageUrl
-} from "@/db/storage/assistant-images"
+import { getPublicAssistants } from "@/db/assistants"
+import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
 import { getPublicTools, getToolWorkspacesByWorkspaceId } from "@/db/tools"
 import { getWorkspaceById } from "@/db/workspaces"
-import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { supabase } from "@/lib/supabase/browser-client"
 import { LLMID } from "@/types"
 import { useParams, useRouter } from "next/navigation"
@@ -36,15 +28,12 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setAssistants,
     setAssistantImages,
     setChats,
-    setCollections,
     setFolders,
     setFiles,
-    setPresets,
     setPrompts,
     setTools,
     setPlatformTools,
     setModels,
-    selectedWorkspace,
     setSelectedWorkspace,
     setSelectedChat,
     setChatMessages,
@@ -59,18 +48,6 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   } = useContext(ChatbotUIContext)
 
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    ;(async () => {
-      const session = (await supabase.auth.getSession()).data.session
-
-      if (!session) {
-        return router.push("/login")
-      } else {
-        await fetchWorkspaceData(workspaceId)
-      }
-    })()
-  }, [])
 
   useEffect(() => {
     ;(async () => await fetchWorkspaceData(workspaceId))()
@@ -90,67 +67,43 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setLoading(true)
 
     const workspace = await getWorkspaceById(workspaceId)
+
+    if (!workspace) {
+      router.push("/")
+      return
+    }
+
     setSelectedWorkspace(workspace)
-
-    // const assistantData = await getAssistantWorkspacesByWorkspaceId(workspaceId)
-
-    // const publicAssistantData = await getPublicAssistants()
-
-    // function to fetch unique values from array by id
 
     function onlyUniqueById(value: any, index: any, self: any) {
       return self.findIndex((item: any) => item.id === value.id) === index
     }
 
     const [
-      workspaceData,
-      // assistantData,
       publicAssistantData,
-      // chats,
-      // collectionData,
-      // folders,
-      // fileData,
-      // presetData,
-      // promptData,
-      // toolData,
       publicToolData,
       platformToolData
       // modelData
     ] = await Promise.all([
-      getWorkspaceById(workspaceId),
-      // getAssistantWorkspacesByWorkspaceId(workspaceId),
       getPublicAssistants(),
-      // getChatsByWorkspaceId(workspaceId),
-      // getCollectionWorkspacesByWorkspaceId(workspaceId),
-      // getFoldersByWorkspaceId(workspaceId),
-      // getFileWorkspacesByWorkspaceId(workspaceId),
-      // getPresetWorkspacesByWorkspaceId(workspaceId),
-      // getPromptWorkspacesByWorkspaceId(workspaceId),
-      // getToolWorkspacesByWorkspaceId(workspaceId),
       getPublicTools(),
       getPlatformTools()
-      // getModelWorkspacesByWorkspaceId(workspaceId)
     ])
 
-    setSelectedWorkspace(workspaceData)
     setAssistants(
-      [...workspaceData.assistants, ...publicAssistantData].filter(
-        onlyUniqueById
-      )
+      [...workspace.assistants, ...publicAssistantData].filter(onlyUniqueById)
     )
-    setChats(workspaceData.chats)
-    // setCollections(collectionData.collections)
-    setFolders(workspaceData.folders)
-    setFiles(workspaceData.files)
-    // setPresets(presetData.presets)
-    setPrompts(workspaceData.prompts)
+    setChats(workspace.chats)
+    setFolders(workspace.folders)
+    setFiles(workspace.files)
+    setPrompts(workspace.prompts)
     setTools(
-      [...platformToolData, ...workspaceData.tools, ...publicToolData].filter(
+      [...platformToolData, ...workspace.tools, ...publicToolData].filter(
         onlyUniqueById
       )
     )
     setPlatformTools(platformToolData)
-    setModels(workspaceData.models)
+    setModels(workspace.models)
 
     const parallelize = async (array: any, callback: any) => {
       const promises = array.map((item: any) => callback(item))
@@ -158,7 +111,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     }
 
     await parallelize(
-      [...workspaceData.assistants, ...publicAssistantData],
+      [...workspace.assistants, ...publicAssistantData],
       async (assistant: any) => {
         let url = assistant.image_path
           ? getAssistantPublicImageUrl(assistant.image_path)

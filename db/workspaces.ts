@@ -31,9 +31,9 @@ export const getWorkspaceById = async (workspaceId: string) => {
     models(*)`
     )
     .eq("id", workspaceId)
-    .single()
+    .maybeSingle()
 
-  if (!workspace) {
+  if (error) {
     throw new Error(error.message)
   }
 

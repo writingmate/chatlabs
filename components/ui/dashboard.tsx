@@ -10,7 +10,6 @@ import { FC, useState, useContext } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
 import { PlanPicker } from "@/components/upgrade/plan-picker"
-import { useTheme } from "next-themes"
 import { ChatbotUIContext } from "@/context/context"
 import { Sidebar2 } from "@/components/sidebar2/sidebar"
 
@@ -23,11 +22,8 @@ interface DashboardProps {
 export const Dashboard: FC<DashboardProps> = ({ children }) => {
   useHotkey("s", () => setShowSidebar(prevState => !prevState))
 
-  const pathname = usePathname()
-  const router = useRouter()
   const searchParams = useSearchParams()
   const tabValue = searchParams.get("tab") || "chats"
-  const { theme } = useTheme()
 
   const { handleSelectDeviceFile } = useSelectFileHandler()
 

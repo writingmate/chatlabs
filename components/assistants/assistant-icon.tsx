@@ -1,9 +1,8 @@
 import Image from "next/image"
 import { IconRobotFace } from "@tabler/icons-react"
-import { useContext } from "react"
-import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { cn } from "@/lib/utils"
+import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
 
 const COLOR_CLASSES = [
   "bg-red-500",
@@ -37,10 +36,11 @@ export function AssistantIcon({
   size?: number
   className?: string
 }) {
-  const { assistantImages } = useContext(ChatbotUIContext)
-  const imageUrl =
-    assistantImages.find(image => image.path === assistant.image_path)?.url ||
-    ""
+  // const { assistantImages } = useContext(ChatbotUIContext)
+  const imageUrl = assistant.image_path
+    ? getAssistantPublicImageUrl(assistant.image_path)
+    : ""
+
   const backgroundColor = imageUrl
     ? ""
     : COLOR_CLASSES[getColorIndex(assistant.id)]

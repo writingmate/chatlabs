@@ -23,10 +23,13 @@ import { useTheme } from "next-themes"
 import { IconMessagePlus } from "@tabler/icons-react"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { Tables } from "@/supabase/types"
 
-interface ChatUIProps {}
+interface ChatUIProps {
+  selectedAssistant?: Tables<"assistants">
+}
 
-export const ChatUI: FC<ChatUIProps> = ({}) => {
+export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
   useHotkey("o", () => handleNewChat())
   useHotkey("l", () => {
     handleFocusChatInput()
@@ -73,6 +76,9 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   const { theme } = useTheme()
 
   useEffect(() => {
+    if (selectedAssistant) {
+      setSelectedAssistant(selectedAssistant)
+    }
     if (!params.chatid) {
       setLoading(false)
       return
@@ -165,6 +171,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
   const fetchChat = async () => {
     const chat = chats.find(chat => chat.id === params.chatid)
+
     if (!chat) return
 
     if (chat.assistant_id) {
