@@ -59,7 +59,11 @@ async function redirectToChatMiddleware(supabase: SupabaseClient, session: any, 
     return
   }
 
-  const redirectToChat = request.nextUrl.pathname === "/"
+  const pathsToRedirect = ["/", "/chat"]
+
+  const redirectToChat = pathsToRedirect.includes(request.nextUrl.pathname)
+
+  console.log("redirectToChat", redirectToChat)
 
   if (redirectToChat) {
     const { data: homeWorkspace, error } = await supabase
@@ -73,8 +77,10 @@ async function redirectToChatMiddleware(supabase: SupabaseClient, session: any, 
       throw new Error(error?.message)
     }
 
+    const currentUrl = new URL(request.url)
+
     return NextResponse.redirect(
-      new URL(`/${homeWorkspace.id}/chat`, request.url)
+      new URL(`/${homeWorkspace.id}/chat?${currentUrl.searchParams.toString()}`, request.url)
     )
   }
 }
@@ -110,5 +116,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/"
+  matcher: "/(chat)?",
 }

@@ -10,6 +10,7 @@ import {
   DialogTitle
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { redirect } from "next/navigation"
 
 export default async function PromptsPage({
   params
@@ -18,18 +19,25 @@ export default async function PromptsPage({
 }) {
   const prompt = await getPromptById(params.id)
 
+  const redirectAction = async () => {
+    "use server"
+    redirect(`/chat?prompt_id=${prompt.id}`)
+  }
+
   return (
     <Dialog open={true}>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{prompt.name}</DialogTitle>
-        </DialogHeader>
-        <DialogDescription>
-          {prompt.description}
-          {prompt.content}
+        <form>
+          <DialogHeader>
+            <DialogTitle>{prompt.name}</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            {prompt.description}
+            {prompt.content}
 
-          <Button>Use this prompt</Button>
-        </DialogDescription>
+            <Button formAction={redirectAction}>Use this prompt</Button>
+          </DialogDescription>
+        </form>
       </DialogContent>
     </Dialog>
   )

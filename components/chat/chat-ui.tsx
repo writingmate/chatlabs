@@ -10,7 +10,7 @@ import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLMID, MessageImage } from "@/types"
-import { useParams } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { FC, useContext, useEffect, useState } from "react"
 import { ChatHelp } from "./chat-help"
 import { useScroll } from "./chat-hooks/use-scroll"
@@ -24,6 +24,8 @@ import { IconMessagePlus } from "@tabler/icons-react"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { Tables } from "@/supabase/types"
+import { getPromptById } from "@/db/prompts"
+import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
 
 interface ChatUIProps {
   selectedAssistant?: Tables<"assistants">
@@ -36,8 +38,10 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
   })
 
   const params = useParams()
+  const searchParams = useSearchParams()
 
   const {
+    prompts,
     chats,
     setChatImages,
     assistants,
@@ -58,6 +62,8 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
   } = useContext(ChatbotUIChatContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
+
+  const { handleSelectPromptWithVariables } = usePromptAndCommand()
 
   const {
     messagesStartRef,
@@ -99,6 +105,18 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
       setLoading(false)
     }
   }, [params])
+
+  useEffect(() => {
+    const promptId = searchParams.get("prompt_id")
+
+    if (promptId) {
+      getPromptById(promptId)
+        .then(prompt => {
+          handleSelectPromptWithVariables(prompt)
+        })
+        .catch(console.error)
+    }
+  }, [searchParams])
 
   const fetchMessages = async () => {
     const fetchedMessages = await getMessagesByChatId(params.chatid as string)

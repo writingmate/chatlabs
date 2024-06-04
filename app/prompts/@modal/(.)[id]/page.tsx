@@ -8,11 +8,9 @@ import {
   DialogTitle
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-import Markdown from "react-markdown"
-import { MessageMarkdown } from "@/components/messages/message-markdown"
 import ReactMarkdown from "react-markdown"
 import { Label } from "@/components/ui/label"
+import Link from "next/link"
 
 export default async function PromptsPage({
   params
@@ -26,7 +24,9 @@ export default async function PromptsPage({
       <DialogContent>
         <DialogHeader className={"flex flex-row items-center justify-between"}>
           <DialogTitle>{prompt.name} </DialogTitle>
-          <Button size={"xs"}>Use this prompt</Button>
+          <Button type={"submit"} size={"xs"}>
+            <Link href={`/chat?prompt_id=${prompt.id}`}>Use this prompt</Link>
+          </Button>
         </DialogHeader>
         <DialogDescription
           className={"text-foreground flex flex-col space-y-3"}
