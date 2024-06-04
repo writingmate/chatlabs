@@ -14,9 +14,7 @@ import {
   IconRepeat,
   IconArrowUp
 } from "@tabler/icons-react"
-import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
@@ -27,13 +25,11 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
-import { Button } from "@/components/ui/button"
 import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatInputProps {}
 
 export const ChatInput: FC<ChatInputProps> = ({}) => {
-  const { t } = useTranslation()
   useHotkey("l", () => {
     handleFocusChatInput()
   })
@@ -329,9 +325,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             <TextareaAutosize
               textareaRef={chatInputRef}
               className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 pr-[70px] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder={t(
-                `Ask anything. Type "${profile?.assistant_command || "@"}" for assistants, "${profile?.prompt_command || "/"}" for prompts, "${profile?.files_command || "#"}" for files, and "${profile?.tools_command || "!"}" for plugins.`
-              )}
+              placeholder={`Ask anything. Type "${profile?.assistant_command || "@"}" for assistants, "${profile?.prompt_command || "/"}" for prompts, "${profile?.files_command || "#"}" for files, and "${profile?.tools_command || "!"}" for plugins.`}
               onValueChange={handleInputChange}
               value={userInput}
               minRows={1}

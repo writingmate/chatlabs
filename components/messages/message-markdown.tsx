@@ -10,6 +10,7 @@ import { sr } from "date-fns/locale"
 
 interface MessageMarkdownProps {
   content: string
+  className?: string
 }
 
 function urlTransform(url: string) {
@@ -19,7 +20,10 @@ function urlTransform(url: string) {
   return defaultUrlTransform(url)
 }
 
-export const MessageMarkdown: FC<MessageMarkdownProps> = ({ content }) => {
+export const MessageMarkdown: FC<MessageMarkdownProps> = ({
+  className,
+  content
+}) => {
   return (
     <MessageMarkdownMemoized
       className="prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 min-h-[40px] min-w-full space-y-6 break-words"

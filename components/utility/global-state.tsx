@@ -210,6 +210,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
       const workspaces = await getWorkspacesByUserId(user.id)
       setWorkspaces(workspaces)
+      setSelectedWorkspace(workspaces?.[0])
 
       for (const workspace of workspaces) {
         let workspaceImageUrl = ""

@@ -71,8 +71,6 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content"
 }
 
-const i18nNamespaces = ["translation"]
-
 export default async function RootLayout({
   children,
   params: { locale }
@@ -82,7 +80,7 @@ export default async function RootLayout({
       <body className={font.className + " h-full antialiased"}>
         <Providers attribute="class" defaultTheme="light">
           <Toaster richColors position="top-center" duration={3000} />
-          <div className="bg-background text-foreground flex h-full flex-col items-center sm:h-screen">
+          <div className="bg-muted/50 text-foreground flex h-full flex-col items-center sm:h-screen">
             <GlobalState>{children}</GlobalState>
           </div>
         </Providers>

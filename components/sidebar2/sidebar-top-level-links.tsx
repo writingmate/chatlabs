@@ -47,38 +47,32 @@ export const SidebarTopLevelLinks: FC<SidebarTopLevelLinksProps> = ({
     {
       icon: <IconRobotFace size={SIDEBAR_ICON_SIZE} stroke={1.5} />,
       label: "Assistants",
-      contentType: "assistants",
       data: assistants,
+      href: `/assistants`,
       folders: folders.filter(folder => folder.type === "assistants")
     },
     {
       icon: <IconTerminal2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />,
       label: "Prompts",
-      contentType: "prompts",
       data: prompts,
+      href: `/prompts`,
       folders: folders.filter(folder => folder.type === "prompts")
     },
     {
       icon: <IconFile size={SIDEBAR_ICON_SIZE} stroke={1.5} />,
       label: "Files",
-      contentType: "files",
+      href: `/${selectedWorkspace?.id}/files`,
       data: files,
       folders: folders.filter(folder => folder.type === "files")
     },
     {
       icon: <IconColumns2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />,
       label: "Compare models",
-      contentType: "splitview",
+      href: `/${selectedWorkspace?.id}/splitview`,
       data: [],
       folders: []
     }
   ]
-
-  const router = useRouter()
-
-  useEffect(() => {
-    menuItems.map(x => router.prefetch(`./${x.contentType}`))
-  }, [])
 
   return (
     <div
@@ -86,10 +80,9 @@ export const SidebarTopLevelLinks: FC<SidebarTopLevelLinksProps> = ({
     >
       {menuItems.map((item, index) => (
         <SidebarTopLevelLink
-          href={`/${selectedWorkspace?.id}/${item.contentType}`}
+          href={item.href}
           folders={item.folders}
           key={index}
-          // active={contentType === item.contentType}
           icon={item.icon}
           label={item.label}
         />

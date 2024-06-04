@@ -1319,9 +1319,12 @@ export interface Database {
       }
       prompts: {
         Row: {
+          category: Database["public"]["Enums"]["prompt_category"][] | null
           content: string
           created_at: string
+          description: string | null
           folder_id: string | null
+          icon: string | null
           id: string
           name: string
           sharing: string
@@ -1329,9 +1332,12 @@ export interface Database {
           user_id: string
         }
         Insert: {
+          category?: Database["public"]["Enums"]["prompt_category"][] | null
           content: string
           created_at?: string
+          description?: string | null
           folder_id?: string | null
+          icon?: string | null
           id?: string
           name: string
           sharing?: string
@@ -1339,9 +1345,12 @@ export interface Database {
           user_id: string
         }
         Update: {
+          category?: Database["public"]["Enums"]["prompt_category"][] | null
           content?: string
           created_at?: string
+          description?: string | null
           folder_id?: string | null
+          icon?: string | null
           id?: string
           name?: string
           sharing?: string
@@ -1633,7 +1642,13 @@ export interface Database {
       }
     }
     Enums: {
-      [_ in never]: never
+      prompt_category:
+        | "Extract"
+        | "Generate"
+        | "Transform"
+        | "Code"
+        | "Natural Language"
+        | "Structured Data"
     }
     CompositeTypes: {
       [_ in never]: never

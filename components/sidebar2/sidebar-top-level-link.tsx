@@ -16,6 +16,7 @@ export function SidebarTopLevelLink({
 }: SidebarSwitchItemProps) {
   return (
     <Link
+      prefetch={true}
       href={href}
       className={
         "hover:bg-accent/60 flex-start focus:bg-accent group flex h-[36px] w-full cursor-pointer items-center rounded px-2 focus:outline-none"

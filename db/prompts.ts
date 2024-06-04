@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
+import { SupabaseClient } from "@supabase/supabase-js"
 
 export const getPromptById = async (promptId: string) => {
   const { data: prompt, error } = await supabase
@@ -176,8 +177,8 @@ export const deletePromptWorkspace = async (
   return true
 }
 
-export const getPublicPrompts = async () => {
-  const { data: prompts, error } = await supabase
+export const getPublicPrompts = async (client?: SupabaseClient) => {
+  const { data: prompts, error } = await (client || supabase)
     .from("prompts")
     .select("*")
     .neq("sharing", "private")

@@ -3,29 +3,7 @@ import { IconRobotFace } from "@tabler/icons-react"
 import { Tables } from "@/supabase/types"
 import { cn } from "@/lib/utils"
 import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
-
-const COLOR_CLASSES = [
-  "bg-red-500",
-  "bg-green-500",
-  "bg-blue-500",
-  "bg-yellow-500",
-  "bg-indigo-500",
-  "bg-pink-500",
-  "bg-purple-500",
-  "bg-cyan-500",
-  "bg-rose-500",
-  "bg-emerald-500",
-  "bg-violet-500",
-  "bg-orange-500"
-]
-
-// consistent number based on the assistant id (string) of a given range
-function getColorIndex(assistantId: string) {
-  return (
-    assistantId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
-    COLOR_CLASSES.length
-  )
-}
+import { getColorById } from "@/lib/color-by-id"
 
 export function AssistantIcon({
   assistant,
@@ -41,9 +19,7 @@ export function AssistantIcon({
     ? getAssistantPublicImageUrl(assistant.image_path)
     : ""
 
-  const backgroundColor = imageUrl
-    ? ""
-    : COLOR_CLASSES[getColorIndex(assistant.id)]
+  const backgroundColor = imageUrl ? "" : getColorById(assistant.id)
 
   return (
     <div
