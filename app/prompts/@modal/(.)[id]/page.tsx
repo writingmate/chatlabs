@@ -19,11 +19,20 @@ export default async function PromptsPage({
 }) {
   const prompt = await getPromptById(params.id)
 
+  function onOpenChange() {
+    // TODO: Implement router.back()
+    window.history.back()
+  }
+
   return (
-    <Dialog open={true}>
+    <Dialog open={true} onOpenChange={onOpenChange} modal={true}>
       <DialogContent>
         <DialogHeader className={"flex flex-row items-center justify-between"}>
-          <DialogTitle>{prompt.name} </DialogTitle>
+          <DialogTitle>
+            {prompt.icon}
+            {"  "}
+            {prompt.name}{" "}
+          </DialogTitle>
           <Button type={"submit"} size={"xs"}>
             <Link href={`/chat?prompt_id=${prompt.id}`}>Use this prompt</Link>
           </Button>
@@ -37,8 +46,10 @@ export default async function PromptsPage({
           </div>
           <div className={"flex flex-col space-y-1"}>
             <Label>Prompt</Label>
-            <div className={"bg-accent rounded-md p-3"}>
-              <ReactMarkdown>{prompt.content}</ReactMarkdown>
+            <div className={"bg-accent overflow-hidden rounded-md p-3"}>
+              <ReactMarkdown className={"overflow-auto"}>
+                {prompt.content}
+              </ReactMarkdown>
             </div>
           </div>
         </DialogDescription>

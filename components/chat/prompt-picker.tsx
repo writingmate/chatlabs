@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { Label } from "../ui/label"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
+import { getPublicPrompts } from "@/db/prompts"
 
 interface PromptPickerProps {}
 
@@ -27,10 +28,16 @@ export const PromptPicker: FC<PromptPickerProps> = ({}) => {
 
   const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
+  const [publicPrompts, setPublicPrompts] = useState<Tables<"prompts">[]>([])
+
   useEffect(() => {
     if (focusPrompt && itemsRef.current[0]) {
       itemsRef.current[0].focus()
     }
+
+    getPublicPrompts().then(prompts => {
+      setPublicPrompts(prompts)
+    })
   }, [focusPrompt])
 
   const [isTyping, setIsTyping] = useState(false)
@@ -81,14 +88,17 @@ export const PromptPicker: FC<PromptPickerProps> = ({}) => {
           new RegExp(`\\{\\{${variable.name}\\}\\}`, "g"),
           variable.value
         ),
-      prompts.find(prompt => prompt.id === promptVariables[0].promptId)
-        ?.content || ""
+      [...publicPrompts, ...prompts].find(
+        prompt => prompt.id === promptVariables[0].promptId
+      )?.content || ""
     )
 
     const newPrompt: any = {
       ...prompts.find(prompt => prompt.id === promptVariables[0].promptId),
       content: newPromptContent
     }
+
+    console.log("newPrompt", newPrompt)
 
     handleSelectPrompt(newPrompt)
     handleOpenChange(false)

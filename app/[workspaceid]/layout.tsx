@@ -79,16 +79,12 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
       return self.findIndex((item: any) => item.id === value.id) === index
     }
 
-    const [
-      publicAssistantData,
-      publicToolData,
-      platformToolData
-      // modelData
-    ] = await Promise.all([
-      getPublicAssistants(),
-      getPublicTools(),
-      getPlatformTools()
-    ])
+    const [publicAssistantData, publicToolData, platformToolData] =
+      await Promise.all([
+        getPublicAssistants(),
+        getPublicTools(),
+        getPlatformTools()
+      ])
 
     setAssistants(
       [...workspace.assistants, ...publicAssistantData].filter(onlyUniqueById)
