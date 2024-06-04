@@ -63,8 +63,6 @@ async function redirectToChatMiddleware(supabase: SupabaseClient, session: any, 
 
   const redirectToChat = pathsToRedirect.includes(request.nextUrl.pathname)
 
-  console.log("redirectToChat", redirectToChat)
-
   if (redirectToChat) {
     const { data: homeWorkspace, error } = await supabase
       .from("workspaces")

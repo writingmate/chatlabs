@@ -1,3 +1,4 @@
+"use client"
 import { cn } from "@/lib/utils"
 import mistral from "@/public/providers/mistral.png"
 import groq from "@/public/providers/groq.png"

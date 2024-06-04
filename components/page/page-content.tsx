@@ -9,7 +9,7 @@ export default function PageContent({ children, className }: PageContentProps) {
   return (
     <div
       className={cn(
-        "flex size-full flex-col items-center justify-center self-center py-4",
+        "container flex h-full flex-col items-center justify-start self-center py-4 pb-5",
         className
       )}
     >

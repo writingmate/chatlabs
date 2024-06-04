@@ -80,7 +80,7 @@ export default async function RootLayout({
       <body className={font.className + " h-full antialiased"}>
         <Providers attribute="class" defaultTheme="light">
           <Toaster richColors position="top-center" duration={3000} />
-          <div className="bg-muted/50 text-foreground flex h-full flex-col items-center sm:h-screen">
+          <div className="text-foreground flex h-full flex-col items-center sm:h-screen">
             <GlobalState>{children}</GlobalState>
           </div>
         </Providers>

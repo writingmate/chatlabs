@@ -15,6 +15,7 @@ const COLOR_CLASSES = [
 
 // consistent number based on the assistant id (string) of a given range
 export function getColorById(id: string) {
+  console.log(id)
   return COLOR_CLASSES[
     id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
       COLOR_CLASSES.length

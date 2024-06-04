@@ -14,26 +14,7 @@ import { getPublicPrompts } from "@/db/prompts"
 import { createClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
 import { Tables } from "@/supabase/types"
-import { IconPrompt } from "@tabler/icons-react"
-import { getColorById } from "@/lib/color-by-id"
-import { cn } from "@/lib/utils"
-
-function PromptIcon({ prompt }: { prompt: Tables<"prompts"> }) {
-  if (prompt.icon) {
-    return (
-      <div
-        className={cn(
-          "flex size-[50px] items-center justify-center rounded-md text-center text-3xl",
-          getColorById(prompt.id)
-        )}
-      >
-        {prompt.icon}
-      </div>
-    )
-  }
-
-  return <IconPrompt />
-}
+import { PromptIcon } from "@/components/prompts/prompt-icon"
 
 function Prompts({
   showCreateButton = true,
@@ -90,15 +71,5 @@ export default async function PromptsPage() {
   const supabase = createClient(cookieStore)
   const data = await getPublicPrompts(supabase)
 
-  const isAnon = !(await supabase.auth.getSession()).data.session
-
-  if (isAnon) {
-    return <Prompts showCreateButton={false} data={data} />
-  }
-
-  return (
-    <Dashboard>
-      <Prompts data={data} />
-    </Dashboard>
-  )
+  return <Prompts data={data} />
 }

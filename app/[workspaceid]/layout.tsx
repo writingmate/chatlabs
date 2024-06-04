@@ -66,109 +66,112 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   const fetchWorkspaceData = async (workspaceId: string) => {
     setLoading(true)
 
-    const workspace = await getWorkspaceById(workspaceId)
-
-    if (!workspace) {
-      router.push("/")
-      return
-    }
-
-    setSelectedWorkspace(workspace)
-
-    function onlyUniqueById(value: any, index: any, self: any) {
-      return self.findIndex((item: any) => item.id === value.id) === index
-    }
-
-    const [publicAssistantData, publicToolData, platformToolData] =
-      await Promise.all([
-        getPublicAssistants(),
-        getPublicTools(),
-        getPlatformTools()
-      ])
-
-    setAssistants(
-      [...workspace.assistants, ...publicAssistantData].filter(onlyUniqueById)
-    )
-    setChats(workspace.chats)
-    setFolders(workspace.folders)
-    setFiles(workspace.files)
-    setPrompts(workspace.prompts)
-    setTools(
-      [...platformToolData, ...workspace.tools, ...publicToolData].filter(
-        onlyUniqueById
-      )
-    )
-    setPlatformTools(platformToolData)
-    setModels(workspace.models)
-
-    const parallelize = async (array: any, callback: any) => {
-      const promises = array.map((item: any) => callback(item))
-      return Promise.all(promises)
-    }
-
-    await parallelize(
-      [...workspace.assistants, ...publicAssistantData],
-      async (assistant: any) => {
-        let url = assistant.image_path
-          ? getAssistantPublicImageUrl(assistant.image_path)
-          : ""
-
-        if (url) {
-          // const response = await fetch(url)
-          // const blob = await response.blob()
-          // const base64 = await convertBlobToBase64(blob)
-
-          setAssistantImages(prev => [
-            ...prev,
-            {
-              assistantId: assistant.id,
-              path: assistant.image_path,
-              base64: "",
-              url
-            }
-          ])
-        } else {
-          setAssistantImages(prev => [
-            ...prev,
-            {
-              assistantId: assistant.id,
-              path: assistant.image_path,
-              base64: "",
-              url
-            }
-          ])
-        }
+    try {
+      const workspace = await getWorkspaceById(workspaceId)
+      if (!workspace) {
+        router.push("/")
+        return
       }
-    )
+      setSelectedWorkspace(workspace)
 
-    setLoading(false)
+      function onlyUniqueById(value: any, index: any, self: any) {
+        return self.findIndex((item: any) => item.id === value.id) === index
+      }
 
-    setChatSettings({
-      model: (chatSettings?.model ||
-        workspace?.default_model ||
-        "gpt-3.5-turbo-0125") as LLMID,
-      prompt:
-        // chatSettings?.prompt ||
-        workspace?.default_prompt ||
-        "You are a friendly, helpful AI assistant.",
-      temperature:
-        // chatSettings?.temperature ||
-        workspace?.default_temperature || 0.5,
-      contextLength:
-        // chatSettings?.contextLength ||
-        workspace?.default_context_length || 4096,
-      includeProfileContext:
-        // chatSettings?.includeProfileContext ||
-        workspace?.include_profile_context || true,
-      includeWorkspaceInstructions:
-        // chatSettings?.includeWorkspaceInstructions ||
-        workspace?.include_workspace_instructions || true,
-      embeddingsProvider:
-        // chatSettings?.embeddingsProvider ||
-        (workspace?.embeddings_provider as "openai" | "local") || "openai"
-    })
+      const [publicAssistantData, publicToolData, platformToolData] =
+        await Promise.all([
+          getPublicAssistants(),
+          getPublicTools(),
+          getPlatformTools()
+        ])
 
-    setLoading(false)
+      setAssistants(
+        [...workspace.assistants, ...publicAssistantData].filter(onlyUniqueById)
+      )
+      setChats(workspace.chats)
+      setFolders(workspace.folders)
+      setFiles(workspace.files)
+      setPrompts(workspace.prompts)
+      setTools(
+        [...platformToolData, ...workspace.tools, ...publicToolData].filter(
+          onlyUniqueById
+        )
+      )
+      setPlatformTools(platformToolData)
+      setModels(workspace.models)
+
+      const parallelize = async (array: any, callback: any) => {
+        const promises = array.map((item: any) => callback(item))
+        return Promise.all(promises)
+      }
+
+      await parallelize(
+        [...workspace.assistants, ...publicAssistantData],
+        async (assistant: any) => {
+          let url = assistant.image_path
+            ? getAssistantPublicImageUrl(assistant.image_path)
+            : ""
+
+          if (url) {
+            // const response = await fetch(url)
+            // const blob = await response.blob()
+            // const base64 = await convertBlobToBase64(blob)
+
+            setAssistantImages(prev => [
+              ...prev,
+              {
+                assistantId: assistant.id,
+                path: assistant.image_path,
+                base64: "",
+                url
+              }
+            ])
+          } else {
+            setAssistantImages(prev => [
+              ...prev,
+              {
+                assistantId: assistant.id,
+                path: assistant.image_path,
+                base64: "",
+                url
+              }
+            ])
+          }
+        }
+      )
+
+      setLoading(false)
+
+      setChatSettings({
+        model: (chatSettings?.model ||
+          workspace?.default_model ||
+          "gpt-3.5-turbo-0125") as LLMID,
+        prompt:
+          // chatSettings?.prompt ||
+          workspace?.default_prompt ||
+          "You are a friendly, helpful AI assistant.",
+        temperature:
+          // chatSettings?.temperature ||
+          workspace?.default_temperature || 0.5,
+        contextLength:
+          // chatSettings?.contextLength ||
+          workspace?.default_context_length || 4096,
+        includeProfileContext:
+          // chatSettings?.includeProfileContext ||
+          workspace?.include_profile_context || true,
+        includeWorkspaceInstructions:
+          // chatSettings?.includeWorkspaceInstructions ||
+          workspace?.include_workspace_instructions || true,
+        embeddingsProvider:
+          // chatSettings?.embeddingsProvider ||
+          (workspace?.embeddings_provider as "openai" | "local") || "openai"
+      })
+
+      setLoading(false)
+    } catch (error) {
+      console.error(error)
+      router.push("/")
+    }
   }
 
   if (loading) {

@@ -9,7 +9,7 @@ type HeaderProps = {
 }
 
 const Header = ({ children, className }: HeaderProps) => {
-  return <div className={cn("p-4", className)}>{children}</div>
+  return <div className={cn("pb-4", className)}>{children}</div>
 }
 
 export default Header
