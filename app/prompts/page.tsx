@@ -21,7 +21,11 @@ type ArrayElement<A> = A extends readonly (infer T)[] ? T : never
 function getPageTitle(category?: string) {
   return !category || category === "All" ? "Prompts" : category + " Prompts"
 }
-export function generateMetadata({ c: category }: { c?: string }) {
+export function generateMetadata({
+  searchParams: { c: category }
+}: {
+  searchParams: { c?: string }
+}) {
   const title = getPageTitle(category)
   return {
     title: `Best ${title} for Large Language Models`,
