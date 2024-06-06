@@ -9,18 +9,20 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import Link from "next/link"
-import { getPublicPrompts } from "@/db/prompts"
+import { getPromptCategories, getPublicPrompts } from "@/db/prompts"
 import { createClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
 import { PromptIcon } from "@/components/prompts/prompt-icon"
 import { Badge } from "@/components/ui/badge"
 import { Tables } from "@/supabase/types"
+import Search from "@/components/ui/search"
 
 type ArrayElement<A> = A extends readonly (infer T)[] ? T : never
 
 function getPageTitle(category?: string) {
   return !category || category === "All" ? "Prompts" : category + " Prompts"
 }
+
 export function generateMetadata({
   searchParams: { c: category }
 }: {
@@ -33,31 +35,24 @@ export function generateMetadata({
   }
 }
 
+const ALL_CATEGORIES = "All"
+
 export default async function PromptsPage({
-  searchParams: { c: category }
+  searchParams: { c: category = ALL_CATEGORIES, q: query }
 }: {
-  searchParams: { c?: ArrayElement<Tables<"prompts">["category"]> | "All" }
+  searchParams: {
+    c?: ArrayElement<Tables<"prompt_category">["name"]> | typeof ALL_CATEGORIES
+    q?: string
+  }
 }) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
-  const data = await getPublicPrompts(supabase)
-
-  const filteredData =
-    !!category && category !== "All"
-      ? data?.filter(x => x.category?.includes(category))
-      : data
-
-  const categories = [
-    "All",
-    ...data.reduce((acc, prompt) => {
-      prompt.category?.forEach((category: string) => {
-        if (!acc.includes(category)) {
-          acc.push(category)
-        }
-      })
-      return acc
-    }, [] as string[])
-  ]
+  const searchCategory = category === ALL_CATEGORIES ? undefined : category
+  const categories = await getPromptCategories(supabase)
+  const data = await getPublicPrompts(supabase, {
+    category: searchCategory,
+    query
+  })
 
   const categoryTitle = getPageTitle(category)
 
@@ -70,6 +65,7 @@ export default async function PromptsPage({
       >
         <PageTitle className={"capitalize"}>{categoryTitle}</PageTitle>
         <div className={"flex space-x-2"}>
+          <Search className={"w-18 h-8"} placeholder={"Search prompts..."} />
           {
             <SidebarCreateButtons
               contentType={"prompts"}
@@ -79,14 +75,17 @@ export default async function PromptsPage({
         </div>
       </PageHeader>
       <div className="flex space-x-2 pb-6">
-        {categories.map((cat: string, index: number) => (
-          <Badge variant={cat === category ? "default" : "outline"} key={index}>
-            <Link href={"/prompts?c=" + cat}>{cat}</Link>
+        {[{ name: ALL_CATEGORIES }, ...categories].map((cat, index: number) => (
+          <Badge
+            variant={cat.name === category ? "default" : "outline"}
+            key={index}
+          >
+            <Link href={"/prompts?c=" + cat.name}>{cat.name}</Link>
           </Badge>
         ))}
       </div>
       <div className="grid w-full grid-cols-2 items-start justify-between gap-2 pb-6 lg:grid-cols-3">
-        {filteredData?.map(prompt => (
+        {data?.map(prompt => (
           <Link href={`./prompts/${prompt.id}`} key={prompt.id}>
             <Card className={"hover:bg-foreground/5 rounded-xl border-none"}>
               <CardContent className={"flex space-x-3 p-4"}>

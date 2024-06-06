@@ -5,7 +5,7 @@ import { SupabaseClient } from "@supabase/supabase-js"
 export const getPromptById = async (promptId: string) => {
   const { data: prompt, error } = await supabase
     .from("prompts")
-    .select("*")
+    .select("*, prompt_category!inner(id, name)")
     .eq("id", promptId)
     .single()
 
@@ -177,11 +177,41 @@ export const deletePromptWorkspace = async (
   return true
 }
 
-export const getPublicPrompts = async (client?: SupabaseClient) => {
-  const { data: prompts, error } = await (client || supabase)
-    .from("prompts")
+export const getPromptCategories = async (client?: SupabaseClient) => {
+  const { data: categories, error } = await (client || supabase)
+    .from("prompt_category")
     .select("*")
+    .order("name")
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return categories
+}
+
+export const getPublicPrompts = async (
+  client?: SupabaseClient,
+  search?: { category?: string; query?: string }
+) => {
+  const query = (client || supabase)
+    .from("prompts")
+    .select("*, prompt_category!inner(id, name)")
     .neq("sharing", "private")
+
+  if (search?.category) {
+    query.eq("prompt_category.name", search.category)
+  }
+
+  if (search?.query) {
+    query.or(
+      `name.ilike.*${search.query}*,description.ilike.*${search.query}*,content.ilike.*${search.query}*`
+    )
+  }
+
+  console.log(query)
+
+  const { data: prompts, error } = await query
 
   if (error) {
     throw new Error(error.message)

@@ -1271,6 +1271,27 @@ export interface Database {
           }
         ]
       }
+      prompt_category: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       prompt_workspaces: {
         Row: {
           created_at: string
@@ -1319,7 +1340,6 @@ export interface Database {
       }
       prompts: {
         Row: {
-          category: Database["public"]["Enums"]["prompt_category"][] | null
           content: string
           created_at: string
           description: string | null
@@ -1332,7 +1352,6 @@ export interface Database {
           user_id: string
         }
         Insert: {
-          category?: Database["public"]["Enums"]["prompt_category"][] | null
           content: string
           created_at?: string
           description?: string | null
@@ -1345,7 +1364,6 @@ export interface Database {
           user_id: string
         }
         Update: {
-          category?: Database["public"]["Enums"]["prompt_category"][] | null
           content?: string
           created_at?: string
           description?: string | null
@@ -1370,6 +1388,36 @@ export interface Database {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      prompts_categories: {
+        Row: {
+          category_id: string
+          prompt_id: string
+        }
+        Insert: {
+          category_id: string
+          prompt_id: string
+        }
+        Update: {
+          category_id?: string
+          prompt_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompts_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_category"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompts_categories_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
             referencedColumns: ["id"]
           }
         ]
@@ -1642,7 +1690,7 @@ export interface Database {
       }
     }
     Enums: {
-      prompt_category:
+      prompt_category_old:
         | "Extract"
         | "Generate"
         | "Transform"

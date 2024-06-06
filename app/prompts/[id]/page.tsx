@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge"
 import { getAllModels } from "@/db/models"
 import { ModelIcon } from "@/components/models/model-icon"
 import { LLM, ModelProvider } from "@/types"
+import { IconExternalLink } from "@tabler/icons-react"
+import { WithTooltip } from "@/components/ui/with-tooltip"
 
 export default async function PromptsPage({
   params
@@ -40,9 +42,9 @@ export default async function PromptsPage({
               AI Prompt &ldquo;{prompt.icon} {prompt.name}&rdquo;
             </div>
             <div className={"flex justify-start space-x-1"}>
-              {prompt.category?.map((category, index) => (
+              {prompt.prompt_category?.map((category, index) => (
                 <Badge variant={"outline"} key={index}>
-                  <Link href={`/prompts?c=${category}`}>{category}</Link>
+                  <Link href={`/prompts?c=${category}`}>{category.name}</Link>
                 </Badge>
               ))}
             </div>
@@ -69,25 +71,51 @@ export default async function PromptsPage({
           <Label>Try AI prompt with these large language models</Label>
           {Object.keys(modelsByProvider).map(provider => {
             return (
-              <div key={provider} className={"grid grid-cols-3 gap-2"}>
+              <div
+                key={provider}
+                className={"grid grid-cols-2 gap-2 sm:grid-cols-3"}
+              >
                 {modelsByProvider[provider as ModelProvider].map(model => {
+                  const modelLink = `/chat?prompt_id=${prompt.id}&model=${model.modelId}`
                   return (
                     <div
-                      className={"flex items-center space-x-1"}
+                      className={
+                        "group relative flex flex-nowrap items-center justify-between space-x-1"
+                      }
                       key={model.modelId}
                     >
-                      <ModelIcon
-                        width={30}
-                        height={30}
-                        provider={model.provider}
-                        modelId={model.modelId}
-                      />
-                      <div>
-                        <span className={"text-foreground/70"}>
-                          {model.provider}
-                        </span>{" "}
-                        / {model.modelName}
+                      <div
+                        className={
+                          "flex flex-nowrap items-center space-x-1 overflow-hidden text-ellipsis text-nowrap"
+                        }
+                      >
+                        <ModelIcon
+                          width={30}
+                          height={30}
+                          provider={model.provider}
+                          modelId={model.modelId}
+                        />
+                        <div>
+                          <span className={"text-foreground/70"}>
+                            {model.provider}
+                          </span>{" "}
+                          / {model.modelName}
+                        </div>
                       </div>
+                      <WithTooltip
+                        display={"Try this prompt with " + model.modelName}
+                        trigger={
+                          <Link href={modelLink} target={"_blank"}>
+                            <IconExternalLink
+                              className={
+                                "text-foreground invisible right-0 group-hover:visible"
+                              }
+                              size={18}
+                              stroke={1.5}
+                            />
+                          </Link>
+                        }
+                      />
                     </div>
                   )
                 })}

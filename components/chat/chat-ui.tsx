@@ -108,6 +108,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
 
   useEffect(() => {
     const promptId = searchParams.get("prompt_id")
+    const modelId = searchParams.get("model")
 
     if (promptId) {
       getPromptById(promptId)
@@ -115,6 +116,13 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
           handleSelectPromptWithVariables(prompt)
         })
         .catch(console.error)
+    }
+
+    if (modelId) {
+      setChatSettings(prev => ({
+        ...prev,
+        model: modelId as LLMID
+      }))
     }
   }, [searchParams])
 
