@@ -112,6 +112,8 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
     }
   }
 
+  if (!profile) return null
+
   return (
     <div className={"flex flex-nowrap space-x-1"}>
       <Button

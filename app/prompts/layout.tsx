@@ -23,9 +23,9 @@ export default async function Layout({
   }
 
   return (
-    <Dashboard>
+    <>
       {modal}
-      {children}
-    </Dashboard>
+      <Dashboard>{children}</Dashboard>
+    </>
   )
 }

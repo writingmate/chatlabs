@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge"
 import { getAllModels } from "@/db/models"
 import { ModelIcon } from "@/components/models/model-icon"
 import { LLM, ModelProvider } from "@/types"
-import { PromptIcon } from "@/components/prompts/prompt-icon"
 
 export default async function PromptsPage({
   params
@@ -36,20 +35,20 @@ export default async function PromptsPage({
     <PageContent className={"container w-full pt-10 lg:w-2/3"}>
       <PageHeader className={"flex w-full items-center justify-between"}>
         <PageTitle className={"flex items-center space-y-2"}>
-          <div className={"flex flex-col justify-start"}>
+          <div className={"flex flex-col justify-start space-y-1"}>
             <div>
               AI Prompt &ldquo;{prompt.icon} {prompt.name}&rdquo;
             </div>
             <div className={"flex justify-start space-x-1"}>
               {prompt.category?.map((category, index) => (
-                <Badge variant={"secondary"} key={index}>
-                  {category}
+                <Badge variant={"outline"} key={index}>
+                  <Link href={`/prompts?c=${category}`}>{category}</Link>
                 </Badge>
               ))}
             </div>
           </div>
         </PageTitle>
-        <Button type={"submit"} size={"xs"}>
+        <Button type={"submit"} size={"sm"}>
           <Link href={`/chat?prompt_id=${prompt.id}`}>Use this prompt</Link>
         </Button>
       </PageHeader>
