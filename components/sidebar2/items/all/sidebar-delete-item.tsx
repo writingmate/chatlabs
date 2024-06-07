@@ -1,3 +1,4 @@
+"use client"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -21,19 +22,22 @@ import { deleteTool } from "@/db/tools"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType } from "@/types"
 import { FC, useContext, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 
 interface SidebarDeleteItemProps {
   item: DataItemType
   contentType: ContentType
   name?: string
   trigger?: JSX.Element
+  onDelete?: (item: DataItemType) => Promise<any>
 }
 
 export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
   item,
   contentType,
   name,
-  trigger
+  trigger,
+  onDelete
 }) => {
   const {
     setChats,
@@ -54,6 +58,8 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
   const [showDialog, setShowDialog] = useState(false)
 
   const resolvedName = name || contentType
+
+  const router = useRouter()
 
   const deleteFunctions = {
     chats: async (chat: Tables<"chats">) => {
@@ -99,7 +105,7 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
   }
 
   const handleDelete = async () => {
-    const deleteFunction = deleteFunctions[contentType]
+    const deleteFunction = onDelete || deleteFunctions[contentType]
     const setStateFunction = stateUpdateFunctions[contentType]
 
     if (!deleteFunction || !setStateFunction) return

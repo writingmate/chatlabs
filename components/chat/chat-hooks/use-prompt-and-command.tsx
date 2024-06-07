@@ -87,8 +87,6 @@ export const usePromptAndCommand = () => {
         value: ""
       }))
 
-      console.log("newPromptVariables", newPromptVariables)
-
       setPromptVariables(newPromptVariables)
       setShowPromptVariables(true)
     } else {

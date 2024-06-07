@@ -11,21 +11,64 @@ import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
+import { getCurrentUser } from "@/lib/supabase/browser-client"
+import { toast } from "sonner"
+import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react"
+import { SidebarDeleteItem } from "@/components/sidebar2/items/all/sidebar-delete-item"
+import { copyPrompt, deletePrompt } from "@/app/prompts/actions"
+import { useAuth } from "@/context/auth"
+import { useEffect, useState } from "react"
+import { Tables } from "@/supabase/types"
+import { useRouter } from "next/navigation"
 
-export default async function PromptsPage({
-  params
+export default function PromptsPage({
+  params: { id }
 }: {
   params: { id: string }
 }) {
-  const prompt = await getPromptById(params.id)
+  const { user } = useAuth()
+  const [open, setOpen] = useState(true)
+  const [prompt, setPrompt] = useState<Tables<"prompts"> | null>()
+  const router = useRouter()
 
   function onOpenChange() {
     // TODO: Implement router.back()
-    window.history.back()
+    router.back()
   }
 
+  useEffect(() => {
+    if (id) {
+      getPromptById(id)
+        .then(setPrompt)
+        .catch(() => {
+          toast.error("Unable to fetch prompt")
+        })
+    }
+  }, [id])
+
+  async function handleCopyPrompt() {
+    if (!prompt) {
+      return
+    }
+    copyPrompt(prompt)
+      .then(() => {
+        toast.info("Prompt copied successfully")
+        router.push("/prompts?c=Your Prompts")
+        setOpen(false)
+      })
+      .catch(error => {
+        toast.error(error.message)
+      })
+  }
+
+  if (!prompt) {
+    return
+  }
+
+  const myPrompt = prompt?.user_id === user?.id
+
   return (
-    <Dialog open={true} onOpenChange={onOpenChange} modal={true}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader className={"flex flex-row items-center justify-between"}>
           <DialogTitle>
@@ -33,9 +76,39 @@ export default async function PromptsPage({
             {"  "}
             {prompt.name}{" "}
           </DialogTitle>
-          <Button type={"submit"} size={"xs"}>
-            <Link href={`/chat?prompt_id=${prompt.id}`}>Use this prompt</Link>
-          </Button>
+          <div className={"flex space-x-1"}>
+            {myPrompt && (
+              <Button variant={"outline"} size={"xs"}>
+                <Link href={`/prompts/${prompt?.id}/edit`}>
+                  <IconEdit size={18} stroke={1.5} />
+                </Link>
+              </Button>
+            )}
+            {myPrompt && (
+              <SidebarDeleteItem
+                onDelete={item => deletePrompt(item as Tables<"prompts">)}
+                item={prompt}
+                contentType={"prompts"}
+                trigger={
+                  <Button variant={"destructive"} size={"xs"}>
+                    <IconTrash size={18} stroke={1.5} />
+                  </Button>
+                }
+              />
+            )}
+            {!myPrompt && (
+              <Button
+                onClick={handleCopyPrompt}
+                variant={"outline"}
+                size={"xs"}
+              >
+                <IconCopy size={18} stroke={1.5} />
+              </Button>
+            )}
+            <Button size={"xs"}>
+              <Link href={`/chat?prompt_id=${prompt.id}`}>Use this prompt</Link>
+            </Button>
+          </div>
         </DialogHeader>
         <DialogDescription
           className={"text-foreground flex flex-col space-y-3"}

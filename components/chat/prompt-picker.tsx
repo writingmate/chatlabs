@@ -98,8 +98,6 @@ export const PromptPicker: FC<PromptPickerProps> = ({}) => {
       content: newPromptContent
     }
 
-    console.log("newPrompt", newPrompt)
-
     handleSelectPrompt(newPrompt)
     handleOpenChange(false)
     setShowPromptVariables(false)

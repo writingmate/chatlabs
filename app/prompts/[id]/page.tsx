@@ -44,7 +44,9 @@ export default async function PromptsPage({
             <div className={"flex justify-start space-x-1"}>
               {prompt.prompt_category?.map((category, index) => (
                 <Badge variant={"outline"} key={index}>
-                  <Link href={`/prompts?c=${category}`}>{category.name}</Link>
+                  <Link href={`/prompts?c=${category.name}`}>
+                    {category.name}
+                  </Link>
                 </Badge>
               ))}
             </div>

@@ -104,6 +104,7 @@ interface SidebarUpdateItemProps {
   name?: string
   isHovering?: boolean
   isActive?: boolean
+  isOpen?: boolean
 }
 
 export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
@@ -115,7 +116,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   updateState,
   isTyping,
   isHovering,
-  isActive
+  isActive,
+  isOpen: isDefaultOpen = false
 }) => {
   const {
     workspaces,
@@ -135,7 +137,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null)
   const [isUpdating, setIsUpdating] = useState(false)
 
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(isDefaultOpen)
   const [startingWorkspaces, setStartingWorkspaces] = useState<
     Tables<"workspaces">[]
   >([])
