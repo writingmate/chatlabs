@@ -20,6 +20,7 @@ import { useAuth } from "@/context/auth"
 import { useEffect, useState } from "react"
 import { Tables } from "@/supabase/types"
 import { useRouter } from "next/navigation"
+import { MessageMarkdown } from "@/components/messages/message-markdown"
 
 export default function PromptsPage({
   params: { id }
@@ -69,7 +70,7 @@ export default function PromptsPage({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className={"md:w-[500px] lg:w-[600px] xl:w-[700px]"}>
         <DialogHeader className={"flex flex-row items-center justify-between"}>
           <DialogTitle>
             {prompt.icon}
@@ -110,22 +111,21 @@ export default function PromptsPage({
             </Button>
           </div>
         </DialogHeader>
-        <DialogDescription
-          className={"text-foreground flex flex-col space-y-3"}
-        >
+        <div className={"text-foreground flex flex-col space-y-3 text-sm"}>
           <div className={"flex flex-col space-y-1"}>
             <Label>Description</Label>
             <div>{prompt.description}</div>
           </div>
           <div className={"flex flex-col space-y-1"}>
             <Label>Prompt</Label>
-            <div className={"bg-accent overflow-hidden rounded-md p-3"}>
-              <ReactMarkdown className={"overflow-auto"}>
-                {prompt.content}
-              </ReactMarkdown>
+            <div className={"bg-accent w-full overflow-x-auto rounded-md p-3"}>
+              <MessageMarkdown
+                className={"max-w-md text-sm"}
+                content={prompt.content}
+              />
             </div>
           </div>
-        </DialogDescription>
+        </div>
       </DialogContent>
     </Dialog>
   )

@@ -93,6 +93,7 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import { useRouter } from "next/navigation"
 
 interface SidebarUpdateItemProps {
   isTyping: boolean
@@ -136,6 +137,12 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
   const buttonRef = useRef<HTMLButtonElement>(null)
   const [isUpdating, setIsUpdating] = useState(false)
+  const router = useRouter()
+
+  const handleOpenChange = (value: boolean) => {
+    setIsOpen(value)
+    router.back()
+  }
 
   const [isOpen, setIsOpen] = useState(isDefaultOpen)
   const [startingWorkspaces, setStartingWorkspaces] = useState<
@@ -627,7 +634,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
         )
       )
 
-      setIsOpen(false)
+      handleOpenChange(false)
 
       toast.success(`${contentType.slice(0, -1)} updated successfully`)
     } catch (error) {
@@ -663,7 +670,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   const resolvedName = name || contentType
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       {children}
       {isHovering && (
         <div
@@ -743,7 +750,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
             <Button
               disabled={isUpdating}
               variant="outline"
-              onClick={() => setIsOpen(false)}
+              onClick={() => handleOpenChange(false)}
             >
               Cancel
             </Button>
