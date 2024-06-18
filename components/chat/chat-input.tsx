@@ -9,7 +9,8 @@ import {
   IconMicrophone,
   IconPlayerRecordFilled,
   IconArrowUp,
-  IconPrompt
+  IconPrompt,
+  IconPlus
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Input } from "../ui/input"
@@ -58,7 +59,8 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     isFilePickerOpen,
     setFocusFile,
     assistantImages,
-    profile
+    profile,
+    selectedWorkspace
   } = useContext(ChatbotUIContext)
 
   const { userInput, setUserInput, chatMessages, isGenerating, chatSettings } =
@@ -301,39 +303,47 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               />
             </div>
           )}
-
-          <div className={"relative my-2 flex items-center justify-center"}>
-            <div className={"absolute bottom-[4px] left-3 flex"}>
-              <Link href="./files">
-                <IconPaperclip
+          <TextareaAutosize
+            textareaRef={chatInputRef}
+            className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent p-2.5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            placeholder={`Ask anything. Type "${profile?.assistant_command || "@"}" for assistants, "${profile?.prompt_command || "/"}" for prompts, "${profile?.files_command || "#"}" for files, and "${profile?.tools_command || "!"}" for plugins.`}
+            onValueChange={handleInputChange}
+            value={userInput}
+            minRows={1}
+            maxRows={18}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onCompositionStart={() => setIsTyping(true)}
+            onCompositionEnd={() => setIsTyping(false)}
+          />
+          <div
+            className={
+              "bg-accent border-input relative flex items-center justify-between border-t p-1.5"
+            }
+          >
+            <div className={"flex"}>
+              <Link
+                href={`/${selectedWorkspace?.id}/files`}
+                title={"Upload/attach files"}
+              >
+                <IconPlus
                   stroke={1.5}
-                  className="cursor-pointer p-1 hover:opacity-50"
-                  size={30}
+                  className="cursor-pointer p-0.5 hover:opacity-50"
+                  size={24}
                 />
               </Link>
-              <Link href="./prompts">
+              <Link
+                href={`/${selectedWorkspace?.id}/prompts`}
+                title={"Select prompt from a library"}
+              >
                 <IconPrompt
                   stroke={1.5}
-                  className="cursor-pointer p-1 hover:opacity-50"
-                  size={30}
+                  className="cursor-pointer p-0.5 hover:opacity-50"
+                  size={24}
                 />
               </Link>
             </div>
-
-            <TextareaAutosize
-              textareaRef={chatInputRef}
-              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-[74px] py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder={`Ask anything. Type "${profile?.assistant_command || "@"}" for assistants, "${profile?.prompt_command || "/"}" for prompts, "${profile?.files_command || "#"}" for files, and "${profile?.tools_command || "!"}" for plugins.`}
-              onValueChange={handleInputChange}
-              value={userInput}
-              minRows={1}
-              maxRows={18}
-              onKeyDown={handleKeyDown}
-              onPaste={handlePaste}
-              onCompositionStart={() => setIsTyping(true)}
-              onCompositionEnd={() => setIsTyping(false)}
-            />
-            <div className="absolute bottom-[6px] right-3 flex cursor-pointer justify-end space-x-2">
+            <div className="flex cursor-pointer justify-end">
               {recognition && (
                 <button onClick={listening ? stopListening : restartListening}>
                   {listening ? (
@@ -343,30 +353,34 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                       size={24}
                     />
                   ) : (
-                    <IconMicrophone stroke={1.5} size={24} />
+                    <IconMicrophone
+                      className={"cursor-pointer p-0.5 hover:opacity-50"}
+                      stroke={1.5}
+                      size={24}
+                    />
                   )}
                 </button>
               )}
               {isGenerating ? (
                 <IconPlayerStopFilled
-                  className="hover:bg-background animate-pulse rounded bg-transparent p-1 hover:opacity-50"
+                  className="hover:bg-background animate-pulse rounded bg-transparent p-0.5 hover:opacity-50"
                   onClick={handleStopMessage}
                   stroke={1.5}
-                  size={30}
+                  size={24}
                 />
               ) : (
                 <IconArrowUp
                   className={cn(
-                    "bg-primary text-secondary rounded-lg p-1 hover:opacity-50",
+                    "bg-primary text-secondary rounded-lg p-0.5 hover:opacity-50",
                     (!userInput || isUploading) &&
-                      "opacity-md cursor-not-allowed"
+                      "cursor-not-allowed opacity-50"
                   )}
                   onClick={() => {
                     if (!userInput || isUploading) return
                     handleSendMessage(userInput, chatMessages, false)
                   }}
                   stroke={1.5}
-                  size={30}
+                  size={24}
                 />
               )}
             </div>
