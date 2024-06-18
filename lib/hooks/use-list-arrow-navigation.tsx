@@ -40,8 +40,8 @@ import { useEffect, useRef, useState } from "react"
 export function useListArrowNavigation<T>(
   data: T[],
   initialIndex: number,
-  onEnter: (item: T) => void,
-  onEscape: () => void
+  onEnter?: (item: T) => void,
+  onEscape?: () => void
 ) {
   const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
@@ -77,10 +77,10 @@ export function useListArrowNavigation<T>(
         })
       } else if (e.key === "Enter") {
         e.preventDefault()
-        onEnter(data[index])
+        onEnter?.(data[index])
       } else if (e.key === "Escape") {
         e.preventDefault()
-        onEscape()
+        onEscape?.()
       }
     }
 

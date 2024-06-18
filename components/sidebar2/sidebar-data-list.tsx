@@ -65,12 +65,6 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
   const [isOverflowing, setIsOverflowing] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
 
-  function onEnter() {}
-
-  function onEscape() {
-    console.log("onEscape")
-  }
-
   const actionMap = {
     chats: async (item: any) => {},
     presets: async (item: any) => {},
@@ -197,9 +191,9 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const { index: activeRow, itemsRef } = useListArrowNavigation(
     data as any,
-    0,
-    onEnter,
-    onEscape
+    0
+    // onEnter,
+    // onEscape
   )
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
