@@ -1,6 +1,5 @@
 import { FilePreview } from "@/components/ui/file-preview"
 import { forwardRef, HTMLAttributes, ImgHTMLAttributes, useState } from "react"
-import Image, { ImageProps } from "next/image"
 
 const ImageWithPreview = forwardRef<
   HTMLImageElement,

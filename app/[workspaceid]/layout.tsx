@@ -49,19 +49,35 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    ;(async () => await fetchWorkspaceData(workspaceId))()
-    setUserInput("")
-    setChatMessages([])
-    setSelectedChat(null)
-    setIsGenerating(false)
-    setFirstTokenReceived(false)
-    setChatFiles([])
-    setChatImages([])
-    setNewMessageFiles([])
-    setNewMessageImages([])
-    setShowFilesDisplay(false)
-  }, [workspaceId])
+  useEffect(
+    () => {
+      ;(async () => await fetchWorkspaceData(workspaceId))()
+      setUserInput("")
+      setChatMessages([])
+      setSelectedChat(null)
+      setIsGenerating(false)
+      setFirstTokenReceived(false)
+      setChatFiles([])
+      setChatImages([])
+      setNewMessageFiles([])
+      setNewMessageImages([])
+      setShowFilesDisplay(false)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      setChatFiles,
+      setChatImages,
+      setChatMessages,
+      setFirstTokenReceived,
+      setIsGenerating,
+      setNewMessageFiles,
+      setNewMessageImages,
+      setSelectedChat,
+      setShowFilesDisplay,
+      setUserInput,
+      workspaceId
+    ]
+  )
 
   const fetchWorkspaceData = async (workspaceId: string) => {
     setLoading(true)

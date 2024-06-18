@@ -1,11 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
-import { LLM, LLMID, ModelProvider } from "@/types"
-import {
-  IconCheck,
-  IconChevronDown,
-  IconPuzzle,
-  IconSettings
-} from "@tabler/icons-react"
+import { IconPuzzle } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Button } from "../ui/button"
 import {
@@ -16,7 +10,6 @@ import {
 } from "../ui/dropdown-menu"
 import { Switch } from "@/components/ui/switch"
 import { Tables } from "@/supabase/types"
-import { Separator } from "@/components/ui/separator"
 import { validatePlanForTools } from "@/lib/subscription"
 import { cn } from "@/lib/utils"
 
@@ -83,7 +76,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
         setFlash(false)
       }, 500)
     }
-  }, [selectedTools])
+  }, [selectedTools, isOpen])
 
   if (!profile) return null
 
@@ -116,7 +109,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="relative mx-2 -ml-[140px] flex max-h-[300px] overflow-auto p-2"
+        className="relative mx-2 ml-[-140px] flex max-h-[300px] overflow-auto p-2"
         // style={{ width: triggerRef.current?.offsetWidth }}
       >
         <ToolDetails tool={hoveredTool} />

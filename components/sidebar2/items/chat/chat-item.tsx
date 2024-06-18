@@ -140,6 +140,7 @@ export const ChatItem: RowComponentType = ({ item }) => {
         </div>
       </div>
     ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [chat, isActive]
   )
 }

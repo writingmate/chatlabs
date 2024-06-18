@@ -85,6 +85,7 @@ export default function SetupPage() {
         }
       }
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function redirectToHome(profile?: Tables<"profiles">) {

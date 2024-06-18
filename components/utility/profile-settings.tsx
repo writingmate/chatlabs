@@ -1,10 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
-import {
-  PROFILE_CONTEXT_MAX,
-  PROFILE_DISPLAY_NAME_MAX,
-  PROFILE_USERNAME_MAX,
-  PROFILE_USERNAME_MIN
-} from "@/db/limits"
+import { PROFILE_CONTEXT_MAX, PROFILE_DISPLAY_NAME_MAX } from "@/db/limits"
 import { updateProfile } from "@/db/profile"
 import { uploadProfileImage } from "@/db/storage/profile-images"
 import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
@@ -14,17 +9,14 @@ import { supabase } from "@/lib/supabase/browser-client"
 import { cn } from "@/lib/utils"
 import { OpenRouterLLM } from "@/types"
 import {
-  IconCircleCheckFilled,
-  IconCircleXFilled,
   IconFileDownload,
   IconLoader2,
   IconLogout,
   IconSettings,
   IconUser
 } from "@tabler/icons-react"
-import Image from "next/image"
-import { useRouter, redirect } from "next/navigation"
-import { FC, useCallback, useContext, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
+import { FC, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar2/sidebar-top-level-links"
 import { Button } from "../ui/button"
@@ -43,10 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ThemeSwitcher } from "./theme-switcher"
-import {
-  createBillingPortalSession,
-  redirectToBillingPortal
-} from "@/actions/stripe"
+import { redirectToBillingPortal } from "@/actions/stripe"
 import { PLAN_FREE } from "@/lib/stripe/config"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
@@ -74,7 +63,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [displayName, setDisplayName] = useState(profile?.display_name || "")
   const [username, setUsername] = useState(profile?.username || "")
   const [usernameAvailable, setUsernameAvailable] = useState(true)
-  const [loadingUsername, setLoadingUsername] = useState(false)
+  // const [loadingUsername, setLoadingUsername] = useState(false)
   const [profileImageSrc, setProfileImageSrc] = useState(
     profile?.image_url || ""
   )
@@ -276,49 +265,49 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     }
   }
 
-  const checkUsernameAvailability = useCallback(
-    debounce(async (username: string) => {
-      if (!username) return
-
-      if (username.length < PROFILE_USERNAME_MIN) {
-        setUsernameAvailable(false)
-        return
-      }
-
-      if (username.length > PROFILE_USERNAME_MAX) {
-        setUsernameAvailable(false)
-        return
-      }
-
-      const usernameRegex = /^[a-zA-Z0-9_]+$/
-      if (!usernameRegex.test(username)) {
-        setUsernameAvailable(false)
-        alert(
-          "Username must be letters, numbers, or underscores only - no other characters or spacing allowed."
-        )
-        return
-      }
-
-      setLoadingUsername(true)
-
-      const response = await fetch(`/api/username/available`, {
-        method: "POST",
-        body: JSON.stringify({ username })
-      })
-
-      const data = await response.json()
-      const isAvailable = data.isAvailable
-
-      setUsernameAvailable(isAvailable)
-
-      if (username === profile?.username) {
-        setUsernameAvailable(true)
-      }
-
-      setLoadingUsername(false)
-    }, 500),
-    []
-  )
+  // const checkUsernameAvailability = useCallback(
+  //   debounce(async (username: string) => {
+  //     if (!username) return
+  //
+  //     if (username.length < PROFILE_USERNAME_MIN) {
+  //       setUsernameAvailable(false)
+  //       return
+  //     }
+  //
+  //     if (username.length > PROFILE_USERNAME_MAX) {
+  //       setUsernameAvailable(false)
+  //       return
+  //     }
+  //
+  //     const usernameRegex = /^[a-zA-Z0-9_]+$/
+  //     if (!usernameRegex.test(username)) {
+  //       setUsernameAvailable(false)
+  //       alert(
+  //         "Username must be letters, numbers, or underscores only - no other characters or spacing allowed."
+  //       )
+  //       return
+  //     }
+  //
+  //     setLoadingUsername(true)
+  //
+  //     const response = await fetch(`/api/username/available`, {
+  //       method: "POST",
+  //       body: JSON.stringify({ username })
+  //     })
+  //
+  //     const data = await response.json()
+  //     const isAvailable = data.isAvailable
+  //
+  //     setUsernameAvailable(isAvailable)
+  //
+  //     if (username === profile?.username) {
+  //       setUsernameAvailable(true)
+  //     }
+  //
+  //     setLoadingUsername(false)
+  //   }, 500),
+  //   []
+  // )
 
   function resetToDefaults() {
     setFilesCommand("#")

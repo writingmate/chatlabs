@@ -48,9 +48,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
   const [name, setName] = useState(selectedWorkspace?.name || "")
   const [imageLink, setImageLink] = useState("")
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
-  const [description, setDescription] = useState(
-    selectedWorkspace?.description || ""
-  )
+  const [description] = useState(selectedWorkspace?.description || "")
   const [instructions, setInstructions] = useState(
     selectedWorkspace?.instructions || ""
   )
@@ -73,7 +71,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
       )?.base64 || ""
 
     setImageLink(workspaceImage)
-  }, [workspaceImages])
+  }, [workspaceImages, selectedWorkspace])
 
   const handleSave = async () => {
     if (!selectedWorkspace) return
