@@ -157,10 +157,10 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     <div
       ref={itemRef}
       className={cn(
-        "hover:bg-accent/50 focus:bg-accent group flex w-full cursor-pointer items-center rounded p-2 focus:outline-none",
+        "group flex w-full cursor-pointer items-center p-2 focus:outline-none",
         isActiveMap[contentType]?.(item) && "bg-accent"
       )}
-      tabIndex={0}
+      // tabIndex={0}
       onClick={handleClickAction}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsHovering(true)}

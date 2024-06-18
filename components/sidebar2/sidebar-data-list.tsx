@@ -14,6 +14,7 @@ import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { Separator } from "../ui/separator"
 import { Folder } from "./items/folders/folder-item"
 import { VList } from "virtua"
+import { useListArrowNavigation } from "@/lib/hooks/use-list-arrow-navigation"
 
 export type RowComponentType = FC<{ item: DataItemType }>
 
@@ -46,6 +47,12 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const [isOverflowing, setIsOverflowing] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
+
+  function onEnter() {}
+
+  function onEscape() {
+    console.log("onEscape")
+  }
 
   const getSortedData = (
     data: any,
@@ -140,6 +147,13 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     )
   }
 
+  const { index: activeRow, itemsRef } = useListArrowNavigation(
+    data as any,
+    0,
+    onEnter,
+    onEscape
+  )
+
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
@@ -222,9 +236,10 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
           {(dataWithFolders.length > 0 || dataWithoutFolders.length > 0) && (
             <div
-              className={`h-full ${
-                isOverflowing ? "w-[calc(100%-8px)]" : "w-full"
-              } space-y-2 ${isOverflowing ? "mr-2" : ""}`}
+              className={cn(
+                `h-full space-y-2`,
+                isOverflowing ? "mr-2 w-[calc(100%-8px)]" : "w-full"
+              )}
             >
               {folders.map(folder => (
                 <Folder
@@ -239,6 +254,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                       <div
                         key={item.id}
                         draggable
+                        tabIndex={0}
                         onDragStart={e => handleDragStart(e, item.id)}
                       >
                         <RowComponent item={item} />
@@ -284,10 +300,15 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                             onDragLeave={handleDragLeave}
                             onDragOver={handleDragOver}
                           >
-                            {sortedData.map((item: any) => (
+                            {sortedData.map((item: any, index: number) => (
                               <div
                                 key={item.id}
                                 draggable
+                                tabIndex={0}
+                                ref={(ref: any) =>
+                                  (itemsRef.current[index] = ref)
+                                }
+                                className={"focus:bg-accent hover:bg-accent"}
                                 onDragStart={e => handleDragStart(e, item.id)}
                               >
                                 <RowComponent item={item} />
@@ -310,11 +331,16 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                   onDragLeave={handleDragLeave}
                   onDragOver={handleDragOver}
                 >
-                  {dataWithoutFolders.map(item => {
+                  {dataWithoutFolders.map((item, index) => {
                     return (
                       <div
                         key={item.id}
                         draggable
+                        tabIndex={0}
+                        className={
+                          "focus:bg-accent hover:bg-accent rounded focus:outline-none"
+                        }
+                        ref={(ref: any) => (itemsRef.current[index] = ref)}
                         onDragStart={e => handleDragStart(e, item.id)}
                       >
                         <RowComponent item={item} />
@@ -336,6 +362,15 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         />
       </div>
     ),
-    [data, folders, contentType, isOverflowing, isDragOver, RowComponent]
+    [
+      data,
+      folders,
+      contentType,
+      isOverflowing,
+      isDragOver,
+      RowComponent,
+      activeRow,
+      itemsRef
+    ]
   )
 }

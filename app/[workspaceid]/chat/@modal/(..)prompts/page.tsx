@@ -54,7 +54,7 @@ export default function PromptsPage() {
           }}
         >
           <IconLayoutDashboard stroke={1.5} size={18} />
-          <div>View community prompts</div>
+          <div>Manage prompts</div>
         </Button>
       </DialogContent>
     </Dialog>

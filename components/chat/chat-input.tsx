@@ -58,7 +58,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setIsPromptPickerOpen,
     isFilePickerOpen,
     setFocusFile,
-    assistantImages,
     profile,
     selectedWorkspace
   } = useContext(ChatbotUIContext)
@@ -257,35 +256,13 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     <>
       <div className="flex flex-col flex-wrap justify-center gap-2">
         <ChatFilesDisplay />
-
-        {/*{selectedTools &&*/}
-        {/*  selectedTools.map((tool, index) => (*/}
-        {/*    <div*/}
-        {/*      key={index}*/}
-        {/*      className="flex justify-center"*/}
-        {/*      onClick={() =>*/}
-        {/*        setSelectedTools(*/}
-        {/*          selectedTools.filter(*/}
-        {/*            selectedTool => selectedTool.id !== tool.id*/}
-        {/*          )*/}
-        {/*        )*/}
-        {/*      }*/}
-        {/*    >*/}
-        {/*      <div*/}
-        {/*        className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-600 px-3 py-1 hover:opacity-50">*/}
-        {/*        <IconBolt size={20}/>*/}
-
-        {/*        <div>{tool.name}</div>*/}
-        {/*      </div>*/}
-        {/*    </div>*/}
-        {/*  ))}*/}
       </div>
 
       <div className={"relative"}>
         <ChatCommandInput />
         <div className="border-input mt-3 flex min-h-[60px] w-full flex-col justify-end overflow-hidden rounded-xl border backdrop-blur-xl">
           {selectedAssistant && (
-            <div className="bg-secondary flex items-center justify-between space-x-2 p-2 pl-4 pr-3">
+            <div className="bg-accent border-input flex items-center justify-between space-x-2 border-b p-2 pl-4 pr-3">
               <div className={"flex items-center space-x-2"}>
                 <AssistantIcon assistant={selectedAssistant} size={24} />
                 <div className="text-sm font-bold">
@@ -304,7 +281,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           <TextareaAutosize
             textareaRef={chatInputRef}
             className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent p-2.5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            placeholder={`Ask anything. Type "${profile?.assistant_command || "@"}" for assistants, "${profile?.prompt_command || "/"}" for prompts, "${profile?.files_command || "#"}" for files, and "${profile?.tools_command || "!"}" for plugins.`}
+            placeholder={`Ask anything...`}
             onValueChange={handleInputChange}
             value={userInput}
             minRows={1}

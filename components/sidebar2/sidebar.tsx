@@ -19,55 +19,18 @@ interface SidebarProps {
 
 export const Sidebar2: FC<SidebarProps> = ({
   contentType,
-  onContentTypeChange,
-  showSidebar
+  onContentTypeChange
 }) => {
-  const {
-    folders,
-    chats,
-    presets,
-    prompts,
-    files,
-    collections,
-    assistants,
-    tools,
-    models,
-    profile,
-    setIsPaywallOpen,
-    workspaces
-  } = useContext(ChatbotUIContext)
+  const { folders, chats, profile, setIsPaywallOpen, workspaces } =
+    useContext(ChatbotUIContext)
 
   const [searchTerm, setSearchTerm] = useState("")
-
   const chatFolders = folders.filter(folder => folder.type === "chats")
-  const presetFolders = folders.filter(folder => folder.type === "presets")
-  const promptFolders = folders.filter(folder => folder.type === "prompts")
-  const filesFolders = folders.filter(folder => folder.type === "files")
-  const collectionFolders = folders.filter(
-    folder => folder.type === "collections"
-  )
-  const assistantFolders = folders.filter(
-    folder => folder.type === "assistants"
-  )
-  const toolFolders = folders.filter(folder => folder.type === "tools")
-  const modelFolders = folders.filter(folder => folder.type === "models")
-
   const filteredChats = chats.filter(
     chat => chat.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
   )
   return (
-    <div
-      className="m-0 w-full space-y-2"
-      style={
-        {
-          // Sidebar - SidebarSwitcher
-          // minWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-          // maxWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-          // width: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px"
-        }
-      }
-      // value={contentType}
-    >
+    <div className="m-0 w-full space-y-2">
       <div className="flex h-screen flex-col p-3 pb-2">
         {workspaces?.length > 1 && (
           <div className="flex items-center border-b pb-2">
@@ -86,7 +49,7 @@ export const Sidebar2: FC<SidebarProps> = ({
             RowComponent={ChatItem}
             contentType={"chats"}
             data={filteredChats}
-            folders={folders}
+            folders={chatFolders}
           />
         </div>
 
