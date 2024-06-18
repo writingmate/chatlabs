@@ -4,10 +4,7 @@ import { AssistantPicker } from "./assistant-picker"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { FilePicker } from "./file-picker"
 import { PromptPicker } from "./prompt-picker"
-import { ToolPicker } from "./tool-picker"
 import { cn } from "@/lib/utils"
-import { MessageHistoryPicker } from "@/components/message-history-picker"
-import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatCommandInputProps {}
 
@@ -15,11 +12,9 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
   const {
     newMessageFiles,
     chatFiles,
-    slashCommand,
     isFilePickerOpen,
     setIsFilePickerOpen,
     hashtagCommand,
-    focusPrompt,
     focusFile,
     selectedAssistant,
     isPromptPickerOpen,
@@ -41,13 +36,12 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
   return (
     <div
       className={cn(
-        "bg-background left-0 max-h-[300px] w-full overflow-y-auto rounded-xl border dark:border-none",
+        "left-0 max-h-[300px] w-full overflow-y-auto dark:border-none",
         selectedAssistant && "bottom-[106px]",
         isOpen ? "block" : "hidden"
       )}
     >
       <PromptPicker />
-
       <FilePicker
         isOpen={isFilePickerOpen}
         searchQuery={hashtagCommand}
@@ -60,7 +54,7 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
         onSelectCollection={handleSelectUserCollection}
         isFocused={focusFile}
       />
-      <ToolPicker />
+      {/*<ToolPicker />*/}
 
       <AssistantPicker />
     </div>

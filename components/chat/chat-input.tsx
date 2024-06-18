@@ -83,8 +83,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setNewMessageContentToPreviousUserMessage
   } = useChatHistoryHandler()
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
       const recognition = new window.webkitSpeechRecognition()

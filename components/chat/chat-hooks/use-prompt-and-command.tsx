@@ -7,9 +7,11 @@ import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
 import { useContext } from "react"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { useRouter } from "next/navigation"
 
 export const usePromptAndCommand = () => {
   const {
+    selectedWorkspace,
     chatFiles,
     newMessageFiles,
     setNewMessageFiles,
@@ -29,6 +31,8 @@ export const usePromptAndCommand = () => {
     setShowPromptVariables,
     profile
   } = useContext(ChatbotUIContext)
+
+  const router = useRouter()
 
   const {
     userInput,
@@ -54,11 +58,9 @@ export const usePromptAndCommand = () => {
       setIsAssistantPickerOpen(true)
       setAtCommand(assistantMatch[1])
     } else if (promptMatch) {
-      setIsPromptPickerOpen(true)
-      setSlashCommand(promptMatch[1])
+      router.push(`/${selectedWorkspace?.id}/prompts`)
     } else if (filesMatch) {
-      setIsFilePickerOpen(true)
-      setHashtagCommand(filesMatch[1])
+      router.push(`/${selectedWorkspace?.id}/files`)
     } else if (toolMatch) {
       setIsToolPickerOpen(true)
       setToolCommand(toolMatch[1])

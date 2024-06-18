@@ -142,6 +142,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
+    e.stopPropagation()
     setIsDragOver(true)
   }
 
