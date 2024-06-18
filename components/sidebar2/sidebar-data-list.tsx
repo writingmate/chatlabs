@@ -15,6 +15,12 @@ import { Separator } from "../ui/separator"
 import { Folder } from "./items/folders/folder-item"
 import { VList } from "virtua"
 import { useListArrowNavigation } from "@/lib/hooks/use-list-arrow-navigation"
+import {
+  validatePlanForAssistant,
+  validatePlanForTools
+} from "@/lib/subscription"
+import { useRouter } from "next/navigation"
+import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
 
 export type RowComponentType = FC<{ item: DataItemType }>
 
@@ -39,11 +45,22 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     setCollections,
     setAssistants,
     setTools,
+    profile,
+    setIsPaywallOpen,
     setPlatformTools,
-    setModels
+    setModels,
+    selectedWorkspace
   } = useContext(ChatbotUIContext)
 
   const divRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+
+  const {
+    handleSelectPromptWithVariables,
+    handleSelectTool,
+    handleSelectAssistant,
+    handleSelectUserFile
+  } = usePromptAndCommand()
 
   const [isOverflowing, setIsOverflowing] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
@@ -52,6 +69,37 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   function onEscape() {
     console.log("onEscape")
+  }
+
+  const actionMap = {
+    chats: async (item: any) => {},
+    presets: async (item: any) => {},
+    prompts: async (item: any) => {
+      handleSelectPromptWithVariables(item)
+      return router.back()
+    },
+    files: async (item: any) => {
+      handleSelectUserFile(item)
+      return router.back()
+    },
+    collections: async (item: any) => {},
+    assistants: async (assistant: Tables<"assistants">) => {
+      if (!selectedWorkspace) return
+      if (!validatePlanForAssistant(profile, assistant)) {
+        setIsPaywallOpen(true)
+        return
+      }
+      handleSelectAssistant(assistant)
+      return router.back()
+    },
+    tools: async (item: any) => {
+      if (!validatePlanForTools(profile, [item])) {
+        setIsPaywallOpen(true)
+        return
+      }
+      handleSelectTool(item)
+    },
+    models: async (item: any) => {}
   }
 
   const getSortedData = (
@@ -219,6 +267,25 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     }
   }
 
+  const handleClickAction = async (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    item: any
+  ) => {
+    e.stopPropagation()
+
+    const action = actionMap[contentType]
+
+    await action(item as any)
+  }
+
+  function onKeydown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      e.stopPropagation()
+      e.currentTarget.click()
+    }
+  }
+
   return useMemo(
     () => (
       <div
@@ -255,6 +322,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                         key={item.id}
                         draggable
                         tabIndex={0}
+                        onKeyDown={onKeydown}
+                        onClick={e => handleClickAction(e, item as any)}
                         onDragStart={e => handleDragStart(e, item.id)}
                       >
                         <RowComponent item={item} />
@@ -308,6 +377,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                                 ref={(ref: any) =>
                                   (itemsRef.current[index] = ref)
                                 }
+                                onKeyDown={onKeydown}
+                                onClick={e => handleClickAction(e, item as any)}
                                 className={"focus:bg-accent hover:bg-accent"}
                                 onDragStart={e => handleDragStart(e, item.id)}
                               >
@@ -340,6 +411,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                         className={
                           "focus:bg-accent hover:bg-accent rounded focus:outline-none"
                         }
+                        onKeyDown={onKeydown}
+                        onClick={e => handleClickAction(e, item as any)}
                         ref={(ref: any) => (itemsRef.current[index] = ref)}
                         onDragStart={e => handleDragStart(e, item.id)}
                       >

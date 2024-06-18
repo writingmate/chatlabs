@@ -95,37 +95,6 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     }
   }
 
-  const actionMap = {
-    chats: async (item: any) => {},
-    presets: async (item: any) => {},
-    prompts: async (item: any) => {
-      handleSelectPromptWithVariables(item)
-      return router.back()
-    },
-    files: async (item: any) => {
-      handleSelectUserFile(item)
-      return router.back()
-    },
-    collections: async (item: any) => {},
-    assistants: async (assistant: Tables<"assistants">) => {
-      if (!selectedWorkspace) return
-      if (!validatePlanForAssistant(profile, assistant)) {
-        setIsPaywallOpen(true)
-        return
-      }
-      handleSelectAssistant(assistant)
-      return router.back()
-    },
-    tools: async (item: any) => {
-      if (!validatePlanForTools(profile, [item])) {
-        setIsPaywallOpen(true)
-        return
-      }
-      handleSelectTool(item)
-    },
-    models: async (item: any) => {}
-  }
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter") {
       e.stopPropagation()
@@ -137,22 +106,6 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     item.sharing == "platform" ||
     (item.sharing === "public" && item.user_id !== profile?.user_id)
 
-  const handleClickAction = async (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    e.stopPropagation()
-
-    // if (readOnly) {
-    //   e.preventDefault()
-    //   e.stopPropagation()
-    //   return
-    // }
-
-    const action = actionMap[contentType]
-
-    await action(item as any)
-  }
-
   return (
     <div
       ref={itemRef}
@@ -160,8 +113,6 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         "group flex w-full cursor-pointer items-center p-2 focus:outline-none",
         isActiveMap[contentType]?.(item) && "bg-accent"
       )}
-      // tabIndex={0}
-      onClick={handleClickAction}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
