@@ -59,13 +59,6 @@ export const SidebarTopLevelLinks: FC<SidebarTopLevelLinksProps> = ({
       folders: folders.filter(folder => folder.type === "prompts")
     },
     {
-      icon: <IconFile size={SIDEBAR_ICON_SIZE} stroke={1.5} />,
-      label: "Files",
-      href: `/${selectedWorkspace?.id}/files`,
-      data: files,
-      folders: folders.filter(folder => folder.type === "files")
-    },
-    {
       icon: <IconColumns2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />,
       label: "Compare models",
       href: `/${selectedWorkspace?.id}/splitview`,

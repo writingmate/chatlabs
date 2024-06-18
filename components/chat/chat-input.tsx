@@ -3,16 +3,13 @@ import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import {
-  IconBolt,
-  IconCirclePlus,
   IconPaperclip,
   IconPlayerStopFilled,
-  IconSend,
   IconX,
   IconMicrophone,
   IconPlayerRecordFilled,
-  IconRepeat,
-  IconArrowUp
+  IconArrowUp,
+  IconPrompt
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Input } from "../ui/input"
@@ -26,6 +23,8 @@ import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { ChatbotUIChatContext } from "@/context/chat"
+import Lib from "@apidevtools/json-schema-ref-parser/lib"
+import Link from "next/link"
 
 interface ChatInputProps {}
 
@@ -304,27 +303,26 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           )}
 
           <div className={"relative my-2 flex items-center justify-center"}>
-            <IconPaperclip
-              className="absolute bottom-[4px] left-3 cursor-pointer p-1 hover:opacity-50"
-              size={32}
-              onClick={() => fileInputRef.current?.click()}
-            />
-
-            {/* Hidden input to select files from device */}
-            <Input
-              ref={fileInputRef}
-              className="hidden"
-              type="file"
-              onChange={e => {
-                if (!e.target.files) return
-                handleSelectDeviceFile(e.target.files[0])
-              }}
-              accept={filesToAccept}
-            />
+            <div className={"absolute bottom-[4px] left-3 flex"}>
+              <Link href="./files">
+                <IconPaperclip
+                  stroke={1.5}
+                  className="cursor-pointer p-1 hover:opacity-50"
+                  size={30}
+                />
+              </Link>
+              <Link href="./prompts">
+                <IconPrompt
+                  stroke={1.5}
+                  className="cursor-pointer p-1 hover:opacity-50"
+                  size={30}
+                />
+              </Link>
+            </div>
 
             <TextareaAutosize
               textareaRef={chatInputRef}
-              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 pr-[70px] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-[74px] py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               placeholder={`Ask anything. Type "${profile?.assistant_command || "@"}" for assistants, "${profile?.prompt_command || "/"}" for prompts, "${profile?.files_command || "#"}" for files, and "${profile?.tools_command || "!"}" for plugins.`}
               onValueChange={handleInputChange}
               value={userInput}
@@ -340,11 +338,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 <button onClick={listening ? stopListening : restartListening}>
                   {listening ? (
                     <IconPlayerRecordFilled
+                      stroke={1.5}
                       className={"animate-pulse text-red-500"}
                       size={24}
                     />
                   ) : (
-                    <IconMicrophone size={24} />
+                    <IconMicrophone stroke={1.5} size={24} />
                   )}
                 </button>
               )}
@@ -352,6 +351,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 <IconPlayerStopFilled
                   className="hover:bg-background animate-pulse rounded bg-transparent p-1 hover:opacity-50"
                   onClick={handleStopMessage}
+                  stroke={1.5}
                   size={30}
                 />
               ) : (
@@ -365,6 +365,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                     if (!userInput || isUploading) return
                     handleSendMessage(userInput, chatMessages, false)
                   }}
+                  stroke={1.5}
                   size={30}
                 />
               )}

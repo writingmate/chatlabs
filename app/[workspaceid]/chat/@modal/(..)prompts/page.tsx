@@ -12,6 +12,8 @@ import { SidebarCreateButtons } from "@/components/sidebar2/sidebar-create-butto
 import { SidebarDataList } from "@/components/sidebar2/sidebar-data-list"
 import { useRouter } from "next/navigation"
 import { PromptItem } from "@/components/sidebar2/items/prompts/prompt-item"
+import { IconLayoutDashboard } from "@tabler/icons-react"
+import { Button } from "@/components/ui/button"
 
 export default function PromptsPage() {
   const { prompts: data, folders } = useContext(ChatbotUIContext)
@@ -29,10 +31,12 @@ export default function PromptsPage() {
           }
         >
           <DialogTitle className={"capitalize"}>Prompts</DialogTitle>
-          <SidebarCreateButtons
-            contentType={"prompts"}
-            hasData={data.length > 0}
-          />
+          <div className={"flex items-center space-x-1"}>
+            <SidebarCreateButtons
+              contentType={"prompts"}
+              hasData={data.length > 0}
+            />
+          </div>
         </DialogHeader>
         <SidebarDataList
           RowComponent={PromptItem}
@@ -40,6 +44,18 @@ export default function PromptsPage() {
           data={data}
           folders={filteredFolders}
         />
+        <Button
+          size={"xs"}
+          variant={"outline"}
+          className={"flex items-center space-x-1"}
+          onClick={e => {
+            e.preventDefault()
+            router.push("/prompts")
+          }}
+        >
+          <IconLayoutDashboard stroke={1.5} size={18} />
+          <div>View community prompts</div>
+        </Button>
       </DialogContent>
     </Dialog>
   )
