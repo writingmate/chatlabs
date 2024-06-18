@@ -12,7 +12,7 @@ export function PromptsList({ prompts }: { prompts: Tables<"prompts">[] }) {
   return (
     <div className="grid w-full grid-cols-2 items-start justify-between gap-2 pb-6 lg:grid-cols-3">
       {prompts?.map(prompt => (
-        <Link href={`/prompts/${prompt.id}`} key={prompt.id}>
+        <Link href={`/p/${prompt.slug || prompt.id}`} key={prompt.id}>
           <Card className={"hover:bg-foreground/5 rounded-xl border-none"}>
             <CardContent className={"flex space-x-3 p-4"}>
               <PromptIcon prompt={prompt} />

@@ -16,7 +16,7 @@ export function PromptCategories({
           variant={cat.name === selected ? "default" : "outline"}
           key={index}
         >
-          <Link href={"/prompts?c=" + cat.name}>{cat.name}</Link>
+          <Link href={"/prompts/" + cat.name}>{cat.name}</Link>
         </Badge>
       ))}
     </div>

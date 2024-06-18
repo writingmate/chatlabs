@@ -54,7 +54,7 @@ export default function PromptsPage({
     copyPrompt(prompt)
       .then(() => {
         toast.info("Prompt copied successfully")
-        router.push("/prompts?c=Your Prompts")
+        router.push("/prompts/Your Prompts")
         setOpen(false)
       })
       .catch(error => {

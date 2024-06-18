@@ -25,9 +25,9 @@ function getPageTitle(category?: string) {
 }
 
 export function generateMetadata({
-  searchParams: { c: category }
+  params: { category }
 }: {
-  searchParams: { c?: string }
+  params: { category?: string }
 }) {
   const title = getPageTitle(category)
   return {
@@ -38,13 +38,18 @@ export function generateMetadata({
 
 const YOUR_PROMPTS = "Your Prompts"
 export default async function PromptsPage({
-  searchParams: { c: category, q: query }
+  params: { category, q: query }
 }: {
-  searchParams: {
-    c?: ArrayElement<Tables<"prompt_category">["name"]> | typeof YOUR_PROMPTS
+  params: {
+    category?:
+      | ArrayElement<Tables<"prompt_category">["name"]>
+      | typeof YOUR_PROMPTS
     q?: string
   }
 }) {
+  if (category !== undefined) {
+    category = decodeURI(category) as any
+  }
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
   const searchCategory = category === YOUR_PROMPTS ? undefined : category
