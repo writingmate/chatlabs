@@ -260,7 +260,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
       <div className={"relative"}>
         <ChatCommandInput />
-        <div className="border-input mt-3 flex min-h-[60px] w-full flex-col justify-end overflow-hidden rounded-xl border backdrop-blur-xl">
+        <div className="border-input mt-3 flex w-full flex-col justify-end overflow-hidden rounded-xl border backdrop-blur-xl">
           {selectedAssistant && (
             <div className="bg-accent border-input flex items-center justify-between space-x-2 border-b p-2 pl-4 pr-3">
               <div className={"flex items-center space-x-2"}>
@@ -278,24 +278,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               />
             </div>
           )}
-          <TextareaAutosize
-            textareaRef={chatInputRef}
-            className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent p-2.5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            placeholder={`Ask anything...`}
-            onValueChange={handleInputChange}
-            value={userInput}
-            minRows={1}
-            maxRows={18}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            onCompositionStart={() => setIsTyping(true)}
-            onCompositionEnd={() => setIsTyping(false)}
-          />
-          <div
-            className={
-              "bg-accent border-input relative flex items-center justify-between border-t p-1.5"
-            }
-          >
+          <div className="flex items-end justify-between p-2">
             <div className={"flex"}>
               <Link
                 href={`/${selectedWorkspace?.id}/files`}
@@ -318,6 +301,19 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
                 />
               </Link>
             </div>
+            <TextareaAutosize
+              textareaRef={chatInputRef}
+              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full resize-none rounded-md border-none bg-transparent p-0.5 px-1 text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder={`Ask anything...`}
+              onValueChange={handleInputChange}
+              value={userInput}
+              minRows={1}
+              maxRows={18}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+              onCompositionStart={() => setIsTyping(true)}
+              onCompositionEnd={() => setIsTyping(false)}
+            />
             <div className="flex cursor-pointer justify-end">
               {recognition && (
                 <button onClick={listening ? stopListening : restartListening}>
