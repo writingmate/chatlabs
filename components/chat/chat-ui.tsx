@@ -10,7 +10,12 @@ import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLMID, MessageImage } from "@/types"
-import { useParams, useRouter, useSearchParams } from "next/navigation"
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams
+} from "next/navigation"
 import { FC, useContext, useEffect, useState } from "react"
 import { ChatHelp } from "./chat-help"
 import { useScroll } from "./chat-hooks/use-scroll"
@@ -38,6 +43,9 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
   })
 
   const params = useParams()
+
+  const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const {
@@ -124,6 +132,8 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
         model: modelId as LLMID
       }))
     }
+
+    router.replace(pathname)
   }, [searchParams])
 
   const fetchMessages = async () => {

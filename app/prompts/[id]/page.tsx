@@ -37,7 +37,7 @@ export default async function PromptsPage({
     <PageContent className={"container w-full pt-10 lg:w-2/3"}>
       <PageHeader className={"flex w-full items-center justify-between"}>
         <PageTitle className={"flex items-center space-y-2"}>
-          <div className={"flex flex-col justify-start space-y-1"}>
+          <div className={"flex flex-col justify-start space-y-2"}>
             <div>
               AI Prompt &ldquo;{prompt.icon} {prompt.name}&rdquo;
             </div>
@@ -56,15 +56,15 @@ export default async function PromptsPage({
           <Link href={`/chat?prompt_id=${prompt.id}`}>Use this prompt</Link>
         </Button>
       </PageHeader>
-      <div className={"flex w-full flex-col space-y-8 pb-6"}>
-        <div className={"flex w-full flex-col space-y-1"}>
+      <div className={"flex w-full flex-col space-y-6 pb-6"}>
+        <div className={"flex w-full flex-col space-y-2"}>
           <Label>AI prompt description</Label>
           <div>{prompt.description}</div>
         </div>
-        <div className={"flex w-full flex-col space-y-1"}>
+        <div className={"flex w-full flex-col space-y-2"}>
           <Label>AI prompt</Label>
           <div className={"bg-accent overflow-hidden rounded-md p-3"}>
-            <ReactMarkdown className={"overflow-auto"}>
+            <ReactMarkdown className={"overflow-auto text-sm"}>
               {prompt.content}
             </ReactMarkdown>
           </div>

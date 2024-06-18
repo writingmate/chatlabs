@@ -41,7 +41,7 @@ export default function EditPromptPage({
 
   const renderInputs = () => (
     <>
-      <div className="space-y-1">
+      <div className="space-y-2">
         <Label>Icon</Label>
 
         <Input
@@ -54,7 +54,7 @@ export default function EditPromptPage({
         />
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-2">
         <Label>Name</Label>
 
         <Input
@@ -67,7 +67,7 @@ export default function EditPromptPage({
         />
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-2">
         <Label>Prompt</Label>
 
         <TextareaAutosize
@@ -81,7 +81,7 @@ export default function EditPromptPage({
         />
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-2">
         <Label>Sharing</Label>
 
         <Select value={sharing} onValueChange={setSharing}>

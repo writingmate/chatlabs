@@ -111,12 +111,12 @@ export default function PromptsPage({
             </Button>
           </div>
         </DialogHeader>
-        <div className={"text-foreground flex flex-col space-y-3 text-sm"}>
-          <div className={"flex flex-col space-y-1"}>
+        <div className={"text-foreground flex flex-col space-y-4 text-sm"}>
+          <div className={"flex flex-col space-y-2"}>
             <Label>Description</Label>
             <div>{prompt.description}</div>
           </div>
-          <div className={"flex flex-col space-y-1"}>
+          <div className={"flex flex-col space-y-2"}>
             <Label>Prompt</Label>
             <div className={"bg-accent w-full overflow-x-auto rounded-md p-3"}>
               <MessageMarkdown
