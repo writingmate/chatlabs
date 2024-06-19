@@ -1,19 +1,31 @@
-import React, { FC } from "react"
+import React, { FC, useState } from "react"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import { MessageCodeBlock } from "./message-codeblock"
 import { MessageMarkdownMemoized } from "./message-markdown-memoized"
+import { defaultUrlTransform } from "react-markdown"
+import { FilePreview } from "@/components/ui/file-preview"
+import { ImageWithPreview } from "@/components/image/image-with-preview"
+import { sr } from "date-fns/locale"
 
 interface MessageMarkdownProps {
   content: string
 }
 
+function urlTransform(url: string) {
+  if (url.startsWith("data:")) {
+    return url
+  }
+  return defaultUrlTransform(url)
+}
+
 export const MessageMarkdown: FC<MessageMarkdownProps> = ({ content }) => {
   return (
     <MessageMarkdownMemoized
-      className="prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 min-w-full space-y-6 break-words"
+      className="prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 min-h-[40px] min-w-full space-y-6 break-words"
       // remarkPlugins={[remarkGfm, remarkMath]}
       remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
+      urlTransform={urlTransform}
       components={{
         a({ children, ...props }) {
           if (typeof children === "string" && /^\d+$/.test(children)) {
@@ -31,10 +43,12 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({ content }) => {
           return <a {...props}>{children}</a>
         },
         p({ children }) {
-          return <p className="mb-2 last:mb-0">{children}</p>
+          return (
+            <p className="mb-2 whitespace-pre-wrap last:mb-0">{children}</p>
+          )
         },
-        img({ node, ...props }) {
-          return <img className="max-w-[67%]" {...props} />
+        img({ node, src, ...props }) {
+          return <ImageWithPreview src={src!} alt={props.alt || "image"} />
         },
         code({ node, className, children, ...props }) {
           const childArray = React.Children.toArray(children)

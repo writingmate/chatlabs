@@ -19,6 +19,7 @@ export const SidebarSwitchItem: FC<SidebarSwitchItemProps> = ({
   const resolvedName = name || contentType
   return (
     <WithTooltip
+      asChild
       display={
         <div>{resolvedName[0].toUpperCase() + resolvedName.substring(1)}</div>
       }

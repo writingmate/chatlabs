@@ -157,12 +157,16 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   useEffect(() => {
     ;(async () => {
       const profile = await fetchStartingData()
-      if (profile) {
-        const hostedModelRes = await fetchHostedModels(profile)
-        if (!hostedModelRes) return
+      const hostedModelRes = await fetchHostedModels(profile)
+      if (!hostedModelRes) return
 
-        setEnvKeyMap(hostedModelRes.envKeyMap)
-        setAvailableHostedModels(hostedModelRes.hostedModels)
+      setEnvKeyMap(hostedModelRes.envKeyMap)
+      setAvailableHostedModels(hostedModelRes.hostedModels)
+
+      if (profile) {
+        if (!profile.has_onboarded) {
+          return router.push("/setup")
+        }
 
         if (
           profile["openrouter_api_key"] ||
@@ -188,7 +192,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     }
   }, [chatSettings])
 
-  const fetchStartingData = async () => {
+  const fetchStartingData = async (): Promise<
+    Tables<"profiles"> | undefined
+  > => {
     const session = (await supabase.auth.getSession()).data.session
 
     if (session) {
@@ -199,7 +205,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       setProfile(profile)
 
       if (!profile?.has_onboarded) {
-        return router.push("/setup")
+        return profile
       }
 
       const workspaces = await getWorkspacesByUserId(user.id)
@@ -232,6 +238,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
       return profile
     }
+
+    return undefined
   }
 
   return (

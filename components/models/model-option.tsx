@@ -3,6 +3,7 @@ import { FC } from "react"
 import { ModelIcon } from "./model-icon"
 import {
   IconBrain,
+  IconCheck,
   IconCurrencyDollar,
   IconEye,
   IconHistory,
@@ -51,14 +52,14 @@ export const ModelOption: FC<ModelOptionProps> = ({
                   : "border-foreground/10 border-[1px]"
               )}
               stroke={1.5}
-              size={28}
+              size={24}
             />
           ) : (
             <ModelIcon
               provider={model.provider}
               modelId={model?.modelId}
-              width={28}
-              height={28}
+              width={24}
+              height={24}
             />
           )}
           <div
@@ -69,44 +70,47 @@ export const ModelOption: FC<ModelOptionProps> = ({
             {model.modelName}
           </div>
         </div>
-        <div className={"flex items-center space-x-1"}>
-          {model.imageInput && (
-            <WithTooltip
-              side="top"
-              display={"Vision supported"}
-              trigger={
-                <div className="w-4 text-xs font-normal opacity-75">
-                  <IconEye stroke={2} size={16} />
-                </div>
-              }
-            />
-          )}
-          {model.tools && (
-            <WithTooltip
-              side="top"
-              display={"Plugins supported"}
-              trigger={
-                <div className="w-4 text-xs font-normal opacity-75">
-                  <IconPuzzle stroke={2} size={16} />
-                </div>
-              }
-            />
-          )}
-          {contextLength && (
-            <WithTooltip
-              side="top"
-              display={
-                "Context length: " + (contextLength / 1000).toFixed(0) + "k"
-              }
-              trigger={
-                <div className="flex w-12 text-xs font-normal opacity-75">
-                  <IconBrain stroke={2} size={16} />
-                  {(contextLength / 1000).toFixed(0)}k
-                </div>
-              }
-            />
-          )}
+        <div className="flex items-center space-x-1">
+          {selected && <IconCheck size={18} stroke={1.5} />}
         </div>
+        {/*<div className={"flex items-center space-x-1"}>*/}
+        {/*  {model.imageInput && (*/}
+        {/*    <WithTooltip*/}
+        {/*      side="top"*/}
+        {/*      display={"Vision supported"}*/}
+        {/*      trigger={*/}
+        {/*        <div className="w-4 text-xs font-normal opacity-75">*/}
+        {/*          <IconEye stroke={2} size={16} />*/}
+        {/*        </div>*/}
+        {/*      }*/}
+        {/*    />*/}
+        {/*  )}*/}
+        {/*  {model.tools && (*/}
+        {/*    <WithTooltip*/}
+        {/*      side="top"*/}
+        {/*      display={"Plugins supported"}*/}
+        {/*      trigger={*/}
+        {/*        <div className="w-4 text-xs font-normal opacity-75">*/}
+        {/*          <IconPuzzle stroke={2} size={16} />*/}
+        {/*        </div>*/}
+        {/*      }*/}
+        {/*    />*/}
+        {/*  )}*/}
+        {/*  {contextLength && (*/}
+        {/*    <WithTooltip*/}
+        {/*      side="top"*/}
+        {/*      display={*/}
+        {/*        "Context length: " + (contextLength / 1000).toFixed(0) + "k"*/}
+        {/*      }*/}
+        {/*      trigger={*/}
+        {/*        <div className="flex w-12 text-xs font-normal opacity-75">*/}
+        {/*          <IconBrain stroke={2} size={16} />*/}
+        {/*          {(contextLength / 1000).toFixed(0)}k*/}
+        {/*        </div>*/}
+        {/*      }*/}
+        {/*    />*/}
+        {/*  )}*/}
+        {/*</div>*/}
       </div>
     </div>
   )

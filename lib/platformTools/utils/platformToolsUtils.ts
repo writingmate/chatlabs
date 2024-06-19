@@ -55,16 +55,24 @@ export const platformToolDefinitions = () => {
   return platformToolList.map(platformToolDefinition) as Tables<"tools">[]
 }
 
-export const platformToolFunction = (functionName: string): Function => {
+export const platformToolFunctionSpec = (functionName: string) => {
   const [toolName, toolFunctionId] = getToolIds(functionName)
   const tool = platformToolList.find(tool => tool.toolName === toolName)
   if (!tool) {
-    return () => Promise.resolve("Tool not found.")
+    return null
   }
   const toolFunction = tool.toolsFunctions.find(
     toolFunction => toolFunction.id === toolFunctionId
   )
+  if (!toolFunction) {
+    return null
+  }
   return toolFunction
-    ? toolFunction.toolFunction
+}
+
+export const platformToolFunction = (functionName: string): Function => {
+  const toolFunctionSpec = platformToolFunctionSpec(functionName)
+  return toolFunctionSpec
+    ? toolFunctionSpec.toolFunction
     : () => Promise.resolve("Tool function not found.")
 }

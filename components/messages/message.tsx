@@ -30,8 +30,9 @@ import { MessageMarkdown } from "./message-markdown"
 import { YouTube } from "@/components/messages/annotations/youtube"
 import { WebSearch } from "@/components/messages/annotations/websearch"
 import AnnotationImage from "@/components/messages/annotations/image"
-import { Annotation } from "@/types/annotation"
+import { Annotation, Annotation2 } from "@/types/annotation"
 import { any } from "zod"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 const ICON_SIZE = 32
 
@@ -43,26 +44,30 @@ interface MessageProps {
   onStartEdit: (message: Tables<"messages">) => void
   onCancelEdit: () => void
   onSubmitEdit: (value: string, sequenceNumber: number) => void
+  onRegenerate: (editedMessage?: string) => void
+  isGenerating: boolean
+  firstTokenReceived: boolean
+  setIsGenerating: (value: boolean) => void
 }
 
 export const Message: FC<MessageProps> = ({
+  isGenerating,
+  firstTokenReceived,
+  setIsGenerating,
   message,
   fileItems,
   isEditing,
   isLast,
   onStartEdit,
   onCancelEdit,
+  onRegenerate,
   onSubmitEdit
 }) => {
   const {
     assistants,
     profile,
-    isGenerating,
-    setIsGenerating,
-    firstTokenReceived,
     availableLocalModels,
     availableOpenRouterModels,
-    chatMessages,
     selectedAssistant,
     chatImages,
     assistantImages,
@@ -164,11 +169,7 @@ export const Message: FC<MessageProps> = ({
 
   const handleRegenerate = async () => {
     setIsGenerating(true)
-    await handleSendMessage(
-      editedMessage || chatMessages[chatMessages.length - 2].message.content,
-      chatMessages,
-      true
-    )
+    onRegenerate(editedMessage)
   }
 
   const handleStartEdit = () => {
@@ -253,7 +254,7 @@ export const Message: FC<MessageProps> = ({
     }
 
     const annotationMap: {
-      [key: string]: React.FC<{ annotation: Annotation }>
+      [key: string]: React.FC<{ annotation: Annotation | Annotation2 }>
     } = {
       imageGenerator__generateImage: AnnotationImage,
       webScraper__youtubeCaptions: YouTube,
@@ -273,25 +274,13 @@ export const Message: FC<MessageProps> = ({
     <div
       className={cn(
         "group flex w-full justify-center",
-        message.role === "user" ? "" : "bg-secondary",
+        // message.role === "user" ? "" : "bg-secondary",
         "role-" + message.role,
         isLast ? "is-last" : ""
       )}
       onKeyDown={handleKeyDown}
     >
-      <div className="relative flex w-full flex-col px-4 py-6 md:w-[500px] md:px-0 lg:w-[600px] xl:w-[700px]">
-        <div className="absolute right-0 top-7">
-          <MessageActions
-            onCopy={handleCopy}
-            onEdit={handleStartEdit}
-            isAssistant={message.role === "assistant"}
-            isLast={isLast}
-            isEditing={isEditing}
-            onRegenerate={handleRegenerate}
-            isVoiceToTextPlaying={isVoiceToTextPlaying}
-            onVoiceToText={handleSpeakMessage}
-          />
-        </div>
+      <div className="relative flex w-full flex-col p-4 md:w-[500px] md:px-0 lg:w-[600px] xl:w-[700px]">
         <div className="space-y-3">
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
@@ -303,7 +292,7 @@ export const Message: FC<MessageProps> = ({
               <div className="text-lg font-semibold">Prompt</div>
             </div>
           ) : (
-            <div className="flex items-center space-x-3">
+            <div className="relative flex items-center space-x-3">
               {message.role === "assistant" ? (
                 messageAssistantImage ? (
                   <Image
@@ -355,6 +344,18 @@ export const Message: FC<MessageProps> = ({
                       ? selectedAssistant?.name
                       : MODEL_DATA?.modelName
                   : profile?.display_name ?? profile?.username}
+              </div>
+              <div className={"absolute right-0"}>
+                <MessageActions
+                  isGenerating={isGenerating}
+                  onCopy={handleCopy}
+                  onEdit={handleStartEdit}
+                  isAssistant={message.role === "assistant"}
+                  isLast={isLast}
+                  isEditing={isEditing}
+                  onRegenerate={handleRegenerate}
+                  onVoiceToText={() => {}}
+                />
               </div>
             </div>
           )}
@@ -469,34 +470,38 @@ export const Message: FC<MessageProps> = ({
           </div>
         )}
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          {message.image_paths.map((path, index) => {
-            const item = chatImages.find(image => image.path === path)
+        {message.image_paths.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {message.image_paths.map((path, index) => {
+              const item = chatImages.find(image => image.path === path)
 
-            return (
-              <Image
-                key={index}
-                className="cursor-pointer rounded hover:opacity-50"
-                src={path.startsWith("data") ? path : item?.base64}
-                alt="message image"
-                width={300}
-                height={300}
-                onClick={() => {
-                  setSelectedImage({
-                    messageId: message.id,
-                    path,
-                    base64: path.startsWith("data") ? path : item?.base64 || "",
-                    url: path.startsWith("data") ? "" : item?.url || "",
-                    file: null
-                  })
+              return (
+                <Image
+                  key={index}
+                  className="cursor-pointer rounded hover:opacity-50"
+                  src={path.startsWith("data") ? path : item?.base64}
+                  alt="message image"
+                  width={300}
+                  height={300}
+                  onClick={() => {
+                    setSelectedImage({
+                      messageId: message.id,
+                      path,
+                      base64: path.startsWith("data")
+                        ? path
+                        : item?.base64 || "",
+                      url: path.startsWith("data") ? "" : item?.url || "",
+                      file: null
+                    })
 
-                  setShowImagePreview(true)
-                }}
-                loading="lazy"
-              />
-            )
-          })}
-        </div>
+                    setShowImagePreview(true)
+                  }}
+                  loading="lazy"
+                />
+              )
+            })}
+          </div>
+        )}
         {isEditing && (
           <div className="mt-4 flex justify-center space-x-2">
             <Button size="sm" onClick={handleSendEdit}>

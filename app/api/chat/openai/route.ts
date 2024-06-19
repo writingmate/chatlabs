@@ -27,14 +27,15 @@ export async function POST(request: Request) {
 
     const openai = new OpenAI({
       apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id
+      organization: profile.openai_organization_id,
+      baseURL: process.env.OPENAI_BASE_URL || undefined
     })
 
     const response = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens: ["gpt-4-vision-preview", "gpt-4-turbo"].includes(
+      max_tokens: ["gpt-4-vision-preview", "gpt-4-turbo", "gpt-4o"].includes(
         chatSettings.model
       )
         ? 4096

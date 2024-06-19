@@ -5,7 +5,6 @@ import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { updateChat } from "@/db/chats"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
-import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
 import { useRouter } from "next/navigation"
@@ -19,60 +18,65 @@ import {
   handleHostedChat,
   handleLocalChat,
   handleRetrieval,
+  handleToolsChat,
   processResponse,
   validateChatSettings
 } from "../chat-helpers"
 import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 export const useChatHandler = () => {
   const router = useRouter()
 
   const {
-    userInput,
     chatFiles,
-    setUserInput,
     setNewMessageImages,
     profile,
-    isGenerating,
-    setIsGenerating,
-    setChatMessages,
-    setFirstTokenReceived,
-    selectedChat,
     selectedWorkspace,
-    setSelectedChat,
     setChats,
-    setSelectedTools,
     availableLocalModels,
     availableOpenRouterModels,
-    abortController,
-    setAbortController,
-    chatSettings,
     newMessageImages,
     selectedAssistant,
-    chatMessages,
     chatImages,
     setChatImages,
     setChatFiles,
     setNewMessageFiles,
     setShowFilesDisplay,
     newMessageFiles,
-    chatFileItems,
-    setChatFileItems,
     setToolInUse,
     useRetrieval,
     sourceCount,
     setIsPromptPickerOpen,
     setIsFilePickerOpen,
-    selectedTools,
     selectedPreset,
-    setChatSettings,
     models,
     isPromptPickerOpen,
     isFilePickerOpen,
     isToolPickerOpen,
     setIsPaywallOpen
   } = useContext(ChatbotUIContext)
+
+  const {
+    userInput,
+    setUserInput,
+    isGenerating,
+    setIsGenerating,
+    setChatMessages,
+    setFirstTokenReceived,
+    selectedChat,
+    setSelectedChat,
+    setSelectedTools,
+    abortController,
+    setAbortController,
+    chatSettings,
+    chatMessages,
+    chatFileItems,
+    setChatFileItems,
+    selectedTools,
+    setChatSettings
+  } = useContext(ChatbotUIChatContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -161,23 +165,6 @@ export const useChatHandler = () => {
           | "openai"
           | "local"
       })
-    } else if (selectedWorkspace) {
-      // setChatSettings({
-      //   model: (selectedWorkspace.default_model ||
-      //     "gpt-4-1106-preview") as LLMID,
-      //   prompt:
-      //     selectedWorkspace.default_prompt ||
-      //     "You are a friendly, helpful AI assistant.",
-      //   temperature: selectedWorkspace.default_temperature || 0.5,
-      //   contextLength: selectedWorkspace.default_context_length || 4096,
-      //   includeProfileContext:
-      //     selectedWorkspace.include_profile_context || true,
-      //   includeWorkspaceInstructions:
-      //     selectedWorkspace.include_workspace_instructions || true,
-      //   embeddingsProvider:
-      //     (selectedWorkspace.embeddings_provider as "openai" | "local") ||
-      //     "openai"
-      // })
     }
 
     return router.push(`/${selectedWorkspace.id}/chat`)
@@ -220,7 +207,9 @@ export const useChatHandler = () => {
           provider: "custom" as ModelProvider,
           hostedId: model.id,
           platformLink: "",
-          imageInput: false
+          imageInput: false,
+          supportsStreaming: false,
+          tools: false
         })),
         ...LLM_LIST,
         ...availableLocalModels,
@@ -271,7 +260,7 @@ export const useChatHandler = () => {
 
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
-        workspaceInstructions: selectedWorkspace!.instructions || "",
+        // workspaceInstructions: selectedWorkspace?.instructions || "",
         chatMessages: isRegeneration
           ? [...chatMessages]
           : [...chatMessages, tempUserChatMessage],
@@ -283,40 +272,20 @@ export const useChatHandler = () => {
       let generatedText = ""
       let data = null
 
-      if (selectedTools.length > 0) {
-        setToolInUse("none")
-
-        const formattedMessages = await buildFinalMessages(
+      if (selectedTools.length > 0 && modelData!.tools) {
+        ;({ generatedText, data } = await handleToolsChat(
           payload,
           profile!,
-          chatImages
-        )
-
-        const response = await fetchChatResponse(
-          "/api/chat/tools",
-          {
-            chatSettings: payload.chatSettings,
-            messages: formattedMessages,
-            selectedTools
-          },
-          true,
+          tempAssistantChatMessage,
+          isRegeneration,
           newAbortController,
+          chatImages,
           setIsGenerating,
-          setChatMessages
-        )
-
-        setToolInUse("none")
-        ;({ generatedText, data } = await processResponse(
-          response,
-          isRegeneration
-            ? payload.chatMessages[payload.chatMessages.length - 1]
-            : tempAssistantChatMessage,
-          true,
-          newAbortController,
           setFirstTokenReceived,
           setChatMessages,
           setToolInUse,
-          selectedTools
+          selectedTools,
+          modelData!.supportsStreaming
         ))
       } else {
         if (modelData!.provider === "ollama") {
@@ -433,7 +402,7 @@ export const useChatHandler = () => {
 
   return {
     chatInputRef,
-    prompt,
+    // prompt,
     handleNewChat,
     handleSendMessage,
     handleFocusChatInput,

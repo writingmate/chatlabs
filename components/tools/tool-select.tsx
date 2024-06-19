@@ -14,21 +14,31 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "../ui/dropdown-menu"
-import { Input } from "../ui/input"
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Tables } from "@/supabase/types"
 import { Separator } from "@/components/ui/separator"
 import { validatePlanForTools } from "@/lib/subscription"
+import { cn } from "@/lib/utils"
 
 interface ToolSelectProps {
+  className?: string
   selectedTools: Tables<"tools">[]
   onSelectTools: (tools: Tables<"tools">[]) => void
 }
 
+function ToolDetails({ tool }: { tool: Tables<"tools"> }) {
+  return (
+    <div className="mr-2 hidden w-[240px] flex-col space-y-1 border-r px-2 py-1 sm:flex">
+      <div className="font-semibold">{tool.name}</div>
+      <div className="text-xs">{tool.description}</div>
+    </div>
+  )
+}
+
 export const ToolSelect: FC<ToolSelectProps> = ({
   selectedTools,
-  onSelectTools
+  onSelectTools,
+  className
 }) => {
   const { profile, tools, setIsPaywallOpen } = useContext(ChatbotUIContext)
 
@@ -38,6 +48,8 @@ export const ToolSelect: FC<ToolSelectProps> = ({
   const [flash, setFlash] = useState(false)
 
   const [isOpen, setIsOpen] = useState(false)
+
+  const [hoveredTool, setHoveredTool] = useState<Tables<"tools">>(tools[0])
 
   useEffect(() => {
     if (isOpen) {
@@ -85,10 +97,11 @@ export const ToolSelect: FC<ToolSelectProps> = ({
       <DropdownMenuTrigger>
         <Button
           ref={triggerRef}
-          className={
-            "flex border-0 items-center relative justify-between space-x-0 " +
-            (flash ? "animate-bounce" : "")
-          }
+          className={cn(
+            "relative flex items-center justify-between space-x-0 border-0",
+            flash ? "animate-bounce" : "",
+            className
+          )}
           variant="ghost"
         >
           <IconPuzzle />
@@ -103,14 +116,16 @@ export const ToolSelect: FC<ToolSelectProps> = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="mx-2 space-y-2 overflow-auto p-2"
+        className="relative mx-2 -ml-[140px] flex max-h-[300px] overflow-auto p-2"
         // style={{ width: triggerRef.current?.offsetWidth }}
       >
-        <div className="max-h-[300px] overflow-auto">
+        <ToolDetails tool={hoveredTool} />
+        <div>
           {tools.map(tool => {
             return (
               <DropdownMenuItem
                 key={tool.id}
+                onMouseEnter={() => setHoveredTool(tool as Tables<"tools">)}
                 className={"flex w-full justify-between space-x-3"}
               >
                 <div>{tool.name}</div>

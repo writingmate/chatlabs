@@ -1,11 +1,17 @@
 import { ChatbotUIContext } from "@/context/context"
 import { LLM, LLMID, ModelProvider } from "@/types"
-import { IconCheck, IconChevronDown, IconSquarePlus } from "@tabler/icons-react"
+import {
+  IconCheck,
+  IconChevronDown,
+  IconSquarePlus,
+  IconX
+} from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuSubContent2,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
@@ -20,15 +26,23 @@ import {
   ModelSettings
 } from "@/components/models/model-settings"
 import { validatePlanForModel } from "@/lib/subscription"
+import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
+import { cn } from "@/lib/utils"
+import ReactMarkdown from "react-markdown"
+import { ModelDetails } from "@/components/models/model-details"
 
 interface ModelSelectProps {
   selectedModelId: string
+  detailsLocation?: "left" | "right"
   onSelectModel: (modelId: LLMID) => void
+  showModelSettings?: boolean
 }
 
 export const ModelSelectChat: FC<ModelSelectProps> = ({
   selectedModelId,
-  onSelectModel
+  onSelectModel,
+  detailsLocation = "left",
+  showModelSettings = true
 }) => {
   const {
     profile,
@@ -48,6 +62,8 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   const [mostRecentModels, setMostRecentModels] = useState<
     Tables<"recent_models">[]
   >([])
+
+  const [hoveredModel, setHoveredModel] = useState<LLM | null>(null)
 
   useEffect(() => {
     if (isOpen) {
@@ -92,7 +108,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
     model => model.modelId === selectedModelId
   )
 
-  if (!profile) return null
+  // if (!profile) return null
 
   const filteredModels = allModels
     .filter(model => {
@@ -103,7 +119,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
     .filter(
       model =>
         (
-          (profile.model_visibility || DEFAULT_MODEL_VISIBILITY) as Record<
+          (profile?.model_visibility || DEFAULT_MODEL_VISIBILITY) as Record<
             LLMID,
             boolean
           >
@@ -161,73 +177,89 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="w-[300px] space-y-2 overflow-auto p-2 sm:w-[350px] md:w-[400px] lg:w-[500px]"
-        // style={{ width: triggerRef.current?.offsetWidth }}
-        align="start"
+        className={cn(
+          "mx-2 flex items-start justify-between overflow-visible border-0 bg-transparent p-0 shadow-none",
+          detailsLocation === "left" ? "flex-row" : "flex-row-reverse"
+        )}
       >
-        <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
+        <DropdownMenuSubContent2
+          className={
+            "relative mr-2 hidden h-auto flex-col justify-between border-r p-4 lg:flex"
+          }
+        >
+          <ModelDetails model={hoveredModel || filteredModels[0]} />
+        </DropdownMenuSubContent2>
+        <DropdownMenuSubContent2 className="relative mr-2 flex w-[340px] flex-col space-y-2 overflow-auto p-2">
           {availableLocalModels.length > 0 && (
-            <TabsList defaultValue="hosted" className="grid grid-cols-2">
-              <TabsTrigger value="hosted">Hosted</TabsTrigger>
-              <TabsTrigger value="local">Local</TabsTrigger>
-            </TabsList>
+            <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
+              <TabsList defaultValue="hosted" className="grid grid-cols-2">
+                <TabsTrigger value="hosted">Hosted</TabsTrigger>
+                <TabsTrigger value="local">Local</TabsTrigger>
+              </TabsList>
+            </Tabs>
           )}
-        </Tabs>
 
-        <Input
-          ref={inputRef}
-          className="w-full"
-          placeholder="Search models..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+          <Input
+            ref={inputRef}
+            className="w-full"
+            placeholder="Search models..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
 
-        <div className="max-h-[300px] overflow-auto">
-          {!search && mostRecentModels.length > 0 && (
-            <div>
-              {mostRecentModels.map(recentModel => {
-                const model = allModels.find(
-                  model => model.modelId === recentModel.model
-                )
-                if (!model) return null
+          <div className="max-h-[300px] overflow-auto">
+            {!search && mostRecentModels.length > 0 && (
+              <div>
+                {mostRecentModels.map(recentModel => {
+                  const model = allModels.find(
+                    model => model.modelId === recentModel.model
+                  )
+                  if (!model) return null
+                  return (
+                    <div
+                      onMouseEnter={() => setHoveredModel(model)}
+                      key={model.modelId}
+                      className="flex items-center space-x-1"
+                    >
+                      <ModelOption
+                        recent={true}
+                        key={model.modelId}
+                        model={model}
+                        selected={false}
+                        onSelect={() => handleSelectModel(model.modelId)}
+                      />
+                    </div>
+                  )
+                })}
+                <Separator className={"opacity-75"} />
+              </div>
+            )}
+            <div className="mb-1">
+              {filteredModels.map(model => {
                 return (
                   <div
                     key={model.modelId}
                     className="flex items-center space-x-1"
+                    onMouseEnter={() => setHoveredModel(model)}
                   >
                     <ModelOption
-                      recent={true}
                       key={model.modelId}
                       model={model}
-                      selected={false}
+                      selected={selectedModelId === model.modelId}
                       onSelect={() => handleSelectModel(model.modelId)}
                     />
                   </div>
                 )
               })}
-              <Separator className={"opacity-75"} />
             </div>
-          )}
-          <div className="mb-4">
-            {filteredModels.map(model => {
-              return (
-                <div
-                  key={model.modelId}
-                  className="flex items-center space-x-1"
-                >
-                  <ModelOption
-                    key={model.modelId}
-                    model={model}
-                    selected={selectedModelId === model.modelId}
-                    onSelect={() => handleSelectModel(model.modelId)}
-                  />
-                </div>
-              )
-            })}
           </div>
-        </div>
-        <Separator className={"opacity-75"} />
-        <ModelSettings models={allModels} />
+          {showModelSettings && (
+            <>
+              <Separator className={"opacity-75"} />
+              <ModelSettings models={allModels} />
+            </>
+          )}
+        </DropdownMenuSubContent2>
       </DropdownMenuContent>
     </DropdownMenu>
   )

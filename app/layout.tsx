@@ -9,7 +9,7 @@ import { Metadata, Viewport } from "next"
 import { DM_Sans, Inter } from "next/font/google"
 import { cookies } from "next/headers"
 import { ReactNode } from "react"
-import { GoogleAnalytics } from "@next/third-parties/google"
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
@@ -66,7 +66,10 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#FFFFFF"
+  themeColor: "#FFFFFF",
+  width: "device-width",
+  initialScale: 1,
+  interactiveWidget: "resizes-content"
 }
 
 const i18nNamespaces = ["translation"]
@@ -95,20 +98,25 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning className={"h-full"}>
       <body className={font.className + " h-full antialiased"}>
         <Providers attribute="class" defaultTheme="light">
-          <TranslationsProvider
-            namespaces={i18nNamespaces}
-            locale={locale}
-            resources={resources}
-          >
-            <Toaster richColors position="top-center" duration={3000} />
-            <div className="bg-background text-foreground flex h-full flex-col items-center sm:h-screen">
-              {session ? <GlobalState>{children}</GlobalState> : children}
-            </div>
-          </TranslationsProvider>
+          {/*<TranslationsProvider*/}
+          {/*  namespaces={i18nNamespaces}*/}
+          {/*  locale={locale}*/}
+          {/*  resources={resources}*/}
+          {/*>*/}
+          <Toaster richColors position="top-center" duration={3000} />
+          <div className="bg-background text-foreground flex h-full flex-col items-center sm:h-screen">
+            <GlobalState>{children}</GlobalState>
+          </div>
+          {/*</TranslationsProvider>*/}
         </Providers>
-        <Analytics />
-        <SpeedInsights />
-        <GoogleAnalytics gaId="G-Y14R2TP0QH" />
+        {process.env.NODE_ENV === "production" && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+            <GoogleAnalytics gaId="G-Y14R2TP0QH" />
+            <GoogleTagManager gtmId={"GTM-5SBXJ23Q"} />
+          </>
+        )}
       </body>
     </html>
   )
