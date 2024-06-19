@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { FC } from "react"
 import { ChatbotUISVG } from "../icons/chatbotui-svg"
 
@@ -15,12 +14,10 @@ export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
         <ChatbotUISVG theme={theme === "dark" ? "dark" : "light"} scale={0.3} />
       </div>
 
-      <div className="text-4xl font-semibold tracking-wide">ChatLabs</div>
+      <h1 className="text-4xl font-semibold tracking-wide">ChatLabs</h1>
       <div className="flex flex-col items-center py-2">
-        <div className="text-sm">More than 20 AI models in one place.</div>
-        <div className="text-sm">
-          Featuring GPT-4, Claude, Gemini and LLaMa.
-        </div>
+        <h4 className="text-sm">More than 20 AI models in one place.</h4>
+        <h4 className="text-sm">Featuring GPT-4, Claude, Gemini and LLaMa.</h4>
       </div>
     </div>
   )
