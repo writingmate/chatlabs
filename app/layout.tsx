@@ -18,7 +18,8 @@ const font = DM_Sans({ subsets: ["latin"] })
 const APP_NAME = "ChatLabs"
 const APP_DEFAULT_TITLE = "ChatLabs"
 const APP_TITLE_TEMPLATE = "%s - ChatLabs"
-const APP_DESCRIPTION = "ChatLabs is a platform for LLM and AI tinkerers."
+const APP_DESCRIPTION =
+  "ChatLabs is a platform for LLM and AI tinkerers. Experience more than 30 AI models in one place."
 
 interface RootLayoutProps {
   children: ReactNode
