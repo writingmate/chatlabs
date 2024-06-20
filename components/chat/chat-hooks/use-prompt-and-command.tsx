@@ -58,9 +58,11 @@ export const usePromptAndCommand = () => {
       setIsAssistantPickerOpen(true)
       setAtCommand(assistantMatch[1])
     } else if (promptMatch) {
-      router.push(`/${selectedWorkspace?.id}/prompts`)
+      setIsPromptPickerOpen(true)
+      setSlashCommand(promptMatch[1])
     } else if (filesMatch) {
-      router.push(`/${selectedWorkspace?.id}/files`)
+      setIsFilePickerOpen(true)
+      setHashtagCommand(filesMatch[1])
     } else if (toolMatch) {
       setIsToolPickerOpen(true)
       setToolCommand(toolMatch[1])

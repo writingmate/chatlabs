@@ -28,7 +28,7 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
 
   const isOpen =
     isPromptPickerOpen ||
-    isToolPickerOpen ||
+    // isToolPickerOpen ||
     isAssistantPickerOpen ||
     isFilePickerOpen ||
     isMessageHistoryPickerOpen
@@ -36,7 +36,7 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
   return (
     <div
       className={cn(
-        "left-0 max-h-[300px] w-full overflow-y-auto dark:border-none",
+        "bg-background border-input left-0 max-h-[300px] w-full overflow-y-auto rounded-lg border dark:border-none",
         selectedAssistant && "bottom-[106px]",
         isOpen ? "block" : "hidden"
       )}
