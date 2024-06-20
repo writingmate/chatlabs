@@ -2,6 +2,8 @@ import { FC, useEffect, useRef } from "react"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { useSelectFileHandler } from "@/components/chat/chat-hooks/use-select-file-handler"
+import { useClickOutside } from "@/components/chat/picker-hooks/use-click-outside"
+import { VList } from "virtua"
 
 export const defaultItemRenderer = (
   item: any,
@@ -13,7 +15,7 @@ export const defaultItemRenderer = (
   <div
     key={index}
     tabIndex={0}
-    className="hover:bg-accent bg-background focus:bg-accent flex h-[36px] w-full cursor-pointer items-center space-x-2 rounded px-2 text-sm focus:outline-none"
+    className="hover:bg-accent bg-background focus:bg-accent flex h-[36px] w-full cursor-pointer items-center space-x-2 px-2 text-sm focus:outline-none"
     onClick={() => handleSelectItem(item)}
     onKeyDown={handleKeyDown}
   >
@@ -24,6 +26,22 @@ export const defaultItemRenderer = (
     </div>
   </div>
 )
+
+function defaultIconRenderer(item: any) {
+  if (typeof item.icon === "string") {
+    return (
+      <div
+        className={
+          "border-foreground/10 flex size-[24px] items-center justify-center rounded border-[1px]"
+        }
+      >
+        {item.icon}
+      </div>
+    )
+  } else {
+    return <>{item.icon}</>
+  }
+}
 
 interface PickerAction {
   icon: JSX.Element
@@ -71,21 +89,9 @@ export const Picker: FC<PickerProps<any>> = ({
     item.name.toLowerCase().includes(command.toLowerCase())
   )
 
-  function defaultIconRenderer(item: any) {
-    if (typeof item.icon === "string") {
-      return (
-        <div
-          className={
-            "border-foreground/10 flex size-[24px] items-center justify-center rounded border-[1px]"
-          }
-        >
-          {item.icon}
-        </div>
-      )
-    } else {
-      return <>{item.icon}</>
-    }
-  }
+  const pickerRef = useRef<HTMLDivElement>(null)
+
+  useClickOutside(pickerRef, () => setIsOpen(false))
 
   const renderIcon = iconRenderer || defaultIconRenderer
 
@@ -128,9 +134,9 @@ export const Picker: FC<PickerProps<any>> = ({
   return (
     <>
       {isOpen && (
-        <div className="relative m-2 flex flex-col text-sm">
+        <div ref={pickerRef} className="relative flex flex-col text-sm">
           {actions && actions.length > 0 && (
-            <div className={cn("border-input sticky top-2 flex grow border-b")}>
+            <div className={cn("border-input sticky top-0 flex grow border-b")}>
               {actions?.map((action, index) =>
                 renderItem(
                   {

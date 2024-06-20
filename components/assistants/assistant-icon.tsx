@@ -35,6 +35,7 @@ export function AssistantIcon({
           src={imageUrl}
           alt={assistant.name}
           width={size}
+          placeholder={`data:image/svg+xml;utf8,<svg><text x='10' y='20' font-size='20' fill='black'>${assistant.name}</text></svg>`}
           height={size}
           className={`size-full`}
         />
@@ -42,7 +43,7 @@ export function AssistantIcon({
         <IconRobotFace
           size={size - 2}
           stroke={1.5}
-          className="text-background"
+          className="text-foreground"
         />
       )}
     </div>

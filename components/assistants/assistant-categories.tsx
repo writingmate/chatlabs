@@ -16,6 +16,7 @@ export function AssistantCategories({
     <div className="flex space-x-2 py-4">
       {[...categories].map((cat, index: number) => (
         <Badge
+          className={"px-3 py-1 text-sm"}
           variant={cat.value === selected ? "default" : "outline"}
           key={index}
         >

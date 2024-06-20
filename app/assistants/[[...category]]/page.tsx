@@ -127,25 +127,15 @@ export default async function AssistantsPage({
 
   if (!category || category?.length === 0) {
     return (
-      <Dashboard>
-        <Assistants
-          data={[...assistants.assistants, ...data].filter(onlyUniqueById)}
-        />
-      </Dashboard>
+      <Assistants
+        data={[...assistants.assistants, ...data].filter(onlyUniqueById)}
+      />
     )
   }
 
   if (category[0] === "my-assistants") {
-    return (
-      <Dashboard>
-        <Assistants data={assistants.assistants} category={category[0]} />
-      </Dashboard>
-    )
+    return <Assistants data={assistants.assistants} category={category[0]} />
   }
 
-  return (
-    <Dashboard>
-      <Assistants data={data} category={category[0]} />
-    </Dashboard>
-  )
+  return <Assistants data={data} category={category[0]} />
 }
