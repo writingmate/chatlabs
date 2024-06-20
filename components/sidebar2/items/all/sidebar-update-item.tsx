@@ -99,7 +99,7 @@ interface SidebarUpdateItemProps {
   isTyping: boolean
   item: DataItemType
   contentType: ContentType
-  children: React.ReactNode
+  children?: React.ReactNode
   renderInputs: (renderState: any) => JSX.Element
   updateState: any
   name?: string

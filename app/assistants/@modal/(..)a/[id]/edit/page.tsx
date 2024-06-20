@@ -1,3 +1,3 @@
-import EditPromptPage from "@/app/p/[id]/edit/page"
+import EditAssistantPage from "@/app/a/[id]/edit/page"
 
-export default EditPromptPage
+export default EditAssistantPage

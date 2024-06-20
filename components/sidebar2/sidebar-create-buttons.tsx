@@ -130,16 +130,16 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
         </div>
       </Button>
 
-      {hasData && (
-        <Button
-          size={"xs"}
-          variant={"outline"}
-          className="flex p-1 px-2 py-0"
-          onClick={handleCreateFolder}
-        >
-          <IconFolderPlus stroke={1.5} size={SIDEBAR_ICON_SIZE} />
-        </Button>
-      )}
+      {/*{hasData && (*/}
+      {/*  <Button*/}
+      {/*    size={"xs"}*/}
+      {/*    variant={"outline"}*/}
+      {/*    className="flex p-1 px-2 py-0"*/}
+      {/*    onClick={handleCreateFolder}*/}
+      {/*  >*/}
+      {/*    <IconFolderPlus stroke={1.5} size={SIDEBAR_ICON_SIZE} />*/}
+      {/*  </Button>*/}
+      {/*)}*/}
 
       {isCreatingPrompt && (
         <CreatePrompt
