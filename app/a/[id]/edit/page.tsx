@@ -12,6 +12,13 @@ import { AssistantRetrievalSelect } from "@/components/sidebar2/items/assistants
 import { AssistantToolSelect } from "@/components/sidebar2/items/assistants/assistant-tool-select"
 import { getAssistantById } from "@/db/assistants"
 import { ChatSettings, LLMID } from "@/types"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
 
 export default function EditAssistantPage({
   params: { id }
@@ -19,6 +26,7 @@ export default function EditAssistantPage({
   params: { id: string }
 }) {
   const [assistant, setAssistant] = useState<Tables<"assistants"> | null>()
+  const [sharing, setSharing] = useState<"public" | "private">("private" as any)
   // const { assistantImages } = useContext(ChatbotUIContext)
   const [name, setName] = useState("")
   const [isTyping, setIsTyping] = useState(false)
@@ -34,6 +42,7 @@ export default function EditAssistantPage({
       setAssistant(assistant)
       setName(assistant.name)
       setDescription(assistant.description)
+      setSharing(assistant.sharing as any)
       setAssistantChatSettings({
         includeProfileContext: assistant.include_profile_context,
         includeWorkspaceInstructions: assistant.include_workspace_instructions,
@@ -131,7 +140,8 @@ export default function EditAssistantPage({
         model: assistantChatSettings.model,
         image_path: assistant.image_path,
         prompt: assistantChatSettings.prompt,
-        temperature: assistantChatSettings.temperature
+        temperature: assistantChatSettings.temperature,
+        sharing
       }}
       renderInputs={(renderState: {
         startingAssistantFiles: Tables<"files">[]
@@ -289,6 +299,26 @@ export default function EditAssistantPage({
                 handleToolSelect(tool, renderState.setSelectedAssistantTools)
               }
             />
+          </div>
+          <div className="space-y-2">
+            <Label>Sharing</Label>
+
+            <Select
+              value={sharing}
+              onValueChange={value => setSharing(value as any)}
+            >
+              <SelectTrigger>
+                {sharing === "public" ? "Public" : "Private"}
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={"public"}>
+                  <SelectValue>Public</SelectValue>
+                </SelectItem>
+                <SelectItem value={"private"}>
+                  <SelectValue>Private</SelectValue>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </>
       )}

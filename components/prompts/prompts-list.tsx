@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card"
 import { PromptIcon } from "@/components/prompts/prompt-icon"
 import { Tables } from "@/supabase/types"
+import { SharingIcon } from "@/components/sharing/sharing-icon"
 
 export function PromptsList({ prompts }: { prompts: Tables<"prompts">[] }) {
   return (
@@ -14,7 +15,8 @@ export function PromptsList({ prompts }: { prompts: Tables<"prompts">[] }) {
       {prompts?.map(prompt => (
         <Link href={`/p/${prompt.slug || prompt.id}`} key={prompt.id}>
           <Card className={"hover:bg-foreground/5 rounded-xl border-none"}>
-            <CardContent className={"flex space-x-3 p-4"}>
+            <CardContent className={"relative flex space-x-3 p-4"}>
+              <SharingIcon item={prompt as any} />
               <PromptIcon prompt={prompt} />
               <div className={"flex flex-col"}>
                 <CardTitle className={"text-md line-clamp-1"}>

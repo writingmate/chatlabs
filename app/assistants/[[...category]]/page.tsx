@@ -25,6 +25,8 @@ import {
 } from "@/db/workspaces"
 import { AssistantCategories } from "@/components/assistants/assistant-categories"
 import { onlyUniqueById } from "@/lib/utils"
+import { IconGlobe, IconLock, IconWorld } from "@tabler/icons-react"
+import { SharingIcon } from "@/components/sharing/sharing-icon"
 
 function Assistants({
   showCreateButton = true,
@@ -70,11 +72,12 @@ function Assistants({
           }
         ]}
       />
-      <div className="grid w-full grid-cols-2 items-start justify-between gap-2">
+      <div className="grid w-full grid-cols-2 items-start justify-between gap-2 pb-6 lg:grid-cols-3">
         {data?.map(assistant => (
           <Link href={`/a/${assistant.id}`} key={assistant.id}>
             <Card className={"hover:bg-foreground/5 rounded-xl border-none"}>
-              <CardContent className={"flex space-x-3 p-4"}>
+              <CardContent className={"relative flex space-x-3 p-4"}>
+                <SharingIcon item={assistant as any} />
                 <AssistantIcon
                   className={"size-[76px] rounded-xl"}
                   assistant={assistant}
@@ -116,7 +119,12 @@ export default async function AssistantsPage({
   const session = (await supabase.auth.getSession()).data.session
 
   if (!session) {
-    return <Assistants showCreateButton={false} data={data} />
+    return (
+      <Assistants
+        showCreateButton={false}
+        data={data.sort((a, b) => (a.sharing === "private" ? -1 : 1))}
+      />
+    )
   }
 
   const workspaceId = await getHomeWorkspaceByUserId(session.user.id, supabase)
@@ -128,14 +136,28 @@ export default async function AssistantsPage({
   if (!category || category?.length === 0) {
     return (
       <Assistants
-        data={[...assistants.assistants, ...data].filter(onlyUniqueById)}
+        data={[...assistants.assistants, ...data]
+          .filter(onlyUniqueById)
+          .sort((a, b) => (a.sharing === "private" ? -1 : 1))}
       />
     )
   }
 
   if (category[0] === "my-assistants") {
-    return <Assistants data={assistants.assistants} category={category[0]} />
+    return (
+      <Assistants
+        data={assistants.assistants.sort((a, b) =>
+          a.sharing === "private" ? -1 : 1
+        )}
+        category={category[0]}
+      />
+    )
   }
 
-  return <Assistants data={data} category={category[0]} />
+  return (
+    <Assistants
+      data={data.sort((a, b) => (a.sharing === "private" ? -1 : 1))}
+      category={category[0]}
+    />
+  )
 }
