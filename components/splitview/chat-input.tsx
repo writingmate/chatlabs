@@ -183,7 +183,7 @@ export const ChatInput: FC<ChatInputProps> = ({
           {/*  <div className="bg-secondary flex items-center justify-between space-x-2 p-2 pl-4 pr-3">*/}
           {/*    <div className={"flex items-center space-x-2"}>*/}
           {/*      <AssistantIcon assistant={selectedAssistant} size={24}/>*/}
-          {/*      <div className="text-sm font-bold">*/}
+          {/*      <div className="text-sm font-semibold">*/}
           {/*        Talking to {selectedAssistant.name}*/}
           {/*      </div>*/}
           {/*    </div>*/}

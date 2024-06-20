@@ -48,8 +48,8 @@ export const CreateModel: FC<CreateModelProps> = ({ isOpen, onOpenChange }) => {
             <div>Create a custom model.</div>
 
             <div>
-              Your API <span className="font-bold">*must*</span> be compatible
-              with the OpenAI SDK.
+              Your API <span className="font-semibold">*must*</span> be
+              compatible with the OpenAI SDK.
             </div>
           </div>
 

@@ -377,7 +377,7 @@ export const Message: FC<MessageProps> = ({
           </div>
 
           {fileItems.length > 0 && (
-            <div className="border-primary mt-6 border-t pt-4 font-bold">
+            <div className="border-primary mt-6 border-t pt-4 font-semibold">
               {!viewSources ? (
                 <div
                   className="flex cursor-pointer items-center text-lg hover:opacity-50"
@@ -430,7 +430,7 @@ export const Message: FC<MessageProps> = ({
                               }}
                             >
                               <div className="text-sm font-normal">
-                                <span className="mr-1 text-lg font-bold">
+                                <span className="mr-1 text-lg font-semibold">
                                   -
                                 </span>{" "}
                                 {fileItem.content.substring(0, 200)}...

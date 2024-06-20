@@ -36,8 +36,8 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
   return (
     <div
       className={cn(
-        "bg-background border-input left-0 max-h-[300px] w-full overflow-y-auto rounded-lg border dark:border-none",
-        selectedAssistant && "bottom-[106px]",
+        "bg-background border-input left-0 max-h-[310px] w-full overflow-y-auto rounded-lg border dark:border-none",
+        selectedAssistant && "bottom-[100px]",
         isOpen ? "block" : "hidden"
       )}
     >

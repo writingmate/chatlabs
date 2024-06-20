@@ -718,7 +718,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       >
         <div className="grow overflow-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">
+            <DialogTitle className="text-2xl font-semibold">
               Edit {resolvedName.slice(0, -1)}
             </DialogTitle>
           </DialogHeader>

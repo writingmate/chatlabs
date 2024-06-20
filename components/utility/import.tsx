@@ -225,7 +225,7 @@ export const Import: FC<ImportProps> = ({}) => {
             onKeyDown={handleKeyDown}
           >
             <DialogHeader>
-              <div className="text-2xl font-bold">Import Data</div>
+              <div className="text-2xl font-semibold">Import Data</div>
 
               <DialogDescription>
                 Import data from a JSON file(s).

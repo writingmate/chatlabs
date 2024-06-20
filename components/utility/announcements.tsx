@@ -92,7 +92,7 @@ export const Announcements: FC<AnnouncementsProps> = () => {
       <PopoverContent className="mb-2 w-80" side="top">
         <div className="grid gap-4">
           <div>
-            <div className="mb-4 text-left text-xl font-bold leading-none">
+            <div className="mb-4 text-left text-xl font-semibold leading-none">
               Updates
             </div>
 

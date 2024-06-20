@@ -10,7 +10,8 @@ import {
   IconPlayerRecordFilled,
   IconArrowUp,
   IconPrompt,
-  IconPlus
+  IconPlus,
+  IconTerminal2
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Input } from "../ui/input"
@@ -55,6 +56,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setFocusTool,
     isToolPickerOpen,
     isPromptPickerOpen,
+    setIsFilePickerOpen,
     setIsPromptPickerOpen,
     isFilePickerOpen,
     setFocusFile,
@@ -265,12 +267,13 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
             <div className="bg-accent border-input flex items-center justify-between space-x-2 border-b p-2 pl-4 pr-3">
               <div className={"flex items-center space-x-2"}>
                 <AssistantIcon assistant={selectedAssistant} size={24} />
-                <div className="text-sm font-bold">
+                <div className="text-sm font-semibold">
                   Talking to {selectedAssistant.name}
                 </div>
               </div>
 
               <IconX
+                stroke={1.5}
                 onClick={() => setSelectedAssistant(null)}
                 className={
                   "hover:text-foreground/50 flex size-4 cursor-pointer items-center justify-center text-[10px]"
@@ -280,26 +283,32 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           )}
           <div className="flex items-end justify-between p-2">
             <div className={"flex"}>
-              <Link
-                href={`/${selectedWorkspace?.id}/files`}
-                title={"Upload/attach files"}
-              >
+              <div title={"Upload/attach files"}>
                 <IconPlus
+                  onClick={() =>
+                    setIsFilePickerOpen(isFilePickerOpen => !isFilePickerOpen)
+                  }
                   stroke={1.5}
-                  className="cursor-pointer p-0.5 hover:opacity-50"
+                  className="m-1 cursor-pointer p-0.5 hover:opacity-50"
                   size={24}
                 />
-              </Link>
-              <Link
-                href={`/${selectedWorkspace?.id}/prompts`}
-                title={"Select prompt from a library"}
-              >
-                <IconPrompt
+              </div>
+              <div title={"Select prompt from a library"}>
+                <IconTerminal2
+                  onClick={() =>
+                    setIsPromptPickerOpen(
+                      isPromptPickerOpen => !isPromptPickerOpen
+                    )
+                  }
                   stroke={1.5}
-                  className="cursor-pointer p-0.5 hover:opacity-50"
+                  className={cn(
+                    "m-1 cursor-pointer p-0.5 hover:opacity-50",
+                    userInput &&
+                      "invisible -ml-7 transition-[margin] duration-200"
+                  )}
                   size={24}
                 />
-              </Link>
+              </div>
             </div>
             <TextareaAutosize
               textareaRef={chatInputRef}
@@ -315,45 +324,49 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               onCompositionEnd={() => setIsTyping(false)}
             />
             <div className="flex cursor-pointer justify-end">
-              {recognition && (
-                <button onClick={listening ? stopListening : restartListening}>
-                  {listening ? (
-                    <IconPlayerRecordFilled
-                      stroke={1.5}
-                      className={"animate-pulse text-red-500"}
-                      size={24}
-                    />
-                  ) : (
-                    <IconMicrophone
-                      className={"cursor-pointer p-0.5 hover:opacity-50"}
-                      stroke={1.5}
-                      size={24}
-                    />
-                  )}
-                </button>
-              )}
-              {isGenerating ? (
-                <IconPlayerStopFilled
-                  className="hover:bg-background animate-pulse rounded bg-transparent p-0.5 hover:opacity-50"
-                  onClick={handleStopMessage}
-                  stroke={1.5}
-                  size={24}
-                />
-              ) : (
-                <IconArrowUp
-                  className={cn(
-                    "bg-primary text-secondary rounded-lg p-0.5 hover:opacity-50",
-                    (!userInput || isUploading) &&
-                      "cursor-not-allowed opacity-50"
-                  )}
-                  onClick={() => {
-                    if (!userInput || isUploading) return
-                    handleSendMessage(userInput, chatMessages, false)
-                  }}
-                  stroke={1.5}
-                  size={24}
-                />
-              )}
+              <div className={"flex flex-nowrap overflow-hidden"}>
+                {recognition && (
+                  <button
+                    onClick={listening ? stopListening : restartListening}
+                  >
+                    {listening ? (
+                      <IconPlayerRecordFilled
+                        stroke={1.5}
+                        className={"animate-pulse text-red-500"}
+                        size={24}
+                      />
+                    ) : (
+                      <IconMicrophone
+                        className={"m-1 cursor-pointer p-0.5 hover:opacity-50"}
+                        stroke={1.5}
+                        size={24}
+                      />
+                    )}
+                  </button>
+                )}
+                {isGenerating ? (
+                  <IconPlayerStopFilled
+                    className="hover:bg-background m-1 animate-pulse rounded bg-transparent p-0.5 hover:opacity-50"
+                    onClick={handleStopMessage}
+                    stroke={1.5}
+                    size={24}
+                  />
+                ) : (
+                  <IconArrowUp
+                    className={cn(
+                      "bg-primary text-secondary m-1 rounded-lg p-0.5 hover:opacity-50",
+                      (!userInput || isUploading) &&
+                        "cursor-not-allowed opacity-50"
+                    )}
+                    onClick={() => {
+                      if (!userInput || isUploading) return
+                      handleSendMessage(userInput, chatMessages, false)
+                    }}
+                    stroke={1.5}
+                    size={24}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>

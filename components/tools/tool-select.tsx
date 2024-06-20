@@ -158,7 +158,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
           )}
           variant="ghost"
         >
-          <IconPuzzle />
+          <IconPuzzle stroke={1.5} />
           <div
             className={
               "bg-foreground text-background absolute bottom-1 right-2 size-4 rounded-full text-xs font-semibold"

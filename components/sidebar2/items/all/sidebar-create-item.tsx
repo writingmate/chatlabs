@@ -238,7 +238,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       >
         <div className="grow overflow-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">
+            <DialogTitle className="text-2xl font-semibold">
               Create{" "}
               {resolvedName.charAt(0).toUpperCase() + resolvedName.slice(1, -1)}
             </DialogTitle>
