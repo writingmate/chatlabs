@@ -11,20 +11,37 @@ import {
 } from "@/components/ui/card"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import Link from "next/link"
-import { getPublicAssistants } from "@/db/assistants"
+import {
+  getAssistantWorkspacesByAssistantId,
+  getAssistantWorkspacesByWorkspaceId,
+  getPublicAssistants
+} from "@/db/assistants"
 import { createClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
-import { SupabaseClient } from "@supabase/supabase-js"
-import { ReactNode } from "react"
 import { Tables } from "@/supabase/types"
+import {
+  getHomeWorkspaceByUserId,
+  getWorkspacesByUserId
+} from "@/db/workspaces"
+import { AssistantCategories } from "@/components/assistants/assistant-categories"
+import { onlyUniqueById } from "@/lib/utils"
 
 function Assistants({
   showCreateButton = true,
+  category,
   data
 }: {
   showCreateButton?: boolean
   data: Tables<"assistants">[]
+  category?: string
 }) {
+  let pageTitle =
+    category === "my-assistants" ? "My Assistants" : "Community Assistants"
+
+  if (!category) {
+    pageTitle = "All Assistants"
+  }
+
   return (
     <PageContent className={"container h-full justify-start pb-5"}>
       <PageHeader
@@ -32,7 +49,7 @@ function Assistants({
           "flex w-full flex-row items-center justify-between space-y-0"
         }
       >
-        <PageTitle className={"capitalize"}>Assistants</PageTitle>
+        <PageTitle className={"capitalize"}>{pageTitle}</PageTitle>
         {showCreateButton && (
           <SidebarCreateButtons
             contentType={"assistants"}
@@ -40,9 +57,22 @@ function Assistants({
           />
         )}
       </PageHeader>
+      <AssistantCategories
+        selected={category}
+        categories={[
+          {
+            name: "My Assistants",
+            value: "my-assistants"
+          },
+          {
+            name: "Community Assistants",
+            value: "community"
+          }
+        ]}
+      />
       <div className="grid w-full grid-cols-2 items-start justify-between gap-2">
         {data?.map(assistant => (
-          <Link href={`./assistants/${assistant.id}`} key={assistant.id}>
+          <Link href={`/a/${assistant.id}`} key={assistant.id}>
             <Card className={"hover:bg-foreground/5 rounded-xl border-none"}>
               <CardContent className={"flex space-x-3 p-4"}>
                 <AssistantIcon
@@ -72,20 +102,50 @@ function Assistants({
   )
 }
 
-export default async function AssistantsPage() {
+export default async function AssistantsPage({
+  params: { category }
+}: {
+  params: {
+    category?: string[]
+  }
+}) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
   const data = await getPublicAssistants(supabase)
 
-  const isAnon = !(await supabase.auth.getSession()).data.session
+  const session = (await supabase.auth.getSession()).data.session
 
-  if (isAnon) {
+  if (!session) {
     return <Assistants showCreateButton={false} data={data} />
+  }
+
+  const workspaceId = await getHomeWorkspaceByUserId(session.user.id, supabase)
+  const assistants = await getAssistantWorkspacesByWorkspaceId(
+    workspaceId,
+    supabase
+  )
+
+  if (!category || category?.length === 0) {
+    return (
+      <Dashboard>
+        <Assistants
+          data={[...assistants.assistants, ...data].filter(onlyUniqueById)}
+        />
+      </Dashboard>
+    )
+  }
+
+  if (category[0] === "my-assistants") {
+    return (
+      <Dashboard>
+        <Assistants data={assistants.assistants} category={category[0]} />
+      </Dashboard>
+    )
   }
 
   return (
     <Dashboard>
-      <Assistants data={data} />
+      <Assistants data={data} category={category[0]} />
     </Dashboard>
   )
 }

@@ -1,5 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
-import { FC, useContext } from "react"
+import { FC, useContext, useEffect } from "react"
 import { AssistantPicker } from "./assistant-picker"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { FilePicker } from "./file-picker"
@@ -20,7 +20,10 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
     isPromptPickerOpen,
     isToolPickerOpen,
     isAssistantPickerOpen,
-    isMessageHistoryPickerOpen
+    isMessageHistoryPickerOpen,
+    setIsPromptPickerOpen,
+    setIsToolPickerOpen,
+    setIsAssistantPickerOpen
   } = useContext(ChatbotUIContext)
 
   const { handleSelectUserFile, handleSelectUserCollection } =
@@ -32,6 +35,35 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
     isAssistantPickerOpen ||
     isFilePickerOpen ||
     isMessageHistoryPickerOpen
+
+  useEffect(() => {
+    // only one picker can be open at a time
+    if (isFilePickerOpen) {
+      setIsPromptPickerOpen(false)
+      setIsToolPickerOpen(false)
+      setIsAssistantPickerOpen(false)
+    }
+    if (isPromptPickerOpen) {
+      setIsFilePickerOpen(false)
+      setIsToolPickerOpen(false)
+      setIsAssistantPickerOpen(false)
+    }
+    if (isToolPickerOpen) {
+      setIsFilePickerOpen(false)
+      setIsPromptPickerOpen(false)
+      setIsAssistantPickerOpen(false)
+    }
+    if (isAssistantPickerOpen) {
+      setIsFilePickerOpen(false)
+      setIsPromptPickerOpen(false)
+      setIsToolPickerOpen(false)
+    }
+  }, [
+    isFilePickerOpen,
+    isPromptPickerOpen,
+    isToolPickerOpen,
+    isAssistantPickerOpen
+  ])
 
   return (
     <div

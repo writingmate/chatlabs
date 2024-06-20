@@ -1,4 +1,36 @@
 import { FC, useEffect, useRef } from "react"
+import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils"
+import { useSelectFileHandler } from "@/components/chat/chat-hooks/use-select-file-handler"
+
+export const defaultItemRenderer = (
+  item: any,
+  index: number,
+  renderIcon: (item: any) => JSX.Element,
+  handleSelectItem: (item: any) => void,
+  handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void
+) => (
+  <div
+    key={index}
+    tabIndex={0}
+    className="hover:bg-accent bg-background focus:bg-accent flex h-[36px] w-full cursor-pointer items-center space-x-2 rounded px-2 text-sm focus:outline-none"
+    onClick={() => handleSelectItem(item)}
+    onKeyDown={handleKeyDown}
+  >
+    <div>{renderIcon(item)}</div>
+    <div className={"text-nowrap"}>{item.name}</div>
+    <div className="truncate text-nowrap text-sm opacity-50">
+      {item.description}
+    </div>
+  </div>
+)
+
+interface PickerAction {
+  icon: JSX.Element
+  label: string
+  description?: string
+  onClick: () => void
+}
 
 interface PickerProps<T> {
   items: T[]
@@ -13,6 +45,7 @@ interface PickerProps<T> {
     index: number,
     handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void
   ) => JSX.Element
+  actions?: PickerAction[]
 }
 
 export const Picker: FC<PickerProps<any>> = ({
@@ -23,7 +56,8 @@ export const Picker: FC<PickerProps<any>> = ({
   command,
   handleSelectItem,
   iconRenderer,
-  itemRenderer
+  itemRenderer,
+  actions
 }) => {
   const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
@@ -38,7 +72,6 @@ export const Picker: FC<PickerProps<any>> = ({
   )
 
   function defaultIconRenderer(item: any) {
-    console.log(typeof item.icon)
     if (typeof item.icon === "string") {
       return (
         <div
@@ -49,31 +82,12 @@ export const Picker: FC<PickerProps<any>> = ({
           {item.icon}
         </div>
       )
+    } else {
+      return <>{item.icon}</>
     }
   }
 
   const renderIcon = iconRenderer || defaultIconRenderer
-
-  // Default item renderer
-  const defaultItemRenderer = (
-    item: any,
-    index: number,
-    handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void
-  ) => (
-    <div
-      key={index}
-      tabIndex={0}
-      className="hover:bg-accent focus:bg-accent flex h-[36px] cursor-pointer items-center space-x-2 rounded px-2 text-sm focus:outline-none"
-      onClick={() => handleSelectItem(item)}
-      onKeyDown={handleKeyDown}
-    >
-      <div>{renderIcon(item)}</div>
-      <div className={"text-nowrap"}>{item.name}</div>
-      <div className="truncate text-nowrap text-sm opacity-50">
-        {item.description}
-      </div>
-    </div>
-  )
 
   // Use the provided itemRenderer prop if it exists, otherwise use the default
   const renderItem = itemRenderer || defaultItemRenderer
@@ -114,14 +128,37 @@ export const Picker: FC<PickerProps<any>> = ({
   return (
     <>
       {isOpen && (
-        <div className="flex flex-col p-2 text-sm">
+        <div className="relative m-2 flex flex-col text-sm">
+          {actions && actions.length > 0 && (
+            <div className={cn("border-input sticky top-2 flex grow border-b")}>
+              {actions?.map((action, index) =>
+                renderItem(
+                  {
+                    name: action.label,
+                    description: action.description,
+                    icon: action.icon
+                  },
+                  index,
+                  () => action.icon,
+                  action.onClick,
+                  getKeyDownHandler(index, action)
+                )
+              )}
+            </div>
+          )}
           {filteredItems.length === 0 ? (
             <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
               No matching items.
             </div>
           ) : (
             filteredItems.map((item, index) =>
-              renderItem(item, index, getKeyDownHandler(index, item))
+              renderItem(
+                item,
+                index,
+                renderIcon,
+                handleSelectItem,
+                getKeyDownHandler(index, item)
+              )
             )
           )}
         </div>

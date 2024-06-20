@@ -11,6 +11,7 @@ import { useParams, useRouter } from "next/navigation"
 import { ReactNode, useContext, useEffect, useState } from "react"
 import Loading from "../loading"
 import { getPlatformTools } from "@/db/platform-tools"
+import { onlyUniqueById } from "@/lib/utils"
 
 interface WorkspaceLayoutProps {
   children: ReactNode
@@ -89,10 +90,6 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
         return
       }
       setSelectedWorkspace(workspace)
-
-      function onlyUniqueById(value: any, index: any, self: any) {
-        return self.findIndex((item: any) => item.id === value.id) === index
-      }
 
       const [publicAssistantData, publicToolData, platformToolData] =
         await Promise.all([

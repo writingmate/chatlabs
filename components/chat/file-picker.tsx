@@ -1,9 +1,11 @@
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
-import { IconBooks } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef } from "react"
+import { IconBooks, IconUpload } from "@tabler/icons-react"
+import React, { FC, useContext, useEffect, useRef } from "react"
 import { FileIcon } from "../ui/file-icon"
-import { Picker } from "@/components/picker/picker"
+import { defaultItemRenderer, Picker } from "@/components/picker/picker"
+import { Input } from "@/components/ui/input"
+import { useSelectFileHandler } from "@/components/chat/chat-hooks/use-select-file-handler"
 
 interface FilePickerProps {
   isOpen: boolean
@@ -63,6 +65,9 @@ export const FilePicker: FC<FilePickerProps> = ({
     handleOpenChange(false)
   }
 
+  const { filesToAccept, handleSelectDeviceFile, isUploading } =
+    useSelectFileHandler()
+
   const getKeyDownHandler =
     (index: number, type: "file" | "collection", item: any) =>
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -102,33 +107,58 @@ export const FilePicker: FC<FilePickerProps> = ({
       }
     }
 
+  const ref = useRef<HTMLInputElement>(null)
+
   return (
-    <Picker
-      isOpen={isOpen}
-      items={[...filteredFiles, ...filteredCollections]}
-      focusItem={isFocused}
-      setIsOpen={handleOpenChange}
-      command={searchQuery}
-      iconRenderer={item => {
-        if ("type" in item) {
-          return (
-            <FileIcon
-              type={(item as Tables<"files">).type}
-              size={24}
-              stroke={1.5}
-            />
-          )
-        } else {
-          return <IconBooks size={24} stroke={1.5} />
-        }
-      }}
-      handleSelectItem={item => {
-        if ("type" in item) {
-          handleSelectFile(item as Tables<"files">)
-        } else {
-          handleSelectCollection(item)
-        }
-      }}
-    />
+    <>
+      <Input
+        type="file"
+        accept={filesToAccept}
+        onChange={e => {
+          if (isUploading) return
+          if (e.target.files?.length) {
+            handleSelectDeviceFile(e.target.files[0])
+            handleOpenChange(false)
+          }
+        }}
+        className={"hidden"}
+        ref={ref}
+      />
+      <Picker
+        isOpen={isOpen}
+        items={[...filteredFiles, ...filteredCollections]}
+        focusItem={isFocused}
+        setIsOpen={handleOpenChange}
+        command={searchQuery}
+        iconRenderer={item => {
+          if ("type" in item) {
+            return (
+              <FileIcon
+                type={(item as Tables<"files">).type}
+                size={24}
+                stroke={1.5}
+              />
+            )
+          } else {
+            return <IconBooks size={24} stroke={1.5} />
+          }
+        }}
+        handleSelectItem={item => {
+          if ("type" in item) {
+            handleSelectFile(item as Tables<"files">)
+          } else {
+            handleSelectCollection(item)
+          }
+        }}
+        actions={[
+          {
+            icon: <IconUpload size={20} stroke={1.5} />,
+            label: "Upload file",
+            description: "Upload a file from your computer",
+            onClick: () => ref.current?.click()
+          }
+        ]}
+      />
+    </>
   )
 }
