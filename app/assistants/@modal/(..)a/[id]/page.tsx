@@ -13,7 +13,12 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { getCurrentUser } from "@/lib/supabase/browser-client"
 import { toast } from "sonner"
-import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react"
+import {
+  IconCopy,
+  IconEdit,
+  IconMessageCirclePlus,
+  IconTrash
+} from "@tabler/icons-react"
 import { SidebarDeleteItem } from "@/components/sidebar2/items/all/sidebar-delete-item"
 import { copyPrompt, deletePrompt } from "@/app/prompts/actions"
 import { useAuth } from "@/context/auth"
@@ -58,12 +63,24 @@ export default function AssistantPage({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={"md:w-[500px] lg:w-[600px] xl:w-[700px]"}>
-        <DialogHeader className={"flex flex-row items-center justify-between"}>
-          <DialogTitle className={"flex flex-col"}>
-            <AssistantIcon assistant={item} />
-            {item.name}{" "}
+        <DialogHeader
+          className={
+            "relative flex w-full flex-row items-center justify-between"
+          }
+        >
+          <DialogTitle
+            className={
+              "flex w-full flex-col items-center justify-center space-y-4"
+            }
+          >
+            <AssistantIcon
+              size={70}
+              className={"border-input size-24 rounded-md border"}
+              assistant={item}
+            />
+            <div>{item.name}</div>
           </DialogTitle>
-          <div className={"flex space-x-1"}>
+          <div className={"absolute right-0 top-0 flex space-x-1"}>
             {myItem && (
               <Button variant={"outline"} size={"xs"}>
                 <Link href={`/a/${item?.id}/edit`}>
@@ -85,14 +102,21 @@ export default function AssistantPage({
             )}
           </div>
         </DialogHeader>
-        <div className={"text-foreground flex flex-col space-y-4 text-sm"}>
-          <div className={"flex flex-col space-y-2"}>
-            <Label>Description</Label>
-            <div>{item.description}</div>
-          </div>
+        <div
+          className={
+            "text-foreground flex w-full flex-col space-y-4 text-center text-sm"
+          }
+        >
+          {item.description}
         </div>
         <Button size={"lg"}>
-          <Link href={`/chat?assistant_id=${item.id}`}>Start Chatting</Link>
+          <Link
+            className={"text-md flex items-center space-x-2"}
+            href={`/chat?assistant_id=${item.id}`}
+          >
+            <IconMessageCirclePlus size={24} stroke={1.5} />
+            <div>Start Chatting</div>
+          </Link>
         </Button>
       </DialogContent>
     </Dialog>
