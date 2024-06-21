@@ -6,7 +6,7 @@ export const getPromptById = async (promptId: string) => {
   const { data: prompt, error } = await supabase
     .from("prompts")
     .select("*, prompt_category(id, name)")
-    .eq("id", promptId)
+    .eq("hashid", promptId)
     .single()
 
   if (!prompt) {

@@ -369,11 +369,17 @@ export const Message: FC<MessageProps> = ({
                 switch (toolInUse) {
                   case "none":
                     return (
-                      <IconCircleFilled className="animate-pulse" size={20} />
+                      <div
+                        className={
+                          "bg-foreground flex size-3 items-center justify-center rounded-full"
+                        }
+                      >
+                        <IconCircleFilled className="animate-ping" size={20} />
+                      </div>
                     )
                   case "retrieval":
                     return (
-                      <div className="flex animate-pulse items-center space-x-2">
+                      <div className="flex animate-ping items-center space-x-2">
                         <IconFileText stroke={1.5} size={20} />
 
                         <div>Searching files...</div>
@@ -381,7 +387,7 @@ export const Message: FC<MessageProps> = ({
                     )
                   default:
                     return (
-                      <div className="flex animate-pulse items-center space-x-2">
+                      <div className="flex animate-ping items-center space-x-2">
                         <IconPuzzle stroke={1.5} size={20} />
 
                         <div>Using {toolInUse}...</div>

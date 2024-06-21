@@ -21,3 +21,7 @@ export function slugify(item: NameTitleWithHashID): string {
     .slice(0, MAX_SLUG_LENGTH)
   return `${item.hashid}-${nameDash}`
 }
+
+export function parseIdFromSlug(slug: string): string {
+  return slug.split("-")[0]
+}

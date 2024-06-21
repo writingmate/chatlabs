@@ -21,6 +21,7 @@ import { useEffect, useState } from "react"
 import { Tables } from "@/supabase/types"
 import { useRouter } from "next/navigation"
 import { MessageMarkdown } from "@/components/messages/message-markdown"
+import { parseIdFromSlug } from "@/db/lib/slugify"
 
 export default function PromptsPage({
   params: { id }
@@ -39,7 +40,7 @@ export default function PromptsPage({
 
   useEffect(() => {
     if (id) {
-      getPromptById(id)
+      getPromptById(parseIdFromSlug(id))
         .then(setPrompt)
         .catch(() => {
           toast.error("Unable to fetch prompt")

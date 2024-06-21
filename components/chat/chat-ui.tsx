@@ -44,7 +44,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
 
   const params = useParams()
 
-  const hashid = (params.slug as string).split("-")[0]
+  const hashid = (params.slug as string)?.split("-")[0]
 
   const router = useRouter()
   const pathname = usePathname()

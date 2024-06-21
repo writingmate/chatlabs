@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation"
 import { MessageMarkdown } from "@/components/messages/message-markdown"
 import { deleteAssistant, getAssistantById } from "@/db/assistants"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { parseIdFromSlug, slugify } from "@/db/lib/slugify"
 
 export default function AssistantPage({
   params: { id }
@@ -46,7 +47,7 @@ export default function AssistantPage({
 
   useEffect(() => {
     if (id) {
-      getAssistantById(id)
+      getAssistantById(parseIdFromSlug(id))
         .then(setItem)
         .catch(() => {
           toast.error("Unable to fetch assistant")
@@ -83,7 +84,7 @@ export default function AssistantPage({
           <div className={"absolute right-0 top-0 flex space-x-1"}>
             {myItem && (
               <Button variant={"outline"} size={"xs"}>
-                <Link href={`/a/${item?.id}/edit`}>
+                <Link href={`/a/${slugify(item)}/edit`}>
                   <IconEdit size={18} stroke={1.5} />
                 </Link>
               </Button>

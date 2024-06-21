@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
+import { parseIdFromSlug } from "@/db/lib/slugify"
 
 export default function EditAssistantPage({
   params: { id }
@@ -37,7 +38,7 @@ export default function EditAssistantPage({
 
   useEffect(() => {
     if (!id) return
-    getAssistantById(id).then(assistant => {
+    getAssistantById(parseIdFromSlug(id)).then(assistant => {
       setAssistant(assistant)
       setName(assistant.name)
       setDescription(assistant.description)

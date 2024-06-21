@@ -12,13 +12,14 @@ import { ModelIcon } from "@/components/models/model-icon"
 import { LLM, ModelProvider } from "@/types"
 import { IconExternalLink } from "@tabler/icons-react"
 import { WithTooltip } from "@/components/ui/with-tooltip"
+import { parseIdFromSlug } from "@/db/lib/slugify"
 
 export default async function PromptsPage({
   params
 }: {
   params: { id: string }
 }) {
-  const prompt = await getPromptById(params.id)
+  const prompt = await getPromptById(parseIdFromSlug(params.id))
   const models = await getAllModels()
 
   // group by provider
