@@ -119,7 +119,7 @@ export default function SetupPage() {
     const workspaceId = await getHomeWorkspaceByUserId(session.user.id)
 
     // TODO: this should be a redirect
-    window.location.href = window.location.origin + `/${workspaceId}/chat`
+    window.location.href = window.location.origin + `/chat`
     // router.push(`/${workspaceId}/chat`)
   }
 

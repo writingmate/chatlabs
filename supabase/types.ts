@@ -264,6 +264,7 @@ export interface Database {
           description: string
           embeddings_provider: string
           folder_id: string | null
+          hashid: string
           id: string
           image_path: string
           include_profile_context: boolean
@@ -282,6 +283,7 @@ export interface Database {
           description: string
           embeddings_provider: string
           folder_id?: string | null
+          hashid?: string
           id?: string
           image_path: string
           include_profile_context: boolean
@@ -300,6 +302,7 @@ export interface Database {
           description?: string
           embeddings_provider?: string
           folder_id?: string | null
+          hashid?: string
           id?: string
           image_path?: string
           include_profile_context?: boolean
@@ -382,6 +385,7 @@ export interface Database {
           created_at: string
           embeddings_provider: string
           folder_id: string | null
+          hashid: string
           id: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
@@ -401,6 +405,7 @@ export interface Database {
           created_at?: string
           embeddings_provider: string
           folder_id?: string | null
+          hashid?: string
           id?: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
@@ -420,6 +425,7 @@ export interface Database {
           created_at?: string
           embeddings_provider?: string
           folder_id?: string | null
+          hashid?: string
           id?: string
           include_profile_context?: boolean
           include_workspace_instructions?: boolean
@@ -1347,6 +1353,7 @@ export interface Database {
           created_at: string
           description: string | null
           folder_id: string | null
+          hashid: string
           icon: string | null
           id: string
           name: string
@@ -1360,6 +1367,7 @@ export interface Database {
           created_at?: string
           description?: string | null
           folder_id?: string | null
+          hashid?: string
           icon?: string | null
           id?: string
           name: string
@@ -1373,6 +1381,7 @@ export interface Database {
           created_at?: string
           description?: string | null
           folder_id?: string | null
+          hashid?: string
           icon?: string | null
           id?: string
           name?: string
@@ -1648,6 +1657,37 @@ export interface Database {
         }
         Returns: Record<string, unknown>
       }
+      hash_encode: {
+        Args: {
+          "": number
+        }
+        Returns: string
+      }
+      id_decode: {
+        Args: {
+          "": string
+        }
+        Returns: unknown
+      }
+      id_decode_once: {
+        Args: {
+          "": string
+        }
+        Returns: number
+      }
+      id_encode:
+        | {
+            Args: {
+              "": number[]
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              "": number
+            }
+            Returns: string
+          }
       match_file_items_local: {
         Args: {
           query_embedding: string

@@ -49,7 +49,7 @@ export default function AssistantPage({
       getAssistantById(id)
         .then(setItem)
         .catch(() => {
-          toast.error("Unable to fetch prompt")
+          toast.error("Unable to fetch assistant")
         })
     }
   }, [id])

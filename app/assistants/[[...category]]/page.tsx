@@ -27,6 +27,7 @@ import { AssistantCategories } from "@/components/assistants/assistant-categorie
 import { onlyUniqueById } from "@/lib/utils"
 import { IconGlobe, IconLock, IconWorld } from "@tabler/icons-react"
 import { SharingIcon } from "@/components/sharing/sharing-icon"
+import { slugify } from "@/db/lib/slugify"
 
 function Assistants({
   showCreateButton = true,
@@ -74,7 +75,7 @@ function Assistants({
       />
       <div className="grid w-full grid-cols-2 items-start justify-between gap-2 pb-6 lg:grid-cols-3">
         {data?.map(assistant => (
-          <Link href={`/a/${assistant.id}`} key={assistant.id}>
+          <Link href={`/a/${slugify(assistant)}`} key={assistant.id}>
             <Card className={"hover:bg-foreground/5 rounded-xl border-none"}>
               <CardContent className={"relative flex space-x-3 p-4"}>
                 <SharingIcon item={assistant as any} />

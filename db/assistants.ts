@@ -6,7 +6,7 @@ export const getAssistantById = async (assistantId: string) => {
   const { data: assistant, error } = await supabase
     .from("assistants")
     .select("*")
-    .eq("id", assistantId)
+    .eq("hashid", assistantId)
     .single()
 
   if (!assistant) {

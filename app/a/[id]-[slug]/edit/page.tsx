@@ -27,7 +27,6 @@ export default function EditAssistantPage({
 }) {
   const [assistant, setAssistant] = useState<Tables<"assistants"> | null>()
   const [sharing, setSharing] = useState<"public" | "private">("private" as any)
-  // const { assistantImages } = useContext(ChatbotUIContext)
   const [name, setName] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState("")
@@ -52,10 +51,6 @@ export default function EditAssistantPage({
         temperature: assistant.temperature,
         embeddingsProvider: assistant.embeddings_provider as any
       })
-      // const assistantImage =
-      //   assistantImages.find(image => image.path === assistant.image_path)?.url ||
-      //   ""
-      // setImageLink(assistantImage)
     })
   }, [id])
 

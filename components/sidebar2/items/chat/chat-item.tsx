@@ -19,6 +19,7 @@ import {
 import { PinChat } from "@/components/sidebar2/items/chat/pin-chat"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { RowComponentType } from "@/components/sidebar2/sidebar-data-list"
+import { slugify } from "@/db/lib/slugify"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -46,7 +47,7 @@ export const ChatItem: RowComponentType = ({ item }) => {
 
   const handleClick = () => {
     if (!selectedWorkspace) return
-    return router.push(`/${selectedWorkspace.id}/chat/${chat.id}`)
+    return router.push(`/chat/${slugify(chat)}`)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {

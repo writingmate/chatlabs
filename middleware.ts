@@ -2,14 +2,16 @@ import { createClient } from "@/lib/supabase/middleware"
 import { NextResponse, type NextRequest } from "next/server"
 import { Ratelimit } from "@upstash/ratelimit";
 import { kv } from "@vercel/kv";
-import { SupabaseClient } from "@supabase/supabase-js";
+import { Session, SupabaseClient } from "@supabase/supabase-js";
+import { cookies } from 'next/headers'
 
 const ratelimit = new Ratelimit({
   redis: kv,
   limiter: Ratelimit.slidingWindow(100, '3600 s'),
 })
 
-async function rateLimitMiddleware(supabase: SupabaseClient, session: any, request: NextRequest) {
+async function rateLimitMiddleware(supabase: SupabaseClient, request: NextRequest) {
+  const session = await supabase.auth.getSession()
   if (session && request.nextUrl.pathname.startsWith('/api/chat') && request.method === "POST") {
     const userId = session.data.session?.user.id
     if (userId) {
@@ -28,7 +30,8 @@ async function rateLimitMiddleware(supabase: SupabaseClient, session: any, reque
   }
 }
 
-async function redirectToSetupMiddleware(supabase: SupabaseClient, session: any, request: NextRequest) {
+async function redirectToSetupMiddleware(supabase: SupabaseClient, request: NextRequest) {
+  const session = await supabase.auth.getSession()
   if (!session) {
     return NextResponse.redirect("/")
   }
@@ -54,16 +57,13 @@ async function redirectToSetupMiddleware(supabase: SupabaseClient, session: any,
   }
 }
 
-async function redirectToChatMiddleware(supabase: SupabaseClient, session: any, request: NextRequest) {
+async function findHomeWorkspace(supabase: SupabaseClient, request: NextRequest) {
+  const session = await supabase.auth.getSession()
   if (!session) {
     return
   }
 
-  const pathsToRedirect = ["/", "/chat"]
-
-  const redirectToChat = pathsToRedirect.includes(request.nextUrl.pathname)
-
-  if (redirectToChat) {
+  if (!cookies().get("workspace_id")) {
     const { data: homeWorkspace, error } = await supabase
       .from("workspaces")
       .select("*")
@@ -75,28 +75,37 @@ async function redirectToChatMiddleware(supabase: SupabaseClient, session: any, 
       throw new Error(error?.message)
     }
 
+
+    cookies().set("workspace_id", homeWorkspace.id, {
+      secure: true,
+      httpOnly: true,
+    })
+  }
+
+  if (request.nextUrl.pathname === "/") {
+
     const currentUrl = new URL(request.url)
 
     return NextResponse.redirect(
-      new URL(`/${homeWorkspace.id}/chat?${currentUrl.searchParams.toString()}`, request.url)
+      new URL(`/chat?${currentUrl.searchParams.toString()}`, request.url)
     )
   }
 }
 
-const middlewares = [
+type Middleware = (supabase: SupabaseClient, request: NextRequest) => Promise<NextResponse | void>
+
+const middlewares: Middleware[] = [
   rateLimitMiddleware,
   redirectToSetupMiddleware,
-  redirectToChatMiddleware
+  findHomeWorkspace
 ]
 
 export async function middleware(request: NextRequest) {
   try {
     const { supabase, response } = createClient(request)
 
-    const session = await supabase.auth.getSession()
-
     for (const middleware of middlewares) {
-      const result = await middleware(supabase, session, request)
+      const result = await middleware(supabase, request)
       if (result) {
         return result
       }

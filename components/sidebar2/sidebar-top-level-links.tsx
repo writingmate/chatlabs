@@ -38,7 +38,7 @@ export const SidebarTopLevelLinks: FC<SidebarTopLevelLinksProps> = ({
     {
       icon: <IconColumns2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />,
       label: "Compare models",
-      href: `/${selectedWorkspace?.id}/splitview`,
+      href: `/splitview`,
       target: "_blank"
     }
   ]

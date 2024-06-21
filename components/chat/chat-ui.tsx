@@ -44,6 +44,8 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
 
   const params = useParams()
 
+  const hashid = params.slug?.split("-")[0]
+
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -93,7 +95,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
     if (selectedAssistant) {
       setSelectedAssistant(selectedAssistant)
     }
-    if (!params.chatid) {
+    if (!params.slug) {
       setLoading(false)
       return
     }
@@ -104,7 +106,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
       setIsAtBottom(true)
     }
 
-    if ((chatMessages?.length === 0 && !params.chatid) || params.chatid) {
+    if ((chatMessages?.length === 0 && !params.slug) || params.slug) {
       fetchData().then(() => {
         handleFocusChatInput()
         setLoading(false)
@@ -137,7 +139,8 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
   }, [searchParams])
 
   const fetchMessages = async () => {
-    const fetchedMessages = await getMessagesByChatId(params.chatid as string)
+    const chat = chats.find(chat => chat.hashid === hashid)
+    const fetchedMessages = await getMessagesByChatId(chat?.id as string)
 
     const imagePromises: Promise<MessageImage>[] = fetchedMessages.flatMap(
       message =>
@@ -178,7 +181,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
     // const messageFileItems = await Promise.all(messageFileItemPromises)
 
     const uniqueFileItems = fetchedMessages.flatMap(item => item.file_items)
-    const chatFiles = await getChatFilesByChatId(params.chatid as string)
+    const chatFiles = await getChatFilesByChatId(chat!.id as string)
 
     setChatFiles(
       chatFiles.files.map(file => ({
@@ -206,7 +209,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
   }
 
   const fetchChat = async () => {
-    const chat = chats.find(chat => chat.id === params.chatid)
+    const chat = chats.find(chat => chat.hashid === hashid)
 
     if (!chat) return
 

@@ -5,17 +5,13 @@ import { ReactNode, useContext, useEffect, useState } from "react"
 import { ChatbotUIChatProvider } from "@/context/chat"
 
 interface ChatLayoutProps {
-  modal: ReactNode
   children: ReactNode
 }
 
-export default function ChatLayout({ children, modal }: ChatLayoutProps) {
+export default function ChatLayout({ children }: ChatLayoutProps) {
   return (
     <ChatbotUIChatProvider id={"one"}>
-      <Dashboard>
-        {modal}
-        {children}
-      </Dashboard>
+      <Dashboard>{children}</Dashboard>
     </ChatbotUIChatProvider>
   )
 }
