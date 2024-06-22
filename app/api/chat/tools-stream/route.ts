@@ -25,7 +25,7 @@ import {
   prependSystemPrompt
 } from "@/lib/tools/utils"
 
-export const maxDuration = 300
+export const maxDuration = 60
 
 export async function GET() {
   return new Response(JSON.stringify(platformToolDefinitions()), {
