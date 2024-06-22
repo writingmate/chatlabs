@@ -29,6 +29,14 @@ const KNOWN_MODEL_NAMES: {
     modelProvider: "microsoft",
     modelName: "WizardLM 2 8x22B"
   },
+  "google/gemini-pro-1.5": {
+    modelProvider: "google",
+    modelName: "Gemini Pro 1.5"
+  },
+  "anthropic/claude-3.5-sonnet": {
+    modelProvider: "anthropic",
+    modelName: "Claude 3.5 Sonnet"
+  },
 }
 
 export function parseOpenRouterModelName(modelId: string) {
@@ -53,7 +61,9 @@ function parseSupportedModelsFromEnv() {
     "cohere/command-r-plus",
     "mistralai/mixtral-8x22b-instruct",
     "microsoft/wizardlm-2-8x22b",
-    "meta-llama/llama-3-70b-instruct"
+    "meta-llama/llama-3-70b-instruct",
+    "google/gemini-pro-1.5",
+    "anthropic/claude-3.5-sonnet"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {
@@ -201,9 +211,9 @@ export const fetchOpenRouterModels = async () => {
           }
         })
       )
-      // .filter(({ modelId }: { modelId: string }) =>
-      //   SUPPORTED_OPENROUTER_MODELS.includes(modelId)
-      // )
+      .filter(({ modelId }: { modelId: string }) =>
+        SUPPORTED_OPENROUTER_MODELS.includes(modelId)
+      )
       .map((model: any) => {
         const { modelName } = parseOpenRouterModelName(model.modelId)
         return {
