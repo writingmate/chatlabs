@@ -160,6 +160,8 @@ async function googleSearch(
     body: JSON.stringify({ q: query })
   })
 
+  console.log("Debug SERP:",response)
+
   if (!response.ok) {
     throw new Error(response.statusText)
   }
