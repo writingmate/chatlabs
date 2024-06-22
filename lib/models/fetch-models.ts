@@ -28,7 +28,7 @@ const KNOWN_MODEL_NAMES: {
   "microsoft/wizardlm-2-8x22b": {
     modelProvider: "microsoft",
     modelName: "WizardLM 2 8x22B"
-  }
+  },
 }
 
 export function parseOpenRouterModelName(modelId: string) {
@@ -201,9 +201,9 @@ export const fetchOpenRouterModels = async () => {
           }
         })
       )
-      .filter(({ modelId }: { modelId: string }) =>
-        SUPPORTED_OPENROUTER_MODELS.includes(modelId)
-      )
+      // .filter(({ modelId }: { modelId: string }) =>
+      //   SUPPORTED_OPENROUTER_MODELS.includes(modelId)
+      // )
       .map((model: any) => {
         const { modelName } = parseOpenRouterModelName(model.modelId)
         return {
