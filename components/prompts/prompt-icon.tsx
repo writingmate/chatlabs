@@ -14,7 +14,7 @@ export function PromptIcon({
     return (
       <div
         className={cn(
-          "flex size-[50px] items-center justify-center rounded-md text-center text-3xl",
+          "flex size-[50px] shrink-0 items-center justify-center rounded-md text-center text-3xl",
           getColorById(prompt.id),
           className
         )}
