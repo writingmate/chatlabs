@@ -8,6 +8,16 @@ export async function GET(request: Request) {
   const next = requestUrl.searchParams.get("next")
   const error_description = requestUrl.searchParams.get("error_description")
 
+  let baseHost = request.headers.get("host")
+
+  if (baseHost === null) {
+    baseHost = requestUrl.origin
+  } else {
+    baseHost = "https://" + baseHost
+  }
+
+  console.log("baseHost", baseHost)
+
   if (code) {
     try {
       const cookieStore = cookies()
@@ -16,17 +26,18 @@ export async function GET(request: Request) {
 
 
       if (!error) {
-        return NextResponse.redirect(`/`)
+        return NextResponse.redirect(baseHost)
       } else {
         return NextResponse.redirect(
-          "/login?error_description=" + error.message
+          baseHost + "/login?error_description=" + error.message
         )
       }
     } catch (error) {
-        return NextResponse.redirect(
-          "/login?error_description=" + error
-        )
+      return NextResponse.redirect(
+        baseHost + "/login?error_description=" + error
+      )
     }
+
   }
 
   if (next) {
