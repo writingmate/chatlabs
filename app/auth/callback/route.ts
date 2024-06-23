@@ -9,16 +9,22 @@ export async function GET(request: Request) {
   const error_description = requestUrl.searchParams.get("error_description")
 
   if (code) {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    try {
+      const cookieStore = cookies()
+      const supabase = createClient(cookieStore)
+      const { error } = await supabase.auth.exchangeCodeForSession(code)
 
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
-    } else {
-      return NextResponse.redirect(
-        requestUrl.origin + "/login?error_description=" + error.message
-      )
+      if (!error) {
+        return NextResponse.redirect(`${origin}${next}`)
+      } else {
+        return NextResponse.redirect(
+          requestUrl.origin + "/login?error_description=" + error.message
+        )
+      }
+    } catch (error) {
+        return NextResponse.redirect(
+          requestUrl.origin + "/login?error_description=" + error
+        )
     }
   }
 
