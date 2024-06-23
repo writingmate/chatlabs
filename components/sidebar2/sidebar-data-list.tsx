@@ -282,10 +282,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   return useMemo(
     () => (
-      <div
-        className="flex min-h-[400px] w-full flex-1 flex-col"
-        onDrop={handleDrop}
-      >
+      <div className="flex w-full flex-1 grow flex-col" onDrop={handleDrop}>
         <VList className="mt-2 flex w-full flex-col overflow-auto">
           {data.length === 0 && (
             <div className="flex grow flex-col items-center justify-center">

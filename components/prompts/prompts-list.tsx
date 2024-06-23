@@ -12,10 +12,14 @@ import { slugify } from "@/db/lib/slugify"
 
 export function PromptsList({ prompts }: { prompts: Tables<"prompts">[] }) {
   return (
-    <div className="grid w-full grid-cols-2 items-start justify-between gap-2 pb-6 lg:grid-cols-3">
+    <div className="grid w-full grid-cols-2 items-start justify-between gap-3 pb-6 lg:grid-cols-3">
       {prompts?.map(prompt => (
         <Link href={`/p/${slugify(prompt)}`} key={prompt.id}>
-          <Card className={"hover:bg-foreground/5 rounded-xl border-none"}>
+          <Card
+            className={
+              "hover:bg-foreground/5 border-input rounded-xl border shadow-none"
+            }
+          >
             <CardContent className={"relative flex space-x-3 p-4"}>
               <SharingIcon item={prompt as any} />
               <PromptIcon prompt={prompt} />

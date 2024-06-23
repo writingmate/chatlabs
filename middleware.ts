@@ -57,29 +57,10 @@ async function redirectToSetupMiddleware(supabase: SupabaseClient, request: Next
   }
 }
 
-async function findHomeWorkspace(supabase: SupabaseClient, request: NextRequest) {
+async function redirectToChat(supabase: SupabaseClient, request: NextRequest) {
   const session = await supabase.auth.getSession()
   if (!session) {
     return
-  }
-
-  if (!cookies().get("workspace_id")) {
-    const { data: homeWorkspace, error } = await supabase
-      .from("workspaces")
-      .select("*")
-      .eq("user_id", session.data.session?.user.id)
-      .eq("is_home", true)
-      .single()
-
-    if (!homeWorkspace) {
-      throw new Error(error?.message)
-    }
-
-
-    cookies().set("workspace_id", homeWorkspace.id, {
-      secure: true,
-      httpOnly: true,
-    })
   }
 
   if (request.nextUrl.pathname === "/") {
@@ -97,7 +78,7 @@ type Middleware = (supabase: SupabaseClient, request: NextRequest) => Promise<Ne
 const middlewares: Middleware[] = [
   rateLimitMiddleware,
   redirectToSetupMiddleware,
-  findHomeWorkspace
+  redirectToChat
 ]
 
 export async function middleware(request: NextRequest) {
@@ -112,8 +93,8 @@ export async function middleware(request: NextRequest) {
     }
 
     return response
-  } catch
-    (e) {
+  } catch (e) {
+    console.error(e)
     return NextResponse.next({
       request: {
         headers: request.headers

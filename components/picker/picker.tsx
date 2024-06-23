@@ -15,7 +15,7 @@ export const defaultItemRenderer = (
   <div
     key={index}
     tabIndex={0}
-    className="hover:bg-accent bg-background focus:bg-accent flex h-[36px] w-full cursor-pointer items-center space-x-2 px-2 text-sm focus:outline-none"
+    className="hover:bg-accent bg-background focus:bg-accent flex w-full cursor-pointer items-center space-x-2 p-2 text-sm focus:outline-none"
     onClick={() => handleSelectItem(item)}
     onKeyDown={handleKeyDown}
   >

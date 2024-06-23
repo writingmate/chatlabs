@@ -79,6 +79,7 @@ const CLAUDE_3_5_SONNET: LLM = {
   hostedId: "claude-3-5-sonnet-20240620",
   platformLink: ANTHROPIC_PLATFORM_LINK,
   imageInput: true,
+  tools: true,
   paid: true,
   pricing: {
     currency: "USD",

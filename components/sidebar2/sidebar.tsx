@@ -38,7 +38,7 @@ export const Sidebar2: FC<SidebarProps> = ({
             <WorkspaceSettings />
           </div>
         )}
-        <div className="flex max-h-full grow flex-col overflow-auto">
+        <div className="flex grow flex-col overflow-auto">
           <SidebarTopContent
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}

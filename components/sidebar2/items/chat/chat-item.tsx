@@ -72,7 +72,7 @@ export const ChatItem: RowComponentType = ({ item }) => {
       <div
         ref={itemRef}
         className={cn(
-          "hover:bg-accent/60 focus:bg-accent group flex h-[36px] w-full cursor-pointer items-center rounded px-2 focus:outline-none",
+          "hover:bg-accent/60 focus:bg-accent group flex w-full cursor-pointer items-center rounded p-2 focus:outline-none",
           isActive && "bg-accent"
         )}
         tabIndex={0}

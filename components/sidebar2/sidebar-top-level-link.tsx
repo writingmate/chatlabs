@@ -22,7 +22,7 @@ export const SidebarTopLevelLink = forwardRef<
       target={target}
       href={href}
       className={cn(
-        "hover:bg-accent/60 flex-start focus:bg-accent group flex h-[36px] w-full cursor-pointer items-center rounded px-2 focus:outline-none",
+        "hover:bg-accent/60 flex-start focus:bg-accent group flex w-full cursor-pointer items-center rounded p-2 focus:outline-none",
         className
       )}
       {...props}
