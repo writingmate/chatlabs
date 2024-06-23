@@ -367,7 +367,7 @@ export const useChatHandler = () => {
 
       setIsGenerating(false)
       setFirstTokenReceived(false)
-      // setUserInput("")
+      setUserInput("")
     } catch (error) {
       if (error instanceof SubscriptionRequiredError) {
         setIsPaywallOpen(true)

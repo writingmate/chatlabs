@@ -16,8 +16,6 @@ export async function GET(request: Request) {
     baseHost = "https://" + baseHost
   }
 
-  console.log("baseHost", baseHost)
-
   if (code) {
     try {
       const cookieStore = cookies()
@@ -26,7 +24,7 @@ export async function GET(request: Request) {
 
 
       if (!error) {
-        return NextResponse.redirect(baseHost)
+        return NextResponse.redirect(baseHost + '/')
       } else {
         return NextResponse.redirect(
           baseHost + "/login?error_description=" + error.message
@@ -42,14 +40,14 @@ export async function GET(request: Request) {
 
   if (next) {
     return NextResponse.redirect(
-      requestUrl.origin + next + "?error_description=" + error_description
+      baseHost + next + "?error_description=" + error_description
     )
   } else {
     if (error_description) {
       return NextResponse.redirect(
-        requestUrl.origin + "/login?error_description=" + error_description
+        baseHost + "/login?error_description=" + error_description
       )
     }
-    return NextResponse.redirect(requestUrl.origin)
+    return NextResponse.redirect(baseHost)
   }
 }
