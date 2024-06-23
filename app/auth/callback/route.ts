@@ -11,7 +11,15 @@ export async function GET(request: Request) {
   if (code) {
     const cookieStore = cookies()
     const supabase = createClient(cookieStore)
-    await supabase.auth.exchangeCodeForSession(code)
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (!error) {
+      return NextResponse.redirect(`${origin}${next}`)
+    } else {
+      return NextResponse.redirect(
+        requestUrl.origin + "/login?error_description=" + error.message
+      )
+    }
   }
 
   if (next) {
