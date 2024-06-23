@@ -21,7 +21,7 @@ import { useEffect, useState } from "react"
 import { Tables } from "@/supabase/types"
 import { useRouter } from "next/navigation"
 import { MessageMarkdown } from "@/components/messages/message-markdown"
-import { parseIdFromSlug } from "@/db/lib/slugify"
+import { parseIdFromSlug, slugify } from "@/db/lib/slugify"
 
 export default function PromptsPage({
   params: { id }
@@ -108,7 +108,9 @@ export default function PromptsPage({
               </Button>
             )}
             <Button size={"xs"}>
-              <Link href={`/chat?prompt_id=${prompt.id}`}>Use this prompt</Link>
+              <Link href={`/chat?prompt_id=${slugify(prompt)}`}>
+                Use this prompt
+              </Link>
             </Button>
           </div>
         </DialogHeader>

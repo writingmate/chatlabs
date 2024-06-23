@@ -83,15 +83,15 @@ function Assistants({
             >
               <CardContent className={"relative flex space-x-3 p-4"}>
                 <AssistantIcon
-                  className={"size-[76px] rounded-xl"}
+                  className={"size-[50px] rounded-md"}
                   assistant={assistant}
-                  size={50}
+                  size={36}
                 />
                 <div className={"flex flex-col"}>
                   <CardTitle className={"text-md line-clamp-1"}>
                     {assistant.name}
                   </CardTitle>
-                  <CardDescription className={"line-clamp-3 text-xs"}>
+                  <CardDescription className={"line-clamp-2 text-xs"}>
                     {assistant.description}
                   </CardDescription>
                 </div>

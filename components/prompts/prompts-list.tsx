@@ -21,16 +21,16 @@ export function PromptsList({ prompts }: { prompts: Tables<"prompts">[] }) {
             }
           >
             <CardContent className={"relative flex space-x-3 p-4"}>
-              <SharingIcon item={prompt as any} />
               <PromptIcon prompt={prompt} />
               <div className={"flex flex-col"}>
                 <CardTitle className={"text-md line-clamp-1"}>
                   {prompt.name}
                 </CardTitle>
-                <CardDescription className={"line-clamp-3 text-xs"}>
+                <CardDescription className={"line-clamp-2 text-xs"}>
                   {prompt.description}
                 </CardDescription>
               </div>
+              <SharingIcon item={prompt as any} />
             </CardContent>
           </Card>
         </Link>

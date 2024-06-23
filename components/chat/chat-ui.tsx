@@ -31,6 +31,7 @@ import { ChatbotUIChatContext } from "@/context/chat"
 import { Tables } from "@/supabase/types"
 import { getPromptById } from "@/db/prompts"
 import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
+import { parseIdFromSlug } from "@/db/lib/slugify"
 
 interface ChatUIProps {
   selectedAssistant?: Tables<"assistants">
@@ -121,7 +122,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
     const modelId = searchParams.get("model")
 
     if (promptId) {
-      getPromptById(promptId)
+      getPromptById(parseIdFromSlug(promptId))
         .then(prompt => {
           handleSelectPromptWithVariables(prompt)
         })
