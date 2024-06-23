@@ -81,7 +81,7 @@ export default function PromptsPage({
           <div className={"flex space-x-1"}>
             {myPrompt && (
               <Button variant={"outline"} size={"xs"}>
-                <Link href={`/prompts/${prompt?.id}/edit`}>
+                <Link href={`/p/${slugify(prompt)}/edit`}>
                   <IconEdit size={18} stroke={1.5} />
                 </Link>
               </Button>

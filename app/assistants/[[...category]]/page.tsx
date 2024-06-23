@@ -73,39 +73,41 @@ function Assistants({
           }
         ]}
       />
-      <div className="grid w-full grid-cols-2 items-start justify-between gap-2 pb-6 lg:grid-cols-3">
-        {data?.map(assistant => (
-          <Link href={`/a/${slugify(assistant)}`} key={assistant.id}>
-            <Card
-              className={
-                "hover:bg-foreground/5 border-input rounded-xl border shadow-none"
-              }
-            >
-              <CardContent className={"relative flex space-x-3 p-4"}>
-                <AssistantIcon
-                  className={"size-[50px] rounded-md"}
-                  assistant={assistant}
-                  size={36}
-                />
-                <div className={"flex flex-col"}>
-                  <CardTitle className={"text-md line-clamp-1"}>
-                    {assistant.name}
-                  </CardTitle>
-                  <CardDescription className={"line-clamp-2 text-xs"}>
-                    {assistant.description}
-                  </CardDescription>
-                </div>
-                <SharingIcon item={assistant as any} />
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-        {data.length === 0 && (
-          <div className="flex h-full items-center justify-center bg-black/50 text-2xl text-white">
-            No assistants found <br /> Create a new assistant to get started{" "}
-          </div>
-        )}
-      </div>
+      {data?.length > 0 && (
+        <div className="grid w-full grid-cols-2 items-start justify-between gap-2 pb-6 lg:grid-cols-3">
+          {data?.map(assistant => (
+            <Link href={`/a/${slugify(assistant)}`} key={assistant.id}>
+              <Card
+                className={
+                  "hover:bg-foreground/5 border-input rounded-xl border shadow-none"
+                }
+              >
+                <CardContent className={"relative flex space-x-3 p-4"}>
+                  <AssistantIcon
+                    className={"size-[50px] rounded-md"}
+                    assistant={assistant}
+                    size={36}
+                  />
+                  <div className={"flex flex-col"}>
+                    <CardTitle className={"text-md line-clamp-1"}>
+                      {assistant.name}
+                    </CardTitle>
+                    <CardDescription className={"line-clamp-2 text-xs"}>
+                      {assistant.description}
+                    </CardDescription>
+                  </div>
+                  <SharingIcon item={assistant as any} />
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
+      {data.length === 0 && (
+        <div className="flex h-full items-center justify-center text-center text-2xl">
+          No assistants found <br /> Create a new assistant to get started{" "}
+        </div>
+      )}
     </PageContent>
   )
 }

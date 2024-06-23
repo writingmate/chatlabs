@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
+import { parseIdFromSlug } from "@/db/lib/slugify"
 
 export default function EditPromptPage({
   params: { id }
@@ -22,7 +23,7 @@ export default function EditPromptPage({
 }) {
   useEffect(() => {
     if (id) {
-      getPromptById(id).then(prompt => {
+      getPromptById(parseIdFromSlug(id)).then(prompt => {
         setPrompt(prompt)
         setContent(prompt.content)
         setName(prompt.name)

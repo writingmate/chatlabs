@@ -35,6 +35,7 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import { useRouter } from "next/navigation"
 
 interface SidebarCreateItemProps {
   isOpen: boolean
@@ -72,6 +73,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const [creating, setCreating] = useState(false)
+
+  const router = useRouter()
 
   const resolvedName = name || contentType
 
@@ -215,6 +218,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
 
       onOpenChange(false)
       setCreating(false)
+      router.refresh()
     } catch (error) {
       toast.error(`Error creating ${resolvedName.slice(0, -1)}. ${error}.`)
       setCreating(false)

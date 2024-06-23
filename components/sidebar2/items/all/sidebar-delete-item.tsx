@@ -118,6 +118,8 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     )
 
     setShowDialog(false)
+    router.refresh()
+    router.back()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
