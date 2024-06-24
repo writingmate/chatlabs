@@ -11,9 +11,9 @@ const ratelimit = new Ratelimit({
 })
 
 async function rateLimitMiddleware(supabase: SupabaseClient, request: NextRequest) {
-  const session = await supabase.auth.getSession()
+  const session = (await supabase.auth.getSession()).data?.session
   if (session && request.nextUrl.pathname.startsWith('/api/chat') && request.method === "POST") {
-    const userId = session.data.session?.user.id
+    const userId = session?.user.id
     if (userId) {
       const { success, pending, limit, reset, remaining } = await ratelimit.limit(
         [userId, request.nextUrl.pathname].join("-"),
@@ -31,21 +31,31 @@ async function rateLimitMiddleware(supabase: SupabaseClient, request: NextReques
 }
 
 async function redirectToSetupMiddleware(supabase: SupabaseClient, request: NextRequest) {
-  const session = await supabase.auth.getSession()
-  if (!session) {
-    return NextResponse.redirect("/")
+  const session = (await supabase.auth.getSession()).data?.session
+  const path = request.nextUrl.pathname
+
+  // if the user is not logged in and they are on the homepage, do nothing
+  if (!session && path === "/") {
+    return
   }
 
+  // if the user is not logged in and they are not on the homepage, redirect them to the homepage
+  if (!session && path !== "/") {
+    return NextResponse.redirect(new URL("/", request.url))
+  }
+
+  // if the user is logged in and they are on the homepage, check if they have onboarded
   const redirectToChat = request.nextUrl.pathname === "/"
 
   if (!redirectToChat) {
     return
   }
 
+  // if the user is logged in and they have not onboarded, redirect them to the setup page
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("*")
-    .eq("user_id", session.data.session?.user.id)
+    .eq("user_id", session?.user.id)
     .single()
 
   if (!profile) {
@@ -58,7 +68,7 @@ async function redirectToSetupMiddleware(supabase: SupabaseClient, request: Next
 }
 
 async function redirectToChat(supabase: SupabaseClient, request: NextRequest) {
-  const session = await supabase.auth.getSession()
+  const session = (await supabase.auth.getSession()).data?.session
   if (!session) {
     return
   }
@@ -82,27 +92,18 @@ const middlewares: Middleware[] = [
 ]
 
 export async function middleware(request: NextRequest) {
-  try {
-    const { supabase, response } = createClient(request)
+  const { supabase, response } = createClient(request)
 
-    for (const middleware of middlewares) {
-      const result = await middleware(supabase, request)
-      if (result) {
-        return result
-      }
+  for (const middleware of middlewares) {
+    const result = await middleware(supabase, request)
+    if (result) {
+      return result
     }
-
-    return response
-  } catch (e) {
-    console.error(e)
-    return NextResponse.next({
-      request: {
-        headers: request.headers
-      }
-    })
   }
+
+  return response
 }
 
 export const config = {
-  matcher: "/(chat)?",
+  matcher: "/(chat|/api/chat)?",
 }

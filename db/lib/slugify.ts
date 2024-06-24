@@ -23,5 +23,8 @@ export function slugify(item: NameTitleWithHashID): string {
 }
 
 export function parseIdFromSlug(slug: string): string {
+  if (!slug) {
+    return ""
+  }
   return slug.split("-")[0]
 }

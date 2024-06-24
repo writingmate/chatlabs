@@ -45,7 +45,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
 
   const params = useParams()
 
-  const hashid = (params.slug as string)?.split("-")[0]
+  const hashid = parseIdFromSlug(params.slug as string)
 
   const router = useRouter()
   const pathname = usePathname()
@@ -96,7 +96,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
     if (selectedAssistant) {
       setSelectedAssistant(selectedAssistant)
     }
-    if (!params.slug) {
+    if (!hashid) {
       setLoading(false)
       return
     }
@@ -107,7 +107,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
       setIsAtBottom(true)
     }
 
-    if ((chatMessages?.length === 0 && !params.slug) || params.slug) {
+    if ((chatMessages?.length === 0 && !hashid) || !!hashid) {
       fetchData().then(() => {
         handleFocusChatInput()
         setLoading(false)

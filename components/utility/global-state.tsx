@@ -205,62 +205,62 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   > => {
     const session = (await supabase.auth.getSession()).data.session
 
-    if (session) {
-      const user = session.user
+    if (!session) {
+      setLoading(false)
+      return undefined
+    }
+    const user = session.user
 
-      const profile = await getProfileByUserId(user.id)
+    const profile = await getProfileByUserId(user.id)
 
-      setProfile(profile)
+    setProfile(profile)
 
-      if (!profile?.has_onboarded) {
-        return profile
-      }
-
-      const workspaces = await getWorkspacesByUserId(user.id)
-      setWorkspaces(workspaces)
-      setSelectedWorkspace(workspaces?.[0])
-
-      for (const workspace of workspaces) {
-        let workspaceImageUrl = ""
-
-        if (workspace.image_path) {
-          workspaceImageUrl =
-            (await getWorkspaceImageFromStorage(workspace.image_path)) || ""
-        }
-
-        if (workspaceImageUrl) {
-          const response = await fetch(workspaceImageUrl)
-          const blob = await response.blob()
-          const base64 = await convertBlobToBase64(blob)
-
-          setWorkspaceImages(prev => [
-            ...prev,
-            {
-              workspaceId: workspace.id,
-              path: workspace.image_path,
-              base64: base64,
-              url: workspaceImageUrl
-            }
-          ])
-        }
-      }
-
-      await fetchWorkspaceData(workspaces.find(w => w.is_home)?.id as string)
-      setUserInput("")
-      setChatMessages([])
-      setSelectedChat(null)
-      setIsGenerating(false)
-      setFirstTokenReceived(false)
-      setChatFiles([])
-      setChatImages([])
-      setNewMessageFiles([])
-      setNewMessageImages([])
-      setShowFilesDisplay(false)
-
+    if (!profile?.has_onboarded) {
       return profile
     }
 
-    return undefined
+    const workspaces = await getWorkspacesByUserId(user.id)
+    setWorkspaces(workspaces)
+    setSelectedWorkspace(workspaces?.[0])
+
+    for (const workspace of workspaces) {
+      let workspaceImageUrl = ""
+
+      if (workspace.image_path) {
+        workspaceImageUrl =
+          (await getWorkspaceImageFromStorage(workspace.image_path)) || ""
+      }
+
+      if (workspaceImageUrl) {
+        const response = await fetch(workspaceImageUrl)
+        const blob = await response.blob()
+        const base64 = await convertBlobToBase64(blob)
+
+        setWorkspaceImages(prev => [
+          ...prev,
+          {
+            workspaceId: workspace.id,
+            path: workspace.image_path,
+            base64: base64,
+            url: workspaceImageUrl
+          }
+        ])
+      }
+    }
+
+    await fetchWorkspaceData(workspaces.find(w => w.is_home)?.id as string)
+    setUserInput("")
+    setChatMessages([])
+    setSelectedChat(null)
+    setIsGenerating(false)
+    setFirstTokenReceived(false)
+    setChatFiles([])
+    setChatImages([])
+    setNewMessageFiles([])
+    setNewMessageImages([])
+    setShowFilesDisplay(false)
+
+    return profile
   }
 
   const fetchWorkspaceData = async (workspaceId: string) => {
