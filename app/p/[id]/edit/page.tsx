@@ -1,6 +1,4 @@
 "use client"
-import data from "@emoji-mart/data"
-import Picker from "@emoji-mart/react"
 import { SidebarUpdateItem } from "@/components/sidebar2/items/all/sidebar-update-item"
 import React, { useEffect, useState } from "react"
 import { getPromptById, updatePrompt } from "@/db/prompts"
