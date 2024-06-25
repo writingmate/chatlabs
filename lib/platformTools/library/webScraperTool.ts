@@ -202,7 +202,13 @@ export const webScraperTool: PlatformTool = {
     {
       id: "googleSearch",
       toolFunction: googleSearch,
-      description: "Search google for a query and return the results.",
+      description: `Search google for a query and return the results.
+Always add references for google search results at the end of each sentence like this:
+<sentence1>[1](<link1>).
+<sentence2>[2](<link2>).
+
+Each unique link has unique reference number.
+      `,
       parameters: [
         {
           name: "query",
@@ -217,8 +223,11 @@ export const webScraperTool: PlatformTool = {
     {
       id: "youtubeCaptions",
       toolFunction: getYoutubeCaptions,
-      description:
-        "Get YouTube captions using video id. Video id is id from the URL. Returns subtitles and image url. https://www.youtube.com/watch?v=VIDEO_ID",
+      description: `Get YouTube captions using video id. Video id is id from the URL. Returns subtitles and image url. https://www.youtube.com/watch?v=VIDEO_ID
+Always break down youtube captions in to three sentence paragraphs and add links to time codes like this:
+<paragraph1>[1](https://youtube.com/watch?v=VIDEO_ID&t=START1s).
+<paragraph2>[2](https://youtube.com/watch?v=VIDEO_ID&t=START2s).
+<paragraph3>[3](https://youtube.com/watch?v=VIDEO_ID&t=START3s).`,
       parameters: [
         {
           name: "videoId",
