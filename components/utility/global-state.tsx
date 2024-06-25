@@ -362,16 +362,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
           // chatSettings?.embeddingsProvider ||
           (workspace?.embeddings_provider as "openai" | "local") || "openai"
       })
-
-      setLoading(false)
     } catch (error) {
       console.error(error)
       router.push("/")
     }
-  }
-
-  if (loading) {
-    return <Loading />
   }
 
   return (
