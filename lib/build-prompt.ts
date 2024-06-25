@@ -1,6 +1,7 @@
 import { Tables } from "@/supabase/types"
 import { ChatPayload, MessageImage } from "@/types"
 import { encode } from "gpt-tokenizer"
+import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 
 export const DEFAULT_SYSTEM_PROMPT = `Today is {local_date}.
 User info: "{profile_context}"
@@ -47,7 +48,7 @@ export async function buildFinalMessages(
     profile?.system_prompt_template || DEFAULT_SYSTEM_PROMPT
   )
 
-  const CHUNK_SIZE = chatSettings.contextLength
+  const CHUNK_SIZE = CHAT_SETTING_LIMITS[chatSettings.model].MAX_CONTEXT_LENGTH
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
 
   let remainingTokens = CHUNK_SIZE - PROMPT_TOKENS
@@ -224,7 +225,7 @@ export async function buildGoogleGeminiFinalMessages(
   let finalMessages = []
 
   let usedTokens = 0
-  const CHUNK_SIZE = chatSettings.contextLength
+  const CHUNK_SIZE = CHAT_SETTING_LIMITS[chatSettings.model].MAX_CONTEXT_LENGTH
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
   let REMAINING_TOKENS = CHUNK_SIZE - PROMPT_TOKENS
 
