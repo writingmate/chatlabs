@@ -63,7 +63,7 @@ async function redirectToSetupMiddleware(supabase: SupabaseClient, request: Next
   }
 
   if (!profile.has_onboarded) {
-    return NextResponse.redirect("/setup")
+    return NextResponse.redirect(new URL("/setup", request.url))
   }
 }
 
