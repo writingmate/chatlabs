@@ -1,27 +1,9 @@
-"use client"
-
-import { Brand } from "@/components/ui/brand"
-import { Button } from "@/components/ui/button"
-import { redirect, useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase/browser-client"
-import { GoogleSVG } from "@/components/icons/google-svg"
-import { MicrosoftSVG } from "@/components/icons/microsoft-svg"
-import { useEffect, useState } from "react"
-import { useTheme } from "next-themes"
-import Loading from "../loading"
-import { Input } from "@/components/ui/input"
-import { IconMail } from "@tabler/icons-react"
-import { Separator } from "@/components/ui/separator"
-import {
-  getHomeWorkspaceByUserId,
-  getWorkspacesByUserId
-} from "@/db/workspaces"
-import { getProfileByUserId } from "@/db/profile"
 import LoginForm from "@/components/login/login-form"
+import { Metadata } from "next"
 
-// export const metadata: Metadata = {
-//   title: "Login"
-// }
+export const metadata: Metadata = {
+  title: "Welcome to ChatLabs"
+}
 
 export default function Login({
   searchParams
