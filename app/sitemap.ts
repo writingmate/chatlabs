@@ -14,17 +14,17 @@ export default async function sitemap() {
   const links = [
     {
       url: `${BASE_URL}/`,
-      lastModified: new Date(),
+      lastModified: new Date().toISOString(),
       changeFrequency: "daily"
     },
     {
       url: `${BASE_URL}/prompts`,
-      lastModified: new Date(),
+      lastModified: new Date().toISOString(),
       changeFrequency: "daily"
     },
     {
       url: `${BASE_URL}/assistants`,
-      lastModified: new Date(),
+      lastModified: new Date().toISOString(),
       changeFrequency: "daily"
     }
   ]
