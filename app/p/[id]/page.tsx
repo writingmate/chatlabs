@@ -1,4 +1,4 @@
-import { getPromptById } from "@/db/prompts"
+import { getPromptById, getPublicPrompts } from "@/db/prompts"
 import { Button } from "@/components/ui/button"
 import PageContent from "@/components/page/page-content"
 import PageHeader from "@/components/page/page-header"
@@ -13,6 +13,14 @@ import { LLM, ModelProvider } from "@/types"
 import { IconExternalLink } from "@tabler/icons-react"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { parseIdFromSlug } from "@/db/lib/slugify"
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const prompt = await getPromptById(parseIdFromSlug(params.id))
+
+  return {
+    title: `${prompt.icon} ${prompt.name} - Best AI Prompt for Large Language Models`,
+    description: `${prompt.description} - Use this prompt with large language models`
+  }
+}
 
 export default async function PromptsPage({
   params
@@ -45,7 +53,7 @@ export default async function PromptsPage({
             <div className={"flex justify-start space-x-1"}>
               {prompt.prompt_category?.map((category, index) => (
                 <Badge variant={"outline"} key={index}>
-                  <Link href={`/prompts?c=${category.name}`}>
+                  <Link href={`/prompts/${category.name}`}>
                     {category.name}
                   </Link>
                 </Badge>

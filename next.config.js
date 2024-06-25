@@ -8,14 +8,6 @@ const withPWA = require("next-pwa")({
 
 module.exports = withBundleAnalyzer(
     withPWA({
-        async rewrites() {
-            return [
-                {
-                    source: '/a/:id',
-                    destination: '/assistants/:id',
-                },
-            ]
-        },
         reactStrictMode: true,
         images: {
             // unoptimized: true,

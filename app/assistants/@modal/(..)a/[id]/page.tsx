@@ -1,5 +1,4 @@
 "use client"
-import { getPromptById } from "@/db/prompts"
 import {
   Dialog,
   DialogContent,

@@ -141,6 +141,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
   const handleOpenChange = (value: boolean) => {
     setIsOpen(value)
+    router.refresh()
     router.back()
   }
 
@@ -635,7 +636,6 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       )
 
       handleOpenChange(false)
-
       toast.success(`${contentType.slice(0, -1)} updated successfully`)
     } catch (error) {
       toast.error(`Error updating ${contentType.slice(0, -1)}. ${error}`)

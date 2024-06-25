@@ -1,4 +1,6 @@
 "use client"
+import data from "@emoji-mart/data"
+import Picker from "@emoji-mart/react"
 import { SidebarUpdateItem } from "@/components/sidebar2/items/all/sidebar-update-item"
 import React, { useEffect, useState } from "react"
 import { getPromptById, updatePrompt } from "@/db/prompts"
@@ -15,6 +17,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { parseIdFromSlug } from "@/db/lib/slugify"
+import { EmojiEditor } from "@/components/prompts/emoji-editor"
 
 export default function EditPromptPage({
   params: { id }
@@ -43,29 +46,19 @@ export default function EditPromptPage({
   const renderInputs = () => (
     <>
       <div className="space-y-2">
-        <Label>Icon</Label>
-
-        <Input
-          placeholder="Prompt icon..."
-          value={icon}
-          onChange={e => setIcon(e.target.value)}
-          maxLength={PROMPT_NAME_MAX}
-          onCompositionStart={() => setIsTyping(true)}
-          onCompositionEnd={() => setIsTyping(false)}
-        />
-      </div>
-
-      <div className="space-y-2">
         <Label>Name</Label>
 
-        <Input
-          placeholder="Prompt name..."
-          value={name}
-          onChange={e => setName(e.target.value)}
-          maxLength={PROMPT_NAME_MAX}
-          onCompositionStart={() => setIsTyping(true)}
-          onCompositionEnd={() => setIsTyping(false)}
-        />
+        <div className={"flex space-x-2"}>
+          <EmojiEditor emoji={icon} onEmojiChange={setIcon} />
+          <Input
+            placeholder="Prompt name..."
+            value={name}
+            onChange={e => setName(e.target.value)}
+            maxLength={PROMPT_NAME_MAX}
+            onCompositionStart={() => setIsTyping(true)}
+            onCompositionEnd={() => setIsTyping(false)}
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -109,7 +102,6 @@ export default function EditPromptPage({
   return (
     <SidebarUpdateItem
       isOpen={true}
-      name={name}
       item={prompt!}
       isActive={false}
       isHovering={true}
