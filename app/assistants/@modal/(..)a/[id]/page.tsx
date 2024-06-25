@@ -7,11 +7,7 @@ import {
   DialogTitle
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import ReactMarkdown from "react-markdown"
-import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import { getCurrentUser } from "@/lib/supabase/browser-client"
-import { toast } from "sonner"
 import {
   IconCopy,
   IconEdit,
@@ -19,40 +15,35 @@ import {
   IconTrash
 } from "@tabler/icons-react"
 import { SidebarDeleteItem } from "@/components/sidebar2/items/all/sidebar-delete-item"
-import { copyPrompt, deletePrompt } from "@/app/prompts/actions"
 import { useAuth } from "@/context/auth"
 import { useEffect, useState } from "react"
 import { Tables } from "@/supabase/types"
 import { useRouter } from "next/navigation"
-import { MessageMarkdown } from "@/components/messages/message-markdown"
 import { deleteAssistant, getAssistantById } from "@/db/assistants"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { parseIdFromSlug, slugify } from "@/db/lib/slugify"
 
-export default function AssistantPage({
+export default function AssistantPreviewPage({
   params: { id }
 }: {
   params: { id: string }
 }) {
+  const [item, setItem] = useState<Tables<"assistants"> | null>()
   const { user } = useAuth()
   const [open, setOpen] = useState(true)
-  const [item, setItem] = useState<Tables<"assistants"> | null>()
   const router = useRouter()
 
+  useEffect(() => {
+    if (item) {
+      getAssistantById(parseIdFromSlug(id)).then(assistant => {
+        setItem(assistant)
+      })
+    }
+  }, [item])
+
   function onOpenChange() {
-    // TODO: Implement router.back()
     router.back()
   }
-
-  useEffect(() => {
-    if (id) {
-      getAssistantById(parseIdFromSlug(id))
-        .then(setItem)
-        .catch(() => {
-          toast.error("Unable to fetch assistant")
-        })
-    }
-  }, [id])
 
   if (!item) {
     return
@@ -109,14 +100,14 @@ export default function AssistantPage({
         >
           {item.description}
         </div>
-        <Button size={"lg"}>
-          <Link
-            className={"text-md flex items-center space-x-2"}
-            href={`/chat?assistant_id=${item.id}`}
-          >
-            <IconMessageCirclePlus size={24} stroke={1.5} />
-            <div>Start Chatting</div>
-          </Link>
+        <Button
+          size={"lg"}
+          onClick={() => {
+            router.replace(`/a/${slugify(item)}`)
+          }}
+        >
+          <IconMessageCirclePlus size={24} stroke={1.5} />
+          <div>Start Chatting</div>
         </Button>
       </DialogContent>
     </Dialog>

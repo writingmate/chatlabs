@@ -32,6 +32,7 @@ import { Tables } from "@/supabase/types"
 import { getPromptById } from "@/db/prompts"
 import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
 import { parseIdFromSlug } from "@/db/lib/slugify"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
 
 interface ChatUIProps {
   selectedAssistant?: Tables<"assistants">
@@ -269,7 +270,20 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
         (chatMessages.length == 0 ? (
           <>
             <div className="absolute left-1/2 top-1/2 mb-20 -translate-x-1/2 -translate-y-1/2">
-              <Brand theme={theme === "dark" ? "dark" : "light"} />
+              {!selectedAssistant && (
+                <Brand theme={theme === "dark" ? "dark" : "light"} />
+              )}
+              {selectedAssistant && (
+                <>
+                  <AssistantIcon assistant={selectedAssistant} size={100} />
+                  <div className="text-foreground mt-4 text-center text-2xl font-bold">
+                    {selectedAssistant.name}
+                  </div>
+                  <div className="text-foreground mt-2 text-center text-sm">
+                    {selectedAssistant.description}
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="flex grow flex-col items-center justify-center" />
