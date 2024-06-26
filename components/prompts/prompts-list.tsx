@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/card"
 import { PromptIcon } from "@/components/prompts/prompt-icon"
 import { Tables } from "@/supabase/types"
-import { SharingIcon } from "@/components/sharing/sharing-icon"
 import { slugify } from "@/db/lib/slugify"
 
 export function PromptsList({ prompts }: { prompts: Tables<"prompts">[] }) {
@@ -30,7 +29,7 @@ export function PromptsList({ prompts }: { prompts: Tables<"prompts">[] }) {
                   {prompt.description}
                 </CardDescription>
               </div>
-              <SharingIcon item={prompt as any} />
+              {/*<SharingIcon item={prompt as any} />*/}
             </CardContent>
           </Card>
         </Link>

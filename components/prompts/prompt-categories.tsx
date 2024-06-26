@@ -1,6 +1,6 @@
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
 import { Tables } from "@/supabase/types"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Link from "next/link"
 
 export function PromptCategories({
   categories,
@@ -10,16 +10,22 @@ export function PromptCategories({
   selected?: string
 }) {
   return (
-    <div className="flex space-x-2 py-4">
-      {[...categories].map((cat, index: number) => (
-        <Badge
-          className={"px-3 py-1 text-sm"}
-          variant={cat.name === selected ? "default" : "outline"}
-          key={index}
-        >
-          <Link href={"/prompts/" + cat.name}>{cat.name}</Link>
-        </Badge>
-      ))}
+    <div className="flex w-full space-x-2 py-4">
+      <Tabs value={selected} className={"bg-transparent"}>
+        <TabsList className={"bg-transparent"}>
+          {[...categories].map((cat, index: number) => (
+            <TabsTrigger
+              className={
+                "data-[state=active]:border-input rounded-lg border border-transparent"
+              }
+              key={index}
+              value={cat.name}
+            >
+              <Link href={`/prompts/${cat.name}`}>{cat.name}</Link>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
     </div>
   )
 }

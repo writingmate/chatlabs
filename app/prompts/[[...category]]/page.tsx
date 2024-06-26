@@ -95,7 +95,6 @@ export default async function PromptsPage({
       >
         <PageTitle className={"capitalize"}>{categoryTitle}</PageTitle>
         <div className={"flex space-x-2"}>
-          <Search className={"w-18 h-8"} placeholder={"Search prompts..."} />
           {
             <SidebarCreateButtons
               contentType={"prompts"}
@@ -104,6 +103,10 @@ export default async function PromptsPage({
           }
         </div>
       </PageHeader>
+      <Search
+        className={"w-full rounded-lg"}
+        placeholder={"Search prompts..."}
+      />
       <PromptCategories categories={categories} selected={category} />
       <PromptsList prompts={data} />
     </PageContent>

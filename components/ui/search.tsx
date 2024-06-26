@@ -1,8 +1,10 @@
 "use client"
-import { forwardRef } from "react"
+import { forwardRef, useEffect } from "react"
 import { Input, InputProps } from "@/components/ui/input"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useDebouncedCallback } from "use-debounce"
+import { IconSearch } from "@tabler/icons-react"
+import { SidebarSearch } from "@/components/sidebar2/sidebar-search"
 
 const Search = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const searchParams = useSearchParams()
@@ -21,7 +23,11 @@ const Search = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   }, 300)
 
   return (
-    <Input onChange={e => handleSearch(e.target.value)} ref={ref} {...props} />
+    <SidebarSearch
+      placeholder={"Search prompts..."}
+      className={"border-input h-[36px] rounded-lg border"}
+      onValueChange={handleSearch}
+    />
   )
 })
 

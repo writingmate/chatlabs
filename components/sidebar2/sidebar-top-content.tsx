@@ -53,7 +53,7 @@ export const SidebarTopContent: FC<SidebarTopContentProps> = ({
             <div className="ml-3">New Chat</div>
           </Button>
         </div>
-        <SidebarSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <SidebarSearch value={searchTerm} onValueChange={setSearchTerm} />
       </div>
       <SidebarTopLevelLinks
         className={cn(
