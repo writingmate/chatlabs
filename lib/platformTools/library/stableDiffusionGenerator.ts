@@ -109,8 +109,12 @@ export const stableDiffusionTools: PlatformTool = {
       id: "imageGenerationViaStableDiffusion3", // This is the unique identifier of the tool function.
       toolFunction: stableDiffusion3, // This is the function that will be called when the tool function is executed.
       resultProcessingMode: "render_markdown",
-      description:
-        "Generate images using Stable Diffusion v3 based on a text description. ", // This is the description of the tool function.
+      description: `Generate images using Stable Diffusion v3 based on a text description. 
+Returns the URL of the image. Never display the image in the response, nor include the link or url, it is handled in the frontend.
+Never include image url in the response for generated images. Do not say you can't display image. 
+Do not use semi-colons when describing the image. Never use html, always use Markdown.
+You should only return the function call in tools call sections.
+        `, // This is the description of the tool function.
       parameters: [
         // These are the parameters of the tool function.
         {

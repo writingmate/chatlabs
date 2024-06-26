@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
       stream: true
     })
 
+    // @ts-ignore
     const stream = AnthropicStream(response)
     return new StreamingTextResponse(stream)
   } catch (error: any) {
