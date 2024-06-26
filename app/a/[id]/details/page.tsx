@@ -2,7 +2,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
@@ -23,7 +22,7 @@ import { deleteAssistant, getAssistantById } from "@/db/assistants"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { parseIdFromSlug, slugify } from "@/db/lib/slugify"
 
-export default function AssistantPreviewPage({
+export default function AssistantDetailsPage({
   params: { id }
 }: {
   params: { id: string }
@@ -34,12 +33,12 @@ export default function AssistantPreviewPage({
   const router = useRouter()
 
   useEffect(() => {
-    if (item) {
+    if (id) {
       getAssistantById(parseIdFromSlug(id)).then(assistant => {
         setItem(assistant)
       })
     }
-  }, [item])
+  }, [id])
 
   function onOpenChange() {
     router.back()

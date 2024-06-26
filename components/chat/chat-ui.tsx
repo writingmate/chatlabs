@@ -25,14 +25,17 @@ import { QuickSettings } from "@/components/chat/quick-settings"
 import { ChatSettings } from "@/components/chat/chat-settings"
 import { Brand } from "@/components/ui/brand"
 import { useTheme } from "next-themes"
-import { IconMessagePlus } from "@tabler/icons-react"
+import { IconMessagePlus, IconSettings } from "@tabler/icons-react"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { Tables } from "@/supabase/types"
 import { getPromptById } from "@/db/prompts"
 import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
-import { parseIdFromSlug } from "@/db/lib/slugify"
+import { parseIdFromSlug, slugify } from "@/db/lib/slugify"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { useAuth } from "@/context/auth"
 
 interface ChatUIProps {
   selectedAssistant?: Tables<"assistants">
@@ -88,6 +91,8 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
     isOverflowing,
     scrollToTop
   } = useScroll()
+
+  const { user } = useAuth()
 
   const [loading, setLoading] = useState(true)
 
@@ -282,6 +287,15 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
                   <div className="text-foreground mt-2 text-center text-sm">
                     {selectedAssistant.description}
                   </div>
+                  {user?.id === selectedAssistant.user_id && (
+                    <Link
+                      href={`/a/${slugify(selectedAssistant)}/details`}
+                      className={"text-foreground/80 absolute right-0 top-0"}
+                      onClick={handleNewChat}
+                    >
+                      <IconSettings size={24} stroke={1.5} />
+                    </Link>
+                  )}
                 </>
               )}
             </div>
