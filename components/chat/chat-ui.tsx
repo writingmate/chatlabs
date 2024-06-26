@@ -260,7 +260,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
               }
             />
           )}
-          <QuickSettings />
+          {!selectedAssistant && <QuickSettings />}
         </div>
         <ChatSettings />
       </div>
@@ -308,7 +308,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
         ))}
 
       <div className="relative w-full items-end px-4 pb-8 md:w-[500px] lg:w-[660px] xl:w-[800px]">
-        <ChatInput />
+        <ChatInput showAssistant={!selectedAssistant} />
       </div>
 
       <div className="absolute bottom-2 right-2 hidden md:block lg:bottom-4 lg:right-4">

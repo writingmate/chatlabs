@@ -28,9 +28,11 @@ import { ChatbotUIChatContext } from "@/context/chat"
 import Lib from "@apidevtools/json-schema-ref-parser/lib"
 import Link from "next/link"
 
-interface ChatInputProps {}
+interface ChatInputProps {
+  showAssistant: boolean
+}
 
-export const ChatInput: FC<ChatInputProps> = ({}) => {
+export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
   useHotkey("l", () => {
     handleFocusChatInput()
   })
@@ -263,7 +265,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       <div className={"relative"}>
         <ChatCommandInput />
         <div className="border-input mt-3 flex w-full flex-col justify-end overflow-hidden rounded-xl border backdrop-blur-xl">
-          {selectedAssistant && (
+          {showAssistant && selectedAssistant && (
             <div className="bg-accent border-input flex items-center justify-between space-x-2 border-b p-2 pl-4 pr-3">
               <div className={"flex items-center space-x-2"}>
                 <AssistantIcon assistant={selectedAssistant} size={24} />

@@ -1,4 +1,3 @@
-"use client"
 import { ChatUI } from "@/components/chat/chat-ui"
 import { Dashboard } from "@/components/ui/dashboard"
 import { getAssistantById } from "@/db/assistants"
