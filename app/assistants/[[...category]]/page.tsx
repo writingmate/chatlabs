@@ -12,20 +12,15 @@ import {
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import Link from "next/link"
 import {
-  getAssistantWorkspacesByAssistantId,
   getAssistantWorkspacesByWorkspaceId,
   getPublicAssistants
 } from "@/db/assistants"
 import { createClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
 import { Tables } from "@/supabase/types"
-import {
-  getHomeWorkspaceByUserId,
-  getWorkspacesByUserId
-} from "@/db/workspaces"
+import { getHomeWorkspaceByUserId } from "@/db/workspaces"
 import { AssistantCategories } from "@/components/assistants/assistant-categories"
 import { onlyUniqueById } from "@/lib/utils"
-import { IconGlobe, IconLock, IconWorld } from "@tabler/icons-react"
 import { SharingIcon } from "@/components/sharing/sharing-icon"
 import { slugify } from "@/db/lib/slugify"
 
@@ -74,7 +69,7 @@ function Assistants({
         ]}
       />
       {data?.length > 0 && (
-        <div className="grid w-full grid-cols-2 items-start justify-between gap-2 pb-6 lg:grid-cols-3">
+        <div className="grid w-full grid-cols-2 items-start justify-between gap-3 pb-6 lg:grid-cols-3">
           {data?.map(assistant => (
             <Link href={`/a/${slugify(assistant)}`} key={assistant.id}>
               <Card

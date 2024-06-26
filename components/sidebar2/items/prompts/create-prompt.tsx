@@ -6,13 +6,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { PROMPT_NAME_MAX } from "@/db/limits"
 import { TablesInsert } from "@/supabase/types"
 import React, { FC, useContext, useState } from "react"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select"
+import { PromptForm } from "@/components/sidebar2/items/prompts/prompt-form"
 
 interface CreatePromptProps {
   isOpen: boolean
@@ -43,69 +37,23 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
         {
           user_id: profile.user_id,
           name,
-          content
+          content,
+          icon,
+          sharing
         } as TablesInsert<"prompts">
       }
       renderInputs={() => (
-        <>
-          <div className="space-y-2">
-            <Label>Icon</Label>
-
-            <Input
-              placeholder="Prompt icon..."
-              value={icon}
-              onChange={e => setIcon(e.target.value)}
-              maxLength={PROMPT_NAME_MAX}
-              onCompositionStart={() => setIsTyping(true)}
-              onCompositionEnd={() => setIsTyping(false)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Name</Label>
-
-            <Input
-              placeholder="Prompt name..."
-              value={name}
-              onChange={e => setName(e.target.value)}
-              maxLength={PROMPT_NAME_MAX}
-              onCompositionStart={() => setIsTyping(true)}
-              onCompositionEnd={() => setIsTyping(false)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Prompt</Label>
-
-            <TextareaAutosize
-              placeholder="Prompt..."
-              value={content || ""}
-              onValueChange={setContent}
-              minRows={6}
-              maxRows={20}
-              onCompositionStart={() => setIsTyping(true)}
-              onCompositionEnd={() => setIsTyping(false)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Sharing</Label>
-
-            <Select value={sharing} onValueChange={setSharing}>
-              <SelectTrigger>
-                {sharing === "public" ? "Public" : "Private"}
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={"public"}>
-                  <SelectValue>Public</SelectValue>
-                </SelectItem>
-                <SelectItem value={"private"}>
-                  <SelectValue>Private</SelectValue>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </>
+        <PromptForm
+          icon={icon}
+          setIcon={setIcon}
+          name={name}
+          setName={setName}
+          content={content}
+          setContent={setContent}
+          sharing={sharing}
+          setIsTyping={setIsTyping}
+          setSharing={setSharing}
+        />
       )}
     />
   )

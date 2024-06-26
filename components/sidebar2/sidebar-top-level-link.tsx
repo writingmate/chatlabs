@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { forwardRef } from "react"
 import { cn } from "@/lib/utils"
+import { IconExternalLink } from "@tabler/icons-react"
 
 type SidebarSwitchItemProps = {
   icon: React.ReactNode
@@ -29,6 +30,7 @@ export const SidebarTopLevelLink = forwardRef<
     >
       {icon}
       <div className={"ml-3 flex-1 truncate text-left text-sm"}>{label}</div>
+      {target == "_blank" && <IconExternalLink size={18} stroke={1.5} />}
     </Link>
   )
 })

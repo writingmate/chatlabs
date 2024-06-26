@@ -29,7 +29,7 @@ export const SidebarSearch: FC<SidebarSearchProps> = ({
           onBlur={() => setHasFocus(false)}
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          placeholder={"Search"}
+          placeholder={"Search chats..."}
           className={"z-30 -ml-2 h-auto border-transparent px-2 py-0.5"}
         />
       </div>
