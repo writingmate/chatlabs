@@ -1,3 +1,4 @@
+"use client"
 import { ChatbotUIContext } from "@/context/context"
 import { updateAssistant } from "@/db/assistants"
 import { updateChat } from "@/db/chats"

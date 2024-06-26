@@ -48,7 +48,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
   const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
-    setIsDragging(true)
+    setIsDragging(event.dataTransfer.files?.length > 0)
   }
 
   const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {

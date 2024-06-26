@@ -30,7 +30,13 @@ export const SidebarTopLevelLink = forwardRef<
     >
       {icon}
       <div className={"ml-3 flex-1 truncate text-left text-sm"}>{label}</div>
-      {target == "_blank" && <IconExternalLink size={18} stroke={1.5} />}
+      {target == "_blank" && (
+        <IconExternalLink
+          className={"text-foreground/60"}
+          size={18}
+          stroke={1.5}
+        />
+      )}
     </Link>
   )
 })

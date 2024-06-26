@@ -1,9 +1,6 @@
 import { FC, useEffect, useRef } from "react"
-import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
-import { useSelectFileHandler } from "@/components/chat/chat-hooks/use-select-file-handler"
 import { useClickOutside } from "@/components/chat/picker-hooks/use-click-outside"
-import { VList } from "virtua"
 
 export const defaultItemRenderer = (
   item: any,
