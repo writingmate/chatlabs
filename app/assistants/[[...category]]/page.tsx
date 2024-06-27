@@ -2,7 +2,6 @@ import { SidebarCreateButtons } from "@/components/sidebar2/sidebar-create-butto
 import PageContent from "@/components/page/page-content"
 import PageHeader from "@/components/page/page-header"
 import PageTitle from "@/components/page/page-title"
-import { Dashboard } from "@/components/ui/dashboard"
 import {
   Card,
   CardContent,
