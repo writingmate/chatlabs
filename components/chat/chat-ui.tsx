@@ -280,7 +280,11 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
               )}
               {selectedAssistant && (
                 <>
-                  <AssistantIcon assistant={selectedAssistant} size={100} />
+                  <AssistantIcon
+                    className={"rounded-md"}
+                    assistant={selectedAssistant}
+                    size={100}
+                  />
                   <div className="text-foreground mt-4 text-center text-2xl font-bold">
                     {selectedAssistant.name}
                   </div>
