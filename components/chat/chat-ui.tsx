@@ -25,7 +25,7 @@ import { QuickSettings } from "@/components/chat/quick-settings"
 import { ChatSettings } from "@/components/chat/chat-settings"
 import { Brand } from "@/components/ui/brand"
 import { useTheme } from "next-themes"
-import { IconMessagePlus, IconSettings } from "@tabler/icons-react"
+import { IconEdit, IconMessagePlus, IconSettings } from "@tabler/icons-react"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { Tables } from "@/supabase/types"
@@ -266,6 +266,13 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
             />
           )}
           {!selectedAssistant && <QuickSettings />}
+          {selectedAssistant && user?.id === selectedAssistant.user_id && (
+            <Button className={"text-foreground"} variant={"ghost"}>
+              <Link href={`/a/${slugify(selectedAssistant)}/edit`}>
+                <IconEdit size={24} stroke={1.5} />
+              </Link>
+            </Button>
+          )}
         </div>
         <ChatSettings />
       </div>
@@ -291,15 +298,6 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
                   <div className="text-foreground mt-2 text-center text-sm">
                     {selectedAssistant.description}
                   </div>
-                  {user?.id === selectedAssistant.user_id && (
-                    <Link
-                      href={`/a/${slugify(selectedAssistant)}/details`}
-                      className={"text-foreground/80 absolute right-0 top-0"}
-                      onClick={handleNewChat}
-                    >
-                      <IconSettings size={24} stroke={1.5} />
-                    </Link>
-                  )}
                 </>
               )}
             </div>

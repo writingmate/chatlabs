@@ -3,8 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Dashboard } from "@/components/ui/dashboard"
 
 export default async function Layout({
-  children,
-  modal
+  children
 }: {
   children: React.ReactNode
   modal: React.ReactNode
@@ -19,7 +18,6 @@ export default async function Layout({
 
   return (
     <>
-      {modal}
       <Dashboard>{children}</Dashboard>
     </>
   )
