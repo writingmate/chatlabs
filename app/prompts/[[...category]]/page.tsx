@@ -24,14 +24,6 @@ function getPageTitle(category?: string) {
   return !category || category === "All" ? "Prompts" : category + " Prompts"
 }
 
-export async function generateStaticParams() {
-  const categories = await getPromptCategories()
-
-  return categories.map(cat => ({
-    params: { category: cat.name }
-  }))
-}
-
 export function generateMetadata({
   params: { category }
 }: {
@@ -64,18 +56,15 @@ export default async function PromptsPage({
   const supabase = createClient(cookieStore)
   const searchCategory = category === YOUR_PROMPTS ? undefined : category
   const categories = await getPromptCategories(supabase)
+  categories.unshift({ id: "your-prompts", name: YOUR_PROMPTS } as any)
   const session = (await supabase.auth.getSession()).data?.session
   const isAnonymous = !session?.user
   let workspacePrompts = []
   let categoryTitle = getPageTitle(category)
 
-  let data = await getPublicPrompts(supabase, {
-    category: searchCategory,
-    query
-  })
-
+  let data = []
   // If user is logged in, get their workspace prompts
-  if (!isAnonymous && session?.user) {
+  if (!isAnonymous && session?.user && category === YOUR_PROMPTS) {
     const workspaceId = await getHomeWorkspaceByUserId(
       session?.user.id,
       supabase
@@ -90,17 +79,12 @@ export default async function PromptsPage({
         supabase
       )
     ).prompts
-    categories.unshift({ id: "your-prompts", name: YOUR_PROMPTS } as any)
-    if (category === YOUR_PROMPTS) {
-      categoryTitle = YOUR_PROMPTS
-      data = workspacePrompts
-    } else {
-      const workspacePromptsIds = workspacePrompts.map(p => p.id)
-      data = [
-        ...data,
-        ...workspacePrompts.filter(p => !workspacePromptsIds.includes(p.id))
-      ]
-    }
+    data = workspacePrompts
+  } else {
+    data = await getPublicPrompts(supabase, {
+      category: searchCategory,
+      query
+    })
   }
 
   return (

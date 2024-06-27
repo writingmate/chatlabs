@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/browser-client"
-import { TablesInsert, TablesUpdate } from "@/supabase/types"
+import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 
 export const getPromptById = async (promptId: string) => {
@@ -227,20 +227,39 @@ export const getPublicPrompts = async (
     .select("*, prompt_category!inner(id, name)")
     .neq("sharing", "private")
 
-  if (search?.category) {
-    query.eq("prompt_category.name", search.category)
-  }
-
-  if (search?.query) {
-    query.or(
-      `name.ilike.%${search.query}%,description.ilike.%${search.query}%,content.ilike.%${search.query}%`
-    )
-  }
-
   const { data: prompts, error } = await query
+
+  console.log("prompts", JSON.stringify(prompts))
 
   if (error) {
     throw new Error(error.message)
+  }
+
+  if (search?.category && !search?.query) {
+    return prompts.filter(p =>
+      p.prompt_category.find(
+        (c: Tables<"prompt_category">) => c.name === search.category
+      )
+    )
+  }
+
+  if (search?.query && !search?.category) {
+    return prompts.filter(
+      p =>
+        p.name.includes(search.query) ||
+        p.description.includes(search.query) ||
+        p.content.includes(search.query)
+    )
+  }
+
+  if (search?.query && search?.category) {
+    return prompts.filter(
+      p =>
+        p.name.includes(search.query) ||
+        p.description.includes(search.query) ||
+        (p.content.includes(search.query) &&
+          p.prompt_category.name === search.category)
+    )
   }
 
   return prompts
