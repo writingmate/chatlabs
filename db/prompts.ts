@@ -229,8 +229,6 @@ export const getPublicPrompts = async (
 
   const { data: prompts, error } = await query
 
-  console.log("prompts", JSON.stringify(prompts))
-
   if (error) {
     throw new Error(error.message)
   }
