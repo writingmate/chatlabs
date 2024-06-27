@@ -140,30 +140,32 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
         <div className="flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
           <span className="text-xs lowercase">{language}</span>
           <div className="flex items-center space-x-1">
-            <ToggleGroup
-              onValueChange={value => {
-                setExecute(value === "execute")
-              }}
-              size={"xs"}
-              variant={"default"}
-              type={"single"}
-              value={execute ? "execute" : "code"}
-            >
-              <ToggleGroupItem
-                value={"code"}
-                className="space-x-1 text-xs text-white"
+            {["js", "html"].includes(language) && (
+              <ToggleGroup
+                onValueChange={value => {
+                  setExecute(value === "execute")
+                }}
+                size={"xs"}
+                variant={"default"}
+                type={"single"}
+                value={execute ? "execute" : "code"}
               >
-                <IconCode size={16} stroke={1.5} />
-                <span>Code</span>
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value={"execute"}
-                className="space-x-1 text-xs text-white"
-              >
-                <IconPlayerPlay size={16} stroke={1.5} />
-                <span>Run</span>
-              </ToggleGroupItem>
-            </ToggleGroup>
+                <ToggleGroupItem
+                  value={"code"}
+                  className="space-x-1 text-xs text-white"
+                >
+                  <IconCode size={16} stroke={1.5} />
+                  <span>Code</span>
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value={"execute"}
+                  className="space-x-1 text-xs text-white"
+                >
+                  <IconPlayerPlay size={16} stroke={1.5} />
+                  <span>Run</span>
+                </ToggleGroupItem>
+              </ToggleGroup>
+            )}
 
             <Button
               variant="link"
