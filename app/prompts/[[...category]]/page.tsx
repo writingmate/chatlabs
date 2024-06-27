@@ -24,6 +24,14 @@ function getPageTitle(category?: string) {
   return !category || category === "All" ? "Prompts" : category + " Prompts"
 }
 
+export async function generateStaticParams() {
+  const categories = await getPromptCategories()
+
+  return categories.map(cat => ({
+    params: { category: cat.name }
+  }))
+}
+
 export function generateMetadata({
   params: { category }
 }: {
@@ -60,8 +68,6 @@ export default async function PromptsPage({
   const isAnonymous = !session?.user
   let workspacePrompts = []
   let categoryTitle = getPageTitle(category)
-
-  console.log(query)
 
   let data = await getPublicPrompts(supabase, {
     category: searchCategory,
