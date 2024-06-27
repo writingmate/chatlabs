@@ -11,8 +11,6 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import React from "react"
-import { Toast } from "@/components/ui/toast"
-import { Alert } from "@/components/ui/alert"
 
 export function PromptForm({
   icon,
@@ -45,6 +43,7 @@ export function PromptForm({
           <Input
             placeholder="Prompt name..."
             value={name}
+            required={true}
             onChange={e => setName(e.target.value)}
             maxLength={PROMPT_NAME_MAX}
             onCompositionStart={() => setIsTyping(true)}

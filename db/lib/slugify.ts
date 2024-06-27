@@ -8,10 +8,8 @@ const MAX_SLUG_LENGTH = 100
 
 export function slugify(item: NameTitleWithHashID): string {
   if (!item.hashid) {
-    throw new Error("hashid is required")
-  }
-  if (!item.name && !item.title) {
-    throw new Error("name or title is required")
+    console.error("hashid is required")
+    return ""
   }
   const nameDash = (item.name || item.title)
     ?.trim()

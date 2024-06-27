@@ -26,7 +26,7 @@ import { slugify } from "@/db/lib/slugify"
 
 function Assistants({
   showCreateButton = true,
-  category,
+  category = "community",
   data
 }: {
   showCreateButton?: boolean
