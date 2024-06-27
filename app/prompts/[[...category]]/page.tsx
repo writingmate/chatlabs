@@ -38,7 +38,8 @@ export function generateMetadata({
 
 const YOUR_PROMPTS = "Your Prompts"
 export default async function PromptsPage({
-  params: { category, q: query }
+  params: { category = YOUR_PROMPTS },
+  searchParams: { q: query }
 }: {
   params: {
     category?:
@@ -46,6 +47,7 @@ export default async function PromptsPage({
       | typeof YOUR_PROMPTS
     q?: string
   }
+  searchParams: { q?: string }
 }) {
   if (category !== undefined) {
     category = decodeURI(category) as any
@@ -59,6 +61,8 @@ export default async function PromptsPage({
   let workspacePrompts = []
   let categoryTitle = getPageTitle(category)
 
+  console.log(query)
+
   let data = await getPublicPrompts(supabase, {
     category: searchCategory,
     query
@@ -71,7 +75,14 @@ export default async function PromptsPage({
       supabase
     )
     workspacePrompts = (
-      await getPromptWorkspacesByWorkspaceId(workspaceId, supabase)
+      await getPromptWorkspacesByWorkspaceId(
+        workspaceId,
+        {
+          category: searchCategory,
+          query
+        },
+        supabase
+      )
     ).prompts
     categories.unshift({ id: "your-prompts", name: YOUR_PROMPTS } as any)
     if (category === YOUR_PROMPTS) {

@@ -18,9 +18,10 @@ export const getPromptById = async (promptId: string) => {
 
 export const getPromptWorkspacesByWorkspaceId = async (
   workspaceId: string,
-  client?: SupabaseClient
+  search?: { category?: string; query?: string },
+  client: SupabaseClient = supabase
 ) => {
-  const { data: workspace, error } = await (client || supabase)
+  const query = client
     .from("workspaces")
     .select(
       `
@@ -30,7 +31,21 @@ export const getPromptWorkspacesByWorkspaceId = async (
     `
     )
     .eq("id", workspaceId)
-    .single()
+
+  if (search?.category) {
+    query.eq("prompts.prompt_category.name", search.category)
+  }
+
+  if (search?.query) {
+    query.or(
+      `name.ilike.%${search.query}%,description.ilike.%${search.query}%,content.ilike.%${search.query}%`,
+      {
+        referencedTable: "prompts"
+      }
+    )
+  }
+
+  const { data: workspace, error } = await query.single()
 
   if (!workspace) {
     throw new Error(error.message)
@@ -218,7 +233,7 @@ export const getPublicPrompts = async (
 
   if (search?.query) {
     query.or(
-      `name.ilike.*${search.query}*,description.ilike.*${search.query}*,content.ilike.*${search.query}*`
+      `name.ilike.%${search.query}%,description.ilike.%${search.query}%,content.ilike.%${search.query}%`
     )
   }
 

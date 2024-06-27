@@ -108,7 +108,7 @@ function Assistants({
 }
 
 export default async function AssistantsPage({
-  params: { category }
+  params: { category = ["community"] }
 }: {
   params: {
     category?: string[]
