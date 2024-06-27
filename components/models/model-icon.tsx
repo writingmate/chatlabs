@@ -103,7 +103,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
             theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
           )}
           src={perplexity.src}
-          alt="Mistral"
+          alt="Perplexity"
           width={width}
           height={height}
         />

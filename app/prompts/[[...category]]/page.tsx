@@ -24,12 +24,16 @@ function getPageTitle(category?: string) {
   return !category || category === "All" ? "Prompts" : category + " Prompts"
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params: { category }
 }: {
   params: { category?: string }
 }) {
-  const title = getPageTitle(category)
+  const categories = await getPromptCategories()
+  const title =
+    YOUR_PROMPTS ||
+    categories.find(c => c.name === category)?.page_title ||
+    "Prompts"
   return {
     title: `Best ${title} for Large Language Models`,
     description: `Explore ${category} prompts for large language models`
@@ -60,7 +64,10 @@ export default async function PromptsPage({
   const session = (await supabase.auth.getSession()).data?.session
   const isAnonymous = !session?.user
   let workspacePrompts = []
-  let categoryTitle = getPageTitle(category)
+  let categoryTitle =
+    YOUR_PROMPTS ||
+    categories.find(c => c.name === category)?.page_title ||
+    "Prompts"
 
   let data = []
   // If user is logged in, get their workspace prompts
