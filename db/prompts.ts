@@ -238,7 +238,8 @@ export const getPublicPrompts = async (
   if (search?.category && !search?.query) {
     return prompts.filter(p =>
       p.prompt_category.find(
-        (c: Tables<"prompt_category">) => c.name === search.category
+        (c: Tables<"prompt_category">) =>
+          c.name.toLowerCase() === search.category?.toLowerCase()
       )
     )
   }
@@ -246,19 +247,22 @@ export const getPublicPrompts = async (
   if (search?.query && !search?.category) {
     return prompts.filter(
       p =>
-        p.name.includes(search.query) ||
-        p.description.includes(search.query) ||
-        p.content.includes(search.query)
+        p.name.toLowerCase().includes(search.query?.toLowerCase()) ||
+        p.description.toLowerCase().includes(search.query?.toLowerCase()) ||
+        p.content.toLowerCase().includes(search.query?.toLowerCase())
     )
   }
 
   if (search?.query && search?.category) {
     return prompts.filter(
       p =>
-        p.name.includes(search.query) ||
-        p.description.includes(search.query) ||
-        (p.content.includes(search.query) &&
-          p.prompt_category.name === search.category)
+        p.name.toLowerCase().includes(search.query?.toLowerCase()) ||
+        p.description.toLowerCase().includes(search.query?.toLowerCase()) ||
+        (p.content.toLowerCase().includes(search.query?.toLowerCase()) &&
+          p.prompt_category.find(
+            (c: Tables<"prompt_category">) =>
+              c.name.toLowerCase() === search.category?.toLowerCase()
+          ))
     )
   }
 
