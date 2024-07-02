@@ -3,9 +3,14 @@ import { FC } from "react"
 interface ChatbotUISVGProps {
   theme: "dark" | "light"
   scale?: number
+  className?: string
 }
 
-export const ChatbotUISVG: FC<ChatbotUISVGProps> = ({ theme, scale = 1 }) => {
+export const ChatbotUISVG: FC<ChatbotUISVGProps> = ({
+  theme,
+  scale = 1,
+  className
+}) => {
   return (
     <svg
       width={141 * scale}
@@ -13,6 +18,7 @@ export const ChatbotUISVG: FC<ChatbotUISVGProps> = ({ theme, scale = 1 }) => {
       viewBox="0 0 141 140"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
     >
       <path
         fillRule="evenodd"

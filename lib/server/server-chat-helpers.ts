@@ -9,7 +9,7 @@ import { SubscriptionRequiredError } from "@/lib/errors"
 import { validateProPlan } from "@/lib/subscription"
 import { PLAN_FREE } from "@/lib/stripe/config"
 
-function createClient() {
+export function createClient() {
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

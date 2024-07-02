@@ -30,9 +30,12 @@ export async function POST(req: Request) {
     const file_id = formData.get("file_id") as string
     const embeddingsProvider = formData.get("embeddingsProvider") as string
 
+    console.log(file)
+
     const fileBuffer = Buffer.from(await file.arrayBuffer())
     const blob = new Blob([fileBuffer])
-    const fileExtension = file.name.split(".").pop()?.toLowerCase()
+
+    const fileExtension = file.type.split("/")?.[1]
 
     if (embeddingsProvider === "openai") {
       if (profile.use_azure_openai) {
@@ -59,6 +62,9 @@ export async function POST(req: Request) {
         break
       case "txt":
         chunks = await processTxt(blob)
+        break
+      case "html":
+        chunks = await processTxt(blob, 0)
         break
       default:
         return createErrorResponse("Unsupported file type", 400)
