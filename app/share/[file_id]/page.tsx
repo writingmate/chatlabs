@@ -39,27 +39,27 @@ export default async function SharePage({
 
   return (
     <div className={"relative size-full"}>
-      <iframe className={"size-full border-none"} srcDoc={html} />
+      <iframe className={"size-full border-none pb-12"} srcDoc={html} />
       <div
         className={
           "absolute bottom-0 flex w-full items-center justify-center space-x-2 bg-violet-700 p-4 text-sm text-white"
         }
       >
-        <div className={"flex items-center"}>
-          Build with{" "}
-          <ChatbotUISVG scale={0.1} theme={"dark"} className={"mx-2"} />
+        <div
+          className={
+            "flex items-center rounded-lg border border-white p-2 px-3"
+          }
+        >
           <a
+            target={"_blank"}
             className={"font-semibold"}
-            href={`https://writingmate.ai/?utm_source=app_share&utm_medium=${file_id}`}
+            href={`https://labs.writingmate.ai/?utm_source=app_share&utm_medium=${file_id}`}
           >
-            ChatLabs App Builder
+            Build with ChatLabs No Code App Builder
           </a>
+          <ChatbotUISVG scale={0.15} theme={"dark"} className={"ml-2"} />
         </div>
-        <div>
-          <Button size={"sm"} className={"bg-violet-700"} variant={"outline"}>
-            Build your app now
-          </Button>
-        </div>
+        <div></div>
       </div>
     </div>
   )
