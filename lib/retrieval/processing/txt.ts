@@ -3,10 +3,17 @@ import { encode } from "gpt-tokenizer"
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
 import { CHUNK_OVERLAP, CHUNK_SIZE } from "."
 
-export const processTxt = async (txt: Blob): Promise<FileItemChunk[]> => {
+export const processTxt = async (
+  txt: Blob,
+  chunkSize = CHUNK_SIZE
+): Promise<FileItemChunk[]> => {
   const fileBuffer = Buffer.from(await txt.arrayBuffer())
   const textDecoder = new TextDecoder("utf-8")
   const textContent = textDecoder.decode(fileBuffer)
+
+  if (chunkSize === 0) {
+    return [{ content: textContent, tokens: encode(textContent).length }]
+  }
 
   const splitter = new RecursiveCharacterTextSplitter({
     chunkSize: CHUNK_SIZE,

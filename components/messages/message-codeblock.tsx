@@ -2,16 +2,25 @@ import { Button } from "@/components/ui/button"
 import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard"
 import {
   IconCheck,
+  IconCloudUpload,
   IconCode,
   IconCopy,
   IconDownload,
-  IconPlayerPlay
+  IconPlayerPlay,
+  IconShare,
+  IconShare2,
+  IconShare3
 } from "@tabler/icons-react"
-import { FC, memo, useEffect, useRef, useState } from "react"
+import { FC, memo, useContext, useEffect, useRef, useState } from "react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism"
 import { Switch } from "@/components/ui/switch"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { createFile } from "@/db/files"
+import { useAuth } from "@/context/auth"
+import { ChatbotUIChatContext } from "@/context/chat"
+import { ChatbotUIContext } from "@/context/context"
+import { toast } from "sonner"
 
 interface MessageCodeBlockProps {
   language: string
@@ -59,7 +68,10 @@ export const generateRandomString = (length: number, lowercase = false) => {
 
 export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
   ({ language, value }) => {
+    const { user } = useAuth()
+    const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
     const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
+    const [sharing, setSharing] = useState(false)
 
     const [execute, setExecute] = useState(false)
 
@@ -95,6 +107,46 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     const onCopy = () => {
       if (isCopied) return
       copyToClipboard(value)
+    }
+
+    const shareHtmlCode = () => {
+      if (!selectedWorkspace || !chatSettings || !user) {
+        toast.error("Please select a workspace")
+        return
+      }
+
+      setSharing(true)
+
+      const htmlFile: File = new File([value], "index.html", {
+        type: "text/html"
+      })
+
+      toast.info("Sharing your code. You will be redirected shortly...")
+      createFile(
+        htmlFile,
+        {
+          user_id: user.id,
+          description: "",
+          file_path: "",
+          name: htmlFile.name,
+          size: htmlFile.size,
+          sharing: "public",
+          tokens: 0,
+          type: "html"
+        },
+        selectedWorkspace.id,
+        chatSettings.embeddingsProvider
+      )
+        .then(result => {
+          toast.success("Your code has been shared successfully.")
+          window.open(`/share/${result.id}`, "_blank")
+        })
+        .catch(error => {
+          toast.error("Failed to upload.")
+        })
+        .finally(() => {
+          setSharing(false)
+        })
     }
 
     useEffect(() => {
@@ -141,33 +193,53 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           <span className="text-xs lowercase">{language}</span>
           <div className="flex items-center space-x-1">
             {["javascript", "js", "html"].includes(language.toLowerCase()) && (
-              <ToggleGroup
-                onValueChange={value => {
-                  setExecute(value === "execute")
-                }}
-                size={"xs"}
-                variant={"default"}
-                type={"single"}
-                value={execute ? "execute" : "code"}
-              >
-                <ToggleGroupItem
-                  value={"code"}
-                  className="space-x-1 text-xs text-white"
+              <>
+                <ToggleGroup
+                  onValueChange={value => {
+                    setExecute(value === "execute")
+                  }}
+                  size={"xs"}
+                  variant={"default"}
+                  className={
+                    "gap-0 overflow-hidden rounded-md border border-white"
+                  }
+                  type={"single"}
+                  value={execute ? "execute" : "code"}
                 >
-                  <IconCode size={16} stroke={1.5} />
-                  <span>Code</span>
-                </ToggleGroupItem>
-                <ToggleGroupItem
-                  value={"execute"}
-                  className="space-x-1 text-xs text-white"
-                >
-                  <IconPlayerPlay size={16} stroke={1.5} />
-                  <span>Run</span>
-                </ToggleGroupItem>
-              </ToggleGroup>
+                  <ToggleGroupItem
+                    title={"View the code"}
+                    value={"code"}
+                    className="space-x-1 rounded-none border-none text-xs text-white"
+                  >
+                    <IconCode size={16} stroke={1.5} />
+                    <span>Code</span>
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    title={"Run the code"}
+                    value={"execute"}
+                    className="space-x-1 rounded-none border-none text-xs text-white"
+                  >
+                    <IconPlayerPlay size={16} stroke={1.5} />
+                    <span>Run</span>
+                  </ToggleGroupItem>
+                </ToggleGroup>
+                {language == "html" && (
+                  <Button
+                    title={"Share you app with others"}
+                    loading={sharing}
+                    className="text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
+                    onClick={shareHtmlCode}
+                    variant="link"
+                    size="icon"
+                  >
+                    <IconShare3 size={16} />
+                  </Button>
+                )}
+              </>
             )}
 
             <Button
+              title={"Download as file"}
               variant="link"
               size="icon"
               className="text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
@@ -177,6 +249,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
             </Button>
 
             <Button
+              title={"Copy to clipboard"}
               variant="link"
               size="icon"
               className="text-xs text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"

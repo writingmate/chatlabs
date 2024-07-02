@@ -6,7 +6,7 @@ import { uploadFile } from "./storage/files"
 export const getFileById = async (fileId: string) => {
   const { data: file, error } = await supabase
     .from("files")
-    .select("*")
+    .select("*, file_items (*)")
     .eq("id", fileId)
     .single()
 
