@@ -122,6 +122,14 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       })
 
       toast.info("Sharing your code. You will be redirected shortly...")
+
+      const windowRef = window.open()
+
+      if (!windowRef) {
+        toast.error("Failed to open a new window.")
+        return
+      }
+
       createFile(
         htmlFile,
         {
@@ -139,10 +147,11 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       )
         .then(result => {
           toast.success("Your code has been shared successfully.")
-          window.open(`/share/${result.id}`, "_blank")
+          windowRef.location = `/share/${result.hashid}`
         })
         .catch(error => {
           toast.error("Failed to upload.")
+          windowRef?.close()
         })
         .finally(() => {
           setSharing(false)

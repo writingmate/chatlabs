@@ -1,5 +1,5 @@
 "use client"
-import { getFileById } from "@/db/files"
+import { getFileByHashId, getFileById } from "@/db/files"
 import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
@@ -11,7 +11,7 @@ export default async function SharePage({
     file_id: string
   }
 }) {
-  const file = await getFileById(file_id)
+  const file = await getFileByHashId(file_id)
 
   if (
     !file ||
