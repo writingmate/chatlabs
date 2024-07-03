@@ -2,16 +2,25 @@ import { Button } from "@/components/ui/button"
 import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard"
 import {
   IconCheck,
+  IconCloudUpload,
   IconCode,
   IconCopy,
   IconDownload,
-  IconPlayerPlay
+  IconPlayerPlay,
+  IconShare,
+  IconShare2,
+  IconShare3
 } from "@tabler/icons-react"
-import { FC, memo, useEffect, useRef, useState } from "react"
+import { FC, memo, useContext, useEffect, useRef, useState } from "react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism"
-import { Switch } from "@/components/ui/switch"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { createFile } from "@/db/files"
+import { useAuth } from "@/context/auth"
+import { ChatbotUIContext } from "@/context/context"
+import { toast } from "sonner"
+import { Label } from "@/components/ui/label"
+import { cn } from "@/lib/utils"
 
 interface MessageCodeBlockProps {
   language: string
@@ -57,11 +66,43 @@ export const generateRandomString = (length: number, lowercase = false) => {
   return lowercase ? result.toLowerCase() : result
 }
 
+function CopyButton({
+  value,
+  title = "Copy to clipboard",
+  className
+}: {
+  value: string
+  title?: string
+  className?: string
+}) {
+  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
+  return (
+    <Button
+      title={title}
+      variant="link"
+      size="sm"
+      className={cn(
+        "text-xs text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0",
+        className
+      )}
+      onClick={() => {
+        if (isCopied) return
+        copyToClipboard(value)
+      }}
+    >
+      {isCopied ? <IconCheck size={16} /> : <IconCopy size={16} />}
+    </Button>
+  )
+}
+
 export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
   ({ language, value }) => {
-    const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
+    const { user } = useAuth()
+    const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
+    const [sharing, setSharing] = useState(false)
 
     const [execute, setExecute] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     const refIframe = useRef<HTMLIFrameElement>(null)
 
@@ -92,24 +133,54 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       URL.revokeObjectURL(url)
     }
 
-    const onCopy = () => {
-      if (isCopied) return
-      copyToClipboard(value)
-    }
+    const shareHtmlCode = () => {
+      if (!selectedWorkspace || !chatSettings || !user) {
+        toast.error("Please select a workspace")
+        return
+      }
 
-    useEffect(() => {
-      const receiveMessage = (event: MessageEvent) => {
-        if (event.data.type === "resize") {
-          if (refIframe.current) {
-            refIframe.current.style.height = event.data.height + "px"
-          }
-        }
+      setSharing(true)
+
+      const htmlFile: File = new File([value], "index.html", {
+        type: "text/html"
+      })
+
+      toast.info("Sharing your code. You will be redirected shortly...")
+
+      const windowRef = window.open("/share/placeholder", "_blank")
+
+      if (!windowRef) {
+        toast.error("Failed to open a new window.")
+        return
       }
-      window.addEventListener("message", receiveMessage)
-      return () => {
-        window.removeEventListener("message", receiveMessage)
-      }
-    }, [])
+
+      createFile(
+        htmlFile,
+        {
+          user_id: user.id,
+          description: "",
+          file_path: "",
+          name: htmlFile.name,
+          size: htmlFile.size,
+          sharing: "public",
+          tokens: 0,
+          type: "html"
+        },
+        selectedWorkspace.id,
+        chatSettings.embeddingsProvider
+      )
+        .then(result => {
+          toast.success("Your code has been shared successfully.")
+          windowRef.location = `/share/${result.hashid}`
+        })
+        .catch(error => {
+          toast.error("Failed to upload.")
+          windowRef?.close()
+        })
+        .finally(() => {
+          setSharing(false)
+        })
+    }
 
     const sendHeightJS = `
     <script>
@@ -124,9 +195,28 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     </script>
     `
 
-    function addScriptToHtml(html: string) {
+    const errorHandlingScript = `
+      <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+          window.parent.postMessage({
+            type: "error",
+            message: message,
+            source: source,
+            lineno: lineno,
+            colno: colno
+          }, "*");
+          return true;
+        };
+      </script>
+    `
+
+    function addScriptsToHtml(html: string) {
       const parser = new DOMParser()
       const doc = parser.parseFromString(html, "text/html")
+      const head = doc.querySelector("head")
+      if (head) {
+        head.innerHTML = errorHandlingScript + head.innerHTML
+      }
       const body = doc.querySelector("body")
       if (body) {
         body.innerHTML += sendHeightJS
@@ -135,39 +225,78 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       return html
     }
 
+    useEffect(() => {
+      const receiveMessage = (event: MessageEvent) => {
+        if (event.data.type === "resize") {
+          if (refIframe.current) {
+            refIframe.current.style.height = event.data.height + "px"
+          }
+        } else if (event.data.type === "error") {
+          setError(
+            `Error: ${event.data.message}\nLine: ${event.data.lineno}, Column: ${event.data.colno}`
+          )
+        }
+      }
+      window.addEventListener("message", receiveMessage)
+      return () => {
+        window.removeEventListener("message", receiveMessage)
+      }
+    }, [])
+
     return (
       <div className="codeblock relative w-full bg-zinc-950 font-sans">
-        <div className="flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
+        <div className="sticky top-0 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
           <span className="text-xs lowercase">{language}</span>
           <div className="flex items-center space-x-1">
             {["javascript", "js", "html"].includes(language.toLowerCase()) && (
-              <ToggleGroup
-                onValueChange={value => {
-                  setExecute(value === "execute")
-                }}
-                size={"xs"}
-                variant={"default"}
-                type={"single"}
-                value={execute ? "execute" : "code"}
-              >
-                <ToggleGroupItem
-                  value={"code"}
-                  className="space-x-1 text-xs text-white"
+              <>
+                <ToggleGroup
+                  onValueChange={value => {
+                    setExecute(value === "execute")
+                    setError(null) // Clear any previous errors when switching modes
+                  }}
+                  size={"xs"}
+                  variant={"default"}
+                  className={
+                    "gap-0 overflow-hidden rounded-md border border-white"
+                  }
+                  type={"single"}
+                  value={execute ? "execute" : "code"}
                 >
-                  <IconCode size={16} stroke={1.5} />
-                  <span>Code</span>
-                </ToggleGroupItem>
-                <ToggleGroupItem
-                  value={"execute"}
-                  className="space-x-1 text-xs text-white"
-                >
-                  <IconPlayerPlay size={16} stroke={1.5} />
-                  <span>Run</span>
-                </ToggleGroupItem>
-              </ToggleGroup>
+                  <ToggleGroupItem
+                    title={"View the code"}
+                    value={"code"}
+                    className="space-x-1 rounded-none border-none text-xs text-white"
+                  >
+                    <IconCode size={16} stroke={1.5} />
+                    <span>Code</span>
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    title={"Run the code"}
+                    value={"execute"}
+                    className="space-x-1 rounded-none border-none text-xs text-white"
+                  >
+                    <IconPlayerPlay size={16} stroke={1.5} />
+                    <span>Run</span>
+                  </ToggleGroupItem>
+                </ToggleGroup>
+                {language == "html" && (
+                  <Button
+                    title={"Share you app with others"}
+                    loading={sharing}
+                    className="text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
+                    onClick={shareHtmlCode}
+                    variant="link"
+                    size="icon"
+                  >
+                    <IconShare3 size={16} />
+                  </Button>
+                )}
+              </>
             )}
 
             <Button
+              title={"Download as file"}
               variant="link"
               size="icon"
               className="text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
@@ -176,34 +305,46 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               <IconDownload size={16} />
             </Button>
 
-            <Button
-              variant="link"
-              size="icon"
-              className="text-xs text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
-              onClick={onCopy}
-            >
-              {isCopied ? <IconCheck size={16} /> : <IconCopy size={16} />}
-            </Button>
+            <CopyButton value={value} />
           </div>
         </div>
         {execute ? (
-          <iframe
-            ref={refIframe}
-            className={"size-full min-h-[400px] border-none bg-white"}
-            srcDoc={
-              language === "html"
-                ? addScriptToHtml(value)
-                : `<script>${value}</script>${sendHeightJS}`
-            }
-          />
+          <>
+            <iframe
+              ref={refIframe}
+              className={"size-full min-h-[400px] border-none bg-white"}
+              srcDoc={
+                language === "html"
+                  ? addScriptsToHtml(value)
+                  : `${errorHandlingScript}<script>${value}</script>${sendHeightJS}`
+              }
+            />
+            {error && (
+              <div className="absolute bottom-0 max-h-[200px] w-full overflow-auto rounded bg-red-100 p-3 text-sm text-red-800">
+                <div className={"flex items-center justify-between gap-1"}>
+                  <Label>Console errors</Label>
+                  <CopyButton
+                    className={"text-red-800"}
+                    value={error}
+                    title={"Copy error message"}
+                  />
+                </div>
+                <div
+                  className={
+                    "margin-0 relative whitespace-pre bg-red-100 font-mono text-xs text-red-800"
+                  }
+                >
+                  {error}
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <SyntaxHighlighter
             language={language}
             style={oneDark}
-            // showLineNumbers
             customStyle={{
               margin: 0,
-              // width: "100%",
               background: "transparent"
             }}
             codeTagProps={{

@@ -4,10 +4,42 @@ import mammoth from "mammoth"
 import { uploadFile } from "./storage/files"
 
 export const getFileById = async (fileId: string) => {
+  // if file_id is short, search by hashid field
+  // otherwise, search by id field
+
   const { data: file, error } = await supabase
     .from("files")
-    .select("*")
+    .select("*, file_items (*)")
     .eq("id", fileId)
+    .single()
+
+  if (!file) {
+    throw new Error(error.message)
+  }
+
+  return file
+}
+
+export const getAllPublicHtmlFiles = async () => {
+  const { data: files, error } = await supabase
+    .from("files")
+    .select("id, hashid, name, description, file_items (content)")
+    .eq("type", "html")
+    .eq("sharing", "public")
+    .order("created_at", { ascending: false })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return files
+}
+
+export const getFileByHashId = async (hashId: string) => {
+  const { data: file, error } = await supabase
+    .from("files")
+    .select("*, file_items (*)")
+    .eq("hashid", hashId)
     .single()
 
   if (!file) {
