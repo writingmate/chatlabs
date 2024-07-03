@@ -20,6 +20,21 @@ export const getFileById = async (fileId: string) => {
   return file
 }
 
+export const getAllPublicHtmlFiles = async () => {
+  const { data: files, error } = await supabase
+    .from("files")
+    .select("id, hashid, name, description, file_items (content)")
+    .eq("type", "html")
+    .eq("sharing", "public")
+    .order("created_at", { ascending: false })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return files
+}
+
 export const getFileByHashId = async (hashId: string) => {
   const { data: file, error } = await supabase
     .from("files")

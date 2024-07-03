@@ -14,13 +14,13 @@ import {
 import { FC, memo, useContext, useEffect, useRef, useState } from "react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism"
-import { Switch } from "@/components/ui/switch"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { createFile } from "@/db/files"
 import { useAuth } from "@/context/auth"
-import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { toast } from "sonner"
+import { Label } from "@/components/ui/label"
+import { cn } from "@/lib/utils"
 
 interface MessageCodeBlockProps {
   language: string
@@ -66,14 +66,43 @@ export const generateRandomString = (length: number, lowercase = false) => {
   return lowercase ? result.toLowerCase() : result
 }
 
+function CopyButton({
+  value,
+  title = "Copy to clipboard",
+  className
+}: {
+  value: string
+  title?: string
+  className?: string
+}) {
+  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
+  return (
+    <Button
+      title={title}
+      variant="link"
+      size="sm"
+      className={cn(
+        "text-xs text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0",
+        className
+      )}
+      onClick={() => {
+        if (isCopied) return
+        copyToClipboard(value)
+      }}
+    >
+      {isCopied ? <IconCheck size={16} /> : <IconCopy size={16} />}
+    </Button>
+  )
+}
+
 export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
   ({ language, value }) => {
     const { user } = useAuth()
     const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
-    const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
     const [sharing, setSharing] = useState(false)
 
     const [execute, setExecute] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     const refIframe = useRef<HTMLIFrameElement>(null)
 
@@ -104,11 +133,6 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       URL.revokeObjectURL(url)
     }
 
-    const onCopy = () => {
-      if (isCopied) return
-      copyToClipboard(value)
-    }
-
     const shareHtmlCode = () => {
       if (!selectedWorkspace || !chatSettings || !user) {
         toast.error("Please select a workspace")
@@ -123,7 +147,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
       toast.info("Sharing your code. You will be redirected shortly...")
 
-      const windowRef = window.open()
+      const windowRef = window.open("/share/placeholder", "_blank")
 
       if (!windowRef) {
         toast.error("Failed to open a new window.")
@@ -158,20 +182,6 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
         })
     }
 
-    useEffect(() => {
-      const receiveMessage = (event: MessageEvent) => {
-        if (event.data.type === "resize") {
-          if (refIframe.current) {
-            refIframe.current.style.height = event.data.height + "px"
-          }
-        }
-      }
-      window.addEventListener("message", receiveMessage)
-      return () => {
-        window.removeEventListener("message", receiveMessage)
-      }
-    }, [])
-
     const sendHeightJS = `
     <script>
     function sendHeight() {
@@ -185,9 +195,28 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     </script>
     `
 
-    function addScriptToHtml(html: string) {
+    const errorHandlingScript = `
+      <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+          window.parent.postMessage({
+            type: "error",
+            message: message,
+            source: source,
+            lineno: lineno,
+            colno: colno
+          }, "*");
+          return true;
+        };
+      </script>
+    `
+
+    function addScriptsToHtml(html: string) {
       const parser = new DOMParser()
       const doc = parser.parseFromString(html, "text/html")
+      const head = doc.querySelector("head")
+      if (head) {
+        head.innerHTML = errorHandlingScript + head.innerHTML
+      }
       const body = doc.querySelector("body")
       if (body) {
         body.innerHTML += sendHeightJS
@@ -196,9 +225,27 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       return html
     }
 
+    useEffect(() => {
+      const receiveMessage = (event: MessageEvent) => {
+        if (event.data.type === "resize") {
+          if (refIframe.current) {
+            refIframe.current.style.height = event.data.height + "px"
+          }
+        } else if (event.data.type === "error") {
+          setError(
+            `Error: ${event.data.message}\nLine: ${event.data.lineno}, Column: ${event.data.colno}`
+          )
+        }
+      }
+      window.addEventListener("message", receiveMessage)
+      return () => {
+        window.removeEventListener("message", receiveMessage)
+      }
+    }, [])
+
     return (
       <div className="codeblock relative w-full bg-zinc-950 font-sans">
-        <div className="flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
+        <div className="sticky top-0 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
           <span className="text-xs lowercase">{language}</span>
           <div className="flex items-center space-x-1">
             {["javascript", "js", "html"].includes(language.toLowerCase()) && (
@@ -206,6 +253,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                 <ToggleGroup
                   onValueChange={value => {
                     setExecute(value === "execute")
+                    setError(null) // Clear any previous errors when switching modes
                   }}
                   size={"xs"}
                   variant={"default"}
@@ -257,35 +305,46 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               <IconDownload size={16} />
             </Button>
 
-            <Button
-              title={"Copy to clipboard"}
-              variant="link"
-              size="icon"
-              className="text-xs text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
-              onClick={onCopy}
-            >
-              {isCopied ? <IconCheck size={16} /> : <IconCopy size={16} />}
-            </Button>
+            <CopyButton value={value} />
           </div>
         </div>
         {execute ? (
-          <iframe
-            ref={refIframe}
-            className={"size-full min-h-[400px] border-none bg-white"}
-            srcDoc={
-              language === "html"
-                ? addScriptToHtml(value)
-                : `<script>${value}</script>${sendHeightJS}`
-            }
-          />
+          <>
+            <iframe
+              ref={refIframe}
+              className={"size-full min-h-[400px] border-none bg-white"}
+              srcDoc={
+                language === "html"
+                  ? addScriptsToHtml(value)
+                  : `${errorHandlingScript}<script>${value}</script>${sendHeightJS}`
+              }
+            />
+            {error && (
+              <div className="absolute bottom-0 max-h-[200px] w-full overflow-auto rounded bg-red-100 p-3 text-sm text-red-800">
+                <div className={"flex items-center justify-between gap-1"}>
+                  <Label>Console errors</Label>
+                  <CopyButton
+                    className={"text-red-800"}
+                    value={error}
+                    title={"Copy error message"}
+                  />
+                </div>
+                <div
+                  className={
+                    "margin-0 relative whitespace-pre bg-red-100 font-mono text-xs text-red-800"
+                  }
+                >
+                  {error}
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <SyntaxHighlighter
             language={language}
             style={oneDark}
-            // showLineNumbers
             customStyle={{
               margin: 0,
-              // width: "100%",
               background: "transparent"
             }}
             codeTagProps={{

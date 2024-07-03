@@ -1,7 +1,6 @@
 "use client"
-import { getFileByHashId, getFileById } from "@/db/files"
+import { getFileByHashId } from "@/db/files"
 import { notFound } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
 
 export default async function SharePage({
@@ -55,7 +54,7 @@ export default async function SharePage({
             className={"font-semibold"}
             href={`https://labs.writingmate.ai/?utm_source=app_share&utm_medium=${file_id}`}
           >
-            Build with ChatLabs No Code App Builder
+            Built with ChatLabs No Code App Builder
           </a>
           <ChatbotUISVG scale={0.15} theme={"dark"} className={"ml-2"} />
         </div>
