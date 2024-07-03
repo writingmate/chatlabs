@@ -180,8 +180,6 @@ export class AnthropicFunctionCaller implements FunctionCaller {
       }
     }))
 
-    console.log("anthropicTools", anthropicTools)
-
     const anthropicMessages = withoutSystemMessages.map(message => {
       if (message.role === "tool") {
         return {
@@ -195,7 +193,7 @@ export class AnthropicFunctionCaller implements FunctionCaller {
           ]
         }
       }
-      console.log("message", message)
+
       if (message.role === "assistant") {
         return {
           role: "assistant",
@@ -204,12 +202,14 @@ export class AnthropicFunctionCaller implements FunctionCaller {
               type: "text",
               text: message.content
             },
-            ...message.tool_calls?.map((toolCall: any) => ({
-              id: toolCall.id,
-              type: "tool_use",
-              name: toolCall.function.name,
-              input: toolCall.function.arguments
-            }))
+            ...(message.tool_calls
+              ? message.tool_calls?.map((toolCall: any) => ({
+                  id: toolCall.id,
+                  type: "tool_use",
+                  name: toolCall.function.name,
+                  input: toolCall.function.arguments
+                }))
+              : [])
           ]
         }
       }
