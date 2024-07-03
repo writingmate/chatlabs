@@ -168,6 +168,8 @@ export class AnthropicFunctionCaller implements FunctionCaller {
       messages.filter(x => x.role === "system")[0]?.content ?? ""
     const withoutSystemMessages = messages.filter(x => x.role !== "system")
 
+    console.log("anthropicTools", tools)
+
     const anthropicTools = tools?.map(tool => ({
       name: tool.function.name,
       description: tool.function.description,
@@ -177,6 +179,8 @@ export class AnthropicFunctionCaller implements FunctionCaller {
         properties: tool.function.parameters?.properties?.parameters?.properties
       }
     }))
+
+    console.log("anthropicTools", anthropicTools)
 
     const anthropicMessages = withoutSystemMessages.map(message => {
       if (message.role === "tool") {
@@ -191,6 +195,7 @@ export class AnthropicFunctionCaller implements FunctionCaller {
           ]
         }
       }
+      console.log("message", message)
       if (message.role === "assistant") {
         return {
           role: "assistant",
@@ -211,8 +216,6 @@ export class AnthropicFunctionCaller implements FunctionCaller {
 
       return message
     })
-
-    console.log(anthropicMessages[1].content[1])
 
     const response = await this.client.messages.create({
       model: model,
