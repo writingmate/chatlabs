@@ -30,8 +30,6 @@ export async function POST(req: Request) {
     const file_id = formData.get("file_id") as string
     const embeddingsProvider = formData.get("embeddingsProvider") as string
 
-    console.log(file)
-
     const fileBuffer = Buffer.from(await file.arrayBuffer())
     const blob = new Blob([fileBuffer])
 
