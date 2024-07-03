@@ -716,6 +716,7 @@ export interface Database {
           description: string
           file_path: string
           folder_id: string | null
+          hashid: string
           id: string
           name: string
           sharing: string
@@ -730,6 +731,7 @@ export interface Database {
           description: string
           file_path: string
           folder_id?: string | null
+          hashid?: string
           id?: string
           name: string
           sharing?: string
@@ -744,6 +746,7 @@ export interface Database {
           description?: string
           file_path?: string
           folder_id?: string | null
+          hashid?: string
           id?: string
           name?: string
           sharing?: string
@@ -1614,8 +1617,17 @@ export interface Database {
         Row: {
           last_used_at: string | null
           model: string | null
+          user_id: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "chats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Functions: {
