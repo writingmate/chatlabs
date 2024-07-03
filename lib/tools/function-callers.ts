@@ -140,16 +140,18 @@ export class AnthropicFunctionCaller implements FunctionCaller {
     return {
       role: "assistant",
       content: text.text,
-      tool_calls: [
-        {
-          id: toolCalls.id,
-          type: "function",
-          function: {
-            name: toolCalls.name,
-            arguments: toolCalls.input
-          }
-        }
-      ]
+      tool_calls: toolCalls
+        ? [
+            {
+              id: toolCalls.id,
+              type: "function",
+              function: {
+                name: toolCalls.name,
+                arguments: toolCalls.input
+              }
+            }
+          ]
+        : []
     }
   }
 
@@ -167,8 +169,6 @@ export class AnthropicFunctionCaller implements FunctionCaller {
     const existingSystemPrompt =
       messages.filter(x => x.role === "system")[0]?.content ?? ""
     const withoutSystemMessages = messages.filter(x => x.role !== "system")
-
-    console.log("anthropicTools", tools)
 
     const anthropicTools = tools?.map(tool => ({
       name: tool.function.name,
