@@ -2,6 +2,7 @@
 import { getFileByHashId } from "@/db/files"
 import { notFound } from "next/navigation"
 import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
+import { IconExternalLink } from "@tabler/icons-react"
 
 export default async function SharePage({
   params: { file_id }
@@ -38,27 +39,23 @@ export default async function SharePage({
 
   return (
     <div className={"relative size-full"}>
-      <iframe className={"size-full border-none pb-12"} srcDoc={html} />
+      <iframe className={"size-full border-none pb-[60px]"} srcDoc={html} />
       <div
         className={
-          "absolute bottom-0 flex w-full items-center justify-center space-x-2 bg-violet-700 p-4 text-sm text-white"
+          "absolute bottom-0 flex h-[60px] w-full items-center justify-center space-x-1 bg-violet-700 text-sm text-white"
         }
       >
-        <div
-          className={
-            "flex items-center rounded-lg border border-white p-2 px-3"
-          }
-        >
+        Built with
+        <div className={"flex items-center space-x-1 px-1"}>
           <a
             target={"_blank"}
-            className={"font-semibold"}
+            className={"font-semibold hover:underline"}
             href={`https://labs.writingmate.ai/?utm_source=app_share&utm_medium=${file_id}`}
           >
-            Built with ChatLabs No Code App Builder
+            ChatLabs No Code App Builder
           </a>
-          <ChatbotUISVG scale={0.15} theme={"dark"} className={"ml-2"} />
+          <IconExternalLink stroke={1.5} size={16} />
         </div>
-        <div></div>
       </div>
     </div>
   )

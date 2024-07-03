@@ -3,17 +3,25 @@ import { IconRobotFace } from "@tabler/icons-react"
 import { useContext } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
+import { cn } from "@/lib/utils"
 
 export function AssistantIcon({
   assistant,
-  size = 28
+  size = 28,
+  className = ""
 }: {
   assistant: Tables<"assistants">
   size?: number
+  className?: string
 }) {
   const { assistantImages } = useContext(ChatbotUIContext)
   return (
-    <div className={`w-[${size}px]`}>
+    <div
+      className={cn(
+        `bg-foreground size-[${size}px] flex shrink-0 items-center justify-center overflow-hidden rounded`,
+        className
+      )}
+    >
       {assistant.image_path ? (
         <Image
           src={
@@ -23,18 +31,14 @@ export function AssistantIcon({
           alt={assistant.name}
           width={size}
           height={size}
-          className={`max-w-[${size}px] rounded`}
+          className={`max-w-[${size}px]`}
         />
       ) : (
-        <div
-          className={`bg-foreground size-[ flex${size}px] items-center justify-center rounded`}
-        >
-          <IconRobotFace
-            size={size - 2}
-            stroke={1.5}
-            className="text-background"
-          />
-        </div>
+        <IconRobotFace
+          size={size - size / 8}
+          stroke={1.5}
+          className="text-background"
+        />
       )}
     </div>
   )
