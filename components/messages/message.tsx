@@ -5,15 +5,11 @@ import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { LLM, LLMID, MessageImage, ModelProvider } from "@/types"
 import {
-  IconBolt,
   IconCaretDownFilled,
   IconCaretRightFilled,
   IconCircleFilled,
   IconFileText,
   IconMoodSmile,
-  IconPencil,
-  IconPlayerPlay,
-  IconPlayerPlayFilled,
   IconPuzzle,
   IconTerminal2
 } from "@tabler/icons-react"
@@ -33,6 +29,7 @@ import AnnotationImage from "@/components/messages/annotations/image"
 import { Annotation, Annotation2 } from "@/types/annotation"
 import { any } from "zod"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
 
 const ICON_SIZE = 32
 
@@ -270,6 +267,11 @@ export const Message: FC<MessageProps> = ({
     })
   }
 
+  const assistant =
+    message.role === "assistant" && message.assistant_id
+      ? assistants.find(assistant => assistant.id === message.assistant_id)
+      : selectedAssistant
+
   return (
     <div
       className={cn(
@@ -294,17 +296,11 @@ export const Message: FC<MessageProps> = ({
           ) : (
             <div className="relative flex items-center space-x-3">
               {message.role === "assistant" ? (
-                messageAssistantImage ? (
-                  <Image
-                    style={{
-                      width: `${ICON_SIZE}px`,
-                      height: `${ICON_SIZE}px`
-                    }}
-                    className="rounded"
-                    src={messageAssistantImage}
-                    alt="assistant image"
-                    height={ICON_SIZE}
-                    width={ICON_SIZE}
+                assistant ? (
+                  <AssistantIcon
+                    size={ICON_SIZE - 4}
+                    className={`h-[${ICON_SIZE}px] w-[${ICON_SIZE}px]`}
+                    assistant={assistant}
                   />
                 ) : (
                   <WithTooltip
@@ -369,20 +365,26 @@ export const Message: FC<MessageProps> = ({
                 switch (toolInUse) {
                   case "none":
                     return (
-                      <IconCircleFilled className="animate-pulse" size={20} />
+                      <div
+                        className={
+                          "bg-foreground flex size-3 items-center justify-center rounded-full"
+                        }
+                      >
+                        <IconCircleFilled className="animate-ping" size={20} />
+                      </div>
                     )
                   case "retrieval":
                     return (
-                      <div className="flex animate-pulse items-center space-x-2">
-                        <IconFileText size={20} />
+                      <div className="flex animate-ping items-center space-x-2">
+                        <IconFileText stroke={1.5} size={20} />
 
                         <div>Searching files...</div>
                       </div>
                     )
                   default:
                     return (
-                      <div className="flex animate-pulse items-center space-x-2">
-                        <IconPuzzle size={20} />
+                      <div className="flex animate-ping items-center space-x-2">
+                        <IconPuzzle stroke={1.5} size={20} />
 
                         <div>Using {toolInUse}...</div>
                       </div>
@@ -404,7 +406,7 @@ export const Message: FC<MessageProps> = ({
         </div>
 
         {fileItems.length > 0 && (
-          <div className="border-primary mt-6 border-t pt-4 font-bold">
+          <div className="border-primary mt-6 border-t pt-4 font-semibold">
             {!viewSources ? (
               <div
                 className="flex cursor-pointer items-center text-lg hover:opacity-50"
@@ -457,7 +459,9 @@ export const Message: FC<MessageProps> = ({
                             }}
                           >
                             <div className="text-sm font-normal">
-                              <span className="mr-1 text-lg font-bold">-</span>{" "}
+                              <span className="mr-1 text-lg font-semibold">
+                                -
+                              </span>{" "}
                               {fileItem.content.substring(0, 200)}...
                             </div>
                           </div>

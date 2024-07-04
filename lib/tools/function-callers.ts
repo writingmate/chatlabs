@@ -140,16 +140,18 @@ export class AnthropicFunctionCaller implements FunctionCaller {
     return {
       role: "assistant",
       content: text.text,
-      tool_calls: [
-        {
-          id: toolCalls.id,
-          type: "function",
-          function: {
-            name: toolCalls.name,
-            arguments: toolCalls.input
-          }
-        }
-      ]
+      tool_calls: toolCalls
+        ? [
+            {
+              id: toolCalls.id,
+              type: "function",
+              function: {
+                name: toolCalls.name,
+                arguments: toolCalls.input
+              }
+            }
+          ]
+        : []
     }
   }
 
@@ -191,6 +193,7 @@ export class AnthropicFunctionCaller implements FunctionCaller {
           ]
         }
       }
+
       if (message.role === "assistant") {
         return {
           role: "assistant",
@@ -199,20 +202,20 @@ export class AnthropicFunctionCaller implements FunctionCaller {
               type: "text",
               text: message.content
             },
-            ...message.tool_calls?.map((toolCall: any) => ({
-              id: toolCall.id,
-              type: "tool_use",
-              name: toolCall.function.name,
-              input: toolCall.function.arguments
-            }))
+            ...(message.tool_calls
+              ? message.tool_calls?.map((toolCall: any) => ({
+                  id: toolCall.id,
+                  type: "tool_use",
+                  name: toolCall.function.name,
+                  input: toolCall.function.arguments
+                }))
+              : [])
           ]
         }
       }
 
       return message
     })
-
-    console.log(anthropicMessages[1].content[1])
 
     const response = await this.client.messages.create({
       model: model,
