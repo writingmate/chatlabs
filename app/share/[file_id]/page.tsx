@@ -39,7 +39,11 @@ export default async function SharePage({
 
   return (
     <div className={"relative size-full"}>
-      <iframe className={"size-full border-none pb-[60px]"} srcDoc={html} />
+      <iframe
+        sandbox={"allow-scripts"}
+        className={"size-full border-none pb-[60px]"}
+        srcDoc={html}
+      />
       <div
         className={
           "absolute bottom-0 flex h-[60px] w-full items-center justify-center space-x-1 bg-violet-700 text-sm text-white"
