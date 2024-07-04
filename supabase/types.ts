@@ -165,6 +165,51 @@ export interface Database {
           }
         ]
       }
+      assistant_prompts: {
+        Row: {
+          assistant_id: string
+          content: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          assistant_id: string
+          content: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          assistant_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_prompts_assistant_id_fkey"
+            columns: ["assistant_id"]
+            isOneToOne: false
+            referencedRelation: "assistants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assistant_prompts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       assistant_tools: {
         Row: {
           assistant_id: string
@@ -260,6 +305,7 @@ export interface Database {
       assistants: {
         Row: {
           context_length: number
+          conversation_starters: string[]
           created_at: string
           description: string
           embeddings_provider: string
@@ -279,6 +325,7 @@ export interface Database {
         }
         Insert: {
           context_length: number
+          conversation_starters?: string[]
           created_at?: string
           description: string
           embeddings_provider: string
@@ -298,6 +345,7 @@ export interface Database {
         }
         Update: {
           context_length?: number
+          conversation_starters?: string[]
           created_at?: string
           description?: string
           embeddings_provider?: string

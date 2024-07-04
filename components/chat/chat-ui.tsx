@@ -36,9 +36,13 @@ import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useAuth } from "@/context/auth"
+import { Card, CardContent } from "@/components/ui/card"
+import { ConversationStarters } from "@/components/chat/conversation-starters"
 
 interface ChatUIProps {
-  selectedAssistant?: Tables<"assistants">
+  selectedAssistant?: Tables<"assistants"> & {
+    assistant_prompts?: Tables<"assistant_prompts">[]
+  }
 }
 
 export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
@@ -68,6 +72,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
   } = useContext(ChatbotUIContext)
 
   const {
+    setUserInput,
     setSelectedChat,
     setChatSettings,
     setChatFileItems,
@@ -76,7 +81,8 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
     setChatMessages
   } = useContext(ChatbotUIChatContext)
 
-  const { handleNewChat, handleFocusChatInput } = useChatHandler()
+  const { handleNewChat, handleFocusChatInput, handleSendMessage } =
+    useChatHandler()
 
   const { handleSelectPromptWithVariables } = usePromptAndCommand()
 
@@ -324,6 +330,12 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
         ))}
 
       <div className="relative w-full items-end px-4 pb-8 md:w-[500px] lg:w-[660px] xl:w-[800px]">
+        {chatMessages?.length === 0 && (
+          <ConversationStarters
+            values={selectedAssistant?.conversation_starters}
+            onSelect={value => handleSendMessage(value, chatMessages, false)}
+          />
+        )}
         <ChatInput showAssistant={!selectedAssistant} />
       </div>
 

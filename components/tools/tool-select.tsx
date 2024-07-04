@@ -87,6 +87,8 @@ export const ToolSelect: FC<ToolSelectProps> = ({
 
   if (!profile) return null
 
+  if (!tools || tools.length == 0) return null
+
   return (
     <DropdownMenu
       open={isOpen}
@@ -121,7 +123,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
       >
         <ToolDetails tool={hoveredTool} />
         <div>
-          {tools.map(tool => {
+          {tools?.map(tool => {
             return (
               <DropdownMenuItem
                 key={tool.id}

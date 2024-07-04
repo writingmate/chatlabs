@@ -205,11 +205,15 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       setProfile(profile)
 
       if (!profile?.has_onboarded) {
-        return profile
+        return profile || undefined
       }
 
       const workspaces = await getWorkspacesByUserId(user.id)
       setWorkspaces(workspaces)
+
+      if (!selectedWorkspace) {
+        setSelectedWorkspace(workspaces.find(ws => ws.is_home) || workspaces[0])
+      }
 
       for (const workspace of workspaces) {
         let workspaceImageUrl = ""
