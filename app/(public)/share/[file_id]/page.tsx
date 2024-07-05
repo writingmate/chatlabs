@@ -1,16 +1,14 @@
-"use client"
 import { getFileByHashId } from "@/db/files"
 import { notFound } from "next/navigation"
-import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
 import { IconExternalLink } from "@tabler/icons-react"
 
-export default async function SharePage({
+const SharePage = async ({
   params: { file_id }
 }: {
   params: {
     file_id: string
   }
-}) {
+}) => {
   const file = await getFileByHashId(file_id)
 
   if (
@@ -30,19 +28,28 @@ export default async function SharePage({
 
     links.forEach(link => {
       link.rel = "nofollow"
+      if (link.href?.startsWith("#")) {
+        link.href = `about:srcdoc${link.href}`
+      }
     })
 
     return dom.documentElement.outerHTML
   }
 
-  const html = addNoFollowToAllLinks(file.file_items[0].content)
+  return (
+    <div
+      dangerouslySetInnerHTML={{
+        __html: file.file_items[0].content
+      }}
+    />
+  )
 
   return (
     <div className={"relative size-full"}>
       <iframe
-        sandbox={"allow-scripts"}
+        // sandbox={"allow-scripts"}
         className={"size-full border-none pb-[60px]"}
-        srcDoc={html}
+        srcDoc={file.file_items[0].content}
       />
       <div
         className={
@@ -64,3 +71,7 @@ export default async function SharePage({
     </div>
   )
 }
+
+SharePage.layout = "none"
+
+export default SharePage

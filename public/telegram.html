@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Model Chat</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f5f5;
+            --text-color: #333;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        #app {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            background-color: var(--primary-color);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            font-size: 24px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 svg {
+            margin-right: 10px;
+        }
+
+        #search-bar {
+            padding: 15px;
+            background-color: var(--secondary-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        #search-input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+
+        #model-list {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        .model-button {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .model-button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .model-icon {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .model-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .model-details {
+            font-size: 0.75em;
+            color: #666;
+        }
+
+        #chat-interface {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 180px);
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            overflow-y: scroll;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background-color: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background-color: var(--secondary-color);
+            align-self: flex-start;
+        }
+
+        #user-input {
+            width: calc(100% - 70px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+
+        #send-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #credit-info {
+            background-color: var(--secondary-color);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        #buy-credits {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        #buy-credits:hover {
+            background-color: #27ae60;
+        }
+
+        #buy-credits svg {
+            margin-right: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <h1><i data-feather="cpu"></i> AI Model Chat</h1>
+    <div id="search-bar">
+        <input type="text" id="search-input" placeholder="Search models...">
+    </div>
+    <div id="model-list">
+        <p class="loading">Loading models...</p>
+    </div>
+    <div id="chat-interface" style="display: none;">
+        <div id="chat-messages"></div>
+        <div style="display: flex; align-items: center;">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-button"><i data-feather="send"></i></button>
+        </div>
+    </div>
+    <div id="credit-info">
+        <span><i data-feather="dollar-sign"></i> Credits: <span id="credit-amount">1000.000000</span></span>
+        <button id="buy-credits"><i data-feather="plus-circle"></i> Buy More</button>
+    </div>
+</div>
+
+<script>
+    let tg = window.Telegram.WebApp;
+    let credits = 1000;
+    let selectedModel = null;
+    let models = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        tg.expand();
+
+        console.log('tg object:', tg);
+        console.log('initDataUnsafe:', tg.initDataUnsafe);
+
+        fetchModels();
+
+        document.getElementById('send-button').addEventListener('click', sendMessage);
+        document.getElementById('buy-credits').addEventListener('click', initiatePayment);
+        document.getElementById('search-input').addEventListener('input', filterModels);
+
+        updateCreditDisplay();
+        feather.replace();
+
+        // Listen for the event when an invoice is closed
+        tg.onEvent('invoiceClosed', handleInvoiceClosed);
+    });
+
+    function fetchModels() {
+        fetch('https://openrouter.ai/api/v1/models')
+            .then(response => response.json())
+            .then(data => {
+                models = data.data.map(model => ({
+                    id: model.id,
+                    name: model.name,
+                    description: model.description,
+                    promptCost: parseFloat(model.pricing.prompt),
+                    completionCost: parseFloat(model.pricing.completion),
+                    contextLength: model.context_length
+                }));
+                displayModels(models);
+            })
+            .catch(error => {
+                console.error('Error fetching models:', error);
+                document.getElementById('model-list').innerHTML = '<p>Error loading models. Please try again later.</p>';
+            });
+    }
+
+    function displayModels(modelsToDisplay) {
+        const modelList = document.getElementById('model-list');
+        modelList.innerHTML = ''; // Clear loading message
+        modelsToDisplay.forEach(model => {
+            const button = document.createElement('div');
+            button.className = 'model-button';
+            button.innerHTML = `
+                    <div class="model-icon"><i data-feather="box"></i></div>
+                    <div class="model-name">${model.name}</div>
+                    <div class="model-details">
+                        Prompt: ${model.promptCost}<br>
+                        Completion: ${model.completionCost}<br>
+                        Context: ${model.contextLength}
+                    </div>
+                `;
+            button.addEventListener('click', () => selectModel(model));
+            modelList.appendChild(button);
+        });
+        feather.replace();
+    }
+
+    function filterModels() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const filteredModels = models.filter(model =>
+            model.name.toLowerCase().includes(searchTerm) ||
+            model.description.toLowerCase().includes(searchTerm)
+        );
+        displayModels(filteredModels);
+    }
+
+    function selectModel(model) {
+        selectedModel = model;
+        document.getElementById('chat-interface').style.display = 'block';
+        document.getElementById('model-list').style.display = 'none';
+        document.getElementById('search-bar').style.display = 'none';
+    }
+
+    async function sendMessage() {
+        if (!selectedModel) {
+            alert("Please select a model first!");
+            return;
+        }
+
+        const userInput = document.getElementById('user-input');
+        const message = userInput.value;
+        userInput.value = '';
+
+        if (message.trim() === '') return;
+
+        addMessageToChat('User', message);
+
+        try {
+            const userId = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 'unknown';
+
+            const response = await fetch('/api/chat/telegram', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    telegramInitData: tg.initData,
+                    model: selectedModel.id,
+                    messages: [
+                        {role: 'user', content: message},
+                    ],
+                    userId: userId,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'An error occurred');
+            }
+
+            const data = await response.json();
+            addMessageToChat('AI', data.choices[0].message.content);
+
+            // Update credits (this should ideally come from the server)
+            credits -= 1; // Simplified credit deduction
+            updateCreditDisplay();
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Error: ' + error.message);
+        }
+    }
+
+    function addMessageToChat(sender, message) {
+        const chatMessages = document.getElementById('chat-messages');
+        const messageElement = document.createElement('div');
+        messageElement.className = `message ${sender === 'User' ? 'user-message' : 'bot-message'}`;
+        messageElement.textContent = message;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function initiatePayment() {
+        // Create an invoice for 1000 credits
+        const invoice = {
+            title: "1000 AI Chat Credits",
+            description: "Purchase 1000 credits for AI Chat",
+            payload: "1000_credits",
+            provider_token: "YOUR_PROVIDER_TOKEN", // Replace with your actual provider token
+            currency: "USD",
+            prices: [{label: "1000 Credits", amount: 999}], // Amount in cents
+            max_tip_amount: 5000,
+            suggested_tip_amounts: [100, 200, 500],
+            start_parameter: "ai_chat_credits"
+        };
+
+        // Open the invoice
+        tg.openInvoice(JSON.stringify(invoice));
+    }
+
+    function handleInvoiceClosed(event) {
+        if (event.status === 'paid') {
+            // Payment successful, add credits
+            credits += 1000;
+            updateCreditDisplay();
+            tg.showAlert("Payment successful! 1000 credits added to your account.");
+        } else if (event.status === 'failed') {
+            tg.showAlert("Payment failed. Please try again.");
+        } else if (event.status === 'cancelled') {
+            tg.showAlert("Payment cancelled.");
+        }
+    }
+
+    function updateCreditDisplay() {
+        document.getElementById('credit-amount').textContent = credits.toFixed(6);
+    }
+</script>
+</body>
+</html>

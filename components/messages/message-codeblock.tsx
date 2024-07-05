@@ -105,6 +105,8 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     const [error, setError] = useState<string | null>(null)
 
     const refIframe = useRef<HTMLIFrameElement>(null)
+    const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+    const [iframeHeight, setIframeHeight] = useState<number | null>(null)
 
     const downloadAsFile = () => {
       if (typeof window === "undefined") {
@@ -185,13 +187,17 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     const sendHeightJS = `
     <script>
     function sendHeight() {
-      window.parent.postMessage({
-        type: "resize",
-        height: document.body.scrollHeight
-      }, "*")
+      const height = document.body.scrollHeight;
+      if (height !== window.lastSentHeight) {
+        window.parent.postMessage({
+          type: "resize",
+          height: height
+        }, "*");
+        window.lastSentHeight = height;
+      }
     }
     window.addEventListener('load', sendHeight);
-    window.addEventListener('resize', sendHeight);
+    new ResizeObserver(sendHeight).observe(document.body);
     </script>
     `
 
@@ -228,9 +234,12 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     useEffect(() => {
       const receiveMessage = (event: MessageEvent) => {
         if (event.data.type === "resize") {
-          if (refIframe.current) {
-            refIframe.current.style.height = event.data.height + "px"
+          if (resizeTimeoutRef.current) {
+            clearTimeout(resizeTimeoutRef.current)
           }
+          resizeTimeoutRef.current = setTimeout(() => {
+            setIframeHeight(event.data.height)
+          }, 200) // Throttle to 200ms
         } else if (event.data.type === "error") {
           setError(
             `Error: ${event.data.message}\nLine: ${event.data.lineno}, Column: ${event.data.colno}`
@@ -240,12 +249,15 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       window.addEventListener("message", receiveMessage)
       return () => {
         window.removeEventListener("message", receiveMessage)
+        if (resizeTimeoutRef.current) {
+          clearTimeout(resizeTimeoutRef.current)
+        }
       }
     }, [])
 
     return (
       <div className="codeblock relative w-full bg-zinc-950 font-sans">
-        <div className="sticky top-0 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
+        <div className="sticky top-0 z-10 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
           <span className="text-xs lowercase">{language}</span>
           <div className="flex items-center space-x-1">
             {["javascript", "js", "html"].includes(language.toLowerCase()) && (
@@ -308,55 +320,45 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
             <CopyButton value={value} />
           </div>
         </div>
-        {execute ? (
-          <>
-            <iframe
-              ref={refIframe}
-              className={"size-full min-h-[400px] border-none bg-white"}
-              srcDoc={
-                language === "html"
-                  ? addScriptsToHtml(value)
-                  : `${errorHandlingScript}<script>${value}</script>${sendHeightJS}`
-              }
-            />
-            {error && (
-              <div className="absolute bottom-0 max-h-[200px] w-full overflow-auto rounded bg-red-100 p-3 text-sm text-red-800">
-                <div className={"flex items-center justify-between gap-1"}>
-                  <Label>Console errors</Label>
-                  <CopyButton
-                    className={"text-red-800"}
-                    value={error}
-                    title={"Copy error message"}
-                  />
+        <div className="relative">
+          {execute ? (
+            <>
+              <iframe
+                ref={refIframe}
+                className={"w-full border-none bg-white"}
+                style={{ height: iframeHeight ? `${iframeHeight}px` : "400px" }}
+                srcDoc={
+                  language === "html"
+                    ? addScriptsToHtml(value)
+                    : `${errorHandlingScript}<script>${value}</script>${sendHeightJS}`
+                }
+              />
+              {error && (
+                <div className="absolute bottom-0 max-h-[200px] w-full overflow-auto rounded bg-red-100 p-3 text-sm text-red-800">
+                  {/* ... (keep error display) */}
                 </div>
-                <div
-                  className={
-                    "margin-0 relative whitespace-pre bg-red-100 font-mono text-xs text-red-800"
-                  }
-                >
-                  {error}
-                </div>
-              </div>
-            )}
-          </>
-        ) : (
-          <SyntaxHighlighter
-            language={language}
-            style={oneDark}
-            customStyle={{
-              margin: 0,
-              background: "transparent"
-            }}
-            codeTagProps={{
-              style: {
-                fontSize: "14px",
-                fontFamily: "var(--font-mono)"
-              }
-            }}
-          >
-            {value}
-          </SyntaxHighlighter>
-        )}
+              )}
+            </>
+          ) : (
+            <SyntaxHighlighter
+              language={language}
+              style={oneDark}
+              customStyle={{
+                margin: 0,
+                background: "transparent",
+                padding: "1rem"
+              }}
+              codeTagProps={{
+                style: {
+                  fontSize: "14px",
+                  fontFamily: "var(--font-mono)"
+                }
+              }}
+            >
+              {value}
+            </SyntaxHighlighter>
+          )}
+        </div>
       </div>
     )
   }
