@@ -1,4 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from "next"
 import crypto from "crypto"
 import axios from "axios"
 
@@ -9,6 +8,17 @@ const YOUR_SITE_NAME = process.env.YOUR_SITE_NAME || "ChatLabs"
 
 // In-memory user credit storage (replace with a database in production)
 const userCredits: { [key: string]: number } = {}
+
+const fetchOpenRouterModels = async () => {
+  try {
+    const response = await axios.get("https://openrouter.ai/api/v1/models")
+
+    return response.data.data
+  } catch (error) {
+    console.error("Error fetching OpenRouter models:", error)
+    return []
+  }
+}
 
 function validateTelegramWebAppData(telegramInitData: string): boolean {
   const initData = new URLSearchParams(telegramInitData)
@@ -33,25 +43,55 @@ function validateTelegramWebAppData(telegramInitData: string): boolean {
   return calculatedHash === hash
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" })
-  }
+export async function POST(req: Request) {
+  const { telegramInitData, model, messages, userId } = await req.json()
 
-  const { telegramInitData, model, messages, userId } = req.body
+  console.log("Telegram Web App data:", telegramInitData)
 
   // Validate Telegram Web App data
   if (!validateTelegramWebAppData(telegramInitData)) {
-    return res.status(401).json({ error: "Invalid authentication" })
+    return Response.json(
+      { error: "Invalid Telegram Web App data" },
+      {
+        status: 400
+      }
+    )
+  }
+
+  const models = await fetchOpenRouterModels()
+
+  console.log("OpenRouter models:", models)
+
+  const foundModel = models.find((m: any) => m.id === model)
+
+  if (!foundModel) {
+    return Response.json(
+      { error: "Invalid model" },
+      {
+        status: 400
+      }
+    )
   }
 
   // Check user credits (replace with database lookup in production)
-  if (!userCredits[userId] || userCredits[userId] <= 0) {
-    return res.status(402).json({ error: "Insufficient credits" })
+  if (
+    (foundModel.pricing.prompt > 0 || foundModel.pricing.completion > 0) &&
+    userCredits?.[userId] <= 0
+  ) {
+    return Response.json(
+      { error: "Insufficient credits" },
+      {
+        status: 402
+      }
+    )
   }
+
+  console.log(
+    "Calling OpenRouter API with model:",
+    model,
+    messages,
+    OPENROUTER_API_KEY
+  )
 
   try {
     const response = await axios.post(
@@ -73,9 +113,14 @@ export default async function handler(
     // Deduct credits (implement proper credit calculation based on token usage)
     userCredits[userId] -= 1
 
-    res.status(200).json(response.data)
+    return Response.json(response.data)
   } catch (error) {
     console.error("Error calling OpenRouter API:", error)
-    res.status(500).json({ error: "Error processing your request" })
+    return Response.json(
+      { error: "Error processing your request" },
+      {
+        status: 500
+      }
+    )
   }
 }

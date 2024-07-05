@@ -26,6 +26,7 @@
         }
 
         #app {
+            position: relative;
             max-width: 800px;
             margin: 0 auto;
             background-color: white;
@@ -172,8 +173,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
+            position: absolute;
             bottom: 0;
+            width: calc(100% - 30px);
             z-index: 10;
         }
 
@@ -202,26 +204,234 @@
             font-style: italic;
             color: #666;
         }
+
+        .app {
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app h1 {
+            background: linear-gradient(90deg, #4a90e2 0%, #5ca0f2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            font-size: 24px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app h1 svg {
+            margin-right: 10px;
+        }
+
+        .searchBar {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .searchBar input {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .searchBar input:focus {
+            outline: none;
+            background: white;
+        }
+
+        .modelList {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        .modelButton {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .modelButton:hover {
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, #ffffff 0%, #e6e6e6 100%);
+        }
+
+        .modelIcon {
+            margin-bottom: 15px;
+            color: #4a90e2;
+            font-size: 24px;
+        }
+
+        .modelName {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1em;
+            color: #333;
+        }
+
+        .modelDetails {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .chatInterface {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 180px);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .chatMessages {
+            flex-grow: 1;
+            overflow-y: scroll;
+            border: none;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 20px;
+            max-width: 80%;
+        }
+
+        .userMessage {
+            background: linear-gradient(90deg, #4a90e2 0%, #5ca0f2 100%);
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .botMessage {
+            background: linear-gradient(90deg, #f0f0f0 0%, #e6e6e6 100%);
+            color: #333;
+            align-self: flex-start;
+        }
+
+        .inputArea {
+            display: flex;
+            align-items: center;
+        }
+
+        .inputArea input {
+            flex-grow: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            margin-right: 10px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .inputArea input:focus {
+            outline: none;
+            background: #f5f5f5;
+        }
+
+        .inputArea button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4a90e2 0%, #5ca0f2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .inputArea button:hover {
+            transform: scale(1.1);
+        }
+
+        .creditInfo {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .creditInfo span {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .creditInfo button {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .creditInfo button:hover {
+            transform: translateY(-2px);
+        }
+
+        .creditInfo button svg {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
 <div id="app">
-    <h1><i data-feather="cpu"></i> AI Model Chat</h1>
-    <div id="search-bar">
+    <div id="search-bar" class="searchBar">
         <input type="text" id="search-input" placeholder="Search models...">
     </div>
-    <div id="model-list">
+    <div id="model-list" class="modelList">
         <p class="loading">Loading models...</p>
     </div>
-    <div id="chat-interface" style="display: none;">
-        <div id="chat-messages"></div>
+    <div id="chat-interface" class="chatInterface" style="display: none;">
+        <div id="chat-messages" class="chatMessages"></div>
         <div style="display: flex; align-items: center;">
             <input type="text" id="user-input" placeholder="Type your message...">
             <button id="send-button"><i data-feather="send"></i></button>
         </div>
     </div>
-    <div id="credit-info">
-        <span><i data-feather="dollar-sign"></i> Credits: <span id="credit-amount">1000.000000</span></span>
+    <div id="credit-info" class="creditInfo">
+        <span><i data-feather="dollar-sign"></i> Credits: <span id="credit-amount">1000</span></span>
         <button id="buy-credits"><i data-feather="plus-circle"></i> Buy More</button>
     </div>
 </div>
@@ -231,6 +441,16 @@
     let credits = 1000;
     let selectedModel = null;
     let models = [];
+
+    function calculateCost(model, message) {
+        const oneCredit = 1000 * 200;
+
+        if (model.promptCost + model.completionCost === 0) {
+            return 0;
+        }
+
+        return Math.ceil((model.promptCost + model.completionCost * 3) * oneCredit);
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         tg.expand();
@@ -281,9 +501,7 @@
                     <div class="model-icon"><i data-feather="box"></i></div>
                     <div class="model-name">${model.name}</div>
                     <div class="model-details">
-                        Prompt: ${model.promptCost}<br>
-                        Completion: ${model.completionCost}<br>
-                        Context: ${model.contextLength}
+                        Cost: ${calculateCost(model)} credits
                     </div>
                 `;
             button.addEventListener('click', () => selectModel(model));
@@ -372,7 +590,7 @@
             title: "1000 AI Chat Credits",
             description: "Purchase 1000 credits for AI Chat",
             payload: "1000_credits",
-            provider_token: "YOUR_PROVIDER_TOKEN", // Replace with your actual provider token
+            provider_token: "284685063:TEST:YTZiZDNiZGQ4ZmI0", // Replace with your actual provider token
             currency: "USD",
             prices: [{label: "1000 Credits", amount: 999}], // Amount in cents
             max_tip_amount: 5000,
