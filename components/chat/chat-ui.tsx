@@ -40,13 +40,11 @@ import { cn } from "@/lib/utils"
 
 interface ChatUIProps {
   showModelSelector?: boolean
-  selectedAssistant?: Tables<"assistants"> & {
-    assistant_prompts?: Tables<"assistant_prompts">[]
-  }
+  assistant?: Tables<"assistants">
 }
 
 export const ChatUI: FC<ChatUIProps> = ({
-  selectedAssistant,
+  assistant,
   showModelSelector = true
 }) => {
   useHotkey("o", () => handleNewChat())
@@ -72,7 +70,8 @@ export const ChatUI: FC<ChatUIProps> = ({
     setShowFilesDisplay,
     setUseRetrieval,
     showSidebar,
-    setShowSidebar
+    setShowSidebar,
+    selectedAssistant
   } = useContext(ChatbotUIContext)
 
   const {
@@ -120,7 +119,7 @@ export const ChatUI: FC<ChatUIProps> = ({
   }, [showSidebar])
 
   useEffect(() => {
-    if (selectedAssistant) {
+    if (assistant) {
       setSelectedAssistant(selectedAssistant)
     }
     if (!chatid) {
@@ -291,7 +290,7 @@ export const ChatUI: FC<ChatUIProps> = ({
               }
             />
           )}
-          {!selectedAssistant && <QuickSettings />}
+          {!assistant && <QuickSettings />}
           {/*{selectedAssistant && user?.id === selectedAssistant.user_id && (*/}
           {/*  <Button className={"text-foreground"} variant={"ghost"}>*/}
           {/*    <Link href={`/a/${slugify(selectedAssistant)}/edit`}>*/}

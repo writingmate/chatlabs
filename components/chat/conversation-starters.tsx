@@ -26,9 +26,10 @@ export function ConversationStarters({
             onClick={() => onSelect(starter)}
             variant={"outline"}
             key={index}
-            className="text-foreground rounded-xl text-left text-sm font-normal shadow-none"
+            title={starter}
+            className="text-foreground overflow-hidden rounded-xl px-3 text-left text-sm font-normal shadow-none"
           >
-            {starter}
+            <span className="block truncate">{starter}</span>
           </Button>
         ))}
       </div>
