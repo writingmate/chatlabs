@@ -45,6 +45,7 @@ interface MessageProps {
   isGenerating: boolean
   firstTokenReceived: boolean
   setIsGenerating: (value: boolean) => void
+  onPreviewContent?: (content: string) => void
 }
 
 export const Message: FC<MessageProps> = ({
@@ -58,7 +59,8 @@ export const Message: FC<MessageProps> = ({
   onStartEdit,
   onCancelEdit,
   onRegenerate,
-  onSubmitEdit
+  onSubmitEdit,
+  onPreviewContent
 }) => {
   const {
     assistants,
@@ -67,13 +69,10 @@ export const Message: FC<MessageProps> = ({
     availableOpenRouterModels,
     selectedAssistant,
     chatImages,
-    assistantImages,
     toolInUse,
     files,
     models
   } = useContext(ChatbotUIContext)
-
-  const { handleSendMessage } = useChatHandler()
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -197,14 +196,6 @@ export const Message: FC<MessageProps> = ({
     ...availableOpenRouterModels
   ].find(llm => llm.modelId === message.model) as LLM
 
-  const messageAssistantImage = assistantImages.find(
-    image => image.assistantId === message.assistant_id
-  )?.base64
-
-  const selectedAssistantImage = assistantImages.find(
-    image => image.path === selectedAssistant?.image_path
-  )?.base64
-
   const fileAccumulator: Record<
     string,
     {
@@ -282,7 +273,7 @@ export const Message: FC<MessageProps> = ({
       )}
       onKeyDown={handleKeyDown}
     >
-      <div className="relative flex w-full flex-col p-4 md:w-[500px] md:px-0 lg:w-[600px] xl:w-[700px]">
+      <div className="relative flex w-full flex-col p-4">
         <div className="space-y-3">
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
@@ -400,8 +391,13 @@ export const Message: FC<MessageProps> = ({
               onValueChange={setEditedMessage}
               maxRows={20}
             />
+          ) : message.role === "assistant" ? (
+            <MessageMarkdown
+              content={message.content}
+              onPreviewContent={onPreviewContent}
+            />
           ) : (
-            <MessageMarkdown content={message.content} />
+            <div className={"whitespace-pre-wrap"}>{message.content}</div>
           )}
         </div>
 

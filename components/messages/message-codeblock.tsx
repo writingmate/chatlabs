@@ -2,14 +2,13 @@ import { Button } from "@/components/ui/button"
 import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard"
 import {
   IconCheck,
-  IconCloudUpload,
+  IconClipboard,
   IconCode,
   IconCopy,
   IconDownload,
   IconPlayerPlay,
-  IconShare,
-  IconShare2,
-  IconShare3
+  IconShare3,
+  IconX
 } from "@tabler/icons-react"
 import { FC, memo, useContext, useEffect, useRef, useState } from "react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
@@ -25,6 +24,8 @@ import { cn } from "@/lib/utils"
 interface MessageCodeBlockProps {
   language: string
   value: string
+  className?: string
+  onClose?: () => void
 }
 
 interface languageMap {
@@ -78,25 +79,21 @@ function CopyButton({
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
   return (
     <Button
-      title={title}
-      variant="link"
-      size="sm"
-      className={cn(
-        "text-xs text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0",
-        className
-      )}
+      size={"icon"}
+      className="size-4 text-white hover:opacity-50"
+      variant={"link"}
       onClick={() => {
         if (isCopied) return
         copyToClipboard(value)
       }}
     >
-      {isCopied ? <IconCheck size={16} /> : <IconCopy size={16} />}
+      {isCopied ? <IconCheck size={16} /> : <IconClipboard size={16} />}
     </Button>
   )
 }
 
 export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
-  ({ language, value }) => {
+  ({ language, value, className, onClose }) => {
     const { user } = useAuth()
     const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
     const [sharing, setSharing] = useState(false)
@@ -225,7 +222,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       }
       const body = doc.querySelector("body")
       if (body) {
-        body.innerHTML += sendHeightJS
+        // body.innerHTML += sendHeightJS
         return doc.documentElement.outerHTML
       }
       return html
@@ -256,10 +253,15 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     }, [])
 
     return (
-      <div className="codeblock relative w-full bg-zinc-950 font-sans">
-        <div className="sticky top-0 z-10 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
+      <div
+        className={cn(
+          "codeblock relative size-full overflow-hidden bg-zinc-950 font-sans",
+          className
+        )}
+      >
+        <div className="z-10 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
           <span className="text-xs lowercase">{language}</span>
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-2 py-3">
             {["javascript", "js", "html"].includes(language.toLowerCase()) && (
               <>
                 <ToggleGroup
@@ -269,16 +271,14 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                   }}
                   size={"xs"}
                   variant={"default"}
-                  className={
-                    "gap-0 overflow-hidden rounded-md border border-white"
-                  }
+                  className={"gap-0 overflow-hidden rounded-md"}
                   type={"single"}
                   value={execute ? "execute" : "code"}
                 >
                   <ToggleGroupItem
                     title={"View the code"}
                     value={"code"}
-                    className="space-x-1 rounded-none border-none text-xs text-white"
+                    className="space-x-1 rounded-r-none border border-r-0 text-xs text-white"
                   >
                     <IconCode size={16} stroke={1.5} />
                     <span>Code</span>
@@ -286,7 +286,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                   <ToggleGroupItem
                     title={"Run the code"}
                     value={"execute"}
-                    className="space-x-1 rounded-none border-none text-xs text-white"
+                    className="space-x-1 rounded-l-none border border-l-0 text-xs text-white"
                   >
                     <IconPlayerPlay size={16} stroke={1.5} />
                     <span>Run</span>
@@ -296,12 +296,12 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                   <Button
                     title={"Share you app with others"}
                     loading={sharing}
-                    className="text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
+                    className="bg-transparent px-2 text-xs text-white hover:opacity-50"
                     onClick={shareHtmlCode}
-                    variant="link"
-                    size="icon"
+                    variant="outline"
+                    size="xs"
                   >
-                    <IconShare3 size={16} />
+                    <IconShare3 className={"mr-1"} size={16} /> Share
                   </Button>
                 )}
               </>
@@ -311,40 +311,62 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               title={"Download as file"}
               variant="link"
               size="icon"
-              className="text-white hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
+              className="size-4 text-white hover:opacity-50"
               onClick={downloadAsFile}
             >
               <IconDownload size={16} />
             </Button>
 
             <CopyButton value={value} />
+
+            <Button
+              title={"Close"}
+              className="size-4 text-white hover:opacity-50"
+              onClick={() => onClose?.()}
+              variant="link"
+              size="icon"
+            >
+              <IconX size={16} />
+            </Button>
           </div>
         </div>
-        <div className="relative">
-          {execute ? (
-            <>
-              <iframe
-                ref={refIframe}
-                className={"w-full border-none bg-white"}
-                style={{ height: iframeHeight ? `${iframeHeight}px` : "400px" }}
-                srcDoc={
-                  language === "html"
-                    ? addScriptsToHtml(value)
-                    : `${errorHandlingScript}<script>${value}</script>${sendHeightJS}`
-                }
+        {error && (
+          <div className="absolute bottom-0 max-h-[200px] w-full overflow-auto bg-red-100 px-3 py-2 text-sm text-red-800">
+            <div className={"flex h-6 items-center justify-between gap-1"}>
+              <Label>Console errors</Label>
+              <CopyButton
+                className={"text-red-800"}
+                value={error}
+                title={"Copy error message"}
               />
-              {error && (
-                <div className="absolute bottom-0 max-h-[200px] w-full overflow-auto rounded bg-red-100 p-3 text-sm text-red-800">
-                  {/* ... (keep error display) */}
-                </div>
-              )}
-            </>
+            </div>
+            <div
+              className={
+                "margin-0 relative whitespace-pre-wrap bg-red-100 font-mono text-xs text-red-800"
+              }
+            >
+              {error}
+            </div>
+          </div>
+        )}
+        <div className="relative size-full overflow-auto">
+          {execute ? (
+            <iframe
+              className={"size-full border-none bg-white"}
+              srcDoc={
+                language === "html"
+                  ? addScriptsToHtml(value)
+                  : `${errorHandlingScript}<script>${value}</script>${sendHeightJS}`
+              }
+            />
           ) : (
             <SyntaxHighlighter
               language={language}
               style={oneDark}
               customStyle={{
+                overflowY: "auto",
                 margin: 0,
+                height: "100%",
                 background: "transparent",
                 padding: "1rem"
               }}

@@ -3,6 +3,7 @@ import {
   IconFileText,
   IconFileTypeCsv,
   IconFileTypeDocx,
+  IconFileTypeHtml,
   IconFileTypePdf,
   IconJson,
   IconMarkdown,
@@ -35,6 +36,8 @@ export const FileIcon: FC<FileIconProps> = ({
     return <IconJson size={size} stroke={stroke} />
   } else if (type.includes("markdown")) {
     return <IconMarkdown size={size} stroke={stroke} />
+  } else if (type.includes("html")) {
+    return <IconFileTypeHtml size={size} stroke={stroke} />
   } else {
     return <IconFile size={size} stroke={stroke} />
   }

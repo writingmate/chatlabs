@@ -33,19 +33,22 @@ import { getPromptById } from "@/db/prompts"
 import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
 import { parseIdFromSlug, slugify } from "@/lib/slugify"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
 import { useAuth } from "@/context/auth"
-import { Card, CardContent } from "@/components/ui/card"
 import { ConversationStarters } from "@/components/chat/conversation-starters"
+import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
+import { cn } from "@/lib/utils"
 
 interface ChatUIProps {
+  showModelSelector?: boolean
   selectedAssistant?: Tables<"assistants"> & {
     assistant_prompts?: Tables<"assistant_prompts">[]
   }
 }
 
-export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
+export const ChatUI: FC<ChatUIProps> = ({
+  selectedAssistant,
+  showModelSelector = true
+}) => {
   useHotkey("o", () => handleNewChat())
   useHotkey("l", () => {
     handleFocusChatInput()
@@ -53,7 +56,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
 
   const params = useParams()
 
-  const hashid = parseIdFromSlug(params.slug as string)
+  const chatid = params.chatid
 
   const router = useRouter()
   const pathname = usePathname()
@@ -68,7 +71,8 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
     setChatFiles,
     setShowFilesDisplay,
     setUseRetrieval,
-    showSidebar
+    showSidebar,
+    setShowSidebar
   } = useContext(ChatbotUIContext)
 
   const {
@@ -91,24 +95,35 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
     messagesEndRef,
     handleScroll,
     scrollToBottom,
-    setIsAtBottom,
-    isAtTop,
-    isAtBottom,
-    isOverflowing,
-    scrollToTop
+    setIsAtBottom
   } = useScroll()
 
   const { user } = useAuth()
 
   const [loading, setLoading] = useState(true)
 
+  const [previewContent, setPreviewContent] = useState<string>("")
+
   const { theme } = useTheme()
+
+  function handlePreviewContent(content: string) {
+    setPreviewContent(content)
+    if (content) {
+      setShowSidebar(false)
+    }
+  }
+
+  useEffect(() => {
+    if (showSidebar) {
+      setPreviewContent("")
+    }
+  }, [showSidebar])
 
   useEffect(() => {
     if (selectedAssistant) {
       setSelectedAssistant(selectedAssistant)
     }
-    if (!hashid) {
+    if (!chatid) {
       setLoading(false)
       return
     }
@@ -119,7 +134,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
       setIsAtBottom(true)
     }
 
-    if ((chatMessages?.length === 0 && !hashid) || !!hashid) {
+    if ((chatMessages?.length === 0 && !chatid) || !!chatid) {
       fetchData().then(() => {
         handleFocusChatInput()
         setLoading(false)
@@ -152,7 +167,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
   }, [searchParams])
 
   const fetchMessages = async () => {
-    const chat = chats.find(chat => chat.hashid === hashid)
+    const chat = chats.find(chat => chat.id === chatid)
     const fetchedMessages = await getMessagesByChatId(chat?.id as string)
 
     const imagePromises: Promise<MessageImage>[] = fetchedMessages.flatMap(
@@ -222,7 +237,7 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
   }
 
   const fetchChat = async () => {
-    const chat = chats.find(chat => chat.hashid === hashid)
+    const chat = chats.find(chat => chat.id === chatid)
 
     if (!chat) return
 
@@ -254,8 +269,13 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
   }
 
   return (
-    <div className="relative flex h-full flex-col items-center">
-      <div className="sticky top-0 flex w-full justify-between p-2">
+    <div
+      onScroll={handleScroll}
+      className={
+        "relative flex size-full flex-1 flex-col overflow-hidden overflow-y-auto"
+      }
+    >
+      <div className="sticky top-0 flex w-full justify-between bg-none p-2">
         <div className="flex items-center">
           {!showSidebar && (
             <WithTooltip
@@ -272,76 +292,85 @@ export const ChatUI: FC<ChatUIProps> = ({ selectedAssistant }) => {
             />
           )}
           {!selectedAssistant && <QuickSettings />}
-          {selectedAssistant && user?.id === selectedAssistant.user_id && (
-            <Button className={"text-foreground"} variant={"ghost"}>
-              <Link href={`/a/${slugify(selectedAssistant)}/edit`}>
-                <IconEdit size={24} stroke={1.5} />
-              </Link>
-            </Button>
-          )}
+          {/*{selectedAssistant && user?.id === selectedAssistant.user_id && (*/}
+          {/*  <Button className={"text-foreground"} variant={"ghost"}>*/}
+          {/*    <Link href={`/a/${slugify(selectedAssistant)}/edit`}>*/}
+          {/*      <IconEdit size={24} stroke={1.5} />*/}
+          {/*    </Link>*/}
+          {/*  </Button>*/}
+          {/*)}*/}
         </div>
-        <ChatSettings />
+        {showModelSelector && <ChatSettings />}
       </div>
 
-      {loading && <Loading />}
-      {!loading &&
-        (chatMessages.length == 0 ? (
-          <>
-            <div className="absolute left-1/2 top-1/2 mb-20 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center">
-              {!selectedAssistant && (
-                <Brand theme={theme === "dark" ? "dark" : "light"} />
-              )}
-              {selectedAssistant && (
-                <>
-                  <AssistantIcon
-                    className={"size-[100px] rounded-md"}
-                    assistant={selectedAssistant}
-                    size={100}
-                  />
-                  <div className="text-foreground mt-4 text-center text-2xl font-bold">
-                    {selectedAssistant.name}
-                  </div>
-                  <div className="text-foreground mt-2 text-center text-sm">
-                    {selectedAssistant.description}
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="flex grow flex-col items-center justify-center" />
-          </>
+      <div className="flex size-full">
+        {loading ? (
+          <Loading />
         ) : (
           <div
-            className="flex size-full flex-col overflow-auto pt-4"
-            onScroll={handleScroll}
+            className={
+              "relative mx-auto flex size-full max-w-2xl flex-1 flex-col transition-[width]"
+            }
           >
-            <div ref={messagesStartRef} />
+            {chatMessages?.length === 0 ? (
+              <div className="flex w-full flex-1 flex-col items-center justify-center">
+                {!selectedAssistant ? (
+                  <Brand theme={theme === "dark" ? "dark" : "light"} />
+                ) : (
+                  <>
+                    <AssistantIcon
+                      className={"size-[100px] rounded-xl"}
+                      assistant={selectedAssistant}
+                      size={100}
+                    />
+                    <div className="text-foreground mt-4 text-center text-2xl font-bold">
+                      {selectedAssistant.name}
+                    </div>
+                    <div className="text-foreground mt-2 text-center text-sm">
+                      {selectedAssistant.description}
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="flex-1">
+                <div ref={messagesStartRef} />
+                <ChatMessages onPreviewContent={handlePreviewContent} />
+                <div className={"h-10"} ref={messagesEndRef} />
+              </div>
+            )}
 
-            <div
-              className={
-                "mx-auto w-[300px] pb-8 sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]"
-              }
-            >
-              <ChatMessages />
+            <div className="sticky bottom-2 mx-2 items-end">
+              {chatMessages?.length === 0 && (
+                <ConversationStarters
+                  values={selectedAssistant?.conversation_starters}
+                  onSelect={value =>
+                    handleSendMessage(value, chatMessages, false)
+                  }
+                />
+              )}
+              <ChatInput showAssistant={!selectedAssistant} />
             </div>
-
-            <div ref={messagesEndRef} />
           </div>
-        ))}
+        )}
 
-      <div className="relative w-full items-end px-4 pb-8 md:w-[500px] lg:w-[660px] xl:w-[800px]">
-        {chatMessages?.length === 0 && (
-          <ConversationStarters
-            values={selectedAssistant?.conversation_starters}
-            onSelect={value => handleSendMessage(value, chatMessages, false)}
+        <div
+          className={cn(
+            "w-0 transition-[width] duration-100",
+            previewContent && "w-full lg:w-[calc(50%-2rem)]"
+          )}
+        />
+        {previewContent && (
+          <ChatPreviewContent
+            content={previewContent}
+            onPreviewContent={handlePreviewContent}
           />
         )}
-        <ChatInput showAssistant={!selectedAssistant} />
       </div>
 
-      <div className="absolute bottom-2 right-2 hidden md:block lg:bottom-4 lg:right-4">
-        <ChatHelp />
-      </div>
+      {/*<div className="absolute bottom-2 right-2 hidden md:block lg:bottom-4 lg:right-4">*/}
+      {/*  <ChatHelp/>*/}
+      {/*</div>*/}
     </div>
   )
 }

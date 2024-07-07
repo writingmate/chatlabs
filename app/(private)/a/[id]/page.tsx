@@ -21,7 +21,7 @@ export default async function AssistantPage({
   return (
     <ChatbotUIChatProvider id={"one"}>
       <Dashboard>
-        <ChatUI selectedAssistant={assistant} />
+        <ChatUI showModelSelector={false} selectedAssistant={assistant} />
       </Dashboard>
     </ChatbotUIChatProvider>
   )
