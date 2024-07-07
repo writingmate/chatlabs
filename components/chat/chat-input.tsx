@@ -69,6 +69,8 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
   const { userInput, setUserInput, chatMessages, isGenerating, chatSettings } =
     useContext(ChatbotUIChatContext)
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const {
     chatInputRef,
     handleSendMessage,
@@ -286,31 +288,39 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
           <div className="flex items-end justify-between p-2">
             <div className={"flex"}>
               <div title={"Upload/attach files"}>
-                <IconPlus
-                  onClick={() =>
-                    setIsFilePickerOpen(isFilePickerOpen => !isFilePickerOpen)
-                  }
+                <IconPaperclip
+                  onClick={() => fileInputRef.current?.click()}
                   stroke={1.5}
                   className="m-1 cursor-pointer p-0.5 hover:opacity-50"
                   size={24}
                 />
-              </div>
-              <div title={"Select prompt from a library"}>
-                <IconTerminal2
-                  onClick={() =>
-                    setIsPromptPickerOpen(
-                      isPromptPickerOpen => !isPromptPickerOpen
-                    )
-                  }
-                  stroke={1.5}
-                  className={cn(
-                    "m-1 cursor-pointer p-0.5 hover:opacity-50",
-                    userInput &&
-                      "invisible -ml-7 transition-[margin] duration-200"
-                  )}
-                  size={24}
+                <Input
+                  ref={fileInputRef}
+                  className="hidden"
+                  type="file"
+                  onChange={e => {
+                    if (!e.target.files) return
+                    handleSelectDeviceFile(e.target.files[0])
+                  }}
+                  accept={filesToAccept}
                 />
               </div>
+              {/*<div title={"Select prompt from a library"}>*/}
+              {/*  <IconTerminal2*/}
+              {/*    onClick={() =>*/}
+              {/*      setIsPromptPickerOpen(*/}
+              {/*        isPromptPickerOpen => !isPromptPickerOpen*/}
+              {/*      )*/}
+              {/*    }*/}
+              {/*    stroke={1.5}*/}
+              {/*    className={cn(*/}
+              {/*      "m-1 cursor-pointer p-0.5 hover:opacity-50",*/}
+              {/*      userInput &&*/}
+              {/*      "invisible -ml-7 transition-[margin] duration-200"*/}
+              {/*    )}*/}
+              {/*    size={24}*/}
+              {/*  />*/}
+              {/*</div>*/}
             </div>
             <TextareaAutosize
               textareaRef={chatInputRef}

@@ -16,7 +16,7 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   return (
     <div
       className={
-        "fixed bottom-6 right-4 top-14 w-[calc(100%-30px)] overflow-hidden rounded-lg shadow-lg transition-transform lg:w-[calc(50%-30px)]"
+        "fixed bottom-6 right-4 top-14 w-[calc(100%-30px)] transition-transform lg:w-[calc(50%-30px)]"
       }
     >
       <MessageCodeBlock

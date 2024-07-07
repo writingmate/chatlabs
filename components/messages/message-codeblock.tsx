@@ -268,13 +268,13 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     return (
       <div
         className={cn(
-          "codeblock relative size-full overflow-hidden bg-zinc-950 font-sans",
+          "codeblock relative size-full overflow-hidden rounded-lg bg-zinc-950 font-sans shadow-lg",
           className
         )}
       >
         <div className="z-10 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
           <span className="text-xs lowercase">{language}</span>
-          <div className="flex items-center space-x-2 py-3">
+          <div className="flex items-center space-x-2 py-3 ">
             {["javascript", "js", "html"].includes(language.toLowerCase()) && (
               <>
                 <ToggleGroup
