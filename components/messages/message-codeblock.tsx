@@ -101,7 +101,6 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     const [execute, setExecute] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    const refIframe = useRef<HTMLIFrameElement>(null)
     const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const [iframeHeight, setIframeHeight] = useState<number | null>(null)
 
@@ -265,6 +264,12 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       }
     }, [])
 
+    useEffect(() => {
+      if (!value) {
+        setExecute(false)
+      }
+    }, [value])
+
     return (
       <div
         className={cn(
@@ -299,6 +304,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                   <ToggleGroupItem
                     title={"Run the code"}
                     value={"execute"}
+                    disabled={value === ""}
                     className="space-x-1 rounded-l-none border border-l-0 text-xs text-white"
                   >
                     <IconPlayerPlay size={16} stroke={1.5} />

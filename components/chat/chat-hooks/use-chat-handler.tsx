@@ -7,7 +7,7 @@ import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { useContext, useEffect, useRef } from "react"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import {
@@ -86,7 +86,7 @@ export const useChatHandler = () => {
     }
   }, [isPromptPickerOpen, isFilePickerOpen, isToolPickerOpen])
 
-  const handleNewChat = async () => {
+  const handleNewChat = async (redirectTo = "") => {
     if (!selectedWorkspace) return
 
     setUserInput("")
@@ -167,7 +167,7 @@ export const useChatHandler = () => {
       })
     }
 
-    return router.push(`/${selectedWorkspace.id}/chat`)
+    return router.push(redirectTo || `/${selectedWorkspace.id}/chat`)
   }
 
   const handleFocusChatInput = () => {

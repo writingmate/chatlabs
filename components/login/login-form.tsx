@@ -2,7 +2,7 @@
 
 import { Brand } from "@/components/ui/brand"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { supabase } from "@/lib/supabase/browser-client"
 import { GoogleSVG } from "@/components/icons/google-svg"
 import { useState } from "react"
@@ -11,27 +11,30 @@ import { Input } from "@/components/ui/input"
 import { IconMail } from "@tabler/icons-react"
 import { Separator } from "@/components/ui/separator"
 
-export default function LoginForm() {
+export default function LoginForm({ redirectTo }: { redirectTo?: string }) {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [disabled, setDisabled] = useState(false)
 
   const { theme } = useTheme()
 
+  const redirect_to = redirectTo ? `next=${redirectTo}` : ""
+
   const handleOAuthLogin = async (provider: "azure" | "google") => {
     setDisabled(true)
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         scopes: "email",
-        redirectTo: `${window.location.origin}/auth/callback`
+        redirectTo: `${window.location.origin}/auth/callback?${redirect_to}`
       }
     })
 
     setDisabled(false)
 
     if (error) {
-      return router.push(`/login?message=${error.message}`)
+      return router.push(`/login?message=${error.message}&${redirect_to}`)
     }
 
     // Add any additional logic needed after successful login
@@ -43,7 +46,7 @@ export default function LoginForm() {
     const { error } = await supabase.auth.signInWithOtp({
       email: email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`
+        emailRedirectTo: `${window.location.origin}/auth/confirm?${redirect_to}`
       }
     })
 

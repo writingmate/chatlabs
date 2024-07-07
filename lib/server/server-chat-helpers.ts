@@ -126,8 +126,6 @@ export async function validateMessageCount(
     return
   }
 
-  // subtract 24 hours
-
   let previousDate = new Date(date.getTime() - 24 * 60 * 60 * 1000)
 
   const { count, data, error } = await supabase

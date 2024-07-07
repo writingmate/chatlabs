@@ -9,7 +9,7 @@ import {
 import LoginForm from "@/components/login/login-form"
 import React, { ReactPortal, useState } from "react"
 
-export default function LoginDialog() {
+export default function LoginDialog({ redirectTo }: { redirectTo?: string }) {
   const [dialogOpen, setOpen] = useState(true)
 
   return (
@@ -24,7 +24,7 @@ export default function LoginDialog() {
         ></div>
       </DialogTrigger>
       <DialogContent className={"rounded-xl"}>
-        <LoginForm />
+        <LoginForm redirectTo={redirectTo} />
       </DialogContent>
     </Dialog>
   )

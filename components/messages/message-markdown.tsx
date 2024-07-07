@@ -109,7 +109,7 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
                 variant={"outline"}
                 size={"lg"}
                 className={
-                  "text-foreground flex h-auto w-[260px] items-start justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:shadow"
+                  "text-foreground flex h-auto w-[260px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:shadow"
                 }
                 onClick={() =>
                   onPreviewContent?.(

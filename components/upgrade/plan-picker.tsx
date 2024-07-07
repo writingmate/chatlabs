@@ -1,3 +1,4 @@
+"use client"
 import { ChatbotUIContext } from "@/context/context"
 import { IconCheck } from "@tabler/icons-react"
 import { FC, ReactNode, useContext } from "react"
