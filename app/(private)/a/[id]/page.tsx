@@ -1,6 +1,6 @@
 import { ChatUI } from "@/components/chat/chat-ui"
 import { Dashboard } from "@/components/ui/dashboard"
-import { getAssistantByHashId, getAssistantById } from "@/db/assistants"
+import { getAssistantByHashId } from "@/db/assistants"
 import { parseIdFromSlug } from "@/lib/slugify"
 import { ChatbotUIChatProvider } from "@/context/chat"
 import { createClient } from "@/lib/supabase/server"
