@@ -6,7 +6,16 @@ import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { SubscriptionRequiredError } from "@/lib/errors"
-import { validateProPlan } from "@/lib/subscription"
+import {
+  FREE_CATCHALL_DAILY_LIMIT,
+  FREE_TIER2_LIMIT,
+  FREE_TIER3_DAILY_LIMIT,
+  getModelTier,
+  ModelTier,
+  PRO_TIER1_DAILY_LIMIT,
+  PRO_TIER2_DAILY_LIMIT,
+  validateProPlan
+} from "@/lib/subscription"
 import { PLAN_FREE } from "@/lib/stripe/config"
 
 export function createClient() {
@@ -82,23 +91,6 @@ export function checkApiKey(apiKey: string | null, keyName: string) {
   }
 }
 
-function isPaidModel(model: LLMID) {
-  const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
-  return paidLLMS.includes(model)
-}
-
-export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
-  const { plan } = profile
-
-  if (validateProPlan(profile)) {
-    return
-  }
-
-  if (isPaidModel(model)) {
-    throw new SubscriptionRequiredError("Pro plan required to use this model")
-  }
-}
-
 function getEnvInt(varName: string, def: number) {
   if (varName in process.env) {
     return parseInt(process.env[varName] + "")
@@ -114,6 +106,21 @@ const CATCHALL_MESSAGE_DAILY_LIMIT = getEnvInt(
   300
 )
 
+// Updated validateModel function
+export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
+  const { plan } = profile
+  const modelTier = getModelTier(model)
+
+  if (validateProPlan(profile)) {
+    return // Pro users have unlimited access to all tiers
+  }
+
+  if (plan === PLAN_FREE && modelTier === ModelTier.Tier1) {
+    throw new SubscriptionRequiredError("Pro plan required to use this model")
+  }
+}
+
+// Updated validateMessageCount function
 export async function validateMessageCount(
   profile: Tables<"profiles">,
   model: LLMID,
@@ -121,52 +128,71 @@ export async function validateMessageCount(
   supabase: SupabaseClient
 ) {
   const { plan } = profile
-
-  if (plan.startsWith("byok_")) {
-    return
-  }
+  const modelTier = getModelTier(model)
+  const isPro = validateProPlan(profile)
 
   let previousDate = new Date(date.getTime() - 24 * 60 * 60 * 1000)
 
-  const { count, data, error } = await supabase
+  // Count all messages
+  const { count: totalCount } = await supabase
     .from("messages")
-    .select("*", {
-      count: "exact"
-    })
+    .select("*", { count: "exact" })
     .eq("role", "user")
-    .eq("model", model)
     .gte("created_at", previousDate.toISOString())
 
-  if (count === null) {
+  // Count messages for the specific tier
+  const { count: tierCount } = await supabase
+    .from("messages")
+    .select("*", { count: "exact" })
+    .eq("role", "user")
+    .in(
+      "model",
+      LLM_LIST.filter(m => getModelTier(m.modelId) === modelTier).map(
+        m => m.modelId
+      )
+    )
+    .gte("created_at", previousDate.toISOString())
+
+  if (totalCount === null || tierCount === null) {
     throw new Error("Could not fetch message count")
   }
 
-  if (
-    (plan === PLAN_FREE || plan.startsWith("premium_")) &&
-    count > FREE_MESSAGE_DAILY_LIMIT
-  ) {
+  if (!isPro && totalCount >= FREE_CATCHALL_DAILY_LIMIT) {
     throw new SubscriptionRequiredError(
-      `You have reached daily message limit for ${model}. Upgrade to Pro plan to continue come back tomorrow.`
+      `You have reached the overall daily message limit. Upgrade to Pro plan to continue or come back tomorrow.`
     )
   }
 
   if (
-    isPaidModel(model) &&
-    plan.startsWith("pro_") &&
-    count > PRO_MESSAGE_DAILY_LIMIT
+    modelTier === ModelTier.Tier1 &&
+    isPro &&
+    tierCount >= PRO_TIER1_DAILY_LIMIT
   ) {
     throw new SubscriptionRequiredError(
-      `You have reached daily message limit for Pro plan for ${model}`
+      `You have reached the daily message limit for Tier 1 models. Please try again tomorrow.`
     )
   }
 
-  if (count > CATCHALL_MESSAGE_DAILY_LIMIT) {
+  if (
+    modelTier === ModelTier.Tier2 &&
+    isPro &&
+    tierCount >= PRO_TIER2_DAILY_LIMIT
+  ) {
     throw new SubscriptionRequiredError(
-      `You have reached hard daily message limit for model ${model}`
+      `You have reached the daily message limit for Tier 2 models. Please try again tomorrow.`
     )
+  }
+
+  if (modelTier === ModelTier.Tier3) {
+    if (!isPro && tierCount >= FREE_TIER3_DAILY_LIMIT) {
+      throw new SubscriptionRequiredError(
+        `You have reached the daily message limit for Tier 3 models. Upgrade to Pro plan to continue or come back tomorrow.`
+      )
+    }
   }
 }
 
+// Updated validateModelAndMessageCount function
 export async function validateModelAndMessageCount(model: LLMID, date: Date) {
   const client = createClient()
   const profile = await getServerProfile()

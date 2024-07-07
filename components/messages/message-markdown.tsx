@@ -93,8 +93,6 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
 
           const matchedNames = fileContent.match(regexFileName)
 
-          console.log(matchedNames, fileContent)
-
           if (matchedNames) {
             const fileName = matchedNames[1]
             const fileContentWithoutFileName = fileContent.replace(
@@ -113,7 +111,7 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
                 }
                 onClick={() =>
                   onPreviewContent?.(
-                    language + "\n" + String(childArray).replace(/\n$/, "")
+                    language + "\n" + fileContentWithoutFileName
                   )
                 }
               >

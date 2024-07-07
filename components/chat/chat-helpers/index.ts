@@ -24,8 +24,7 @@ import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { SubscriptionRequiredError } from "@/lib/errors"
-import { JSONValue } from "ai"
-import { validateProPlan } from "@/lib/subscription"
+import { getModelTier, ModelTier, validateProPlan } from "@/lib/subscription"
 import { encode } from "gpt-tokenizer"
 
 export const validateChatSettings = (
@@ -45,33 +44,32 @@ export const validateChatSettings = (
     throw new Error("Model not found")
   }
 
-  // if (!profile) {
-  //   throw new Error("Profile not found")
-  // }
-  //
-  // if (!selectedWorkspace) {
-  //   throw new Error("Workspace not found")
-  // }
-
   if (!messageContent) {
     throw new Error("Message content not found")
   }
 
-  if (!validateProPlan(profile) && modelData.paid) {
-    throw new SubscriptionRequiredError(
-      "Subscription required to use this model"
-    )
+  const isPro = validateProPlan(profile)
+  const modelTier = getModelTier(modelData.modelId)
+
+  // Check model access based on tier
+  if (!isPro && modelTier === ModelTier.Tier1) {
+    throw new SubscriptionRequiredError("Pro plan required to use this model")
   }
 
-  if (!validateProPlan(profile) && selectedAssistant) {
-    throw new SubscriptionRequiredError(
-      "Subscription required to use assistants"
-    )
-  }
+  // Check for assistant usage
+  // if (!isPro && selectedAssistant) {
+  //   throw new SubscriptionRequiredError(
+  //     "Pro plan required to use assistants"
+  //   )
+  // }
 
-  if (!validateProPlan(profile) && selectedTools?.length > 0) {
-    throw new SubscriptionRequiredError("Subscription required to use tools")
-  }
+  // Check for tool usage
+  // if (!isPro && selectedTools?.length > 0) {
+  //   throw new SubscriptionRequiredError("Pro plan required to use tools")
+  // }
+
+  // Note: We're not checking message counts here as that's typically a server-side operation
+  // The server will need to handle the daily limits for each tier
 }
 
 export const handleRetrieval = async (

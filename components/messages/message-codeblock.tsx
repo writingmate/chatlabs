@@ -20,6 +20,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
 
 interface MessageCodeBlockProps {
   language: string
@@ -103,6 +104,8 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
     const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const [iframeHeight, setIframeHeight] = useState<number | null>(null)
+
+    const { messagesEndRef, handleScroll } = useScroll()
 
     const downloadAsFile = () => {
       if (typeof window === "undefined") {
@@ -368,7 +371,10 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
             </div>
           </div>
         )}
-        <div className="relative size-full overflow-auto">
+        <div
+          className="relative size-full overflow-auto"
+          onScroll={handleScroll}
+        >
           {execute ? (
             <iframe
               className={"size-full border-none bg-white"}
@@ -379,25 +385,28 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               }
             />
           ) : (
-            <SyntaxHighlighter
-              language={language}
-              style={oneDark}
-              customStyle={{
-                overflowY: "auto",
-                margin: 0,
-                height: "100%",
-                background: "transparent",
-                padding: "1rem"
-              }}
-              codeTagProps={{
-                style: {
-                  fontSize: "14px",
-                  fontFamily: "var(--font-mono)"
-                }
-              }}
-            >
-              {value}
-            </SyntaxHighlighter>
+            <div className={"size-full"}>
+              <SyntaxHighlighter
+                language={language}
+                style={oneDark}
+                customStyle={{
+                  overflowY: "auto",
+                  margin: 0,
+                  height: "100%",
+                  background: "transparent",
+                  padding: "1rem"
+                }}
+                codeTagProps={{
+                  style: {
+                    fontSize: "14px",
+                    fontFamily: "var(--font-mono)"
+                  }
+                }}
+              >
+                {value}
+              </SyntaxHighlighter>
+              <div ref={messagesEndRef} />
+            </div>
           )}
         </div>
       </div>
