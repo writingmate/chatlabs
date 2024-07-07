@@ -275,7 +275,7 @@ export const ChatUI: FC<ChatUIProps> = ({
         "relative flex size-full flex-1 flex-col overflow-hidden overflow-y-auto"
       }
     >
-      <div className="sticky top-0 flex w-full justify-between bg-none p-2">
+      <div className="bg-background sticky top-0 z-50 flex w-full justify-between p-2">
         <div className="flex items-center">
           {!showSidebar && (
             <WithTooltip

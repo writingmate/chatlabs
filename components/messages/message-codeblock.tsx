@@ -169,7 +169,20 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
         chatSettings.embeddingsProvider
       )
         .then(result => {
-          toast.success("Your code has been shared successfully.")
+          toast.success(
+            <div>
+              Your code has been shared successfully.
+              <br />
+              <a
+                className={"underline"}
+                target={"_blank"}
+                href={`/share/${result.hashid}`}
+              >
+                Click to view
+              </a>
+              .
+            </div>
+          )
           windowRef.location = `/share/${result.hashid}`
         })
         .catch(error => {
