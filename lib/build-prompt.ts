@@ -48,7 +48,15 @@ export async function buildFinalMessages(
     profile?.system_prompt_template || DEFAULT_SYSTEM_PROMPT
   )
 
-  const CHUNK_SIZE = CHAT_SETTING_LIMITS[chatSettings.model].MAX_CONTEXT_LENGTH
+  let CHUNK_SIZE = 4096 // sane default
+  if (chatSettings.contextLength) {
+    CHUNK_SIZE = chatSettings.contextLength
+  }
+
+  if (chatSettings.model in CHAT_SETTING_LIMITS) {
+    CHUNK_SIZE = CHAT_SETTING_LIMITS[chatSettings.model].MAX_CONTEXT_LENGTH
+  }
+
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
 
   let remainingTokens = CHUNK_SIZE - PROMPT_TOKENS

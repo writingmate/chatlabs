@@ -20,7 +20,7 @@ export function ConversationStarters({
       .slice(0, MAX_CONVERSATION_STARTERS)
 
     return (
-      <div className="grid w-full grid-cols-2 items-start justify-center gap-2">
+      <div className="grid w-full grid-cols-2 items-start justify-center gap-2 pb-2">
         {trimmedValues?.map((starter, index) => (
           <Button
             onClick={() => onSelect(starter)}

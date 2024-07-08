@@ -266,7 +266,7 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
 
       <div className={"relative"}>
         <ChatCommandInput />
-        <div className="border-input bg-background mt-3 flex w-full flex-col justify-end overflow-hidden rounded-xl border">
+        <div className="border-input bg-background flex w-full flex-col justify-end overflow-hidden rounded-xl border">
           {showAssistant && selectedAssistant && (
             <div className="bg-accent border-input flex items-center justify-between space-x-2 border-b p-2 pl-4 pr-3">
               <div className={"flex items-center space-x-2"}>

@@ -78,7 +78,8 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setChatFileItems,
     setSelectedTools,
     chatMessages,
-    setChatMessages
+    setChatMessages,
+    isGenerating
   } = useContext(ChatbotUIChatContext)
 
   const { handleNewChat, handleFocusChatInput, handleSendMessage } =
@@ -292,7 +293,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
               </div>
             )}
 
-            <div className="bg-background sticky bottom-2 mx-2 items-end">
+            <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
               {chatMessages?.length === 0 && (
                 <ConversationStarters
                   values={selectedAssistant?.conversation_starters}
@@ -315,6 +316,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
         />
         {previewContent && (
           <ChatPreviewContent
+            isGenerating={isGenerating}
             content={previewContent}
             onPreviewContent={handlePreviewContent}
           />

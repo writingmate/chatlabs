@@ -2,10 +2,12 @@ import { FC } from "react"
 import { MessageCodeBlock } from "@/components/messages/message-codeblock"
 
 interface ChatPreviewContentProps {
+  isGenerating: boolean
   content: string
   onPreviewContent?: (content: string) => void
 }
 export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
+  isGenerating,
   content,
   onPreviewContent
 }) => {
@@ -16,10 +18,11 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   return (
     <div
       className={
-        "fixed bottom-6 right-4 top-14 w-[calc(100%-30px)] transition-transform lg:w-[calc(50%-30px)]"
+        "fixed bottom-2 right-4 top-14 w-[calc(100%-30px)] transition-transform lg:w-[calc(50%-30px)]"
       }
     >
       <MessageCodeBlock
+        isGenerating={isGenerating}
         onClose={() => onPreviewContent?.("")}
         className={"h-full"}
         language={language}

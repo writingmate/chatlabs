@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils"
 import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
 
 interface MessageCodeBlockProps {
+  isGenerating?: boolean
   language: string
   value: string
   className?: string
@@ -94,7 +95,7 @@ function CopyButton({
 }
 
 export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
-  ({ language, value, className, onClose }) => {
+  ({ language, value, className, onClose, isGenerating }) => {
     const { user } = useAuth()
     const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
     const [sharing, setSharing] = useState(false)
@@ -268,15 +269,15 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     }, [])
 
     useEffect(() => {
-      if (!value) {
+      if (isGenerating) {
         setExecute(false)
       }
-    }, [value])
+    }, [isGenerating])
 
     return (
       <div
         className={cn(
-          "codeblock relative size-full overflow-hidden rounded-lg bg-zinc-950 font-sans shadow-lg",
+          "codeblock relative size-full overflow-hidden rounded-xl bg-zinc-950 font-sans shadow-lg",
           className
         )}
       >
@@ -372,8 +373,8 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           </div>
         )}
         <div
-          className="relative size-full overflow-auto"
-          onScroll={handleScroll}
+          className="relative h-[calc(100%-40px)] w-full overflow-auto"
+          // onScroll={handleScroll}
         >
           {execute ? (
             <iframe
@@ -403,9 +404,9 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                   }
                 }}
               >
-                {value}
+                {value.trim()}
               </SyntaxHighlighter>
-              <div ref={messagesEndRef} />
+              {/*<div ref={messagesEndRef} />*/}
             </div>
           )}
         </div>

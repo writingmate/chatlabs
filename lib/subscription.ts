@@ -28,11 +28,9 @@ const TIER1_THRESHOLD = 5.1 // $0.05 per 1K tokens
 // Helper function to get model tier based on inputCost
 export function getModelTier(model: LLMID): ModelTier {
   const llm = LLM_LIST.find(llm => llm.modelId === model)
-  if (!llm) throw new Error(`Unknown model: ${model}`)
+  if (!llm) return ModelTier.Tier1
 
   const inputCost = llm.pricing?.inputCost
-
-  console.log("inputCost", inputCost)
 
   if (inputCost === undefined) return ModelTier.Tier1
 
