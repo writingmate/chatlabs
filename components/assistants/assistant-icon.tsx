@@ -1,9 +1,10 @@
 import Image from "next/image"
-import { IconRobotFace } from "@tabler/icons-react"
 import { useContext } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { cn } from "@/lib/utils"
+import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
+import { useTheme } from "next-themes"
 
 export function AssistantIcon({
   assistant,
@@ -14,6 +15,7 @@ export function AssistantIcon({
   size?: number
   className?: string
 }) {
+  const { theme } = useTheme()
   const { assistantImages } = useContext(ChatbotUIContext)
   return (
     <div
@@ -34,10 +36,9 @@ export function AssistantIcon({
           className={`max-w-[${size}px]`}
         />
       ) : (
-        <IconRobotFace
-          size={size - size / 8}
-          stroke={1.5}
-          className="text-background"
+        <ChatbotUISVG
+          theme={theme === "dark" ? "light" : "dark"}
+          size={size * 0.7}
         />
       )}
     </div>

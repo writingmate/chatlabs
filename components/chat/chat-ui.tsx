@@ -292,7 +292,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
               </div>
             )}
 
-            <div className="sticky bottom-2 mx-2 items-end">
+            <div className="bg-background sticky bottom-2 mx-2 items-end">
               {chatMessages?.length === 0 && (
                 <ConversationStarters
                   values={selectedAssistant?.conversation_starters}

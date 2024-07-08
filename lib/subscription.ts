@@ -32,6 +32,8 @@ export function getModelTier(model: LLMID): ModelTier {
 
   const inputCost = llm.pricing?.inputCost
 
+  console.log("inputCost", inputCost)
+
   if (inputCost === undefined) return ModelTier.Tier1
 
   if (inputCost < TIER2_THRESHOLD) return ModelTier.Tier3
