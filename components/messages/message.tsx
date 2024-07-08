@@ -258,10 +258,14 @@ export const Message: FC<MessageProps> = ({
     })
   }
 
-  const assistant =
+  let assistant =
     message.role === "assistant" && message.assistant_id
       ? assistants.find(assistant => assistant.id === message.assistant_id)
-      : selectedAssistant
+      : null
+
+  if (!assistant && selectedAssistant) {
+    assistant = selectedAssistant
+  }
 
   return (
     <div
