@@ -5,6 +5,7 @@ import { Tables } from "@/supabase/types"
 import { cn } from "@/lib/utils"
 import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
 import { useTheme } from "next-themes"
+import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
 
 export function AssistantIcon({
   assistant,
@@ -16,7 +17,6 @@ export function AssistantIcon({
   className?: string
 }) {
   const { theme } = useTheme()
-  const { assistantImages } = useContext(ChatbotUIContext)
   return (
     <div
       className={cn(
@@ -26,10 +26,7 @@ export function AssistantIcon({
     >
       {assistant.image_path ? (
         <Image
-          src={
-            assistantImages.find(image => image.path === assistant.image_path)
-              ?.url || ""
-          }
+          src={getAssistantPublicImageUrl(assistant.image_path)}
           alt={assistant.name}
           width={size}
           height={size}
