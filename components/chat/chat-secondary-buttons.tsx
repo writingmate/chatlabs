@@ -67,7 +67,7 @@ export const ChatSecondaryButtons: FC<ChatSecondaryButtonsProps> = ({}) => {
                 <IconMessagePlus
                   className="cursor-pointer hover:opacity-50"
                   size={24}
-                  onClick={handleNewChat}
+                  onClick={() => handleNewChat()}
                 />
               </div>
             }

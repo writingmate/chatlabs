@@ -31,7 +31,7 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
 
   return (
     <div className={"text-foreground/80 w-full p-2 text-center text-xs"}>
-      You have messages {10 - messageCount}/10 left today.{" "}
+      You have messages {Math.max(10 - messageCount, 0)}/10 left.{" "}
       <Button
         size={"xs"}
         className={"px-0 text-xs"}

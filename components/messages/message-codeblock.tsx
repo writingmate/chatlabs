@@ -353,7 +353,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           </div>
         </div>
         {error && (
-          <div className="absolute bottom-0 max-h-[200px] w-full overflow-auto bg-red-100 px-3 py-2 text-sm text-red-800">
+          <div className="absolute bottom-0 z-10 max-h-[200px] w-full overflow-auto bg-red-100 px-3 py-2 text-sm text-red-800">
             <div className={"flex h-6 items-center justify-between gap-1"}>
               <Label>Console errors</Label>
               <CopyButton

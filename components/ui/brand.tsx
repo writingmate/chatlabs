@@ -11,7 +11,10 @@ export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
   return (
     <div className="flex cursor-pointer flex-col items-center">
       <div className="mb-2">
-        <ChatbotUISVG theme={theme === "dark" ? "dark" : "light"} scale={0.3} />
+        <ChatbotUISVG
+          theme={theme === "dark" ? "dark" : "light"}
+          size={141 * 0.3}
+        />
       </div>
 
       <h1 className="text-4xl font-semibold tracking-wide">ChatLabs</h1>
