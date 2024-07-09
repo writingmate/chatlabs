@@ -136,25 +136,10 @@ export const ToolSelect: FC<ToolSelectProps> = ({
                   onClick={e => e.stopPropagation()}
                   onCheckedChange={createHandleSelectTool(tool)}
                 />
-                {/*{selectedModelId === model.modelId && (*/}
-                {/*  <IconCheck className="ml-2" size={32} />*/}
-                {/*)}*/}
-
-                {/*<ModelOption*/}
-                {/*  key={model.modelId}*/}
-                {/*  model={model}*/}
-                {/*  selected={selectedModelId === model.modelId}*/}
-                {/*  onSelect={() => handleSelectModel(model.modelId)}*/}
-                {/*/>*/}
               </DropdownMenuItem>
             )
           })}
         </div>
-        {/*<Separator />*/}
-        {/*<DropdownMenuItem className={"flex w-full items-center space-x-2"}>*/}
-        {/*  <IconSettings size={16} />*/}
-        {/*  <div>Manage tools</div>*/}
-        {/*</DropdownMenuItem>*/}
       </DropdownMenuContent>
     </DropdownMenu>
   )

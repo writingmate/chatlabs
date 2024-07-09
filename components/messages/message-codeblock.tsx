@@ -10,6 +10,7 @@ import {
   IconShare3,
   IconStars,
   IconWand,
+  IconWorld,
   IconX
 } from "@tabler/icons-react"
 import { FC, memo, useContext, useEffect, useRef, useState } from "react"
@@ -25,6 +26,8 @@ import { cn } from "@/lib/utils"
 import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { MessageSharingDialog } from "@/components/messages/message-sharing-dialog"
+import { fi } from "date-fns/locale"
 
 interface MessageCodeBlockProps {
   isGenerating?: boolean
@@ -74,7 +77,7 @@ export const generateRandomString = (length: number, lowercase = false) => {
   return lowercase ? result.toLowerCase() : result
 }
 
-function CopyButton({
+export function CopyButton({
   value,
   title = "Copy to clipboard",
   className
@@ -143,68 +146,6 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
-    }
-
-    const shareHtmlCode = () => {
-      if (!selectedWorkspace || !chatSettings || !user) {
-        toast.error("Please select a workspace")
-        return
-      }
-
-      setSharing(true)
-
-      const htmlFile: File = new File([value], filename || "index.html", {
-        type: "text/html"
-      })
-
-      toast.info("Sharing your code. You will be redirected shortly...")
-
-      const windowRef = window.open("/share/placeholder", "_blank")
-
-      if (!windowRef) {
-        toast.error("Failed to open a new window.")
-        return
-      }
-
-      createFile(
-        htmlFile,
-        {
-          user_id: user.id,
-          description: "",
-          file_path: "",
-          name: htmlFile.name,
-          size: htmlFile.size,
-          sharing: "public",
-          tokens: 0,
-          type: "html"
-        },
-        selectedWorkspace.id,
-        chatSettings.embeddingsProvider
-      )
-        .then(result => {
-          toast.success(
-            <div>
-              Your code has been shared successfully.
-              <br />
-              <a
-                className={"underline"}
-                target={"_blank"}
-                href={`/share/${result.hashid}`}
-              >
-                Click to view
-              </a>
-              .
-            </div>
-          )
-          windowRef.location = `/share/${result.hashid}`
-        })
-        .catch(error => {
-          toast.error("Failed to upload.")
-          windowRef?.close()
-        })
-        .finally(() => {
-          setSharing(false)
-        })
     }
 
     const sendHeightJS = `
@@ -334,13 +275,12 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                   <Button
                     disabled={isGenerating}
                     title={"Share you app with others"}
-                    loading={sharing}
                     className="bg-transparent px-2 text-xs text-white hover:opacity-50"
-                    onClick={shareHtmlCode}
+                    onClick={() => setSharing(true)}
                     variant="outline"
                     size="xs"
                   >
-                    <IconShare3 className={"mr-1"} size={16} /> Share
+                    <IconWorld className={"mr-1"} size={16} /> Share
                   </Button>
                 )}
               </>
@@ -436,6 +376,15 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
             </div>
           )}
         </div>
+        <MessageSharingDialog
+          open={sharing}
+          setOpen={setSharing}
+          user={user}
+          selectedWorkspace={selectedWorkspace}
+          chatSettings={chatSettings}
+          defaultFilename={filename || ""}
+          fileContent={value}
+        />
       </div>
     )
   }
