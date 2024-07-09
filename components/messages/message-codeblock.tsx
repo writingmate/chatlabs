@@ -8,6 +8,8 @@ import {
   IconDownload,
   IconPlayerPlay,
   IconShare3,
+  IconStars,
+  IconWand,
   IconX
 } from "@tabler/icons-react"
 import { FC, memo, useContext, useEffect, useRef, useState } from "react"
@@ -21,6 +23,8 @@ import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
+import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface MessageCodeBlockProps {
   isGenerating?: boolean
@@ -82,7 +86,7 @@ function CopyButton({
   return (
     <Button
       size={"icon"}
-      className="size-4 text-white hover:opacity-50"
+      className={cn("size-4 text-red-800 hover:opacity-50", className)}
       variant={"link"}
       onClick={() => {
         if (isCopied) return
@@ -104,9 +108,12 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     const [error, setError] = useState<string | null>(null)
 
     const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
     const [iframeHeight, setIframeHeight] = useState<number | null>(null)
 
-    const { messagesEndRef, handleScroll } = useScroll()
+    const { chatMessages } = useContext(ChatbotUIChatContext)
+
+    const { handleSendMessage } = useChatHandler()
 
     const downloadAsFile = () => {
       if (typeof window === "undefined") {
@@ -287,6 +294,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
             {["javascript", "js", "html"].includes(language.toLowerCase()) && (
               <>
                 <ToggleGroup
+                  disabled={isGenerating}
                   onValueChange={value => {
                     setExecute(value === "execute")
                     setError(null) // Clear any previous errors when switching modes
@@ -317,6 +325,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                 </ToggleGroup>
                 {language == "html" && (
                   <Button
+                    disabled={isGenerating}
                     title={"Share you app with others"}
                     loading={sharing}
                     className="bg-transparent px-2 text-xs text-white hover:opacity-50"
@@ -331,6 +340,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
             )}
 
             <Button
+              disabled={isGenerating}
               title={"Download as file"}
               variant="link"
               size="icon"
@@ -340,7 +350,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               <IconDownload size={16} />
             </Button>
 
-            <CopyButton value={value} />
+            <CopyButton className={"text-white"} value={value} />
 
             <Button
               title={"Close"}
@@ -357,11 +367,20 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           <div className="absolute bottom-0 z-10 max-h-[200px] w-full overflow-auto bg-red-100 px-3 py-2 text-sm text-red-800">
             <div className={"flex h-6 items-center justify-between gap-1"}>
               <Label>Console errors</Label>
-              <CopyButton
-                className={"text-red-800"}
-                value={error}
-                title={"Copy error message"}
-              />
+              <div className={"flex items-center justify-between space-x-2"}>
+                <Button
+                  size={"xs"}
+                  variant={"outline"}
+                  onClick={() => handleSendMessage(error, chatMessages, false)}
+                  className={
+                    "h-6 border-red-800 bg-transparent text-xs hover:opacity-50"
+                  }
+                >
+                  <IconWand size={16} stroke={1.5} />
+                  Fix this
+                </Button>
+                <CopyButton value={error} title={"Copy error message"} />
+              </div>
             </div>
             <div
               className={

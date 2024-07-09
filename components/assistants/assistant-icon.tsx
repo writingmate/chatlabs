@@ -17,14 +17,16 @@ export function AssistantIcon({
   className?: string
 }) {
   const { theme } = useTheme()
+  const image = assistant.image_path
   return (
     <div
       className={cn(
-        `bg-foreground size-[${size}px] flex shrink-0 items-center justify-center overflow-hidden rounded`,
-        className
+        `size-[${size}px] flex shrink-0 items-center justify-center overflow-hidden rounded`,
+        className,
+        image ? "bg-transparent" : "bg-foreground"
       )}
     >
-      {assistant.image_path ? (
+      {image ? (
         <Image
           src={getAssistantPublicImageUrl(assistant.image_path)}
           alt={assistant.name}
