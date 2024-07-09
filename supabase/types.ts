@@ -1219,6 +1219,7 @@ export interface Database {
           bio: string
           created_at: string
           display_name: string
+          experimental_code_editor: boolean | null
           files_command: string | null
           google_gemini_api_key: string | null
           groq_api_key: string | null
@@ -1256,6 +1257,7 @@ export interface Database {
           bio: string
           created_at?: string
           display_name: string
+          experimental_code_editor?: boolean | null
           files_command?: string | null
           google_gemini_api_key?: string | null
           groq_api_key?: string | null
@@ -1293,6 +1295,7 @@ export interface Database {
           bio?: string
           created_at?: string
           display_name?: string
+          experimental_code_editor?: boolean | null
           files_command?: string | null
           google_gemini_api_key?: string | null
           groq_api_key?: string | null

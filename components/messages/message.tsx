@@ -45,7 +45,7 @@ interface MessageProps {
   isGenerating: boolean
   firstTokenReceived: boolean
   setIsGenerating: (value: boolean) => void
-  onPreviewContent?: (content: string) => void
+  onPreviewContent?: (content: { content: string; filename?: string }) => void
 }
 
 export const Message: FC<MessageProps> = ({

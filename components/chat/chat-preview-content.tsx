@@ -3,8 +3,16 @@ import { MessageCodeBlock } from "@/components/messages/message-codeblock"
 
 interface ChatPreviewContentProps {
   isGenerating: boolean
-  content: string
-  onPreviewContent?: (content: string) => void
+  content: {
+    content: string
+    filename?: string
+  }
+  onPreviewContent?: (
+    content: {
+      content: string
+      filename?: string
+    } | null
+  ) => void
 }
 export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   isGenerating,
@@ -13,7 +21,7 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
 }) => {
   // language is the first line of the content
   // the rest is the code
-  const [language, ...code] = content.split("\n")
+  const [language, ...code] = content.content.split("\n")
 
   return (
     <div
@@ -23,9 +31,10 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
     >
       <MessageCodeBlock
         isGenerating={isGenerating}
-        onClose={() => onPreviewContent?.("")}
+        onClose={() => onPreviewContent?.(null)}
         className={"h-full"}
         language={language}
+        filename={content.filename}
         value={code.join("\n")}
       />
     </div>

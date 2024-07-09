@@ -94,7 +94,10 @@ export const ChatUI: React.FC<ChatUIProps> = ({
   } = useScroll()
 
   const [loading, setLoading] = useState<boolean>(true)
-  const [previewContent, setPreviewContent] = useState<string>("")
+  const [previewContent, setPreviewContent] = useState<{
+    content: string
+    filename?: string
+  } | null>(null)
 
   useHotkey("o", handleNewChat)
   useHotkey("l", handleFocusChatInput)
@@ -116,7 +119,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
 
   useEffect(() => {
     if (showSidebar) {
-      setPreviewContent("")
+      setPreviewContent(null)
     }
   }, [showSidebar])
 
@@ -238,7 +241,12 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     })
   }
 
-  const handlePreviewContent = (content: string): void => {
+  const handlePreviewContent = (
+    content: {
+      content: string
+      filename?: string
+    } | null
+  ): void => {
     setPreviewContent(content)
     if (content) {
       setShowSidebar(false)

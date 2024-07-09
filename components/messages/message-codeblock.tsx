@@ -29,6 +29,7 @@ import { ChatbotUIChatContext } from "@/context/chat"
 interface MessageCodeBlockProps {
   isGenerating?: boolean
   language: string
+  filename?: string
   value: string
   className?: string
   onClose?: () => void
@@ -99,7 +100,7 @@ function CopyButton({
 }
 
 export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
-  ({ language, value, className, onClose, isGenerating }) => {
+  ({ language, value, className, onClose, isGenerating, filename }) => {
     const { user } = useAuth()
     const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
     const [sharing, setSharing] = useState(false)
@@ -108,6 +109,8 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     const [error, setError] = useState<string | null>(null)
 
     const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+    const [uniqueIFrameId] = useState(generateRandomString(6, true))
 
     const [iframeHeight, setIframeHeight] = useState<number | null>(null)
 
@@ -150,7 +153,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
       setSharing(true)
 
-      const htmlFile: File = new File([value], "index.html", {
+      const htmlFile: File = new File([value], filename || "index.html", {
         type: "text/html"
       })
 
@@ -229,7 +232,8 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
             message: message,
             source: source,
             lineno: lineno,
-            colno: colno
+            colno: colno,
+            iframeId: "${uniqueIFrameId}"
           }, "*");
           return true;
         };
@@ -245,7 +249,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       }
       const body = doc.querySelector("body")
       if (body) {
-        // body.innerHTML += sendHeightJS
+        body.innerHTML += sendHeightJS
         return doc.documentElement.outerHTML
       }
       return html
@@ -260,7 +264,10 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           resizeTimeoutRef.current = setTimeout(() => {
             setIframeHeight(event.data.height)
           }, 200) // Throttle to 200ms
-        } else if (event.data.type === "error") {
+        } else if (
+          event.data.type === "error" &&
+          event.data.iframeId === uniqueIFrameId
+        ) {
           setError(
             `Error: ${event.data.message}\nLine: ${event.data.lineno}, Column: ${event.data.colno}`
           )
@@ -401,7 +408,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               srcDoc={
                 language === "html"
                   ? addScriptsToHtml(value)
-                  : `${errorHandlingScript}<script>${value}</script>${sendHeightJS}`
+                  : `<html lang="en"><body>${errorHandlingScript}<script>${value}</script>${sendHeightJS}</body></html>`
               }
             />
           ) : (

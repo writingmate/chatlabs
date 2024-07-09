@@ -10,7 +10,7 @@ import { FileIcon } from "@/components/ui/file-icon"
 
 interface MessageMarkdownProps {
   content: string
-  onPreviewContent?: (content: string) => void
+  onPreviewContent?: (content: { content: string; filename?: string }) => void
 }
 
 function urlTransform(url: string) {
@@ -100,7 +100,10 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
               ""
             )
 
-            onPreviewContent?.(language + "\n" + fileContentWithoutFileName)
+            onPreviewContent?.({
+              filename: fileName,
+              content: language + "\n" + fileContentWithoutFileName
+            })
 
             return (
               <Button
@@ -110,9 +113,10 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
                   "text-foreground flex h-auto w-[260px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:shadow"
                 }
                 onClick={() =>
-                  onPreviewContent?.(
-                    language + "\n" + fileContentWithoutFileName
-                  )
+                  onPreviewContent?.({
+                    filename: fileName,
+                    content: language + "\n" + fileContentWithoutFileName
+                  })
                 }
               >
                 <div>
@@ -132,7 +136,6 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
 
           return (
             <MessageCodeBlock
-              // key={Math.random()}
               language={(match && match[1]) || ""}
               value={fileContent}
               {...props}
