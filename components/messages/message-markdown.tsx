@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { FileIcon } from "@/components/ui/file-icon"
 
 interface MessageMarkdownProps {
+  experimentalCodeEditor?: boolean
   content: string
   onPreviewContent?: (content: { content: string; filename?: string }) => void
 }
@@ -21,6 +22,7 @@ function urlTransform(url: string) {
 }
 
 export const MessageMarkdown: FC<MessageMarkdownProps> = ({
+  experimentalCodeEditor = false,
   content,
   onPreviewContent
 }) => {
@@ -92,44 +94,46 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
           const fileContent = String(childArray).replace(/\n$/, "")
 
           const matchedNames = fileContent.match(regexFileName)
+          const fileContentWithoutFileName = fileContent.replace(
+            regexFileName,
+            ""
+          )
 
           if (matchedNames) {
             const fileName = matchedNames[1]
-            const fileContentWithoutFileName = fileContent.replace(
-              regexFileName,
-              ""
-            )
 
-            onPreviewContent?.({
-              filename: fileName,
-              content: language + "\n" + fileContentWithoutFileName
-            })
+            if (experimentalCodeEditor) {
+              onPreviewContent?.({
+                filename: fileName,
+                content: language + "\n" + fileContentWithoutFileName
+              })
 
-            return (
-              <Button
-                variant={"outline"}
-                size={"lg"}
-                className={
-                  "text-foreground flex h-auto w-[260px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:shadow"
-                }
-                onClick={() =>
-                  onPreviewContent?.({
-                    filename: fileName,
-                    content: language + "\n" + fileContentWithoutFileName
-                  })
-                }
-              >
-                <div>
-                  <FileIcon type={fileName.split(".")[1] || language} />
-                </div>
-                <div className={"flex flex-col overflow-hidden"}>
-                  <div>{fileName}</div>
-                  <span className="text-foreground/60 line-clamp-1 text-ellipsis whitespace-pre-wrap text-xs font-normal">
-                    Click to view file
-                  </span>
-                </div>
-              </Button>
-            )
+              return (
+                <Button
+                  variant={"outline"}
+                  size={"lg"}
+                  className={
+                    "text-foreground flex h-auto w-[260px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:shadow"
+                  }
+                  onClick={() =>
+                    onPreviewContent?.({
+                      filename: fileName,
+                      content: language + "\n" + fileContentWithoutFileName
+                    })
+                  }
+                >
+                  <div>
+                    <FileIcon type={fileName.split(".")[1] || language} />
+                  </div>
+                  <div className={"flex flex-col overflow-hidden"}>
+                    <div>{fileName}</div>
+                    <span className="text-foreground/60 line-clamp-1 text-ellipsis whitespace-pre-wrap text-xs font-normal">
+                      Click to view file
+                    </span>
+                  </div>
+                </Button>
+              )
+            }
           }
 
           // eslint-disable-next-line tailwindcss/no-contradicting-classname
@@ -137,7 +141,7 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
           return (
             <MessageCodeBlock
               language={(match && match[1]) || ""}
-              value={fileContent}
+              value={fileContentWithoutFileName}
               {...props}
             />
           )
