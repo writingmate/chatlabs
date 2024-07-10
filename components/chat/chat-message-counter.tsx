@@ -1,13 +1,15 @@
 import { ChatbotUIContext } from "@/context/context"
 import { useContext, useEffect, useState } from "react"
-import { validateProPlan } from "@/lib/subscription"
+import { FREE_MESSAGE_DAILY_LIMIT, validateProPlan } from "@/lib/subscription"
 import { getMessageCount } from "@/db/messages"
 import { Button } from "@/components/ui/button"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatMessageCounterProps {}
 
 const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
   const { profile, setIsPaywallOpen } = useContext(ChatbotUIContext)
+  const { isGenerating } = useContext(ChatbotUIChatContext)
   const [messageCount, setMessageCount] = useState(0)
 
   useEffect(() => {
@@ -19,7 +21,7 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
       setMessageCount(count || 0)
     }
     fetchMessageCount()
-  }, [profile])
+  }, [profile, isGenerating])
 
   if (!profile) {
     return null
@@ -31,7 +33,8 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
 
   return (
     <div className={"text-foreground/80 w-full p-2 text-center text-xs"}>
-      You have messages {Math.max(10 - messageCount, 0)}/10 left.{" "}
+      You have messages {Math.max(FREE_MESSAGE_DAILY_LIMIT - messageCount, 0)}/
+      {FREE_MESSAGE_DAILY_LIMIT} left.{" "}
       <Button
         size={"xs"}
         className={"px-0 text-xs"}

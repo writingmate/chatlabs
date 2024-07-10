@@ -36,6 +36,7 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
         language={language}
         filename={content.filename}
         value={code.join("\n")}
+        showCloseButton={true}
       />
     </div>
   )

@@ -6,7 +6,12 @@ import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { SubscriptionRequiredError } from "@/lib/errors"
-import { validateProPlan } from "@/lib/subscription"
+import {
+  CATCHALL_MESSAGE_DAILY_LIMIT,
+  FREE_MESSAGE_DAILY_LIMIT,
+  PRO_MESSAGE_DAILY_LIMIT,
+  validateProPlan
+} from "@/lib/subscription"
 import { PLAN_FREE } from "@/lib/stripe/config"
 
 function createClient() {
@@ -98,21 +103,6 @@ export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
     throw new SubscriptionRequiredError("Pro plan required to use this model")
   }
 }
-
-function getEnvInt(varName: string, def: number) {
-  if (varName in process.env) {
-    return parseInt(process.env[varName] + "")
-  }
-
-  return def
-}
-
-const FREE_MESSAGE_DAILY_LIMIT = getEnvInt("FREE_MESSAGE_LIMIT", 30)
-const PRO_MESSAGE_DAILY_LIMIT = getEnvInt("PRO_MESSAGE_LIMIT", 50)
-const CATCHALL_MESSAGE_DAILY_LIMIT = getEnvInt(
-  "CATCHALL_MESSAGE_DAILY_LIMIT",
-  300
-)
 
 export async function validateMessageCount(
   profile: Tables<"profiles">,

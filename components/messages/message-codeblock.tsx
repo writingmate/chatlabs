@@ -36,6 +36,7 @@ interface MessageCodeBlockProps {
   value: string
   className?: string
   onClose?: () => void
+  showCloseButton?: boolean
 }
 
 interface languageMap {
@@ -103,7 +104,15 @@ export function CopyButton({
 }
 
 export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
-  ({ language, value, className, onClose, isGenerating, filename }) => {
+  ({
+    language,
+    value,
+    className,
+    onClose,
+    isGenerating,
+    showCloseButton = false,
+    filename
+  }) => {
     const { user } = useAuth()
     const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
     const [sharing, setSharing] = useState(false)
@@ -299,15 +308,17 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
             <CopyButton className={"text-white"} value={value} />
 
-            <Button
-              title={"Close"}
-              className="size-4 text-white hover:opacity-50"
-              onClick={() => onClose?.()}
-              variant="link"
-              size="icon"
-            >
-              <IconX size={16} />
-            </Button>
+            {showCloseButton && (
+              <Button
+                title={"Close"}
+                className="size-4 text-white hover:opacity-50"
+                onClick={() => onClose?.()}
+                variant="link"
+                size="icon"
+              >
+                <IconX size={16} />
+              </Button>
+            )}
           </div>
         </div>
         {error && (
@@ -344,7 +355,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
         >
           {execute ? (
             <iframe
-              className={"size-full border-none bg-white"}
+              className={"size-full min-h-[480px] border-none bg-white"}
               srcDoc={
                 language === "html"
                   ? addScriptsToHtml(value)
