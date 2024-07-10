@@ -866,7 +866,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </Tabs>
         </div>
 
-        <div className="mt-6 flex items-center">
+        <div className="mt-2 flex items-center">
           <div className="flex items-center space-x-1">
             <ThemeSwitcher />
 
