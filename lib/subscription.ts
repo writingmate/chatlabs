@@ -4,8 +4,11 @@ import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { PLAN_FREE } from "@/lib/stripe/config"
 import { getEnvInt } from "@/lib/env"
 
-export const FREE_MESSAGE_DAILY_LIMIT = getEnvInt("FREE_MESSAGE_LIMIT", 30)
-export const PRO_MESSAGE_DAILY_LIMIT = getEnvInt("PRO_MESSAGE_LIMIT", 50)
+export const FREE_MESSAGE_DAILY_LIMIT = getEnvInt(
+  "FREE_MESSAGE_DAILY_LIMIT",
+  30
+)
+export const PRO_MESSAGE_DAILY_LIMIT = getEnvInt("PRO_MESSAGE_DAILY_LIMIT", 50)
 export const CATCHALL_MESSAGE_DAILY_LIMIT = getEnvInt(
   "CATCHALL_MESSAGE_DAILY_LIMIT",
   300

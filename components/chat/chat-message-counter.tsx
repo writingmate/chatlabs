@@ -7,6 +7,10 @@ import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatMessageCounterProps {}
 
+const LIMIT =
+  parseInt(process.env.NEXT_PUBLIC_FREE_MESSAGE_DAILY_LIMIT + "") ||
+  FREE_MESSAGE_DAILY_LIMIT
+
 const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
   const { profile, setIsPaywallOpen } = useContext(ChatbotUIContext)
   const { isGenerating } = useContext(ChatbotUIChatContext)
@@ -33,8 +37,7 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
 
   return (
     <div className={"text-foreground/80 w-full p-2 text-center text-xs"}>
-      You have messages {Math.max(FREE_MESSAGE_DAILY_LIMIT - messageCount, 0)}/
-      {FREE_MESSAGE_DAILY_LIMIT} left.{" "}
+      You have messages {Math.max(LIMIT - messageCount, 0)}/{LIMIT} left.{" "}
       <Button
         size={"xs"}
         className={"px-0 text-xs"}
