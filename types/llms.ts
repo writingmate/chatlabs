@@ -82,6 +82,7 @@ export interface LLM {
     inputCost: number
     outputCost?: number
   }
+  new?: boolean
 }
 
 export interface OpenRouterLLM extends LLM {

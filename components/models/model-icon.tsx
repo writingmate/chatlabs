@@ -146,10 +146,10 @@ export const ModelIcon: FC<ModelIconProps> = ({
         />
       )
     case "openrouter":
-      const { modelProvider } = parseOpenRouterModelName(modelId!)
+      const { provider } = parseOpenRouterModelName(modelId!)
       return (
         <ModelIcon
-          provider={modelProvider as ModelProvider}
+          provider={provider as ModelProvider}
           height={height}
           width={width}
         />

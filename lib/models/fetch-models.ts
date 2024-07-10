@@ -4,38 +4,36 @@ import { toast } from "sonner"
 import { LLM_LIST_MAP } from "./llm/llm-list"
 
 const KNOWN_MODEL_NAMES: {
-  [key: string]: {
-    modelProvider: string
-    modelName: string
-  }
+  [key: string]: Partial<LLM>
 } = {
   "databricks/dbrx-instruct": {
-    modelProvider: "databricks",
+    provider: "databricks",
     modelName: "DBRX Instruct"
   },
   "cohere/command-r-plus": {
-    modelProvider: "cohere",
+    provider: "cohere",
     modelName: "Command R Plus"
   },
   "mistralai/mixtral-8x22b-instruct": {
-    modelProvider: "mistral",
+    provider: "mistral",
     modelName: "Mixtral 8x22B"
   },
   "meta-llama/llama-3-70b-instruct": {
-    modelProvider: "meta",
+    provider: "meta",
     modelName: "Meta Llama 3 70B"
   },
   "microsoft/wizardlm-2-8x22b": {
-    modelProvider: "microsoft",
+    provider: "microsoft",
     modelName: "WizardLM 2 8x22B"
   },
   "deepseek/deepseek-coder": {
-    modelProvider: "deepseek",
-    modelName: "DeepSeek Coder V2"
+    provider: "deepseek",
+    modelName: "DeepSeek Coder V2",
+    new: true
   }
 }
 
-export function parseOpenRouterModelName(modelId: string) {
+export function parseOpenRouterModelName(modelId: string): Partial<LLM> {
   if (Object.keys(KNOWN_MODEL_NAMES).includes(modelId)) {
     return KNOWN_MODEL_NAMES[modelId]
   }
@@ -46,7 +44,7 @@ export function parseOpenRouterModelName(modelId: string) {
   const modelName = match ? humanize(match[2]) : modelId
 
   return {
-    modelProvider: modelProvider,
+    provider: modelProvider as any,
     modelName
   }
 }
@@ -210,10 +208,10 @@ export const fetchOpenRouterModels = async () => {
         SUPPORTED_OPENROUTER_MODELS.includes(modelId)
       )
       .map((model: any) => {
-        const { modelName } = parseOpenRouterModelName(model.modelId)
+        const knownModel = parseOpenRouterModelName(model.modelId)
         return {
           ...model,
-          modelName
+          ...knownModel
         }
       })
 
