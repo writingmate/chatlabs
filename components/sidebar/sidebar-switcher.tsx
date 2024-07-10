@@ -99,7 +99,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
               variant="ghost"
               size="icon"
               onClick={e => {
-                window.open(`/${selectedWorkspace?.id}/splitview`, "_blank")
+                window.open(`/splitview`, "_blank")
               }}
             >
               <IconLayoutColumns size={SIDEBAR_ICON_SIZE} stroke={1.5} />
