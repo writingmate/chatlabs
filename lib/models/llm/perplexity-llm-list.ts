@@ -28,16 +28,6 @@ const MISTRAL_7B_INSTRUCT: LLM = {
   imageInput: false
 }
 
-// CodeLlama 70B Instruct (UPDATED 1/31/24)
-const CODELLAMA_70B_INSTRUCT: LLM = {
-  modelId: "codellama-70b-instruct",
-  modelName: "CodeLlama 70B Instruct",
-  provider: "perplexity",
-  hostedId: "codellama-70b-instruct",
-  platformLink: PERPLEXITY_PLATORM_LINK,
-  imageInput: false
-}
-
 // Sonar Small Chat (UPDATED 2/25/24)
 const PERPLEXITY_SONAR_SMALL_CHAT_7B: LLM = {
   modelId: "sonar-small-chat",
@@ -83,7 +73,6 @@ const PERPLEXITY_SONAR_MEDIUM_ONLINE_8x7B: LLM = {
 export const PERPLEXITY_LLM_LIST: LLM[] = [
   MIXTRAL_8X7B_INSTRUCT,
   MISTRAL_7B_INSTRUCT,
-  CODELLAMA_70B_INSTRUCT,
   PERPLEXITY_SONAR_SMALL_CHAT_7B,
   PERPLEXITY_SONAR_SMALL_ONLINE_7B,
   PERPLEXITY_SONAR_MEDIUM_CHAT_8x7B,

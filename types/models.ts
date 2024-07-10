@@ -12,3 +12,4 @@ export type ModelProvider =
   | "meta"
   | "cohere"
   | "microsoft"
+  | "deepseek"

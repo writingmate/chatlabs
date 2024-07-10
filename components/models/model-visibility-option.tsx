@@ -3,6 +3,7 @@ import { FC } from "react"
 import { ModelIcon } from "./model-icon"
 import { useTheme } from "next-themes"
 import { Switch } from "@/components/ui/switch"
+import { Badge } from "@/components/ui/badge"
 
 interface ModelVisibilityOption {
   model: LLM
@@ -28,11 +29,14 @@ export const ModelVisibilityOption: FC<ModelVisibilityOption> = ({
             height={28}
           />
           <div
-            className={
-              "text-sm " + (selected ? "font-semibold" : "font-normal")
-            }
+            className={"text-sm" + (selected ? "font-semibold" : "font-normal")}
           >
             {model.modelName}
+            {model.paid && (
+              <Badge variant={"outline"} className="ml-2">
+                Pro
+              </Badge>
+            )}
           </div>
         </div>
         <Switch checked={selected} onCheckedChange={onSelect} />

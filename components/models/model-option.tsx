@@ -14,6 +14,7 @@ import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
+import { Badge } from "@/components/ui/badge"
 
 interface ModelOptionProps {
   model: LLM | OpenRouterLLM
@@ -69,6 +70,14 @@ export const ModelOption: FC<ModelOptionProps> = ({
           >
             {model.modelName}
           </div>
+          {model.paid && (
+            <Badge variant={"outline"} className={"h-5 text-xs"}>
+              Pro
+            </Badge>
+          )}
+          {model.new && (
+            <Badge className="h-5 bg-violet-700 text-xs">New</Badge>
+          )}
         </div>
         <div className="flex items-center space-x-1">
           {selected && <IconCheck size={18} stroke={1.5} />}

@@ -81,6 +81,7 @@ const CLAUDE_3_5_SONNET: LLM = {
   imageInput: true,
   tools: true,
   paid: true,
+  new: true,
   pricing: {
     currency: "USD",
     unit: "1M tokens",
