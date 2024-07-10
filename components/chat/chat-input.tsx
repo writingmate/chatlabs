@@ -3,20 +3,17 @@ import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import {
-  IconBolt,
-  IconCirclePlus,
   IconPaperclip,
   IconPlayerStopFilled,
-  IconSend,
   IconX,
   IconMicrophone,
   IconPlayerRecordFilled,
-  IconRepeat,
-  IconArrowUp
+  IconArrowUp,
+  IconPrompt,
+  IconPlus,
+  IconTerminal2
 } from "@tabler/icons-react"
-import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
@@ -27,13 +24,15 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
-import { Button } from "@/components/ui/button"
 import { ChatbotUIChatContext } from "@/context/chat"
+import Lib from "@apidevtools/json-schema-ref-parser/lib"
+import Link from "next/link"
 
-interface ChatInputProps {}
+interface ChatInputProps {
+  showAssistant: boolean
+}
 
-export const ChatInput: FC<ChatInputProps> = ({}) => {
-  const { t } = useTranslation()
+export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
   useHotkey("l", () => {
     handleFocusChatInput()
   })
@@ -59,15 +58,18 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setFocusTool,
     isToolPickerOpen,
     isPromptPickerOpen,
+    setIsFilePickerOpen,
     setIsPromptPickerOpen,
     isFilePickerOpen,
     setFocusFile,
-    assistantImages,
-    profile
+    profile,
+    selectedWorkspace
   } = useContext(ChatbotUIContext)
 
   const { userInput, setUserInput, chatMessages, isGenerating, chatSettings } =
     useContext(ChatbotUIChatContext)
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
     chatInputRef,
@@ -86,59 +88,79 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setNewMessageContentToPreviousUserMessage
   } = useChatHistoryHandler()
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
   useEffect(() => {
+    console.log("Initializing speech recognition...")
     if ("webkitSpeechRecognition" in window) {
       const recognition = new window.webkitSpeechRecognition()
       recognition.continuous = true
       recognition.interimResults = true
       recognition.lang = "en-US"
 
+      recognition.onstart = () => {
+        console.log("Speech recognition started")
+        setListening(true)
+      }
+
       recognition.onresult = (event: any) => {
+        console.log("Speech recognition result received")
         const array: SpeechRecognitionResult[] = Array.from(event.results)
         const transcript = array
           .map((result: SpeechRecognitionResult) => result[0].transcript)
           .join("")
         setTranscript(transcript)
-        // Check for silence
+        console.log("Current transcript:", transcript)
+
         const isSilent = transcript.trim() === ""
         if (isSilent) {
-          // Reset and set a new timeout to stop the recognition after 30 seconds of silence
+          console.log("Silence detected, setting timeout")
           if (timeoutId) clearTimeout(timeoutId)
           setTimeoutId(
             setTimeout(() => {
+              console.log("Stopping recognition due to silence")
               setTranscript("")
               if (recognition) recognition.stop()
             }, 30 * 1000)
-          ) // 30 seconds
+          )
         } else {
-          // Reset the timeout if the user is speaking
+          console.log("Speech detected, clearing timeout")
           if (timeoutId) clearTimeout(timeoutId)
         }
       }
 
       recognition.onend = (event: any) => {
+        console.log("Speech recognition ended", event)
         setListening(false)
-        if (event.error === "no-speech") {
-          startListening()
+        if (event.error) {
+          console.error("Speech recognition error:", event.error)
+          toast.error(`Speech recognition error: ${event.error}`)
         } else if (transcript.trim() !== "") {
-          // Restart the recognition if the user is still speaking
+          console.log("Restarting recognition")
           startListening()
         }
       }
 
+      recognition.onerror = (event: any) => {
+        console.error("Speech recognition error:", event.error)
+        toast.error(`Speech recognition error: ${event.error}`)
+      }
+
       setRecognition(recognition)
+    } else {
+      console.warn("Speech recognition not supported in this browser")
+      toast.error("Speech recognition is not supported in your browser")
     }
+
     setTimeout(() => {
       handleFocusChatInput()
-    }, 200) // FIX: hacky
+    }, 200)
   }, [selectedPreset, selectedAssistant])
 
   useEffect(() => {
     if (listening) {
+      console.log("Updating user input with transcript")
       setUserInput((userInputBeforeRecording + " " + transcript).trim())
     } else {
+      console.log("Updating user input before recording")
       setUserInputBeforeRecording(userInput)
     }
   }, [listening, transcript, userInputBeforeRecording])
@@ -162,7 +184,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       handleSendMessage(userInput, chatMessages, false)
     }
 
-    // Consolidate conditions to avoid TypeScript error
     if (
       isPromptPickerOpen ||
       isFilePickerOpen ||
@@ -175,7 +196,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
         event.key === "ArrowDown"
       ) {
         event.preventDefault()
-        // Toggle focus based on picker type
         if (isPromptPickerOpen) setFocusPrompt(!focusPrompt)
         if (isFilePickerOpen) setFocusFile(!focusFile)
         if (isToolPickerOpen) setFocusTool(!focusTool)
@@ -183,17 +203,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       }
     }
 
-    if (event.key === "ArrowUp" && event.shiftKey && event.ctrlKey) {
-      event.preventDefault()
-      setNewMessageContentToPreviousUserMessage()
-    }
-
-    if (event.key === "ArrowDown" && event.shiftKey && event.ctrlKey) {
-      event.preventDefault()
-      setNewMessageContentToNextUserMessage()
-    }
-
-    //use shift+ctrl+up and shift+ctrl+down to navigate through chat history
     if (event.key === "ArrowUp" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
       setNewMessageContentToPreviousUserMessage()
@@ -235,26 +244,36 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
       }
     }
   }
+
   const startListening = () => {
     if (recognition) {
+      console.log("Starting speech recognition")
       setListening(true)
       recognition.start()
+    } else {
+      console.warn("Speech recognition not initialized")
+      toast.error("Speech recognition is not initialized")
     }
   }
 
   const stopListening = () => {
     if (recognition) {
+      console.log("Stopping speech recognition")
       if (timeoutId) clearTimeout(timeoutId)
       recognition.stop()
       setTranscript("")
       setListening(false)
+    } else {
+      console.warn("Speech recognition not initialized")
+      toast.error("Speech recognition is not initialized")
     }
   }
 
-  // Function to manually restart the recognition
   const restartListening = () => {
     if (!listening) {
       startListening()
+    } else {
+      console.log("Already listening, no need to restart")
     }
   }
 
@@ -262,43 +281,22 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     <>
       <div className="flex flex-col flex-wrap justify-center gap-2">
         <ChatFilesDisplay />
-
-        {/*{selectedTools &&*/}
-        {/*  selectedTools.map((tool, index) => (*/}
-        {/*    <div*/}
-        {/*      key={index}*/}
-        {/*      className="flex justify-center"*/}
-        {/*      onClick={() =>*/}
-        {/*        setSelectedTools(*/}
-        {/*          selectedTools.filter(*/}
-        {/*            selectedTool => selectedTool.id !== tool.id*/}
-        {/*          )*/}
-        {/*        )*/}
-        {/*      }*/}
-        {/*    >*/}
-        {/*      <div*/}
-        {/*        className="flex cursor-pointer items-center justify-center space-x-1 rounded-lg bg-purple-600 px-3 py-1 hover:opacity-50">*/}
-        {/*        <IconBolt size={20}/>*/}
-
-        {/*        <div>{tool.name}</div>*/}
-        {/*      </div>*/}
-        {/*    </div>*/}
-        {/*  ))}*/}
       </div>
 
       <div className={"relative"}>
         <ChatCommandInput />
-        <div className="border-input mt-3 flex min-h-[60px] w-full flex-col justify-end overflow-hidden rounded-xl border backdrop-blur-xl">
-          {selectedAssistant && (
-            <div className="bg-secondary flex items-center justify-between space-x-2 p-2 pl-4 pr-3">
+        <div className="border-input bg-background flex w-full flex-col justify-end overflow-hidden rounded-xl border">
+          {showAssistant && selectedAssistant && (
+            <div className="bg-accent border-input flex items-center justify-between space-x-2 border-b p-2 pl-4 pr-3">
               <div className={"flex items-center space-x-2"}>
                 <AssistantIcon assistant={selectedAssistant} size={24} />
-                <div className="text-sm font-bold">
+                <div className="text-sm font-semibold">
                   Talking to {selectedAssistant.name}
                 </div>
               </div>
 
               <IconX
+                stroke={1.5}
                 onClick={() => setSelectedAssistant(null)}
                 className={
                   "hover:text-foreground/50 flex size-4 cursor-pointer items-center justify-center text-[10px]"
@@ -306,32 +304,31 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               />
             </div>
           )}
-
-          <div className={"relative my-2 flex items-center justify-center"}>
-            <IconPaperclip
-              className="absolute bottom-[4px] left-3 cursor-pointer p-1 hover:opacity-50"
-              size={32}
-              onClick={() => fileInputRef.current?.click()}
-            />
-
-            {/* Hidden input to select files from device */}
-            <Input
-              ref={fileInputRef}
-              className="hidden"
-              type="file"
-              onChange={e => {
-                if (!e.target.files) return
-                handleSelectDeviceFile(e.target.files[0])
-              }}
-              accept={filesToAccept}
-            />
-
+          <div className="flex items-end justify-between p-2">
+            <div className={"flex"}>
+              <div title={"Upload/attach files"}>
+                <IconPaperclip
+                  onClick={() => fileInputRef.current?.click()}
+                  stroke={1.5}
+                  className="m-1 cursor-pointer p-0.5 hover:opacity-50"
+                  size={24}
+                />
+                <Input
+                  ref={fileInputRef}
+                  className="hidden"
+                  type="file"
+                  onChange={e => {
+                    if (!e.target.files) return
+                    handleSelectDeviceFile(e.target.files[0])
+                  }}
+                  accept={filesToAccept}
+                />
+              </div>
+            </div>
             <TextareaAutosize
               textareaRef={chatInputRef}
-              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 pr-[70px] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder={t(
-                `Ask anything. Type "${profile?.assistant_command || "@"}" for assistants, "${profile?.prompt_command || "/"}" for prompts, "${profile?.files_command || "#"}" for files, and "${profile?.tools_command || "!"}" for plugins.`
-              )}
+              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full resize-none rounded-md border-none bg-transparent p-1.5 px-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder={`Ask anything...`}
               onValueChange={handleInputChange}
               value={userInput}
               minRows={1}
@@ -341,39 +338,50 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               onCompositionStart={() => setIsTyping(true)}
               onCompositionEnd={() => setIsTyping(false)}
             />
-            <div className="absolute bottom-[6px] right-3 flex cursor-pointer justify-end space-x-2">
-              {recognition && (
-                <button onClick={listening ? stopListening : restartListening}>
-                  {listening ? (
-                    <IconPlayerRecordFilled
-                      className={"animate-pulse text-red-500"}
-                      size={24}
-                    />
-                  ) : (
-                    <IconMicrophone size={24} />
-                  )}
-                </button>
-              )}
-              {isGenerating ? (
-                <IconPlayerStopFilled
-                  className="hover:bg-background animate-pulse rounded bg-transparent p-1 hover:opacity-50"
-                  onClick={handleStopMessage}
-                  size={30}
-                />
-              ) : (
-                <IconArrowUp
-                  className={cn(
-                    "bg-primary text-secondary rounded-lg p-1 hover:opacity-50",
-                    (!userInput || isUploading) &&
-                      "opacity-md cursor-not-allowed"
-                  )}
-                  onClick={() => {
-                    if (!userInput || isUploading) return
-                    handleSendMessage(userInput, chatMessages, false)
-                  }}
-                  size={30}
-                />
-              )}
+            <div className="flex cursor-pointer justify-end">
+              <div className={"flex flex-nowrap overflow-hidden"}>
+                {recognition && (
+                  <button
+                    onClick={listening ? stopListening : restartListening}
+                  >
+                    {listening ? (
+                      <IconPlayerRecordFilled
+                        stroke={1.5}
+                        className={"animate-pulse text-red-500"}
+                        size={24}
+                      />
+                    ) : (
+                      <IconMicrophone
+                        className={"m-1 cursor-pointer p-0.5 hover:opacity-50"}
+                        stroke={1.5}
+                        size={24}
+                      />
+                    )}
+                  </button>
+                )}
+                {isGenerating ? (
+                  <IconPlayerStopFilled
+                    className="hover:bg-background m-1 animate-pulse rounded bg-transparent p-0.5 hover:opacity-50"
+                    onClick={handleStopMessage}
+                    stroke={1.5}
+                    size={24}
+                  />
+                ) : (
+                  <IconArrowUp
+                    className={cn(
+                      "bg-primary text-secondary m-1 rounded-lg p-0.5 hover:opacity-50",
+                      (!userInput || isUploading) &&
+                        "cursor-not-allowed opacity-50"
+                    )}
+                    onClick={() => {
+                      if (!userInput || isUploading) return
+                      handleSendMessage(userInput, chatMessages, false)
+                    }}
+                    stroke={1.5}
+                    size={24}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>

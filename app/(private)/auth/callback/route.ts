@@ -14,16 +14,19 @@ export async function GET(request: Request) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  if (next) {
-    return NextResponse.redirect(
-      requestUrl.origin + next + "?error_description=" + error_description
-    )
-  } else {
-    if (error_description) {
-      return NextResponse.redirect(
-        requestUrl.origin + "/login?error_description=" + error_description
-      )
-    }
-    return NextResponse.redirect(requestUrl.origin)
+  const urlParams = new URLSearchParams()
+  if (error_description) {
+    urlParams.append("error_description", error_description)
   }
+  if (next) {
+    urlParams.append("next", next)
+  }
+
+  if (error_description) {
+    return NextResponse.redirect(
+      requestUrl.origin + "/login?" + urlParams.toString()
+    )
+  }
+
+  return NextResponse.redirect(requestUrl.origin + `/${next || ""}`)
 }

@@ -6,9 +6,11 @@ import { Message } from "../messages/message"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { as } from "@upstash/redis/zmscore-10fd3773"
 
-interface ChatMessagesProps {}
+interface ChatMessagesProps {
+  onPreviewContent?: (content: { content: string; filename?: string }) => void
+}
 
-export const ChatMessages: FC<ChatMessagesProps> = ({}) => {
+export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {
   const {
     chatMessages,
     chatFileItems,
@@ -55,6 +57,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({}) => {
               onStartEdit={setEditingMessage}
               onCancelEdit={() => setEditingMessage(undefined)}
               onSubmitEdit={handleSendEdit}
+              onPreviewContent={onPreviewContent}
               onRegenerate={handleRegenerate}
             />
           )

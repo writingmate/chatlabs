@@ -11,6 +11,9 @@ import { AssistantRetrievalSelect } from "./assistant-retrieval-select"
 import { AssistantToolSelect } from "./assistant-tool-select"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { LLMID } from "@/types"
+import { SharingField } from "@/components/sidebar/items/all/sharing-field"
+import { AssistantConversationStarters } from "@/components/sidebar/items/assistants/assistant-conversation-starters"
+import { set } from "date-fns"
 
 interface CreateAssistantProps {
   isOpen: boolean
@@ -26,6 +29,8 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
   const [name, setName] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState("")
+  const [sharing, setSharing] = useState("")
+  const [conversationStarters, setConversationStarters] = useState<string[]>([])
   const [assistantChatSettings, setAssistantChatSettings] = useState({
     model: selectedWorkspace?.default_model,
     prompt: selectedWorkspace?.default_prompt,
@@ -127,7 +132,9 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
           collections: selectedAssistantRetrievalItems.filter(
             item => !item.hasOwnProperty("type")
           ) as Tables<"collections">[],
-          tools: selectedAssistantToolItems
+          tools: selectedAssistantToolItems,
+          sharing,
+          conversation_starters: conversationStarters
         } as TablesInsert<"assistants">
       }
       isOpen={isOpen}
@@ -202,6 +209,13 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
               Model is not compatible with tools.
             </div>
           )}
+
+          <AssistantConversationStarters
+            value={conversationStarters}
+            onChange={setConversationStarters}
+          />
+
+          <SharingField value={sharing} onChange={setSharing} />
         </>
       )}
       onOpenChange={onOpenChange}

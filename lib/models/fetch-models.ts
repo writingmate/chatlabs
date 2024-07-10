@@ -28,6 +28,10 @@ const KNOWN_MODEL_NAMES: {
   "microsoft/wizardlm-2-8x22b": {
     modelProvider: "microsoft",
     modelName: "WizardLM 2 8x22B"
+  },
+  "deepseek/deepseek-coder": {
+    modelProvider: "deepseek",
+    modelName: "DeepSeek Coder V2"
   }
 }
 
@@ -53,7 +57,8 @@ function parseSupportedModelsFromEnv() {
     "cohere/command-r-plus",
     "mistralai/mixtral-8x22b-instruct",
     "microsoft/wizardlm-2-8x22b",
-    "meta-llama/llama-3-70b-instruct"
+    "meta-llama/llama-3-70b-instruct",
+    "deepseek/deepseek-coder"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {

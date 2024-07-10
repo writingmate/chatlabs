@@ -146,12 +146,6 @@ export const AdvancedContent: FC<AdvancedContentProps> = ({
       findOpenRouterModel(chatSettings.model)?.maxContext || 4096
   }
 
-  const SYSTEM_PROMPT = buildBasePrompt(
-    profile?.profile_context || "",
-    selectedAssistant,
-    profile?.system_prompt_template || DEFAULT_SYSTEM_PROMPT
-  )
-
   const maxContextLength = isCustomModel
     ? models.find(model => model.model_id === chatSettings.model)
         ?.context_length

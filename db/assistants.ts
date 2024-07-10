@@ -1,15 +1,36 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
+import { SupabaseClient } from "@supabase/supabase-js"
 
-export const getAssistantById = async (assistantId: string) => {
-  const { data: assistant, error } = await supabase
+export const getAssistantById = async (
+  assistantId: string,
+  client: SupabaseClient = supabase
+) => {
+  const { data: assistant, error } = await client
     .from("assistants")
     .select("*")
     .eq("id", assistantId)
     .single()
 
   if (!assistant) {
-    throw new Error(error.message)
+    throw new Error(error?.message)
+  }
+
+  return assistant
+}
+
+export const getAssistantByHashId = async (
+  hashId: string,
+  client: SupabaseClient = supabase
+) => {
+  const { data: assistant, error } = await client
+    .from("assistants")
+    .select("*")
+    .eq("hashid", hashId)
+    .single()
+
+  if (!assistant) {
+    throw new Error(error?.message)
   }
 
   return assistant

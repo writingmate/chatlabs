@@ -40,7 +40,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   const router = useRouter()
   return (
     <div className="flex flex-col justify-between border-r pb-5">
-      <TabsList className="bg-background grid h-[440px] grid-rows-7">
+      <TabsList className="bg-background grid h-[400px] grid-rows-7">
         <SidebarSwitchItem
           icon={<IconMessage size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
           contentType="chats"

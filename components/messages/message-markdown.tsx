@@ -1,15 +1,17 @@
-import React, { FC, useState } from "react"
+import React, { FC } from "react"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import { MessageCodeBlock } from "./message-codeblock"
 import { MessageMarkdownMemoized } from "./message-markdown-memoized"
 import { defaultUrlTransform } from "react-markdown"
-import { FilePreview } from "@/components/ui/file-preview"
 import { ImageWithPreview } from "@/components/image/image-with-preview"
-import { sr } from "date-fns/locale"
+import { Button } from "@/components/ui/button"
+import { FileIcon } from "@/components/ui/file-icon"
 
 interface MessageMarkdownProps {
+  experimentalCodeEditor?: boolean
   content: string
+  onPreviewContent?: (content: { content: string; filename?: string }) => void
 }
 
 function urlTransform(url: string) {
@@ -19,7 +21,11 @@ function urlTransform(url: string) {
   return defaultUrlTransform(url)
 }
 
-export const MessageMarkdown: FC<MessageMarkdownProps> = ({ content }) => {
+export const MessageMarkdown: FC<MessageMarkdownProps> = ({
+  experimentalCodeEditor = false,
+  content,
+  onPreviewContent
+}) => {
   return (
     <MessageMarkdownMemoized
       className="prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 min-h-[40px] min-w-full space-y-6 break-words"
@@ -50,6 +56,9 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({ content }) => {
         img({ node, src, ...props }) {
           return <ImageWithPreview src={src!} alt={props.alt || "image"} />
         },
+        pre({ node, children, ...props }) {
+          return <>{children}</>
+        },
         code({ node, className, children, ...props }) {
           const childArray = React.Children.toArray(children)
           const firstChild = childArray[0] as React.ReactElement
@@ -78,11 +87,61 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({ content }) => {
             )
           }
 
+          const language = (match && match[1]) || ""
+
+          const regexFileName = /^#filename=(.*)#/
+
+          const fileContent = String(childArray).replace(/\n$/, "")
+
+          const matchedNames = fileContent.match(regexFileName)
+          const fileContentWithoutFileName = fileContent.replace(
+            regexFileName,
+            ""
+          )
+
+          if (matchedNames) {
+            const fileName = matchedNames[1]
+
+            if (experimentalCodeEditor) {
+              onPreviewContent?.({
+                filename: fileName,
+                content: language + "\n" + fileContentWithoutFileName
+              })
+
+              return (
+                <Button
+                  variant={"outline"}
+                  size={"lg"}
+                  className={
+                    "text-foreground flex h-auto w-[260px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:shadow"
+                  }
+                  onClick={() =>
+                    onPreviewContent?.({
+                      filename: fileName,
+                      content: language + "\n" + fileContentWithoutFileName
+                    })
+                  }
+                >
+                  <div>
+                    <FileIcon type={fileName.split(".")[1] || language} />
+                  </div>
+                  <div className={"flex flex-col overflow-hidden"}>
+                    <div>{fileName}</div>
+                    <span className="text-foreground/60 line-clamp-1 text-ellipsis whitespace-pre-wrap text-xs font-normal">
+                      Click to view file
+                    </span>
+                  </div>
+                </Button>
+              )
+            }
+          }
+
+          // eslint-disable-next-line tailwindcss/no-contradicting-classname
+
           return (
             <MessageCodeBlock
-              key={Math.random()}
               language={(match && match[1]) || ""}
-              value={String(childArray).replace(/\n$/, "")}
+              value={fileContentWithoutFileName}
               {...props}
             />
           )

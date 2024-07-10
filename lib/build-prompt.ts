@@ -7,6 +7,20 @@ export const DEFAULT_SYSTEM_PROMPT = `Today is {local_date}.
 User info: "{profile_context}"
 {assistant}`
 
+export const SYSTEM_PROMPT_CODE_EDITOR = `
+When working with code, small code snippets should be formatted this way:
+\`\`\`<programming-language>
+<code>
+\`\`\`
+
+When writing code for html/js apps, always put all code in one html file.
+For large files always add a descriptive file name that explains what the file is about exactly this way. The line must start and end with #: 
+\`\`\`<programming-language>
+#filename=<file-name-with-extension>#
+<code>
+\`\`\`
+`
+
 export function validateSystemPromptTemplate(template: string) {
   return (
     template.includes("{profile_context}") &&
@@ -42,13 +56,25 @@ export async function buildFinalMessages(
     chatFileItems
   } = payload
 
-  const BUILT_PROMPT = buildBasePrompt(
+  let BUILT_PROMPT = buildBasePrompt(
     profile?.profile_context || "",
     assistant,
     profile?.system_prompt_template || DEFAULT_SYSTEM_PROMPT
   )
 
-  const CHUNK_SIZE = CHAT_SETTING_LIMITS[chatSettings.model].MAX_CONTEXT_LENGTH
+  if (profile?.experimental_code_editor) {
+    BUILT_PROMPT += SYSTEM_PROMPT_CODE_EDITOR
+  }
+
+  let CHUNK_SIZE = 4096 // sane default
+  if (chatSettings.contextLength) {
+    CHUNK_SIZE = chatSettings.contextLength
+  }
+
+  if (chatSettings.model in CHAT_SETTING_LIMITS) {
+    CHUNK_SIZE = CHAT_SETTING_LIMITS[chatSettings.model].MAX_CONTEXT_LENGTH
+  }
+
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
 
   let remainingTokens = CHUNK_SIZE - PROMPT_TOKENS
@@ -216,11 +242,15 @@ export async function buildGoogleGeminiFinalMessages(
 ) {
   const { chatSettings, chatMessages, assistant } = payload
 
-  const BUILT_PROMPT = buildBasePrompt(
+  let BUILT_PROMPT = buildBasePrompt(
     profile?.profile_context || "",
     assistant,
     profile?.system_prompt_template || DEFAULT_SYSTEM_PROMPT
   )
+
+  if (profile?.experimental_code_editor) {
+    BUILT_PROMPT += SYSTEM_PROMPT_CODE_EDITOR
+  }
 
   let finalMessages = []
 

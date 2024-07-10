@@ -11,13 +11,10 @@ import { useParams, useRouter } from "next/navigation"
 import { FC, useContext, useMemo, useRef } from "react"
 import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
-import { SIDEBAR_ICON_SIZE } from "@/components/sidebar/sidebar-switcher"
-import {
-  SIDEBAR_ITEM_ICON_SIZE,
-  SIDEBAR_ITEM_ICON_STROKE
-} from "@/components/sidebar/items/all/sidebar-display-item"
+import { SIDEBAR_ITEM_ICON_SIZE } from "@/components/sidebar/items/all/sidebar-display-item"
 import { PinChat } from "@/components/sidebar/items/chat/pin-chat"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -25,6 +22,7 @@ interface ChatItemProps {
 
 export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const {
+    assistants,
     selectedWorkspace,
     selectedChat,
     availableLocalModels,
@@ -63,6 +61,10 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     image => image.assistantId === chat.assistant_id
   )?.base64
 
+  const assistant = chat.assistant_id
+    ? assistants.find(a => a.id === chat.assistant_id)
+    : null
+
   return useMemo(
     () => (
       <div
@@ -75,35 +77,14 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
         onKeyDown={handleKeyDown}
         onClick={handleClick}
       >
-        {chat.assistant_id ? (
-          assistantImage ? (
-            <Image
-              style={{ width: "30px", height: "30px" }}
-              className="rounded"
-              src={assistantImage}
-              alt="Assistant image"
-              width={SIDEBAR_ITEM_ICON_SIZE}
-              height={SIDEBAR_ITEM_ICON_SIZE}
-            />
-          ) : (
-            <IconRobotFace
-              className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-              size={SIDEBAR_ITEM_ICON_SIZE}
-              stroke={SIDEBAR_ITEM_ICON_STROKE}
-            />
-          )
+        {assistant ? (
+          <AssistantIcon assistant={assistant} size={SIDEBAR_ITEM_ICON_SIZE} />
         ) : (
-          <WithTooltip
-            delayDuration={200}
-            display={<div>{MODEL_DATA?.modelName}</div>}
-            trigger={
-              <ModelIcon
-                provider={MODEL_DATA?.provider}
-                modelId={MODEL_DATA?.modelId}
-                height={SIDEBAR_ITEM_ICON_SIZE}
-                width={SIDEBAR_ITEM_ICON_SIZE}
-              />
-            }
+          <ModelIcon
+            provider={MODEL_DATA?.provider}
+            modelId={MODEL_DATA?.modelId}
+            height={SIDEBAR_ITEM_ICON_SIZE}
+            width={SIDEBAR_ITEM_ICON_SIZE}
           />
         )}
 

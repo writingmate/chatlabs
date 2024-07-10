@@ -74,6 +74,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [username, setUsername] = useState(profile?.username || "")
   const [usernameAvailable, setUsernameAvailable] = useState(true)
   const [loadingUsername, setLoadingUsername] = useState(false)
+  const [experimentalCodeEditor, setExperimentalCodeEditor] = useState(
+    profile?.experimental_code_editor || false
+  )
   const [profileImageSrc, setProfileImageSrc] = useState(
     profile?.image_url || ""
   )
@@ -191,7 +194,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       tools_command: toolsCommand,
       assistant_command: assistantCommand,
       files_command: filesCommand,
-      prompt_command: promptCommand
+      prompt_command: promptCommand,
+      experimental_code_editor: experimentalCodeEditor
     })
 
     setProfile(updatedProfile)
@@ -383,8 +387,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               )}
             </TabsList>
 
-            <TabsContent className="mt-4 space-y-4" value="profile">
-              <form>
+            <TabsContent className="mt-4" value="profile">
+              <form className={"space-y-2"}>
                 {/*<div className="space-y-1">*/}
                 {/*  <div className="flex items-center space-x-2">*/}
                 {/*    <Label>Username</Label>*/}
@@ -473,6 +477,14 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   <LimitDisplay
                     used={profileInstructions.length}
                     limit={PROFILE_CONTEXT_MAX}
+                  />
+                </div>
+                <div className="flex items-center justify-between space-y-1">
+                  <Label>Enable Experimental Code Editor</Label>
+
+                  <Switch
+                    checked={experimentalCodeEditor}
+                    onCheckedChange={setExperimentalCodeEditor}
                   />
                 </div>
                 <div className={"space-y-1"}>
@@ -854,7 +866,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </Tabs>
         </div>
 
-        <div className="mt-6 flex items-center">
+        <div className="mt-2 flex items-center">
           <div className="flex items-center space-x-1">
             <ThemeSwitcher />
 

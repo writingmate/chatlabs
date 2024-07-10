@@ -1,19 +1,8 @@
 "use client"
-
-import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
-import { IconArrowRight } from "@tabler/icons-react"
-import { useTheme } from "next-themes"
-import Link from "next/link"
-import { Brand } from "@/components/ui/brand"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase/browser-client"
-import Loading from "@/app/loading"
-import {
-  getHomeWorkspaceByUserId,
-  getWorkspaceById,
-  getWorkspacesByUserId
-} from "@/db/workspaces"
+import { getWorkspacesByUserId } from "@/db/workspaces"
 import { getProfileByUserId } from "@/db/profile"
 import { ChatUI } from "@/components/chat/chat-ui"
 import { Dashboard } from "@/components/ui/dashboard"
@@ -21,12 +10,10 @@ import LoginDialog from "@/components/login/login-dialog"
 
 export default function HomePage() {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
-        setLoading(false)
         return
       }
       const userId = data.session.user.id
@@ -43,8 +30,6 @@ export default function HomePage() {
       })
     })
   }, [])
-
-  if (loading) return <Loading />
 
   return (
     <>

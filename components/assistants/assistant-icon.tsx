@@ -1,9 +1,11 @@
 import Image from "next/image"
-import { IconRobotFace } from "@tabler/icons-react"
 import { useContext } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { cn } from "@/lib/utils"
+import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
+import { useTheme } from "next-themes"
+import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
 
 export function AssistantIcon({
   assistant,
@@ -14,30 +16,28 @@ export function AssistantIcon({
   size?: number
   className?: string
 }) {
-  const { assistantImages } = useContext(ChatbotUIContext)
+  const { theme } = useTheme()
+  const image = assistant.image_path
   return (
     <div
       className={cn(
-        `bg-foreground size-[${size}px] flex shrink-0 items-center justify-center overflow-hidden rounded`,
-        className
+        `size-[${size}px] flex shrink-0 items-center justify-center overflow-hidden rounded`,
+        className,
+        image ? "bg-transparent" : "bg-foreground"
       )}
     >
-      {assistant.image_path ? (
+      {image ? (
         <Image
-          src={
-            assistantImages.find(image => image.path === assistant.image_path)
-              ?.url || ""
-          }
+          src={getAssistantPublicImageUrl(assistant.image_path)}
           alt={assistant.name}
           width={size}
           height={size}
           className={`max-w-[${size}px]`}
         />
       ) : (
-        <IconRobotFace
-          size={size - size / 8}
-          stroke={1.5}
-          className="text-background"
+        <ChatbotUISVG
+          theme={theme === "dark" ? "light" : "dark"}
+          size={size * 0.7}
         />
       )}
     </div>

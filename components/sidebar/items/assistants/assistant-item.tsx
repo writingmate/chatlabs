@@ -16,6 +16,9 @@ import {
 } from "../all/sidebar-display-item"
 import { AssistantRetrievalSelect } from "./assistant-retrieval-select"
 import { AssistantToolSelect } from "./assistant-tool-select"
+import { AssistantConversationStarters } from "@/components/sidebar/items/assistants/assistant-conversation-starters"
+import { SharingField } from "@/components/sidebar/items/all/sharing-field"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
 
 interface AssistantItemProps {
   assistant: Tables<"assistants">
@@ -37,6 +40,10 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
   })
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [imageLink, setImageLink] = useState("")
+  const [conversationStarters, setConversationStarters] = useState<string[]>(
+    assistant.conversation_starters || []
+  )
+  const [sharing, setSharing] = useState(assistant.sharing)
 
   useEffect(() => {
     const assistantImage =
@@ -113,25 +120,7 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
       contentType="assistants"
       isTyping={isTyping}
       icon={
-        imageLink ? (
-          <Image
-            style={{
-              width: SIDEBAR_ITEM_ICON_SIZE + "px",
-              height: SIDEBAR_ITEM_ICON_SIZE + "px"
-            }}
-            className="rounded"
-            src={imageLink}
-            alt={assistant.name}
-            width={SIDEBAR_ITEM_ICON_SIZE}
-            height={SIDEBAR_ITEM_ICON_SIZE}
-          />
-        ) : (
-          <IconRobotFace
-            className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-            size={SIDEBAR_ITEM_ICON_SIZE}
-            stroke={SIDEBAR_ITEM_ICON_STROKE}
-          />
-        )
+        <AssistantIcon assistant={assistant} size={SIDEBAR_ITEM_ICON_SIZE} />
       }
       updateState={{
         image: selectedImage,
@@ -145,7 +134,9 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
         model: assistantChatSettings.model,
         image_path: assistant.image_path,
         prompt: assistantChatSettings.prompt,
-        temperature: assistantChatSettings.temperature
+        temperature: assistantChatSettings.temperature,
+        sharing,
+        conversation_starters: conversationStarters
       }}
       renderInputs={(renderState: {
         startingAssistantFiles: Tables<"files">[]
@@ -304,6 +295,13 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
               }
             />
           </div>
+
+          <AssistantConversationStarters
+            value={conversationStarters}
+            onChange={setConversationStarters}
+          />
+
+          <SharingField value={sharing} onChange={setSharing} />
         </>
       )}
     />

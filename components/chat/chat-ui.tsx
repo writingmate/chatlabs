@@ -1,44 +1,75 @@
-import Loading from "@/components/ui/loading"
-import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+"use client"
+
+import React, { useContext, useEffect, useState } from "react"
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams
+} from "next/navigation"
 import { ChatbotUIContext } from "@/context/context"
-import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
-import { getChatFilesByChatId } from "@/db/chat-files"
-import { getChatById } from "@/db/chats"
-import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
-import { getMessagesByChatId } from "@/db/messages"
-import { getMessageImageFromStorage } from "@/db/storage/message-images"
-import { convertBlobToBase64 } from "@/lib/blob-to-b64"
-import useHotkey from "@/lib/hooks/use-hotkey"
-import { LLMID, MessageImage } from "@/types"
-import { useParams } from "next/navigation"
-import { FC, useContext, useEffect, useState } from "react"
-import { ChatHelp } from "./chat-help"
+import { ChatbotUIChatContext } from "@/context/chat"
+import { useAuth } from "@/context/auth"
+import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
 import { useScroll } from "./chat-hooks/use-scroll"
+import useHotkey from "@/lib/hooks/use-hotkey"
+import { useTheme } from "next-themes"
+import { LLMID, MessageImage } from "@/types"
+import { Tables } from "@/supabase/types"
+import { parseIdFromSlug } from "@/lib/slugify"
+import { cn } from "@/lib/utils"
+
+import Loading from "@/components/ui/loading"
 import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 import { QuickSettings } from "@/components/chat/quick-settings"
 import { ChatSettings } from "@/components/chat/chat-settings"
 import { Brand } from "@/components/ui/brand"
-import { useTheme } from "next-themes"
-import { IconMessagePlus } from "@tabler/icons-react"
 import { WithTooltip } from "@/components/ui/with-tooltip"
-import { ChatbotUIChatContext } from "@/context/chat"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { ConversationStarters } from "@/components/chat/conversation-starters"
+import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
 
-interface ChatUIProps {}
+import { IconMessagePlus } from "@tabler/icons-react"
 
-export const ChatUI: FC<ChatUIProps> = ({}) => {
-  useHotkey("o", () => handleNewChat())
+import { getPromptById } from "@/db/prompts"
+import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
+import { getChatFilesByChatId } from "@/db/chat-files"
+import { getMessagesByChatId } from "@/db/messages"
+import { getMessageImageFromStorage } from "@/db/storage/message-images"
+import { convertBlobToBase64 } from "@/lib/blob-to-b64"
+import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
 
+interface ChatUIProps {
+  showModelSelector?: boolean
+  assistant?: Tables<"assistants">
+}
+
+export const ChatUI: React.FC<ChatUIProps> = ({
+  assistant,
+  showModelSelector = true
+}) => {
   const params = useParams()
+  const chatId = params.chatid as string
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const { theme } = useTheme()
+
+  const { user } = useAuth()
 
   const {
+    chats,
     setChatImages,
     assistants,
     setSelectedAssistant,
     setChatFiles,
     setShowFilesDisplay,
     setUseRetrieval,
-    showSidebar
+    showSidebar,
+    setShowSidebar,
+    selectedAssistant
   } = useContext(ChatbotUIContext)
 
   const {
@@ -47,98 +78,92 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setChatFileItems,
     setSelectedTools,
     chatMessages,
-    setChatMessages
+    setChatMessages,
+    isGenerating
   } = useContext(ChatbotUIChatContext)
 
-  const { handleNewChat, handleFocusChatInput } = useChatHandler()
-
+  const { handleNewChat, handleFocusChatInput, handleSendMessage } =
+    useChatHandler()
+  const { handleSelectPromptWithVariables } = usePromptAndCommand()
   const {
     messagesStartRef,
     messagesEndRef,
     handleScroll,
     scrollToBottom,
-    setIsAtBottom,
-    isAtTop,
-    isAtBottom,
-    isOverflowing,
-    scrollToTop
+    setIsAtBottom
   } = useScroll()
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [previewContent, setPreviewContent] = useState<{
+    content: string
+    filename?: string
+  } | null>(null)
 
-  const { theme } = useTheme()
+  useHotkey("o", handleNewChat)
+  useHotkey("l", handleFocusChatInput)
 
   useEffect(() => {
-    if (!params.chatid) {
+    if (assistant) {
+      setSelectedAssistant(assistant)
+    }
+    if (!chatId) {
       setLoading(false)
       return
     }
-    const fetchData = async () => {
-      await Promise.all([fetchMessages(), fetchChat()])
+    fetchChatData()
+  }, [params, chatId, assistant])
 
-      scrollToBottom()
-      setIsAtBottom(true)
+  useEffect(() => {
+    handleSearchParams()
+  }, [searchParams])
+
+  useEffect(() => {
+    if (showSidebar) {
+      setPreviewContent(null)
+    }
+  }, [showSidebar])
+
+  const fetchChatData = async (): Promise<void> => {
+    await Promise.all([fetchMessages(), fetchChat()])
+    scrollToBottom()
+    setIsAtBottom(true)
+    handleFocusChatInput()
+    setLoading(false)
+  }
+
+  const handleSearchParams = (): void => {
+    const promptId = searchParams.get("prompt_id")
+    const modelId = searchParams.get("model")
+
+    if (promptId) {
+      getPromptById(parseIdFromSlug(promptId))
+        .then(prompt => {
+          if (prompt) handleSelectPromptWithVariables(prompt)
+        })
+        .catch(console.error)
     }
 
-    if ((chatMessages?.length === 0 && !params.chatid) || params.chatid) {
-      fetchData().then(() => {
-        handleFocusChatInput()
-        setLoading(false)
-      })
-    } else {
-      setLoading(false)
+    if (modelId) {
+      setChatSettings(prev => ({ ...prev, model: modelId as LLMID }))
     }
-  }, [params])
 
-  const fetchMessages = async () => {
-    const fetchedMessages = await getMessagesByChatId(params.chatid as string)
+    router.replace(pathname)
+  }
 
-    const imagePromises: Promise<MessageImage>[] = fetchedMessages.flatMap(
-      message =>
-        message.image_paths
-          ? message.image_paths.map(async imagePath => {
-              const url = await getMessageImageFromStorage(imagePath)
+  const fetchMessages = async (): Promise<void> => {
+    const chat = chats.find(chat => chat.id === chatId)
+    if (!chat) return
 
-              if (url) {
-                const response = await fetch(url)
-                const blob = await response.blob()
-                const base64 = await convertBlobToBase64(blob)
+    const fetchedMessages = await getMessagesByChatId(chat.id)
 
-                return {
-                  messageId: message.id,
-                  path: imagePath,
-                  base64,
-                  url,
-                  file: null
-                }
-              }
-
-              return {
-                messageId: message.id,
-                path: imagePath,
-                base64: "",
-                url,
-                file: null
-              }
-            })
-          : []
-    )
-
-    const images: MessageImage[] = await Promise.all(imagePromises.flat())
+    const images = await fetchMessageImages(fetchedMessages)
+    const uniqueFileItems = fetchedMessages.flatMap(item => item.file_items)
+    const chatFiles = await getChatFilesByChatId(chat.id)
 
     setChatImages(images)
-
-    const messageFileItemPromises = fetchedMessages.map(
-      async message => await getMessageFileItemsByMessageId(message.id)
-    )
-
-    const messageFileItems = await Promise.all(messageFileItemPromises)
-
-    const uniqueFileItems = messageFileItems.flatMap(item => item.file_items)
     setChatFileItems(uniqueFileItems)
-
-    const chatFiles = await getChatFilesByChatId(params.chatid as string)
-
+    setUseRetrieval(true)
+    setShowFilesDisplay(true)
     setChatFiles(
       chatFiles.files.map(file => ({
         id: file.id,
@@ -147,36 +172,56 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         file: null
       }))
     )
-
-    setUseRetrieval(true)
-    setShowFilesDisplay(true)
-
-    const fetchedChatMessages = fetchedMessages.map(message => {
-      return {
+    setChatMessages(
+      fetchedMessages.map(message => ({
         message,
-        fileItems: messageFileItems
-          .filter(messageFileItem => messageFileItem.id === message.id)
-          .flatMap(messageFileItem =>
-            messageFileItem.file_items.map(fileItem => fileItem.id)
-          )
-      }
-    })
-
-    setChatMessages(fetchedChatMessages)
+        fileItems: message.file_items.map(fileItem => fileItem.id)
+      }))
+    )
   }
 
-  const fetchChat = async () => {
-    const chat = await getChatById(params.chatid as string)
+  const fetchMessageImages = async (
+    messages: Tables<"messages">[]
+  ): Promise<MessageImage[]> => {
+    const imagePromises = messages.flatMap(message =>
+      message.image_paths
+        ? message.image_paths.map(async imagePath => {
+            const url = await getMessageImageFromStorage(imagePath)
+            if (url) {
+              const response = await fetch(url)
+              const blob = await response.blob()
+              const base64 = await convertBlobToBase64(blob)
+              return {
+                messageId: message.id,
+                path: imagePath,
+                base64,
+                url,
+                file: null
+              }
+            }
+            return {
+              messageId: message.id,
+              path: imagePath,
+              base64: "",
+              url,
+              file: null
+            }
+          })
+        : []
+    )
+    return Promise.all(imagePromises)
+  }
+
+  const fetchChat = async (): Promise<void> => {
+    const chat = chats.find(chat => chat.id === chatId)
     if (!chat) return
 
     if (chat.assistant_id) {
       const assistant = assistants.find(
         assistant => assistant.id === chat.assistant_id
       )
-
       if (assistant) {
         setSelectedAssistant(assistant)
-
         const assistantTools = (
           await getAssistantToolsByAssistantId(assistant.id)
         ).tools
@@ -196,11 +241,27 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     })
   }
 
+  const handlePreviewContent = (
+    content: {
+      content: string
+      filename?: string
+    } | null
+  ): void => {
+    setPreviewContent(content)
+    if (content) {
+      setShowSidebar(false)
+    }
+  }
+
   return (
-    <div className="relative flex h-full flex-col items-center">
-      <div className="sticky top-0 flex w-full justify-between p-2">
+    <div
+      onScroll={handleScroll}
+      className="relative flex size-full flex-1 flex-col overflow-hidden overflow-y-auto"
+    >
+      {/* Header */}
+      <div className="bg-background sticky top-0 z-50 flex h-14 w-full shrink-0 justify-between p-2">
         <div className="flex items-center">
-          {!showSidebar && (
+          {(!showSidebar || assistant) && (
             <WithTooltip
               delayDuration={200}
               display={<div>Start a new chat</div>}
@@ -209,52 +270,96 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
                   className="ml-2 cursor-pointer hover:opacity-50"
                   size={24}
                   stroke={1.5}
-                  onClick={handleNewChat}
+                  onClick={() =>
+                    handleNewChat(assistant ? "/a/" + assistant.hashid : "")
+                  }
                 />
               }
             />
           )}
-          <QuickSettings />
+          {!assistant && <QuickSettings />}
         </div>
-        <ChatSettings />
+        {showModelSelector && <ChatSettings />}
       </div>
 
-      {loading && <Loading />}
-      {!loading &&
-        (chatMessages.length == 0 ? (
-          <>
-            <div className="absolute left-1/2 top-1/2 mb-20 -translate-x-1/2 -translate-y-1/2">
-              <Brand theme={theme === "dark" ? "dark" : "light"} />
-            </div>
-
-            <div className="flex grow flex-col items-center justify-center" />
-          </>
+      {/* Chat Content */}
+      <div className="flex size-full">
+        {loading ? (
+          <Loading />
         ) : (
-          <div
-            className="flex size-full flex-col overflow-auto pt-4"
-            onScroll={handleScroll}
-          >
-            <div ref={messagesStartRef} />
+          <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col transition-[width]">
+            {chatMessages?.length === 0 ? (
+              <EmptyChatView
+                selectedAssistant={selectedAssistant}
+                theme={theme}
+              />
+            ) : (
+              <div className="flex-1">
+                <div ref={messagesStartRef} />
+                <ChatMessages onPreviewContent={handlePreviewContent} />
+                <div className="h-10" ref={messagesEndRef} />
+              </div>
+            )}
 
-            <div
-              className={
-                "mx-auto w-[300px] pb-8 sm:w-[400px] md:w-[500px] lg:w-[600px] xl:w-[700px]"
-              }
-            >
-              <ChatMessages />
+            <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
+              {chatMessages?.length === 0 && (
+                <ConversationStarters
+                  values={selectedAssistant?.conversation_starters}
+                  onSelect={(value: string) =>
+                    handleSendMessage(value, chatMessages, false)
+                  }
+                />
+              )}
+              <ChatInput showAssistant={!selectedAssistant} />
+              <ChatMessageCounter />
             </div>
-
-            <div ref={messagesEndRef} />
           </div>
-        ))}
+        )}
 
-      <div className="relative w-full items-end px-4 pb-8 md:w-[500px] lg:w-[660px] xl:w-[800px]">
-        <ChatInput />
-      </div>
-
-      <div className="absolute bottom-2 right-2 hidden md:block lg:bottom-4 lg:right-4">
-        <ChatHelp />
+        <div
+          className={cn(
+            "w-0 transition-[width] duration-100",
+            previewContent && "w-full lg:w-[calc(50%-2rem)]"
+          )}
+        />
+        {previewContent && (
+          <ChatPreviewContent
+            isGenerating={isGenerating}
+            content={previewContent}
+            onPreviewContent={handlePreviewContent}
+          />
+        )}
       </div>
     </div>
   )
 }
+
+interface EmptyChatViewProps {
+  selectedAssistant: Tables<"assistants"> | null
+  theme: string | undefined
+}
+
+const EmptyChatView: React.FC<EmptyChatViewProps> = ({
+  selectedAssistant,
+  theme
+}) => (
+  <div className="flex w-full flex-1 flex-col items-center justify-center">
+    {!selectedAssistant ? (
+      <Brand theme={theme === "dark" ? "dark" : "light"} />
+    ) : (
+      <>
+        <AssistantIcon
+          className="size-[100px] rounded-xl"
+          assistant={selectedAssistant}
+          size={100}
+        />
+        <div className="text-foreground mt-4 text-center text-2xl font-bold">
+          {selectedAssistant.name}
+        </div>
+        <div className="text-foreground mt-2 text-center text-sm">
+          {selectedAssistant.description}
+        </div>
+      </>
+    )}
+  </div>
+)

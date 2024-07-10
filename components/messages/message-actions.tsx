@@ -7,7 +7,8 @@ import {
   IconMicrophone,
   IconPlayerRecordFilled,
   IconPlayerPlay,
-  IconPlayerStop
+  IconPlayerStop,
+  IconClipboard
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
@@ -116,7 +117,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
           showCheckmark ? (
             <IconCheck size={MESSAGE_ICON_SIZE} />
           ) : (
-            <IconCopy
+            <IconClipboard
               className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
               size={MESSAGE_ICON_SIZE}
               onClick={handleCopy}
