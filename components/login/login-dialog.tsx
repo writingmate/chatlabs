@@ -10,7 +10,7 @@ import LoginForm from "@/components/login/login-form"
 import React, { ReactPortal, useState } from "react"
 
 export default function LoginDialog({ redirectTo }: { redirectTo?: string }) {
-  const [dialogOpen, setOpen] = useState(true)
+  const [dialogOpen, setOpen] = useState(false)
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setOpen}>
