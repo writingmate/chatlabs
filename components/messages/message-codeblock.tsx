@@ -81,9 +81,11 @@ export const generateRandomString = (length: number, lowercase = false) => {
 export function CopyButton({
   value,
   title = "Copy to clipboard",
+  variant = "link",
   className
 }: {
   value: string
+  variant?: "link" | "outline"
   title?: string
   className?: string
 }) {
@@ -92,13 +94,17 @@ export function CopyButton({
     <Button
       size={"icon"}
       className={cn("size-4 text-red-800 hover:opacity-50", className)}
-      variant={"link"}
+      variant={variant}
       onClick={() => {
         if (isCopied) return
         copyToClipboard(value)
       }}
     >
-      {isCopied ? <IconCheck size={16} /> : <IconClipboard size={16} />}
+      {isCopied ? (
+        <IconCheck stroke={1.5} size={16} />
+      ) : (
+        <IconClipboard stroke={1.5} size={16} />
+      )}
     </Button>
   )
 }
