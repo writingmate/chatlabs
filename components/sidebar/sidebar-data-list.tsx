@@ -21,6 +21,7 @@ import { ModelItem } from "./items/models/model-item"
 import { PresetItem } from "./items/presets/preset-item"
 import { PromptItem } from "./items/prompts/prompt-item"
 import { ToolItem } from "./items/tools/tool-item"
+import { VList } from "virtua"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -256,12 +257,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   return useMemo(
     () => (
-      <>
-        <div
-          ref={divRef}
-          className="mt-2 flex flex-col overflow-auto"
-          onDrop={handleDrop}
-        >
+      <div className="flex w-full flex-1 grow flex-col" onDrop={handleDrop}>
+        <VList className="mt-2 flex w-full flex-col overflow-auto">
           {data.length === 0 && (
             <div className="flex grow flex-col items-center justify-center">
               <div className="text-centertext-muted-foreground p-3 italic">
@@ -385,7 +382,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
               )}
             </div>
           )}
-        </div>
+        </VList>
 
         <div
           className={cn("flex grow", isDragOver && "bg-accent")}
@@ -394,7 +391,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
           onDragLeave={handleDragLeave}
           onDragOver={handleDragOver}
         />
-      </>
+      </div>
     ),
     [data, folders, contentType, isOverflowing, isDragOver]
   )
