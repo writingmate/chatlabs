@@ -13,7 +13,15 @@ import {
   IconWorld,
   IconX
 } from "@tabler/icons-react"
-import { FC, memo, useContext, useEffect, useRef, useState } from "react"
+import {
+  FC,
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
@@ -81,9 +89,11 @@ export const generateRandomString = (length: number, lowercase = false) => {
 export function CopyButton({
   value,
   title = "Copy to clipboard",
+  variant = "link",
   className
 }: {
   value: string
+  variant?: "link" | "outline"
   title?: string
   className?: string
 }) {
@@ -92,13 +102,17 @@ export function CopyButton({
     <Button
       size={"icon"}
       className={cn("size-4 text-red-800 hover:opacity-50", className)}
-      variant={"link"}
+      variant={variant}
       onClick={() => {
         if (isCopied) return
         copyToClipboard(value)
       }}
     >
-      {isCopied ? <IconCheck size={16} /> : <IconClipboard size={16} />}
+      {isCopied ? (
+        <IconCheck stroke={1.5} size={16} />
+      ) : (
+        <IconClipboard stroke={1.5} size={16} />
+      )}
     </Button>
   )
 }
@@ -238,165 +252,181 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       }
     }, [isGenerating])
 
-    return (
-      <div
-        className={cn(
-          "codeblock relative size-full overflow-hidden rounded-xl bg-zinc-950 font-sans shadow-lg",
-          className
-        )}
-      >
-        <div className="z-10 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
-          <span className="text-xs lowercase">{language}</span>
-          <div className="flex items-center space-x-2 py-3 ">
-            {["javascript", "js", "html"].includes(language.toLowerCase()) && (
-              <>
-                <ToggleGroup
-                  disabled={isGenerating}
-                  onValueChange={value => {
-                    setExecute(value === "execute")
-                    setError(null) // Clear any previous errors when switching modes
-                  }}
-                  size={"xs"}
-                  variant={"default"}
-                  className={"gap-0 overflow-hidden rounded-md"}
-                  type={"single"}
-                  value={execute ? "execute" : "code"}
-                >
-                  <ToggleGroupItem
-                    title={"View the code"}
-                    value={"code"}
-                    className="space-x-1 rounded-r-none border border-r-0 text-xs text-white"
-                  >
-                    <IconCode size={16} stroke={1.5} />
-                    <span>Code</span>
-                  </ToggleGroupItem>
-                  <ToggleGroupItem
-                    title={"Run the code"}
-                    value={"execute"}
-                    disabled={value === ""}
-                    className="space-x-1 rounded-l-none border border-l-0 text-xs text-white"
-                  >
-                    <IconPlayerPlay size={16} stroke={1.5} />
-                    <span>Run</span>
-                  </ToggleGroupItem>
-                </ToggleGroup>
-                {language == "html" && (
-                  <Button
+    return useMemo(
+      () => (
+        <div
+          className={cn(
+            "codeblock relative size-full overflow-hidden rounded-xl bg-zinc-950 font-sans shadow-lg",
+            className
+          )}
+        >
+          <div className="z-10 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
+            <span className="text-xs lowercase">{language}</span>
+            <div className="flex items-center space-x-2 py-3 ">
+              {["javascript", "js", "html"].includes(
+                language.toLowerCase()
+              ) && (
+                <>
+                  <ToggleGroup
                     disabled={isGenerating}
-                    title={"Share you app with others"}
-                    className="bg-transparent px-2 text-xs text-white hover:opacity-50"
-                    onClick={() => setSharing(true)}
-                    variant="outline"
-                    size="xs"
+                    onValueChange={value => {
+                      setExecute(value === "execute")
+                      setError(null) // Clear any previous errors when switching modes
+                    }}
+                    size={"xs"}
+                    variant={"default"}
+                    className={"gap-0 overflow-hidden rounded-md"}
+                    type={"single"}
+                    value={execute ? "execute" : "code"}
                   >
-                    <IconWorld className={"mr-1"} size={16} /> Share
-                  </Button>
-                )}
-              </>
-            )}
+                    <ToggleGroupItem
+                      title={"View the code"}
+                      value={"code"}
+                      className="space-x-1 rounded-r-none border border-r-0 text-xs text-white"
+                    >
+                      <IconCode size={16} stroke={1.5} />
+                      <span>Code</span>
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
+                      title={"Run the code"}
+                      value={"execute"}
+                      disabled={value === ""}
+                      className="space-x-1 rounded-l-none border border-l-0 text-xs text-white"
+                    >
+                      <IconPlayerPlay size={16} stroke={1.5} />
+                      <span>Run</span>
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                  {language == "html" && (
+                    <Button
+                      disabled={isGenerating}
+                      title={"Share you app with others"}
+                      className="bg-transparent px-2 text-xs text-white hover:opacity-50"
+                      onClick={() => setSharing(true)}
+                      variant="outline"
+                      size="xs"
+                    >
+                      <IconWorld className={"mr-1"} size={16} /> Share
+                    </Button>
+                  )}
+                </>
+              )}
 
-            <Button
-              disabled={isGenerating}
-              title={"Download as file"}
-              variant="link"
-              size="icon"
-              className="size-4 text-white hover:opacity-50"
-              onClick={downloadAsFile}
-            >
-              <IconDownload size={16} />
-            </Button>
-
-            <CopyButton className={"text-white"} value={value} />
-
-            {showCloseButton && (
               <Button
-                title={"Close"}
-                className="size-4 text-white hover:opacity-50"
-                onClick={() => onClose?.()}
+                disabled={isGenerating}
+                title={"Download as file"}
                 variant="link"
                 size="icon"
+                className="size-4 text-white hover:opacity-50"
+                onClick={downloadAsFile}
               >
-                <IconX size={16} />
+                <IconDownload size={16} />
               </Button>
-            )}
-          </div>
-        </div>
-        {error && (
-          <div className="absolute bottom-0 z-10 max-h-[200px] w-full overflow-auto bg-red-100 px-3 py-2 text-sm text-red-800">
-            <div className={"flex h-6 items-center justify-between gap-1"}>
-              <Label>Console errors</Label>
-              <div className={"flex items-center justify-between space-x-2"}>
+
+              <CopyButton className={"text-white"} value={value} />
+
+              {showCloseButton && (
                 <Button
-                  size={"xs"}
-                  variant={"outline"}
-                  onClick={() => handleSendMessage(error, chatMessages, false)}
-                  className={
-                    "h-6 border-red-800 bg-transparent text-xs hover:opacity-50"
-                  }
+                  title={"Close"}
+                  className="size-4 text-white hover:opacity-50"
+                  onClick={() => onClose?.()}
+                  variant="link"
+                  size="icon"
                 >
-                  <IconWand size={16} stroke={1.5} />
-                  Fix this
+                  <IconX size={16} />
                 </Button>
-                <CopyButton value={error} title={"Copy error message"} />
+              )}
+            </div>
+          </div>
+          {error && (
+            <div className="absolute bottom-0 z-10 max-h-[200px] w-full overflow-auto bg-red-100 px-3 py-2 text-sm text-red-800">
+              <div className={"flex h-6 items-center justify-between gap-1"}>
+                <Label>Console errors</Label>
+                <div className={"flex items-center justify-between space-x-2"}>
+                  <Button
+                    size={"xs"}
+                    variant={"outline"}
+                    onClick={() =>
+                      handleSendMessage(error, chatMessages, false)
+                    }
+                    className={
+                      "h-6 border-red-800 bg-transparent text-xs hover:opacity-50"
+                    }
+                  >
+                    <IconWand size={16} stroke={1.5} />
+                    Fix this
+                  </Button>
+                  <CopyButton value={error} title={"Copy error message"} />
+                </div>
+              </div>
+              <div
+                className={
+                  "margin-0 relative whitespace-pre-wrap bg-red-100 font-mono text-xs text-red-800"
+                }
+              >
+                {error}
               </div>
             </div>
-            <div
-              className={
-                "margin-0 relative whitespace-pre-wrap bg-red-100 font-mono text-xs text-red-800"
-              }
-            >
-              {error}
-            </div>
-          </div>
-        )}
-        <div
-          className="relative h-[calc(100%-40px)] w-full overflow-auto"
-          // onScroll={handleScroll}
-        >
-          {execute ? (
-            <iframe
-              className={"size-full min-h-[480px] border-none bg-white"}
-              srcDoc={
-                language === "html"
-                  ? addScriptsToHtml(value)
-                  : `<html lang="en"><body>${errorHandlingScript}<script>${value}</script>${sendHeightJS}</body></html>`
-              }
-            />
-          ) : (
-            <div className={"size-full"}>
-              <SyntaxHighlighter
-                language={language}
-                style={oneDark}
-                customStyle={{
-                  overflowY: "auto",
-                  margin: 0,
-                  height: "100%",
-                  background: "transparent",
-                  padding: "1rem"
-                }}
-                codeTagProps={{
-                  style: {
-                    fontSize: "14px",
-                    fontFamily: "var(--font-mono)"
-                  }
-                }}
-              >
-                {value.trim()}
-              </SyntaxHighlighter>
-              {/*<div ref={messagesEndRef} />*/}
-            </div>
           )}
+          <div
+            className="relative h-[calc(100%-40px)] w-full overflow-auto"
+            // onScroll={handleScroll}
+          >
+            {execute ? (
+              <iframe
+                className={"size-full min-h-[480px] border-none bg-white"}
+                srcDoc={
+                  language === "html"
+                    ? addScriptsToHtml(value)
+                    : `<html lang="en"><body>${errorHandlingScript}<script>${value}</script>${sendHeightJS}</body></html>`
+                }
+              />
+            ) : (
+              <div className={"size-full"}>
+                <SyntaxHighlighter
+                  language={language}
+                  style={oneDark}
+                  customStyle={{
+                    overflowY: "auto",
+                    margin: 0,
+                    height: "100%",
+                    background: "transparent",
+                    padding: "1rem"
+                  }}
+                  codeTagProps={{
+                    style: {
+                      fontSize: "14px",
+                      fontFamily: "var(--font-mono)"
+                    }
+                  }}
+                >
+                  {value.trim()}
+                </SyntaxHighlighter>
+                {/*<div ref={messagesEndRef} />*/}
+              </div>
+            )}
+          </div>
+          <MessageSharingDialog
+            open={sharing}
+            setOpen={setSharing}
+            user={user}
+            selectedWorkspace={selectedWorkspace}
+            chatSettings={chatSettings}
+            defaultFilename={filename || ""}
+            fileContent={value}
+          />
         </div>
-        <MessageSharingDialog
-          open={sharing}
-          setOpen={setSharing}
-          user={user}
-          selectedWorkspace={selectedWorkspace}
-          chatSettings={chatSettings}
-          defaultFilename={filename || ""}
-          fileContent={value}
-        />
-      </div>
+      ),
+      [
+        isGenerating,
+        language,
+        value,
+        error,
+        execute,
+        sharing,
+        iframeHeight,
+        uniqueIFrameId
+      ]
     )
   }
 )

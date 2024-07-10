@@ -9,7 +9,7 @@ import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
 import { IconChevronDown, IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
@@ -168,130 +168,159 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     model => model.modelId === selectedPreset?.model
   )
 
-  return (
-    <DropdownMenu
-      open={isOpen}
-      onOpenChange={isOpen => {
-        setIsOpen(isOpen)
-        setSearch("")
-      }}
-    >
-      <DropdownMenuTrigger asChild className="max-w-1/2" disabled={loading}>
-        <Button variant="ghost" className="hidden space-x-3 text-lg sm:flex">
-          {selectedPreset && (
-            <ModelIcon
-              provider={modelDetails?.provider || "custom"}
-              modelId={modelDetails?.modelId}
-              width={32}
-              height={32}
-            />
-          )}
-
-          {selectedAssistant &&
-            (selectedAssistantImage ? (
-              <Image
-                className="rounded"
-                src={selectedAssistantImage}
-                alt="Assistant"
-                width={28}
-                height={28}
+  return useMemo(
+    () => (
+      <DropdownMenu
+        open={isOpen}
+        onOpenChange={isOpen => {
+          setIsOpen(isOpen)
+          setSearch("")
+        }}
+      >
+        <DropdownMenuTrigger asChild className="max-w-1/2" disabled={loading}>
+          <Button variant="ghost" className="hidden space-x-3 text-lg sm:flex">
+            {selectedPreset && (
+              <ModelIcon
+                provider={modelDetails?.provider || "custom"}
+                modelId={modelDetails?.modelId}
+                width={32}
+                height={32}
               />
+            )}
+
+            {selectedAssistant &&
+              (selectedAssistantImage ? (
+                <Image
+                  className="rounded"
+                  src={selectedAssistantImage}
+                  alt="Assistant"
+                  width={28}
+                  height={28}
+                />
+              ) : (
+                <IconRobotFace
+                  className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+                  size={28}
+                />
+              ))}
+
+            {loading ? (
+              <div className="animate-pulse">Loading assistant...</div>
             ) : (
-              <IconRobotFace
-                className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-                size={28}
-              />
-            ))}
+              <>
+                <div className="overflow-hidden text-ellipsis">
+                  {isModified &&
+                    (selectedPreset || selectedAssistant) &&
+                    "Modified "}
 
-          {loading ? (
-            <div className="animate-pulse">Loading assistant...</div>
+                  {selectedPreset?.name ||
+                    selectedAssistant?.name ||
+                    t("Assistants")}
+                </div>
+
+                <IconChevronDown className="ml-1" />
+              </>
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent
+          className="max-w-[calc(100vw-12px)] space-y-4 overflow-y-auto sm:min-w-[300px] sm:max-w-[500px]"
+          align="start"
+        >
+          {presets.length === 0 && assistants.length === 0 ? (
+            <div className="p-8 text-center">No items found.</div>
           ) : (
             <>
-              <div className="overflow-hidden text-ellipsis">
-                {isModified &&
-                  (selectedPreset || selectedAssistant) &&
-                  "Modified "}
+              <Input
+                ref={inputRef}
+                className="w-full"
+                placeholder="Search..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onKeyDown={e => e.stopPropagation()}
+              />
 
-                {selectedPreset?.name ||
-                  selectedAssistant?.name ||
-                  t("Assistants")}
+              <div className="max-h-[300px] overflow-auto">
+                {!!(selectedPreset || selectedAssistant) && (
+                  <QuickSettingOption
+                    contentType={selectedPreset ? "presets" : "assistants"}
+                    isSelected={true}
+                    item={
+                      selectedPreset ||
+                      (selectedAssistant as
+                        | Tables<"presets">
+                        | Tables<"assistants">)
+                    }
+                    onSelect={() => {
+                      handleSelectQuickSetting(null, "remove")
+                    }}
+                    image={selectedPreset ? "" : selectedAssistantImage}
+                  />
+                )}
+
+                {items
+                  .filter(
+                    item =>
+                      item.name.toLowerCase().includes(search.toLowerCase()) &&
+                      item.id !== selectedPreset?.id &&
+                      item.id !== selectedAssistant?.id
+                  )
+                  .map(({ contentType, ...item }) => (
+                    <QuickSettingOption
+                      key={item.id}
+                      contentType={contentType as "presets" | "assistants"}
+                      isSelected={false}
+                      item={item}
+                      onSelect={() =>
+                        handleSelectQuickSetting(
+                          item,
+                          contentType as "presets" | "assistants"
+                        )
+                      }
+                      image={
+                        contentType === "assistants"
+                          ? assistantImages.find(
+                              image =>
+                                image.path ===
+                                (item as Tables<"assistants">).image_path
+                            )?.url || ""
+                          : ""
+                      }
+                    />
+                  ))}
               </div>
-
-              <IconChevronDown className="ml-1" />
             </>
           )}
-        </Button>
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent
-        className="max-w-[calc(100vw-12px)] space-y-4 overflow-y-auto sm:min-w-[300px] sm:max-w-[500px]"
-        align="start"
-      >
-        {presets.length === 0 && assistants.length === 0 ? (
-          <div className="p-8 text-center">No items found.</div>
-        ) : (
-          <>
-            <Input
-              ref={inputRef}
-              className="w-full"
-              placeholder="Search..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              onKeyDown={e => e.stopPropagation()}
-            />
-
-            <div className="max-h-[300px] overflow-auto">
-              {!!(selectedPreset || selectedAssistant) && (
-                <QuickSettingOption
-                  contentType={selectedPreset ? "presets" : "assistants"}
-                  isSelected={true}
-                  item={
-                    selectedPreset ||
-                    (selectedAssistant as
-                      | Tables<"presets">
-                      | Tables<"assistants">)
-                  }
-                  onSelect={() => {
-                    handleSelectQuickSetting(null, "remove")
-                  }}
-                  image={selectedPreset ? "" : selectedAssistantImage}
-                />
-              )}
-
-              {items
-                .filter(
-                  item =>
-                    item.name.toLowerCase().includes(search.toLowerCase()) &&
-                    item.id !== selectedPreset?.id &&
-                    item.id !== selectedAssistant?.id
-                )
-                .map(({ contentType, ...item }) => (
-                  <QuickSettingOption
-                    key={item.id}
-                    contentType={contentType as "presets" | "assistants"}
-                    isSelected={false}
-                    item={item}
-                    onSelect={() =>
-                      handleSelectQuickSetting(
-                        item,
-                        contentType as "presets" | "assistants"
-                      )
-                    }
-                    image={
-                      contentType === "assistants"
-                        ? assistantImages.find(
-                            image =>
-                              image.path ===
-                              (item as Tables<"assistants">).image_path
-                          )?.url || ""
-                        : ""
-                    }
-                  />
-                ))}
-            </div>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+    [
+      isOpen,
+      loading,
+      selectedPreset,
+      selectedAssistant,
+      isModified,
+      selectedAssistantImage,
+      presets,
+      assistants,
+      search,
+      t,
+      assistantImages,
+      handleSelectQuickSetting,
+      inputRef,
+      items,
+      modelDetails,
+      selectedPreset,
+      selectedAssistant,
+      isModified,
+      checkIfModified,
+      setIsOpen,
+      setSearch,
+      handleSelectAssistant,
+      profile,
+      selectedWorkspace,
+      chatSettings
+    ]
   )
 }

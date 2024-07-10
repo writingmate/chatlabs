@@ -75,7 +75,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
   }
 
   return showFilesDisplay && combinedMessageFiles.length > 0 ? (
-    <>
+    <div className="flex flex-col flex-wrap justify-center gap-2 pb-2">
       {showPreview && selectedImage && (
         <FilePreview
           type="image"
@@ -222,26 +222,28 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   ) : (
     combinedMessageFiles.length > 0 && (
-      <div className="flex w-full items-center justify-center space-x-2">
-        <Button
-          className="flex h-[32px] w-[140px] space-x-2"
-          onClick={() => setShowFilesDisplay(true)}
-        >
-          <RetrievalToggle />
+      <div className="flex flex-col flex-wrap justify-center gap-2 pb-2">
+        <div className="flex w-full items-center justify-center space-x-2">
+          <Button
+            className="flex h-[32px] w-[140px] space-x-2"
+            onClick={() => setShowFilesDisplay(true)}
+          >
+            <RetrievalToggle />
 
-          <div>
-            {" "}
-            View {combinedMessageFiles.length} file
-            {combinedMessageFiles.length > 1 ? "s" : ""}
-          </div>
+            <div>
+              {" "}
+              View {combinedMessageFiles.length} file
+              {combinedMessageFiles.length > 1 ? "s" : ""}
+            </div>
 
-          <div onClick={e => e.stopPropagation()}>
-            <ChatRetrievalSettings />
-          </div>
-        </Button>
+            <div onClick={e => e.stopPropagation()}>
+              <ChatRetrievalSettings />
+            </div>
+          </Button>
+        </div>
       </div>
     )
   )
