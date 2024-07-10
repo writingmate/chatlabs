@@ -24,7 +24,7 @@ export default function HomePage() {
         getWorkspacesByUserId(userId)
       ]).then(([profile, workspaces]) => {
         if (profile?.has_onboarded) {
-          return router.push(`/${workspaces[0].id}/chat`)
+          return router.push(`/chat`)
         }
         return router.push("/setup")
       })

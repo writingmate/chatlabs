@@ -113,7 +113,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       }
       handleSelectAssistant(assistant)
 
-      return router.push(`/${selectedWorkspace.id}/chat`)
+      return router.push(`/chat`)
     },
     tools: async (item: any) => {
       if (!validatePlanForTools(profile, [item])) {
