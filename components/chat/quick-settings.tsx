@@ -209,10 +209,6 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
             ) : (
               <>
                 <div className="overflow-hidden text-ellipsis">
-                  {isModified &&
-                    (selectedPreset || selectedAssistant) &&
-                    "Modified "}
-
                   {selectedPreset?.name ||
                     selectedAssistant?.name ||
                     t("Assistants")}
