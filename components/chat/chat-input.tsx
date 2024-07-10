@@ -89,56 +89,78 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
   } = useChatHistoryHandler()
 
   useEffect(() => {
+    console.log("Initializing speech recognition...")
     if ("webkitSpeechRecognition" in window) {
       const recognition = new window.webkitSpeechRecognition()
       recognition.continuous = true
       recognition.interimResults = true
       recognition.lang = "en-US"
 
+      recognition.onstart = () => {
+        console.log("Speech recognition started")
+        setListening(true)
+      }
+
       recognition.onresult = (event: any) => {
+        console.log("Speech recognition result received")
         const array: SpeechRecognitionResult[] = Array.from(event.results)
         const transcript = array
           .map((result: SpeechRecognitionResult) => result[0].transcript)
           .join("")
         setTranscript(transcript)
-        // Check for silence
+        console.log("Current transcript:", transcript)
+
         const isSilent = transcript.trim() === ""
         if (isSilent) {
-          // Reset and set a new timeout to stop the recognition after 30 seconds of silence
+          console.log("Silence detected, setting timeout")
           if (timeoutId) clearTimeout(timeoutId)
           setTimeoutId(
             setTimeout(() => {
+              console.log("Stopping recognition due to silence")
               setTranscript("")
               if (recognition) recognition.stop()
             }, 30 * 1000)
-          ) // 30 seconds
+          )
         } else {
-          // Reset the timeout if the user is speaking
+          console.log("Speech detected, clearing timeout")
           if (timeoutId) clearTimeout(timeoutId)
         }
       }
 
       recognition.onend = (event: any) => {
+        console.log("Speech recognition ended", event)
         setListening(false)
-        if (event.error === "no-speech") {
-          startListening()
+        if (event.error) {
+          console.error("Speech recognition error:", event.error)
+          toast.error(`Speech recognition error: ${event.error}`)
         } else if (transcript.trim() !== "") {
-          // Restart the recognition if the user is still speaking
+          console.log("Restarting recognition")
           startListening()
         }
       }
 
+      recognition.onerror = (event: any) => {
+        console.error("Speech recognition error:", event.error)
+        toast.error(`Speech recognition error: ${event.error}`)
+      }
+
       setRecognition(recognition)
+    } else {
+      console.warn("Speech recognition not supported in this browser")
+      toast.error("Speech recognition is not supported in your browser")
     }
+
     setTimeout(() => {
       handleFocusChatInput()
-    }, 200) // FIX: hacky
+    }, 200)
   }, [selectedPreset, selectedAssistant])
 
   useEffect(() => {
     if (listening) {
+      console.log("Updating user input with transcript")
       setUserInput((userInputBeforeRecording + " " + transcript).trim())
     } else {
+      console.log("Updating user input before recording")
       setUserInputBeforeRecording(userInput)
     }
   }, [listening, transcript, userInputBeforeRecording])
@@ -162,7 +184,6 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
       handleSendMessage(userInput, chatMessages, false)
     }
 
-    // Consolidate conditions to avoid TypeScript error
     if (
       isPromptPickerOpen ||
       isFilePickerOpen ||
@@ -175,7 +196,6 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
         event.key === "ArrowDown"
       ) {
         event.preventDefault()
-        // Toggle focus based on picker type
         if (isPromptPickerOpen) setFocusPrompt(!focusPrompt)
         if (isFilePickerOpen) setFocusFile(!focusFile)
         if (isToolPickerOpen) setFocusTool(!focusTool)
@@ -183,17 +203,6 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
       }
     }
 
-    if (event.key === "ArrowUp" && event.shiftKey && event.ctrlKey) {
-      event.preventDefault()
-      setNewMessageContentToPreviousUserMessage()
-    }
-
-    if (event.key === "ArrowDown" && event.shiftKey && event.ctrlKey) {
-      event.preventDefault()
-      setNewMessageContentToNextUserMessage()
-    }
-
-    //use shift+ctrl+up and shift+ctrl+down to navigate through chat history
     if (event.key === "ArrowUp" && event.shiftKey && event.ctrlKey) {
       event.preventDefault()
       setNewMessageContentToPreviousUserMessage()
@@ -235,26 +244,36 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
       }
     }
   }
+
   const startListening = () => {
     if (recognition) {
+      console.log("Starting speech recognition")
       setListening(true)
       recognition.start()
+    } else {
+      console.warn("Speech recognition not initialized")
+      toast.error("Speech recognition is not initialized")
     }
   }
 
   const stopListening = () => {
     if (recognition) {
+      console.log("Stopping speech recognition")
       if (timeoutId) clearTimeout(timeoutId)
       recognition.stop()
       setTranscript("")
       setListening(false)
+    } else {
+      console.warn("Speech recognition not initialized")
+      toast.error("Speech recognition is not initialized")
     }
   }
 
-  // Function to manually restart the recognition
   const restartListening = () => {
     if (!listening) {
       startListening()
+    } else {
+      console.log("Already listening, no need to restart")
     }
   }
 
@@ -305,22 +324,6 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
                   accept={filesToAccept}
                 />
               </div>
-              {/*<div title={"Select prompt from a library"}>*/}
-              {/*  <IconTerminal2*/}
-              {/*    onClick={() =>*/}
-              {/*      setIsPromptPickerOpen(*/}
-              {/*        isPromptPickerOpen => !isPromptPickerOpen*/}
-              {/*      )*/}
-              {/*    }*/}
-              {/*    stroke={1.5}*/}
-              {/*    className={cn(*/}
-              {/*      "m-1 cursor-pointer p-0.5 hover:opacity-50",*/}
-              {/*      userInput &&*/}
-              {/*      "invisible -ml-7 transition-[margin] duration-200"*/}
-              {/*    )}*/}
-              {/*    size={24}*/}
-              {/*  />*/}
-              {/*</div>*/}
             </div>
             <TextareaAutosize
               textareaRef={chatInputRef}
