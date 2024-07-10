@@ -378,7 +378,7 @@ export const Message: FC<MessageProps> = ({
                     )
                   default:
                     return (
-                      <div className="flex animate-ping items-center space-x-2">
+                      <div className="flex items-center space-x-2">
                         <IconPuzzle stroke={1.5} size={20} />
 
                         <div>Using {toolInUse}...</div>

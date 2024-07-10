@@ -278,114 +278,107 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
   }
 
   return (
-    <>
-      <div className="flex flex-col flex-wrap justify-center gap-2">
-        <ChatFilesDisplay />
-      </div>
-
-      <div className={"relative"}>
-        <ChatCommandInput />
-        <div className="border-input bg-background flex w-full flex-col justify-end overflow-hidden rounded-xl border">
-          {showAssistant && selectedAssistant && (
-            <div className="bg-accent border-input flex items-center justify-between space-x-2 border-b p-2 pl-4 pr-3">
-              <div className={"flex items-center space-x-2"}>
-                <AssistantIcon assistant={selectedAssistant} size={24} />
-                <div className="text-sm font-semibold">
-                  Talking to {selectedAssistant.name}
-                </div>
+    <div className={"relative"}>
+      <ChatFilesDisplay />
+      <ChatCommandInput />
+      <div className="border-input bg-background flex w-full flex-col justify-end overflow-hidden rounded-xl border">
+        {showAssistant && selectedAssistant && (
+          <div className="bg-accent border-input flex items-center justify-between space-x-2 border-b p-2 pl-4 pr-3">
+            <div className={"flex items-center space-x-2"}>
+              <AssistantIcon assistant={selectedAssistant} size={24} />
+              <div className="text-sm font-semibold">
+                Talking to {selectedAssistant.name}
               </div>
+            </div>
 
-              <IconX
+            <IconX
+              stroke={1.5}
+              onClick={() => setSelectedAssistant(null)}
+              className={
+                "hover:text-foreground/50 flex size-4 cursor-pointer items-center justify-center text-[10px]"
+              }
+            />
+          </div>
+        )}
+        <div className="flex items-end justify-between p-2">
+          <div className={"flex"}>
+            <div title={"Upload/attach files"}>
+              <IconPaperclip
+                onClick={() => fileInputRef.current?.click()}
                 stroke={1.5}
-                onClick={() => setSelectedAssistant(null)}
-                className={
-                  "hover:text-foreground/50 flex size-4 cursor-pointer items-center justify-center text-[10px]"
-                }
+                className="m-1 cursor-pointer p-0.5 hover:opacity-50"
+                size={24}
+              />
+              <Input
+                ref={fileInputRef}
+                className="hidden"
+                type="file"
+                onChange={e => {
+                  if (!e.target.files) return
+                  handleSelectDeviceFile(e.target.files[0])
+                }}
+                accept={filesToAccept}
               />
             </div>
-          )}
-          <div className="flex items-end justify-between p-2">
-            <div className={"flex"}>
-              <div title={"Upload/attach files"}>
-                <IconPaperclip
-                  onClick={() => fileInputRef.current?.click()}
+          </div>
+          <TextareaAutosize
+            textareaRef={chatInputRef}
+            className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full resize-none rounded-md border-none bg-transparent p-1.5 px-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            placeholder={`Ask anything...`}
+            onValueChange={handleInputChange}
+            value={userInput}
+            minRows={1}
+            maxRows={18}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onCompositionStart={() => setIsTyping(true)}
+            onCompositionEnd={() => setIsTyping(false)}
+          />
+          <div className="flex cursor-pointer justify-end">
+            <div className={"flex flex-nowrap overflow-hidden"}>
+              {recognition && (
+                <button onClick={listening ? stopListening : restartListening}>
+                  {listening ? (
+                    <IconPlayerRecordFilled
+                      stroke={1.5}
+                      className={"animate-pulse text-red-500"}
+                      size={24}
+                    />
+                  ) : (
+                    <IconMicrophone
+                      className={"m-1 cursor-pointer p-0.5 hover:opacity-50"}
+                      stroke={1.5}
+                      size={24}
+                    />
+                  )}
+                </button>
+              )}
+              {isGenerating ? (
+                <IconPlayerStopFilled
+                  className="hover:bg-background m-1 animate-pulse rounded bg-transparent p-0.5 hover:opacity-50"
+                  onClick={handleStopMessage}
                   stroke={1.5}
-                  className="m-1 cursor-pointer p-0.5 hover:opacity-50"
                   size={24}
                 />
-                <Input
-                  ref={fileInputRef}
-                  className="hidden"
-                  type="file"
-                  onChange={e => {
-                    if (!e.target.files) return
-                    handleSelectDeviceFile(e.target.files[0])
+              ) : (
+                <IconArrowUp
+                  className={cn(
+                    "bg-primary text-secondary m-1 rounded-lg p-0.5 hover:opacity-50",
+                    (!userInput || isUploading) &&
+                      "cursor-not-allowed opacity-50"
+                  )}
+                  onClick={() => {
+                    if (!userInput || isUploading) return
+                    handleSendMessage(userInput, chatMessages, false)
                   }}
-                  accept={filesToAccept}
+                  stroke={1.5}
+                  size={24}
                 />
-              </div>
-            </div>
-            <TextareaAutosize
-              textareaRef={chatInputRef}
-              className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full resize-none rounded-md border-none bg-transparent p-1.5 px-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder={`Ask anything...`}
-              onValueChange={handleInputChange}
-              value={userInput}
-              minRows={1}
-              maxRows={18}
-              onKeyDown={handleKeyDown}
-              onPaste={handlePaste}
-              onCompositionStart={() => setIsTyping(true)}
-              onCompositionEnd={() => setIsTyping(false)}
-            />
-            <div className="flex cursor-pointer justify-end">
-              <div className={"flex flex-nowrap overflow-hidden"}>
-                {recognition && (
-                  <button
-                    onClick={listening ? stopListening : restartListening}
-                  >
-                    {listening ? (
-                      <IconPlayerRecordFilled
-                        stroke={1.5}
-                        className={"animate-pulse text-red-500"}
-                        size={24}
-                      />
-                    ) : (
-                      <IconMicrophone
-                        className={"m-1 cursor-pointer p-0.5 hover:opacity-50"}
-                        stroke={1.5}
-                        size={24}
-                      />
-                    )}
-                  </button>
-                )}
-                {isGenerating ? (
-                  <IconPlayerStopFilled
-                    className="hover:bg-background m-1 animate-pulse rounded bg-transparent p-0.5 hover:opacity-50"
-                    onClick={handleStopMessage}
-                    stroke={1.5}
-                    size={24}
-                  />
-                ) : (
-                  <IconArrowUp
-                    className={cn(
-                      "bg-primary text-secondary m-1 rounded-lg p-0.5 hover:opacity-50",
-                      (!userInput || isUploading) &&
-                        "cursor-not-allowed opacity-50"
-                    )}
-                    onClick={() => {
-                      if (!userInput || isUploading) return
-                      handleSendMessage(userInput, chatMessages, false)
-                    }}
-                    stroke={1.5}
-                    size={24}
-                  />
-                )}
-              </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
