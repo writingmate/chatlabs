@@ -14,10 +14,7 @@ export const getProfileByUserId = async (
     .single()
 
   if (!profile || error) {
-    await client.auth.signOut()
-    window.location.href = "/login"
-    return null
-    // throw new Error(error?.message || "Profile not found")
+    throw new Error(error?.message || "Profile not found")
   }
 
   return profile
