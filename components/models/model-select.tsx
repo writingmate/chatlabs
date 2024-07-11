@@ -29,6 +29,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     availableHostedModels,
     availableLocalModels,
     availableOpenRouterModels,
+    allModels,
     setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
@@ -58,21 +59,6 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     }
     setIsOpen(false)
   }
-
-  const allModels = [
-    ...models.map(model => ({
-      modelId: model.model_id as LLMID,
-      modelName: model.name,
-      provider: "custom" as ModelProvider,
-      hostedId: model.id,
-      platformLink: "",
-      imageInput: false,
-      paid: "paid" in model ? !!model.paid : false
-    })),
-    ...availableHostedModels,
-    ...availableLocalModels,
-    ...availableOpenRouterModels
-  ]
 
   const groupedModels = allModels.reduce<Record<string, LLM[]>>(
     (groups, model) => {

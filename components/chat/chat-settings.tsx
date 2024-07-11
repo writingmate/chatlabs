@@ -15,12 +15,7 @@ interface ChatSettingsProps {
 export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
   useHotkey("i", () => handleClick())
 
-  const {
-    models,
-    availableHostedModels,
-    availableLocalModels,
-    availableOpenRouterModels
-  } = useContext(ChatbotUIContext)
+  const { allModels } = useContext(ChatbotUIContext)
 
   const { chatSettings, setChatSettings, selectedTools, setSelectedTools } =
     useContext(ChatbotUIChatContext)
@@ -50,21 +45,6 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
   }, [chatSettings?.model])
 
   if (!chatSettings) return null
-
-  const allModels = [
-    ...models.map(model => ({
-      modelId: model.model_id as LLMID,
-      modelName: model.name,
-      provider: "custom" as ModelProvider,
-      hostedId: model.id,
-      platformLink: "",
-      imageInput: false,
-      tools: false
-    })),
-    ...availableHostedModels,
-    ...availableLocalModels,
-    ...availableOpenRouterModels
-  ]
 
   const handleSelectModel = (modelId: LLMID) => {
     setChatSettings(prev => {

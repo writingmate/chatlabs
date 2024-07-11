@@ -44,14 +44,8 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   detailsLocation = "left",
   showModelSettings = true
 }) => {
-  const {
-    profile,
-    models,
-    availableHostedModels,
-    availableLocalModels,
-    availableOpenRouterModels,
-    setIsPaywallOpen
-  } = useContext(ChatbotUIContext)
+  const { profile, availableLocalModels, allModels, setIsPaywallOpen } =
+    useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -81,22 +75,6 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
     onSelectModel(modelId)
     setIsOpen(false)
   }
-
-  const allModels = [
-    ...models.map(model => ({
-      modelId: model.model_id as LLMID,
-      modelName: model.name,
-      provider: "custom" as ModelProvider,
-      hostedId: model.id,
-      platformLink: "",
-      imageInput: false,
-      paid: "paid" in model ? !!model.paid : false,
-      maxContext: null
-    })),
-    ...availableHostedModels,
-    ...availableLocalModels,
-    ...availableOpenRouterModels
-  ]
 
   useEffect(() => {
     getMostRecentModels().then(result => {
@@ -143,7 +121,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
         asChild
         disabled={allModels.length === 0}
       >
-        {allModels.length === 0 ? (
+        {allModels.length === 0 && profile?.plan.startsWith("byok_") ? (
           <div className="rounded text-sm font-bold">
             Unlock models by entering API keys in your profile settings.
           </div>

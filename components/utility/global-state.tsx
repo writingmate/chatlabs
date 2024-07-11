@@ -21,6 +21,7 @@ import {
   LLM,
   LLMID,
   MessageImage,
+  ModelProvider,
   OpenRouterLLM,
   WorkspaceImage
 } from "@/types"
@@ -34,6 +35,7 @@ import { getPublicTools } from "@/db/tools"
 import { getPlatformTools } from "@/db/platform-tools"
 import { onlyUniqueById } from "@/lib/utils"
 import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
+import Loading from "@/components/ui/loading"
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -66,6 +68,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [availableOpenRouterModels, setAvailableOpenRouterModels] = useState<
     OpenRouterLLM[]
   >([])
+  const [allModels, setAllModels] = useState<LLM[]>([])
 
   // WORKSPACE STORE
   const [selectedWorkspace, setSelectedWorkspace] =
@@ -167,8 +170,12 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       const hostedModelRes = await fetchHostedModels(profile)
       if (!hostedModelRes) return
 
+      const allModels = []
+
       setEnvKeyMap(hostedModelRes.envKeyMap)
       setAvailableHostedModels(hostedModelRes.hostedModels)
+
+      allModels.push(...hostedModelRes.hostedModels)
 
       if (profile) {
         if (!profile.has_onboarded) {
@@ -181,6 +188,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         ) {
           const openRouterModels = await fetchOpenRouterModels()
           if (!openRouterModels) return
+          allModels.push(...openRouterModels)
           setAvailableOpenRouterModels(openRouterModels)
         }
       }
@@ -188,8 +196,23 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
         const localModels = await fetchOllamaModels()
         if (!localModels) return
+        allModels.push(...localModels)
         setAvailableLocalModels(localModels)
       }
+
+      setAllModels([
+        ...models.map(model => ({
+          modelId: model.model_id as LLMID,
+          modelName: model.name,
+          provider: "custom" as ModelProvider,
+          hostedId: model.id,
+          platformLink: "",
+          imageInput: false,
+          paid: "paid" in model ? !!model.paid : false,
+          maxContext: null
+        })),
+        ...allModels
+      ])
     })()
   }, [])
 
@@ -335,8 +358,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         }
       )
 
-      setLoading(false)
-
       setChatSettings({
         model: (chatSettings?.model ||
           workspace?.default_model ||
@@ -361,10 +382,16 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
           // chatSettings?.embeddingsProvider ||
           (workspace?.embeddings_provider as "openai" | "local") || "openai"
       })
+
+      setLoading(false)
     } catch (error) {
       console.error(error)
       router.push("/")
     }
+  }
+
+  if (loading) {
+    return <Loading />
   }
 
   return (
@@ -507,7 +534,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setIsPaywallOpen,
 
         showSidebar,
-        setShowSidebar
+        setShowSidebar,
+
+        allModels,
+        setAllModels
       }}
     >
       {children}

@@ -61,12 +61,7 @@ const ChatWrapper = forwardRef(
     ref
   ) => {
     const { messagesStartRef, messagesEndRef, handleScroll } = useScroll()
-    const {
-      models,
-      availableHostedModels,
-      availableLocalModels,
-      availableOpenRouterModels
-    } = useContext(ChatbotUIContext)
+    const { allModels } = useContext(ChatbotUIContext)
     const { handleSendEdit, handleStopMessage, handleSendMessage } =
       useChatHandler()
     const {
@@ -84,22 +79,6 @@ const ChatWrapper = forwardRef(
       setRequestTokensTotal,
       setResponseTimeToFirstToken
     } = useContext(ChatbotUIChatContext)
-
-    const allModels = [
-      ...models.map(model => ({
-        modelId: model.model_id as LLMID,
-        modelName: model.name,
-        provider: "custom" as ModelProvider,
-        hostedId: model.id,
-        platformLink: "",
-        imageInput: false,
-        tools: false,
-        pricing: undefined
-      })),
-      ...availableHostedModels,
-      ...availableLocalModels,
-      ...availableOpenRouterModels
-    ]
 
     const responseTimePadding = getResponseTimePadding(
       chatMessages[chatMessages.length - 1]?.message.annotation
