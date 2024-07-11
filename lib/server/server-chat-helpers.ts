@@ -118,13 +118,6 @@ export async function validateMessageCount(
     return
   }
 
-  console.log(
-    "Checking message count for model",
-    model,
-    profile,
-    ALLOWED_MODELS
-  )
-
   // subtract 24 hours
 
   let previousDate = new Date(date.getTime() - 24 * 60 * 60 * 1000)
