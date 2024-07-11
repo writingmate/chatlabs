@@ -104,7 +104,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
           }}
         >
           <Tabs
-            className={cn("h-full", showSidebar ? "flex" : "hidden")}
+            className={cn("z-50 h-full", showSidebar ? "flex" : "hidden")}
             value={contentType}
             onValueChange={tabValue => {
               setContentType(tabValue as ContentType)
