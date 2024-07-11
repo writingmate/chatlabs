@@ -10,10 +10,9 @@ import { SidebarContent } from "./sidebar-content"
 
 interface SidebarProps {
   contentType: ContentType
-  showSidebar: boolean
 }
 
-export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
+export const Sidebar: FC<SidebarProps> = ({ contentType }) => {
   const {
     folders,
     chats,

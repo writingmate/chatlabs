@@ -73,7 +73,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
   return useMemo(
     () => (
-      <div className="flex size-full">
+      <div className="flex size-full overflow-x-hidden">
         <CommandK />
         <PlanPicker />
 
@@ -94,17 +94,14 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
         <div
           className={cn(
-            "bg-background absolute z-50 h-full border-r duration-200 lg:relative"
+            `bg-background w-[ absolute z-50 h-full border-r transition-all duration-200${SIDEBAR_WIDTH}px] lg:relative`
           )}
           style={{
-            // Sidebar
-            minWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
-            maxWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
-            width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"
+            marginLeft: showSidebar ? "0px" : `-${SIDEBAR_WIDTH}px`
           }}
         >
           <Tabs
-            className={cn("z-50 h-full", showSidebar ? "flex" : "hidden")}
+            className={"z-50 flex h-full"}
             value={contentType}
             onValueChange={tabValue => {
               setContentType(tabValue as ContentType)
@@ -113,7 +110,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
           >
             <SidebarSwitcher onContentTypeChange={setContentType} />
 
-            <Sidebar contentType={contentType} showSidebar={showSidebar} />
+            <Sidebar contentType={contentType} />
           </Tabs>
         </div>
 
