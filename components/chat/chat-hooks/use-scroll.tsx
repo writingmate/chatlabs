@@ -55,19 +55,26 @@ export const useScroll = () => {
     setIsOverflowing(isOverflow)
   }, [])
 
-  const scrollToTop = useCallback(() => {
+  function scrollIntoView() {
     if (messagesStartRef.current) {
-      messagesStartRef.current.scrollIntoView({ behavior: "smooth" })
+      if (window.self !== window.top) {
+        document.documentElement.scrollTop = messagesStartRef.current?.offsetTop
+        return
+      }
+      messagesStartRef.current.scrollIntoView({ behavior: "instant" })
     }
+  }
+
+  const scrollToTop = useCallback(() => {
+    // if the window is inside an iframe, we can't scroll to the top
+    scrollIntoView()
   }, [])
 
   const scrollToBottom = useCallback(() => {
     isAutoScrolling.current = true
 
     setTimeout(() => {
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
-      }
+      scrollIntoView()
 
       isAutoScrolling.current = false
     }, 0)
