@@ -343,7 +343,7 @@ const EmptyChatView: React.FC<EmptyChatViewProps> = ({
   selectedAssistant,
   theme
 }) => (
-  <div className="2xl::pt-80 flex w-full flex-1 flex-col items-center justify-start pt-60">
+  <div className="center flex w-full flex-1 flex-col items-center justify-center transition-[height]">
     {!selectedAssistant ? (
       <Brand theme={theme === "dark" ? "dark" : "light"} />
     ) : (

@@ -75,7 +75,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
   }
 
   return showFilesDisplay && combinedMessageFiles.length > 0 ? (
-    <div className="flex flex-col flex-wrap justify-center gap-2 pb-2">
+    <div className="flex flex-col flex-wrap justify-center gap-2 pb-1">
       {showPreview && selectedImage && (
         <FilePreview
           type="image"
