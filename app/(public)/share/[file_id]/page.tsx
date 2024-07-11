@@ -69,6 +69,7 @@ const SharePage = async ({
   return (
     <div className={"relative flex flex-col h-screen " + "w-screen"}>
       <iframe
+        allow="clipboard-write"
         className={"w-full flex-1 border-none"}
         srcDoc={fixSrcDocLinks(file.file_items[0].content)}
       />
