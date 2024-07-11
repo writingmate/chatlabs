@@ -238,6 +238,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     setProfile(profile)
 
     if (!profile?.has_onboarded) {
+      setLoading(false)
       return profile
     }
 
@@ -281,6 +282,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     setNewMessageFiles([])
     setNewMessageImages([])
     setShowFilesDisplay(false)
+
+    setLoading(false)
 
     return profile
   }
@@ -386,6 +389,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       setLoading(false)
     } catch (error) {
       console.error(error)
+      setLoading(false)
       router.push("/")
     }
   }

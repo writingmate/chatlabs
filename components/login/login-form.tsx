@@ -95,7 +95,9 @@ export default function LoginForm({
     const { error } = await supabase.auth.signInWithOtp({
       email: email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm?${callbackRedirectSearchParams.toString()}`
+        emailRedirectTo: encodeURIComponent(
+          `${window.location.origin}/auth/confirm?${callbackRedirectSearchParams.toString()}`
+        )
       }
     })
 
