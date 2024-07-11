@@ -7,6 +7,7 @@ import { LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import {
+  ALLOWED_MODELS,
   CATCHALL_MESSAGE_DAILY_LIMIT,
   FREE_MESSAGE_DAILY_LIMIT,
   PRO_MESSAGE_DAILY_LIMIT,
@@ -117,6 +118,13 @@ export async function validateMessageCount(
     return
   }
 
+  console.log(
+    "Checking message count for model",
+    model,
+    profile,
+    ALLOWED_MODELS
+  )
+
   // subtract 24 hours
 
   let previousDate = new Date(date.getTime() - 24 * 60 * 60 * 1000)
@@ -139,7 +147,7 @@ export async function validateMessageCount(
     count > FREE_MESSAGE_DAILY_LIMIT
   ) {
     throw new SubscriptionRequiredError(
-      `You have reached daily message limit for ${model}. Upgrade to Pro plan to continue come back tomorrow.`
+      `You have reached daily message limit for ${model}. Upgrade to Pro plan to continue or come back tomorrow.`
     )
   }
 

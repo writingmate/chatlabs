@@ -373,11 +373,12 @@ export const fetchChatResponse = async (
       )
     }
 
+    const errorData = await response.json()
+
     if (response.status === 402) {
-      toast.warning("Please upgrade to Pro plan to use this model.")
+      toast.warning(errorData.message)
       setPaywallOpen?.(true)
     } else {
-      const errorData = await response.json()
       toast.error(errorData.message)
     }
 
