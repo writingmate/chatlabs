@@ -1,13 +1,10 @@
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
-import { IconRobotFace } from "@tabler/icons-react"
-import Image from "next/image"
 import { FC, useContext, useEffect, useRef } from "react"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useClickOutside } from "@/components/chat/picker-hooks/use-click-outside"
 import { validatePlanForAssistant } from "@/lib/subscription"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
-import { ChatbotUIChatContext } from "@/context/chat"
 
 interface AssistantPickerProps {}
 

@@ -12,14 +12,12 @@ import { useContext, useEffect, useRef } from "react"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import {
   createTempMessages,
-  fetchChatResponse,
   handleCreateChat,
   handleCreateMessages,
   handleHostedChat,
   handleLocalChat,
   handleRetrieval,
   handleToolsChat,
-  processResponse,
   validateChatSettings
 } from "../chat-helpers"
 import { isMobileScreen } from "@/lib/mobile"

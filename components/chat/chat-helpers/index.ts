@@ -24,8 +24,7 @@ import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { SubscriptionRequiredError } from "@/lib/errors"
-import { JSONValue } from "ai"
-import { validateProPlan } from "@/lib/subscription"
+import { validatePlanForAssistant, validateProPlan } from "@/lib/subscription"
 import { encode } from "gpt-tokenizer"
 
 export const validateChatSettings = (
@@ -45,27 +44,23 @@ export const validateChatSettings = (
     throw new Error("Model not found")
   }
 
-  // if (!profile) {
-  //   throw new Error("Profile not found")
-  // }
-  //
-  // if (!selectedWorkspace) {
-  //   throw new Error("Workspace not found")
-  // }
-
   if (!messageContent) {
     throw new Error("Message content not found")
+  }
+
+  if (selectedAssistant) {
+    if (validatePlanForAssistant(profile, selectedAssistant)) {
+      return
+    }
+
+    throw new SubscriptionRequiredError(
+      "Subscription required to use assistants"
+    )
   }
 
   if (!validateProPlan(profile) && modelData.paid) {
     throw new SubscriptionRequiredError(
       "Subscription required to use this model"
-    )
-  }
-
-  if (!validateProPlan(profile) && selectedAssistant) {
-    throw new SubscriptionRequiredError(
-      "Subscription required to use assistants"
     )
   }
 
@@ -234,8 +229,6 @@ export const handleToolsChat = async (
   setResponseTokensTotal?: React.Dispatch<React.SetStateAction<number>>,
   setRequestTokensTotal?: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  // setToolInUse("plugins")
-
   const startTime = Date.now()
 
   const { finalMessages: formattedMessages, usedTokens } =
@@ -358,7 +351,8 @@ export const fetchChatResponse = async (
   isHosted: boolean,
   controller: AbortController,
   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  setPaywallOpen?: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const response = await fetch(url, {
     method: "POST",
@@ -379,9 +373,13 @@ export const fetchChatResponse = async (
       )
     }
 
-    const errorData = await response.json()
-
-    toast.error(errorData.message)
+    if (response.status === 402) {
+      toast.warning("Please upgrade to Pro plan to use this model.")
+      setPaywallOpen?.(true)
+    } else {
+      const errorData = await response.json()
+      toast.error(errorData.message)
+    }
 
     setIsGenerating(false)
     setChatMessages(prevMessages => prevMessages.slice(0, -2))

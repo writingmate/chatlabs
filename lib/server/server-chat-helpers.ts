@@ -10,6 +10,7 @@ import {
   CATCHALL_MESSAGE_DAILY_LIMIT,
   FREE_MESSAGE_DAILY_LIMIT,
   PRO_MESSAGE_DAILY_LIMIT,
+  validatePlanForModel,
   validateProPlan
 } from "@/lib/subscription"
 import { PLAN_FREE } from "@/lib/stripe/config"
@@ -99,7 +100,7 @@ export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
     return
   }
 
-  if (isPaidModel(model)) {
+  if (!validatePlanForModel(profile, model)) {
     throw new SubscriptionRequiredError("Pro plan required to use this model")
   }
 }

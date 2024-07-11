@@ -4,6 +4,6 @@ export class SubscriptionRequiredError extends Error {
   constructor(message: string) {
     super(message)
     this.name = "SubscriptionRequiredError"
-    this.status = 403
+    this.status = 402
   }
 }

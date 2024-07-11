@@ -14,7 +14,20 @@ export const CATCHALL_MESSAGE_DAILY_LIMIT = getEnvInt(
   300
 )
 
+export const ALLOWED_USERS =
+  process.env.NEXT_PUBLIC_ALLOWED_USERS?.split(",") || []
+export const ALLOWED_MODELS =
+  process.env.NEXT_PUBLIC_ALLOWED_MODELS?.split(",") || []
+
 export function validateProPlan(profile: Tables<"profiles"> | null) {
+  if (!profile) {
+    return false
+  }
+
+  if (ALLOWED_USERS.includes(profile?.user_id)) {
+    return true
+  }
+
   return profile?.plan !== PLAN_FREE && profile?.plan?.indexOf("premium") === -1
 }
 
@@ -27,6 +40,11 @@ export function validatePlanForModel(
   }
 
   const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
+
+  if (ALLOWED_MODELS.includes(model)) {
+    console.log("ALLOWED MODELS. Skipping plan check.", model)
+    return true
+  }
 
   if (!paidLLMS.includes(model)) {
     return true

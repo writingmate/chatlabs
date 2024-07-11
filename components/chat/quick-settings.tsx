@@ -24,6 +24,7 @@ import { set } from "date-fns"
 import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
 import { validatePlanForAssistant } from "@/lib/subscription"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
 
 interface QuickSettingsProps {}
 
@@ -188,21 +189,9 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
               />
             )}
 
-            {selectedAssistant &&
-              (selectedAssistantImage ? (
-                <Image
-                  className="rounded"
-                  src={selectedAssistantImage}
-                  alt="Assistant"
-                  width={28}
-                  height={28}
-                />
-              ) : (
-                <IconRobotFace
-                  className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
-                  size={28}
-                />
-              ))}
+            {selectedAssistant && (
+              <AssistantIcon assistant={selectedAssistant} size={28} />
+            )}
 
             {loading ? (
               <div className="animate-pulse">Loading assistant...</div>
