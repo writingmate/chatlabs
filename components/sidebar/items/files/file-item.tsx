@@ -40,11 +40,23 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
       updateState={{ name, description }}
       renderInputs={() => (
         <>
-          <div
-            className="cursor-pointer underline hover:opacity-50"
-            onClick={getLinkAndView}
-          >
-            View {file.name}
+          <div className={"flex space-x-2"}>
+            <div
+              className="cursor-pointer underline hover:opacity-50"
+              onClick={getLinkAndView}
+            >
+              View {file.name}
+            </div>
+
+            {file.sharing == "public" && (
+              <a
+                className="block cursor-pointer underline hover:opacity-50"
+                href={`/share/${file.hashid}`}
+                target={"_blank"}
+              >
+                View app
+              </a>
+            )}
           </div>
 
           <div className="flex flex-col justify-between">

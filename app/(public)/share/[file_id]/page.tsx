@@ -67,15 +67,15 @@ const SharePage = async ({
   }
 
   return (
-    <div className={"relative h-screen " + "w-screen"}>
+    <div className={"relative flex flex-col h-screen " + "w-screen"}>
       <iframe
-        className={"mb-[60px] size-full border-none"}
+        className={"w-full flex-1 border-none"}
         srcDoc={fixSrcDocLinks(file.file_items[0].content)}
       />
       {showBanner && (
         <div
           className={
-            "absolute bottom-0 flex h-[60px] w-full items-center justify-center space-x-1 bg-violet-700 text-sm text-white"
+            "flex h-[60px] w-full items-center justify-center space-x-1 bg-violet-700 text-sm text-white"
           }
         >
           Built with
