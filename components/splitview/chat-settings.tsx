@@ -81,6 +81,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({
         />
       </div>
       <ToolSelect
+        selectedModelId={chatSettings.model}
         selectedTools={selectedTools}
         onSelectTools={setSelectedTools}
       />
