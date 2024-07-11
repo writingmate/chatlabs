@@ -89,8 +89,11 @@ export default function LoginForm({
     }
   }
 
-  async function handleEmailLogin(e: React.FormEvent<HTMLButtonElement>) {
+  async function handleEmailLogin(
+    e: React.FormEvent<HTMLButtonElement | HTMLFormElement>
+  ) {
     e.preventDefault()
+    e.stopPropagation()
     setDisabled(true)
     const { error } = await supabase.auth.signInWithOtp({
       email: email,
@@ -111,7 +114,7 @@ export default function LoginForm({
   }
 
   return (
-    <form className="animate-in text-foreground flex w-full flex-col justify-center gap-2">
+    <div className="animate-in text-foreground flex w-full flex-col justify-center gap-2">
       <Brand theme={theme === "dark" ? "dark" : "light"} />
 
       <Button
@@ -129,23 +132,26 @@ export default function LoginForm({
         <Separator className={"flex-1"} />
       </div>
 
-      <Input
-        disabled={disabled}
-        type="email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        className="rounded-lg"
-        placeholder={"sama@openai.com"}
-      />
-      <Button
-        disabled={disabled}
-        variant={"outline"}
-        onClick={e => handleEmailLogin(e)}
-        className="text-md mb-1 rounded-lg px-4 py-2"
-      >
-        <IconMail height={20} width={20} stroke={1.5} className="mr-2" />
-        Continue with email
-      </Button>
-    </form>
+      <form onSubmit={e => handleEmailLogin(e)} className="flex flex-col gap-2">
+        <Input
+          required
+          disabled={disabled}
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="rounded-lg"
+          placeholder={"Enter your company email"}
+        />
+        <Button
+          disabled={disabled}
+          variant={"outline"}
+          onClick={e => handleEmailLogin(e)}
+          className="text-md mb-1 rounded-lg px-4 py-2"
+        >
+          <IconMail height={20} width={20} stroke={1.5} className="mr-2" />
+          Continue with email
+        </Button>
+      </form>
+    </div>
   )
 }
