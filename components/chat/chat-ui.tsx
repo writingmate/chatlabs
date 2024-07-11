@@ -40,6 +40,7 @@ import { getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
+import { Virtualizer } from "virtua"
 
 interface ChatUIProps {
   showModelSelector?: boolean
@@ -294,13 +295,14 @@ export const ChatUI: React.FC<ChatUIProps> = ({
                 theme={theme}
               />
             ) : (
-              <div className="flex-1">
+              <>
                 <div ref={messagesStartRef} />
-                <ChatMessages onPreviewContent={handlePreviewContent} />
-                <div className="h-10" ref={messagesEndRef} />
-              </div>
+                <Virtualizer>
+                  <ChatMessages onPreviewContent={handlePreviewContent} />
+                </Virtualizer>
+                <div className="h-10 flex-1" ref={messagesEndRef} />
+              </>
             )}
-
             <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
               {chatMessages?.length === 0 && (
                 <ConversationStarters
