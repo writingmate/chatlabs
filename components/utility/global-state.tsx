@@ -178,10 +178,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       allModels.push(...hostedModelRes.hostedModels)
 
       if (profile) {
-        if (!profile.has_onboarded) {
-          return router.push("/setup")
-        }
-
         if (
           profile["openrouter_api_key"] ||
           hostedModelRes.envKeyMap["openrouter"]
@@ -236,11 +232,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     const profile = await getProfileByUserId(user.id)
 
     setProfile(profile)
-
-    if (!profile?.has_onboarded) {
-      setLoading(false)
-      return profile
-    }
 
     const workspaces = await getWorkspacesByUserId(user.id)
     setWorkspaces(workspaces)

@@ -9,8 +9,6 @@ import { Dashboard } from "@/components/ui/dashboard"
 import LoginDialog from "@/components/login/login-dialog"
 
 export default function HomePage() {
-  const router = useRouter()
-
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
@@ -19,15 +17,6 @@ export default function HomePage() {
       const userId = data.session.user.id
       window.gtag?.("set", { user_id: userId })
       window.dataLayer?.push({ user_id: userId })
-      Promise.all([
-        getProfileByUserId(userId),
-        getWorkspacesByUserId(userId)
-      ]).then(([profile, workspaces]) => {
-        if (profile?.has_onboarded) {
-          return router.push(`/chat`)
-        }
-        return router.push("/setup")
-      })
     })
   }, [])
 

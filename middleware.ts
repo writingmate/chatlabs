@@ -34,13 +34,16 @@ async function redirectToSetupMiddleware(supabase: SupabaseClient, request: Next
   const session = (await supabase.auth.getSession()).data?.session
   const path = request.nextUrl.pathname
 
+  console.log("redirectToSetupMiddleware", path)
   // if the user is not logged in and they are on the homepage, do nothing
   if (!session && path === "/") {
+    console.log("redirectToSetupMiddleware: not logged in and on homepage")
     return
   }
 
   // if the user is not logged in and they are not on the homepage, redirect them to the homepage
   if (!session && path !== "/") {
+    console.log("redirectToSetupMiddleware: not logged in and not on homepage")
     return NextResponse.redirect(new URL("/", request.url))
   }
 
@@ -48,6 +51,7 @@ async function redirectToSetupMiddleware(supabase: SupabaseClient, request: Next
   const redirectToChat = request.nextUrl.pathname === "/"
 
   if (!redirectToChat) {
+    console.log("redirectToSetupMiddleware: logged in and not on homepage")
     return
   }
 
@@ -58,9 +62,14 @@ async function redirectToSetupMiddleware(supabase: SupabaseClient, request: Next
     .eq("user_id", session?.user.id)
     .single()
 
+  console.log("redirectToSetupMiddleware: profile", profile)
+
   if (!profile) {
+    console.log("redirectToSetupMiddleware: no profile")
     throw new Error(error?.message)
   }
+
+  console.log("redirectToSetupMiddleware: has_onboarded", profile.has_onboarded)
 
   if (!profile.has_onboarded) {
     return NextResponse.redirect(new URL("/setup", request.url))
