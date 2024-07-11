@@ -44,7 +44,7 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
   }
 
   const callSelectTool = (tool: Tables<"tools">) => {
-    if (validatePlanForTools(profile, [tool])) {
+    if (validatePlanForTools(profile, [tool], chatSettings?.model)) {
       setIsPaywallOpen(true)
       return
     }

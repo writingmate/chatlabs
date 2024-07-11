@@ -19,6 +19,7 @@ import {
   validatePlanForAssistant,
   validatePlanForTools
 } from "@/lib/subscription"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface SidebarItemProps {
   item: DataItemType
@@ -46,11 +47,12 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     selectedWorkspace,
     profile,
     selectedAssistant,
-    selectedTools,
     chatFiles,
     newMessageFiles,
     setIsPaywallOpen
   } = useContext(ChatbotUIContext)
+
+  const { chatSettings, selectedTools } = useContext(ChatbotUIChatContext)
 
   const router = useRouter()
 
@@ -116,7 +118,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       return router.push(`/chat`)
     },
     tools: async (item: any) => {
-      if (!validatePlanForTools(profile, [item])) {
+      if (!validatePlanForTools(profile, [item], chatSettings?.model)) {
         setIsPaywallOpen(true)
         return
       }

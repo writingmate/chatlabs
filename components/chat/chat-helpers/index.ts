@@ -24,7 +24,12 @@ import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { SubscriptionRequiredError } from "@/lib/errors"
-import { validatePlanForAssistant, validateProPlan } from "@/lib/subscription"
+import {
+  validatePlanForAssistant,
+  validatePlanForModel,
+  validatePlanForTools,
+  validateProPlan
+} from "@/lib/subscription"
 import { encode } from "gpt-tokenizer"
 
 export const validateChatSettings = (
@@ -48,23 +53,13 @@ export const validateChatSettings = (
     throw new Error("Message content not found")
   }
 
-  if (selectedAssistant) {
-    if (validatePlanForAssistant(profile, selectedAssistant)) {
-      return
-    }
-
-    throw new SubscriptionRequiredError(
-      "Subscription required to use assistants"
-    )
-  }
-
-  if (!validateProPlan(profile) && modelData.paid) {
+  if (!validatePlanForModel(profile, modelData.modelId)) {
     throw new SubscriptionRequiredError(
       "Subscription required to use this model"
     )
   }
 
-  if (!validateProPlan(profile) && selectedTools?.length > 0) {
+  if (!validatePlanForTools(profile, selectedTools, modelData.modelId)) {
     throw new SubscriptionRequiredError("Subscription required to use tools")
   }
 }

@@ -81,6 +81,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
     <div className={cn("flex items-center space-x-1", className)}>
       {selectedModel?.tools && (
         <ToolSelect
+          selectedModelId={chatSettings.model}
           selectedTools={selectedTools}
           onSelectTools={setSelectedTools}
         />

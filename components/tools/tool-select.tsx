@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils"
 
 interface ToolSelectProps {
   className?: string
+  selectedModelId: LLMID
   selectedTools: Tables<"tools">[]
   onSelectTools: (tools: Tables<"tools">[]) => void
 }
@@ -36,6 +37,7 @@ function ToolDetails({ tool }: { tool: Tables<"tools"> }) {
 }
 
 export const ToolSelect: FC<ToolSelectProps> = ({
+  selectedModelId,
   selectedTools,
   onSelectTools,
   className
@@ -65,7 +67,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
     }
   }
   function handleSelectTool(tool: Tables<"tools">, selected: boolean) {
-    if (!validatePlanForTools(profile, [tool])) {
+    if (!validatePlanForTools(profile, [tool], selectedModelId)) {
       setIsPaywallOpen(true)
       return
     }
@@ -118,7 +120,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="relative mx-2 -ml-[140px] flex max-h-[300px] overflow-auto p-2"
+        className="relative mx-2 flex max-h-[300px] overflow-auto p-2 sm:-ml-[140px]"
         // style={{ width: triggerRef.current?.offsetWidth }}
       >
         <ToolDetails tool={hoveredTool} />

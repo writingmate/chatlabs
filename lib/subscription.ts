@@ -68,7 +68,11 @@ export function validatePlanForAssistant(
 
 export function validatePlanForTools(
   profile: Tables<"profiles"> | null,
-  tools: any[]
+  tools: any[],
+  model?: LLMID
 ) {
+  if (model && validatePlanForModel(profile, model)) {
+    return true
+  }
   return validateProPlan(profile)
 }
