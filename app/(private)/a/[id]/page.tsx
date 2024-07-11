@@ -25,6 +25,7 @@ export default async function AssistantPage({
     <ChatbotUIChatProvider id={"one"}>
       <ChatUI showModelSelector={false} assistant={assistant} />
       <PlanPicker />
+      {user?.data?.user ? null : <LoginDialog />}
     </ChatbotUIChatProvider>
   )
 }
