@@ -2,42 +2,91 @@
 
 import { Brand } from "@/components/ui/brand"
 import { Button } from "@/components/ui/button"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase/browser-client"
 import { GoogleSVG } from "@/components/icons/google-svg"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTheme } from "next-themes"
 import { Input } from "@/components/ui/input"
 import { IconMail } from "@tabler/icons-react"
 import { Separator } from "@/components/ui/separator"
+import { toast } from "sonner"
 
-export default function LoginForm({ redirectTo }: { redirectTo?: string }) {
+export default function LoginForm({
+  redirectTo,
+  popup = false
+}: {
+  redirectTo?: string
+  popup?: boolean
+}) {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [disabled, setDisabled] = useState(false)
 
   const { theme } = useTheme()
 
-  const redirect_to = redirectTo ? `next=${redirectTo}` : ""
+  const callbackRedirectSearchParams = new URLSearchParams()
+  if (redirectTo) {
+    callbackRedirectSearchParams.append("next", redirectTo)
+  }
+  if (popup) {
+    callbackRedirectSearchParams.append("popup", "true")
+  }
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === "AUTH_COMPLETE") {
+        if (event.data.error) {
+          console.error("Authentication failed")
+          toast.error(event.data.error)
+        } else {
+          console.log("Authentication successful")
+          router.refresh()
+        }
+      }
+    }
+
+    window.addEventListener("message", handleMessage)
+    return () => window.removeEventListener("message", handleMessage)
+  }, [])
+
+  const openAuthPopup = (url: string) => {
+    const width = 500
+    const height = 600
+    const popupUrl = new URL(url)
+    if (popup) {
+      popupUrl.searchParams.append("popup", "true")
+    }
+    const left = window.screenX + (window.outerWidth - width) / 2
+    const top = window.screenY + (window.outerHeight - height) / 2
+    const features = `width=${width},height=${height},left=${left},top=${top}`
+    console.log(popupUrl.toString())
+    window.open(popupUrl.toString(), "Auth", features)
+  }
 
   const handleOAuthLogin = async (provider: "azure" | "google") => {
     setDisabled(true)
 
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         scopes: "email",
-        redirectTo: `${window.location.origin}/auth/callback?${redirect_to}`
+        redirectTo: `${window.location.origin}/auth/callback?${callbackRedirectSearchParams.toString()}`,
+        skipBrowserRedirect: popup
       }
     })
 
     setDisabled(false)
 
     if (error) {
-      return router.push(`/login?message=${error.message}&${redirect_to}`)
+      return router.push(
+        `/login?message=${error.message}&${callbackRedirectSearchParams.toString()}`
+      )
     }
 
-    // Add any additional logic needed after successful login
+    if (popup && data.url) {
+      openAuthPopup(data.url)
+    }
   }
 
   async function handleEmailLogin(e: React.FormEvent<HTMLButtonElement>) {
@@ -46,7 +95,7 @@ export default function LoginForm({ redirectTo }: { redirectTo?: string }) {
     const { error } = await supabase.auth.signInWithOtp({
       email: email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm?${redirect_to}`
+        emailRedirectTo: `${window.location.origin}/auth/confirm?${callbackRedirectSearchParams.toString()}`
       }
     })
 

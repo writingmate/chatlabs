@@ -24,7 +24,7 @@ export default function LoginDialog({ redirectTo }: { redirectTo?: string }) {
         ></div>
       </DialogTrigger>
       <DialogContent className={"rounded-xl"}>
-        <LoginForm redirectTo={redirectTo} />
+        <LoginForm redirectTo={redirectTo} popup={true} />
       </DialogContent>
     </Dialog>
   )
