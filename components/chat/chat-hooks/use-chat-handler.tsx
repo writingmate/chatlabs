@@ -6,10 +6,9 @@ import { updateChat } from "@/db/chats"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { Tables } from "@/supabase/types"
-import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
+import { ChatMessage, ChatPayload, LLMID } from "@/types"
 import { redirect, useRouter } from "next/navigation"
 import { useContext, useEffect, useRef } from "react"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import {
   createTempMessages,
   handleCreateChat,
@@ -33,8 +32,7 @@ export const useChatHandler = () => {
     profile,
     selectedWorkspace,
     setChats,
-    availableLocalModels,
-    availableOpenRouterModels,
+    allModels,
     newMessageImages,
     selectedAssistant,
     chatImages,
@@ -73,7 +71,9 @@ export const useChatHandler = () => {
     chatFileItems,
     setChatFileItems,
     selectedTools,
-    setChatSettings
+    setChatSettings,
+    selectedHtmlElements,
+    setSelectedHtmlElements
   } = useContext(ChatbotUIChatContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
@@ -105,6 +105,7 @@ export const useChatHandler = () => {
     setShowFilesDisplay(false)
     setIsPromptPickerOpen(false)
     setIsFilePickerOpen(false)
+    setSelectedHtmlElements([])
 
     // setSelectedTools([])
     setToolInUse("none")
@@ -197,25 +198,14 @@ export const useChatHandler = () => {
       setIsPromptPickerOpen(false)
       setIsFilePickerOpen(false)
       setNewMessageImages([])
+      setSelectedHtmlElements([])
 
       const newAbortController = new AbortController()
       setAbortController(newAbortController)
 
-      const modelData = [
-        ...models.map(model => ({
-          modelId: model.model_id as LLMID,
-          modelName: model.name,
-          provider: "custom" as ModelProvider,
-          hostedId: model.id,
-          platformLink: "",
-          imageInput: false,
-          supportsStreaming: false,
-          tools: false
-        })),
-        ...LLM_LIST,
-        ...availableLocalModels,
-        ...availableOpenRouterModels
-      ].find(llm => llm.modelId === chatSettings?.model)
+      const modelData = allModels.find(
+        llm => llm.modelId === chatSettings?.model
+      )
 
       validateChatSettings(
         chatSettings,
@@ -267,7 +257,8 @@ export const useChatHandler = () => {
           : [...chatMessages, tempUserChatMessage],
         assistant: selectedAssistant,
         messageFileItems: retrievedFileItems,
-        chatFileItems: chatFileItems
+        chatFileItems: chatFileItems,
+        messageHtmlElements: selectedHtmlElements
       }
 
       let generatedText = ""

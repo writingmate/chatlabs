@@ -9,6 +9,7 @@ import {
   useState,
   useEffect
 } from "react"
+import { MessageHtmlElement } from "@/types/html"
 
 interface ChatbotUIChatContext {
   // PASSIVE CHAT STORE
@@ -42,6 +43,9 @@ interface ChatbotUIChatContext {
 
   selectedTools: Tables<"tools">[]
   setSelectedTools: Dispatch<SetStateAction<Tables<"tools">[]>>
+
+  selectedHtmlElements: MessageHtmlElement[]
+  setSelectedHtmlElements: Dispatch<SetStateAction<MessageHtmlElement[]>>
 }
 
 export const ChatbotUIChatContext = createContext<ChatbotUIChatContext>({
@@ -75,7 +79,10 @@ export const ChatbotUIChatContext = createContext<ChatbotUIChatContext>({
   setResponseTokensTotal: () => {},
 
   selectedTools: [],
-  setSelectedTools: () => {}
+  setSelectedTools: () => {},
+
+  selectedHtmlElements: [],
+  setSelectedHtmlElements: () => {}
 })
 
 interface ChatbotUIChatProviderProps {
@@ -129,6 +136,10 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
 
   const [selectedTools, setSelectedTools] = useState<Tables<"tools">[]>([])
 
+  const [selectedHtmlElements, setSelectedHtmlElements] = useState<
+    MessageHtmlElement[]
+  >([])
+
   useEffect(() => {
     if (chatSettings) {
       localStorage.setItem(chatSettingsKey, JSON.stringify(chatSettings))
@@ -168,7 +179,10 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
         setRequestTokensTotal,
 
         selectedTools,
-        setSelectedTools
+        setSelectedTools,
+
+        selectedHtmlElements,
+        setSelectedHtmlElements
       }}
     >
       {children}

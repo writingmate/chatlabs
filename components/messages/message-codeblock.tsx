@@ -139,9 +139,8 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
     const [iframeHeight, setIframeHeight] = useState<number | null>(null)
 
-    const { chatMessages, setUserInput } = useContext(ChatbotUIChatContext)
-
-    // const { handleScroll, messagesEndRef, scrollToBottom } = useScroll()
+    const { chatMessages, setSelectedHtmlElements } =
+      useContext(ChatbotUIChatContext)
 
     const { handleSendMessage } = useChatHandler()
 
@@ -190,7 +189,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
     const highlightScript = `
       <script>
-        let inspectModeEnabled = false;
+        let inspectModeEnabled = ${inspectMode ? "true" : "false"};
 
         function initializeHighlighting() {
           function getXPath(element) {
@@ -212,10 +211,14 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               }
             }
           }
+          
+          let lastHighlightedElementCursor = null;
 
           function handleMouseOver(e) {
             if (!inspectModeEnabled) return;
             if (e.target.style) {
+              lastHighlightedElementCursor = e.target.style.cursor;  
+              e.target.style.cursor = 'pointer';
               e.target.style.outline = '2px dashed fuchsia';
             }
           }
@@ -223,6 +226,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           function handleMouseOut(e) {
             if (!inspectModeEnabled) return;
             if (e.target.style) {
+              e.target.style.cursor = lastHighlightedElementCursor;
               e.target.style.outline = '';
             }
           }
@@ -230,11 +234,12 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           function handleClick(e) {
             if (!inspectModeEnabled) return;
             e.preventDefault();
-            var xpath = getXPath(e.target);
-            console.log('Element clicked:', e, xpath);
+            e.stopPropagation();
+            let xpath = getXPath(e.target);
             window.parent.postMessage({
               type: 'elementClicked',
-              xpath: xpath
+              xpath: xpath,
+              innerText: e.target.innerText
             }, '*');
           }
 
@@ -288,7 +293,9 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
             `Error: ${event.data.message}\nLine: ${event.data.lineno}, Column: ${event.data.colno}`
           )
         } else if (event.data.type === "elementClicked") {
-          setUserInput(event.data.xpath)
+          setSelectedHtmlElements([
+            { xpath: event.data.xpath, innerText: event.data.innerText }
+          ])
         }
       }
       window.addEventListener("message", receiveMessage)
@@ -315,6 +322,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     useEffect(() => {
       if (isGenerating) {
         setExecute(false)
+        setInspectMode(false)
       }
     }, [isGenerating])
 

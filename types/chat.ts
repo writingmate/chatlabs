@@ -1,5 +1,6 @@
 import { Tables } from "@/supabase/types"
 import { ChatMessage, LLMID } from "."
+import { MessageHtmlElement } from "@/types/html"
 
 export interface ChatSettings {
   model: LLMID
@@ -20,6 +21,7 @@ export interface ChatPayload {
   assistant: Tables<"assistants"> | null
   messageFileItems: Tables<"file_items">[]
   chatFileItems: Tables<"file_items">[]
+  messageHtmlElements: MessageHtmlElement[]
 }
 
 export interface ChatAPIPayload {

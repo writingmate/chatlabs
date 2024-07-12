@@ -25,8 +25,7 @@ import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
 import { toast } from "sonner"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { ChatbotUIChatContext } from "@/context/chat"
-import Lib from "@apidevtools/json-schema-ref-parser/lib"
-import Link from "next/link"
+import { ChatSelectedHtmlElements } from "@/components/chat/chat-selected-html-elements"
 
 interface ChatInputProps {
   showAssistant: boolean
@@ -281,6 +280,7 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
     <div className={"relative"}>
       <ChatFilesDisplay />
       <ChatCommandInput />
+      <ChatSelectedHtmlElements />
       <div className="border-input bg-background flex w-full flex-col justify-end overflow-hidden rounded-xl border">
         {showAssistant && selectedAssistant && (
           <div className="bg-accent border-input flex items-center justify-between space-x-2 border-b p-2 pl-4 pr-3">

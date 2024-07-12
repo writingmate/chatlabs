@@ -27,6 +27,6 @@ export function guessFileExtensionByContentType(contentType: string) {
       return "pptx"
     default:
       console.log("Unknown content type", contentType)
-      return contentType.split("/").pop()
+      return contentType.split("/").pop() || contentType
   }
 }

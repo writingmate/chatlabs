@@ -2,6 +2,7 @@ import { Tables } from "@/supabase/types"
 import { ChatPayload, MessageImage } from "@/types"
 import { encode } from "gpt-tokenizer"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
+import { MessageHtmlElement } from "@/types/html"
 
 export const DEFAULT_SYSTEM_PROMPT = `Today is {local_date}.
 User info: "{profile_context}"
@@ -53,7 +54,8 @@ export async function buildFinalMessages(
     chatMessages,
     assistant,
     messageFileItems,
-    chatFileItems
+    chatFileItems,
+    messageHtmlElements
   } = payload
 
   let BUILT_PROMPT = buildBasePrompt(
@@ -224,6 +226,17 @@ export async function buildFinalMessages(
     }
   }
 
+  if (messageHtmlElements.length > 0) {
+    const elementsText = buildElementsText(messageHtmlElements)
+
+    finalMessages[finalMessages.length - 1] = {
+      ...finalMessages[finalMessages.length - 1],
+      content: `${
+        finalMessages[finalMessages.length - 1].content
+      }\n\n${elementsText}`
+    }
+  }
+
   return { finalMessages, usedTokens }
 }
 
@@ -233,6 +246,16 @@ function buildRetrievalText(fileItems: Tables<"file_items">[]) {
     .join("\n\n")
 
   return `You may use the following sources if needed to answer the user's question. If you don't know the answer, say "I don't know."\n\n${retrievalText}`
+}
+
+function buildElementsText(elements: MessageHtmlElement[]) {
+  const elementsText = elements
+    .map(element => {
+      return `<BEGIN SOURCE>\n${element.xpath}\n</END SOURCE>`
+    })
+    .join("\n\n")
+
+  return `User selected the following html elements \n\n${elementsText}. Please apply the changes to the code accordingly.`
 }
 
 export async function buildGoogleGeminiFinalMessages(
