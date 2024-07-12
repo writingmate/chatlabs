@@ -1,8 +1,8 @@
 import { Label } from "@/components/ui/label"
-import { IconPlus, IconTrash } from "@tabler/icons-react"
+import { IconTrash } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const MAX_CONVERSATION_STARTERS = 10
 
@@ -13,27 +13,40 @@ export function AssistantConversationStarters({
   value: Array<string>
   onChange: (value: Array<string>) => void
 }) {
+  const [starters, setStarters] = useState(value)
   const [newStarter, setNewStarter] = useState("")
 
-  const onAddConversationStarter = () => {
-    if (newStarter.trim() && value.length < MAX_CONVERSATION_STARTERS) {
-      onChange([...value, newStarter.trim()])
-      setNewStarter("")
-    }
+  useEffect(() => {
+    onChange(starters.filter(starter => starter.trim() !== ""))
+  }, [starters, onChange])
+
+  const onChangeConversationStarter = (index: number, newValue: string) => {
+    setStarters(prev => {
+      const updated = [...prev]
+      updated[index] = newValue
+      return updated
+    })
   }
 
   const onRemoveConversationStarter = (index: number) => {
-    onChange(value.filter((_, i) => i !== index))
+    setStarters(prev => prev.filter((_, i) => i !== index))
   }
 
-  const onChangeConversationStarter = (index: number, newValue: string) => {
-    onChange(value.map((item, i) => (i === index ? newValue : item)))
+  const addNewStarter = () => {
+    if (newStarter.trim() && starters.length < MAX_CONVERSATION_STARTERS) {
+      setStarters(prev => [...prev, newStarter.trim()])
+      setNewStarter("")
+    }
   }
 
   return (
     <div className="flex flex-col space-y-1 pt-2">
       <Label>Conversation Starters</Label>
-      {value.map((conversationStarter, index) => (
+      <div className="text-foreground/80 text-xs">
+        Add conversation starters to help users get started. Max 4 shown at
+        once. If more than 4, they will be randomly selected.
+      </div>
+      {starters.map((conversationStarter, index) => (
         <div key={index} className="flex space-x-1">
           <Input
             value={conversationStarter}
@@ -48,7 +61,7 @@ export function AssistantConversationStarters({
           </Button>
         </div>
       ))}
-      {value.length < MAX_CONVERSATION_STARTERS && (
+      {starters.length < MAX_CONVERSATION_STARTERS && (
         <div className="flex space-x-1">
           <Input
             className="w-full"
@@ -57,17 +70,11 @@ export function AssistantConversationStarters({
             onChange={e => setNewStarter(e.target.value)}
             onKeyPress={e => {
               if (e.key === "Enter") {
-                onAddConversationStarter()
+                addNewStarter()
               }
             }}
+            onBlur={addNewStarter}
           />
-          <Button
-            size="icon"
-            onClick={onAddConversationStarter}
-            disabled={value.length >= MAX_CONVERSATION_STARTERS}
-          >
-            <IconPlus stroke={1.5} size={18} />
-          </Button>
         </div>
       )}
     </div>

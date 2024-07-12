@@ -324,13 +324,12 @@ export const ChatUI: React.FC<ChatUIProps> = ({
             previewContent && "w-full lg:w-[calc(50%-2rem)]"
           )}
         />
-        {previewContent && (
-          <ChatPreviewContent
-            isGenerating={isGenerating}
-            content={previewContent}
-            onPreviewContent={handlePreviewContent}
-          />
-        )}
+
+        <ChatPreviewContent
+          isGenerating={isGenerating}
+          content={previewContent}
+          onPreviewContent={handlePreviewContent}
+        />
       </div>
     </div>
   )

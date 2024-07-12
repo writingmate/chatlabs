@@ -33,6 +33,7 @@ import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { MessageSharingDialog } from "@/components/messages/message-sharing-dialog"
 import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
+import { Switch } from "@/components/ui/switch"
 
 interface MessageCodeBlockProps {
   isGenerating?: boolean
@@ -114,6 +115,8 @@ export function CopyButton({
   )
 }
 
+const MemoizedCodeHighlighter = memo(SyntaxHighlighter)
+
 export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
   ({
     language,
@@ -127,28 +130,19 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     const { user } = useAuth()
     const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
     const [sharing, setSharing] = useState(false)
-
+    const [inspectMode, setInspectMode] = useState(false)
     const [execute, setExecute] = useState(false)
     const [error, setError] = useState<string | null>(null)
-
-    const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
     const [uniqueIFrameId] = useState(generateRandomString(6, true))
 
     const [iframeHeight, setIframeHeight] = useState<number | null>(null)
 
-    const { chatMessages } = useContext(ChatbotUIChatContext)
+    const { chatMessages, setUserInput } = useContext(ChatbotUIChatContext)
 
     // const { handleScroll, messagesEndRef, scrollToBottom } = useScroll()
 
     const { handleSendMessage } = useChatHandler()
-
-    // useEffect(() => {
-    //   if (execute || !value) {
-    //     return
-    //   }
-    //   scrollToBottom()
-    // }, [execute, value])
 
     const downloadAsFile = () => {
       if (typeof window === "undefined") {
@@ -177,23 +171,6 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       URL.revokeObjectURL(url)
     }
 
-    const sendHeightJS = `
-    <script>
-    function sendHeight() {
-      const height = document.body.scrollHeight;
-      if (height !== window.lastSentHeight) {
-        window.parent.postMessage({
-          type: "resize",
-          height: height
-        }, "*");
-        window.lastSentHeight = height;
-      }
-    }
-    window.addEventListener('load', sendHeight);
-    new ResizeObserver(sendHeight).observe(document.body);
-    </script>
-    `
-
     const errorHandlingScript = `
       <script>
         window.onerror = function(message, source, lineno, colno, error) {
@@ -210,19 +187,94 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       </script>
     `
 
+    const highlightScript = `
+      <script>
+        let inspectModeEnabled = false;
+
+        function initializeHighlighting() {
+          function getXPath(element) {
+            if (element.id !== "") {
+              return 'id("' + element.id + '")';
+            }
+            if (element === document.body) {
+              return element.tagName.toLowerCase();
+            }
+            var ix = 0;
+            var siblings = element.parentNode.childNodes;
+            for (var i = 0; i < siblings.length; i++) {
+              var sibling = siblings[i];
+              if (sibling === element) {
+                return getXPath(element.parentNode) + '/' + element.tagName.toLowerCase() + '[' + (ix + 1) + ']';
+              }
+              if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
+                ix++;
+              }
+            }
+          }
+
+          function handleMouseOver(e) {
+            if (!inspectModeEnabled) return;
+            if (e.target.style) {
+              e.target.style.outline = '2px dashed fuchsia';
+            }
+          }
+
+          function handleMouseOut(e) {
+            if (!inspectModeEnabled) return;
+            if (e.target.style) {
+              e.target.style.outline = '';
+            }
+          }
+
+          function handleClick(e) {
+            if (!inspectModeEnabled) return;
+            e.preventDefault();
+            var xpath = getXPath(e.target);
+            console.log('Element clicked:', e, xpath);
+            window.parent.postMessage({
+              type: 'elementClicked',
+              xpath: xpath
+            }, '*');
+          }
+
+          document.body.addEventListener('mouseover', handleMouseOver);
+          document.body.addEventListener('mouseout', handleMouseOut);
+          document.body.addEventListener('click', handleClick);
+        }
+
+        window.addEventListener('message', function(event) {
+          if (event.data.type === 'toggleInspectMode') {
+            inspectModeEnabled = event.data.enabled;
+            if (!inspectModeEnabled) {
+              // Clear any remaining outlines when disabling inspect mode
+              document.querySelectorAll('*').forEach(el => {
+                if (el.style) el.style.outline = '';
+              });
+            }
+          }
+        });
+
+        // Run the initialization function when the DOM is fully loaded
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initializeHighlighting);
+        } else {
+          initializeHighlighting();
+        }
+      </script>
+    `
+
     function addScriptsToHtml(html: string) {
       const parser = new DOMParser()
       const doc = parser.parseFromString(html, "text/html")
-      const head = doc.querySelector("head")
-      if (head) {
-        head.innerHTML = errorHandlingScript + head.innerHTML
-      }
       const body = doc.querySelector("body")
       if (body) {
-        body.innerHTML += sendHeightJS
-        return doc.documentElement.outerHTML
+        body.innerHTML = [
+          body.innerHTML,
+          errorHandlingScript,
+          highlightScript
+        ].join("")
       }
-      return html
+      return doc.documentElement.outerHTML
     }
 
     useEffect(() => {
@@ -234,13 +286,30 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           setError(
             `Error: ${event.data.message}\nLine: ${event.data.lineno}, Column: ${event.data.colno}`
           )
+        } else if (event.data.type === "elementClicked") {
+          setUserInput(event.data.xpath)
         }
       }
       window.addEventListener("message", receiveMessage)
       return () => {
         window.removeEventListener("message", receiveMessage)
       }
-    }, [])
+    }, [chatMessages, uniqueIFrameId])
+
+    useEffect(() => {
+      const iframe = document.querySelector(
+        `iframe[data-id="${uniqueIFrameId}"]`
+      ) as HTMLIFrameElement
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage(
+          {
+            type: "toggleInspectMode",
+            enabled: inspectMode
+          },
+          "*"
+        )
+      }
+    }, [execute, inspectMode, uniqueIFrameId])
 
     useEffect(() => {
       if (isGenerating) {
@@ -251,6 +320,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     return useMemo(
       () => (
         <div
+          // ref={codeBlockRef}
           className={cn(
             "codeblock relative flex size-full flex-col overflow-hidden rounded-xl bg-zinc-950 font-sans shadow-lg",
             className
@@ -294,16 +364,18 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                     </ToggleGroupItem>
                   </ToggleGroup>
                   {language == "html" && (
-                    <Button
-                      disabled={isGenerating}
-                      title={"Share you app with others"}
-                      className="bg-transparent px-2 text-xs text-white hover:opacity-50"
-                      onClick={() => setSharing(true)}
-                      variant="outline"
-                      size="xs"
-                    >
-                      <IconWorld className={"mr-1"} size={16} /> Share
-                    </Button>
+                    <>
+                      <Button
+                        disabled={isGenerating}
+                        title={"Share you app with others"}
+                        className="bg-transparent px-2 text-xs text-white hover:opacity-50"
+                        onClick={() => setSharing(true)}
+                        variant="outline"
+                        size="xs"
+                      >
+                        <IconWorld className={"mr-1"} size={16} /> Share
+                      </Button>
+                    </>
                   )}
                 </>
               )}
@@ -339,36 +411,45 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
             // onScroll={handleScroll}
           >
             {execute ? (
-              <iframe
-                className={"size-full min-h-[480px] border-none bg-white"}
-                srcDoc={
-                  language === "html"
-                    ? addScriptsToHtml(value)
-                    : `<html lang="en"><body>${errorHandlingScript}<script>${value}</script>${sendHeightJS}</body></html>`
-                }
-              />
-            ) : (
               <>
-                <SyntaxHighlighter
-                  language={language}
-                  style={oneDark}
-                  customStyle={{
-                    overflowY: "auto",
-                    margin: 0,
-                    height: "100%",
-                    background: "transparent",
-                    padding: "1rem"
-                  }}
-                  codeTagProps={{
-                    style: {
-                      fontSize: "14px",
-                      fontFamily: "var(--font-mono)"
-                    }
-                  }}
-                >
-                  {value.trim()}
-                </SyntaxHighlighter>
+                <iframe
+                  data-id={uniqueIFrameId}
+                  className={"size-full min-h-[480px] border-none bg-white"}
+                  srcDoc={
+                    language === "html"
+                      ? addScriptsToHtml(value)
+                      : `<html lang="en"><body>${errorHandlingScript}<script>${value}</script></body></html>`
+                  }
+                />
+                <div className="absolute right-3 top-2 flex items-center space-x-2">
+                  <Switch
+                    checked={inspectMode}
+                    onCheckedChange={setInspectMode}
+                    disabled={!execute}
+                  />
+                  <span className="text-xs">Inspect</span>
+                </div>
               </>
+            ) : (
+              <MemoizedCodeHighlighter
+                language={language}
+                style={oneDark}
+                customStyle={{
+                  overflowY: "auto",
+                  margin: 0,
+                  height: "100%",
+                  background: "transparent",
+                  padding: "1rem"
+                }}
+                codeTagProps={{
+                  style: {
+                    fontSize: "14px",
+                    fontFamily: "var(--font-mono)"
+                  }
+                }}
+              >
+                {value.trim()}
+              </MemoizedCodeHighlighter>
             )}
           </div>
           {error && (
@@ -413,6 +494,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
         </div>
       ),
       [
+        inspectMode,
         isGenerating,
         language,
         value,

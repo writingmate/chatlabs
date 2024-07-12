@@ -13,7 +13,7 @@ export function ConversationStarters({
   const hash = values?.sort().join("")
 
   return useMemo(() => {
-    const trimmedValues = values
+    const trimmedValues = [...(values ?? [])]
       // randomize the order
       ?.sort(() => Math.random() - 0.5)
       // pick the first {MAX_CONVERSATION_STARTERS} starters
