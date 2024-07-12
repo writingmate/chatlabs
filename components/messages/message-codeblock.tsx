@@ -34,6 +34,7 @@ import { ChatbotUIChatContext } from "@/context/chat"
 import { MessageSharingDialog } from "@/components/messages/message-sharing-dialog"
 import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
 import { Switch } from "@/components/ui/switch"
+import Loading from "@/components/ui/loading"
 
 interface MessageCodeBlockProps {
   isGenerating?: boolean
@@ -450,6 +451,11 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               >
                 {value.trim()}
               </MemoizedCodeHighlighter>
+            )}
+            {isGenerating && (
+              <div className={"absolute right-3 top-0 size-10 text-white"}>
+                <Loading />
+              </div>
             )}
           </div>
           {error && (
