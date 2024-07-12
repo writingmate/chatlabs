@@ -57,6 +57,7 @@ export async function GET(request: Request) {
       return NextResponse.redirect(requestUrl.origin + `/${next || ""}`)
     }
   } catch (error) {
+    console.error("Error in callback route:", error)
     return NextResponse.json(error)
   }
 }
