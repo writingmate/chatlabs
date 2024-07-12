@@ -87,6 +87,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     useChatHandler()
   const { handleSelectPromptWithVariables } = usePromptAndCommand()
   const {
+    scrollRef,
     messagesStartRef,
     messagesEndRef,
     handleScroll,
@@ -256,6 +257,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
 
   return (
     <div
+      ref={scrollRef}
       onScroll={handleScroll}
       className="relative flex size-full flex-1 flex-col overflow-hidden overflow-y-auto"
     >
@@ -297,10 +299,8 @@ export const ChatUI: React.FC<ChatUIProps> = ({
             ) : (
               <>
                 <div ref={messagesStartRef} />
-                <Virtualizer>
-                  <ChatMessages onPreviewContent={handlePreviewContent} />
-                </Virtualizer>
-                <div className="h-10 flex-1" ref={messagesEndRef} />
+                <ChatMessages onPreviewContent={handlePreviewContent} />
+                <div className="min-h-20 flex-1" ref={messagesEndRef} />
               </>
             )}
             <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">

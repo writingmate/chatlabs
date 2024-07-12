@@ -41,7 +41,7 @@ export default function LoginForm({
           toast.error(event.data.error)
         } else {
           console.log("Authentication successful")
-          router.refresh()
+          window.location.reload()
         }
       }
     }

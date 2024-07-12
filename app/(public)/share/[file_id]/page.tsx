@@ -86,7 +86,7 @@ const SharePage = async ({
               className={"font-semibold hover:underline"}
               href={`https://labs.writingmate.ai/?utm_source=app_share&utm_medium=${file_id}`}
             >
-              ChatLabs No Code App Builder
+              ChatLabs
             </a>
             <IconExternalLink stroke={1.5} size={16} />
           </div>

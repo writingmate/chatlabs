@@ -14,6 +14,7 @@ export const useScroll = () => {
 
   const messagesStartRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const isAutoScrolling = useRef(false)
 
   const [isAtTop, setIsAtTop] = useState(false)
@@ -56,12 +57,20 @@ export const useScroll = () => {
   }, [])
 
   function scrollIntoView() {
-    if (messagesStartRef.current) {
+    if (messagesEndRef.current) {
       if (window.self !== window.top) {
-        document.documentElement.scrollTop = messagesStartRef.current?.offsetTop
+        console.log(
+          "scrolling to top",
+          messagesEndRef.current?.offsetTop,
+          document.documentElement.scrollTop
+        )
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = messagesEndRef.current?.offsetTop
+          return
+        }
         return
       }
-      messagesStartRef.current.scrollIntoView({ behavior: "instant" })
+      messagesEndRef.current.scrollIntoView({ behavior: "instant" })
     }
   }
 
@@ -81,6 +90,7 @@ export const useScroll = () => {
   }, [])
 
   return {
+    scrollRef,
     messagesStartRef,
     messagesEndRef,
     isAtTop,

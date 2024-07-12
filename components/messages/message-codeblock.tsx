@@ -142,7 +142,17 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
     const { chatMessages } = useContext(ChatbotUIChatContext)
 
+    const { handleScroll, messagesEndRef, scrollToBottom } = useScroll()
+
     const { handleSendMessage } = useChatHandler()
+
+    useEffect(() => {
+      if (execute || !value) {
+        return
+      }
+
+      scrollToBottom()
+    }, [execute, value])
 
     const downloadAsFile = () => {
       if (typeof window === "undefined") {
@@ -221,14 +231,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
     useEffect(() => {
       const receiveMessage = (event: MessageEvent) => {
-        if (event.data.type === "resize") {
-          if (resizeTimeoutRef.current) {
-            clearTimeout(resizeTimeoutRef.current)
-          }
-          resizeTimeoutRef.current = setTimeout(() => {
-            setIframeHeight(event.data.height)
-          }, 200) // Throttle to 200ms
-        } else if (
+        if (
           event.data.type === "error" &&
           event.data.iframeId === uniqueIFrameId
         ) {
@@ -240,9 +243,6 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       window.addEventListener("message", receiveMessage)
       return () => {
         window.removeEventListener("message", receiveMessage)
-        if (resizeTimeoutRef.current) {
-          clearTimeout(resizeTimeoutRef.current)
-        }
       }
     }, [])
 
@@ -370,7 +370,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           )}
           <div
             className="relative h-[calc(100%-40px)] w-full overflow-auto"
-            // onScroll={handleScroll}
+            onScroll={handleScroll}
           >
             {execute ? (
               <iframe
@@ -402,7 +402,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                 >
                   {value.trim()}
                 </SyntaxHighlighter>
-                {/*<div ref={messagesEndRef} />*/}
+                <div ref={messagesEndRef} />
               </div>
             )}
           </div>
