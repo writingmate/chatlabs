@@ -9,7 +9,7 @@ import {
 } from "react"
 import { ChatbotUIChatContext } from "@/context/chat"
 
-export const useScroll = () => {
+export const useScroll = (scrollParams: any = {}) => {
   const { isGenerating, chatMessages } = useContext(ChatbotUIChatContext)
 
   const messagesStartRef = useRef<HTMLDivElement>(null)
@@ -59,18 +59,16 @@ export const useScroll = () => {
   function scrollIntoView() {
     if (messagesEndRef.current) {
       if (window.self !== window.top) {
-        console.log(
-          "scrolling to top",
-          messagesEndRef.current?.offsetTop,
-          document.documentElement.scrollTop
-        )
         if (scrollRef.current) {
           scrollRef.current.scrollTop = messagesEndRef.current?.offsetTop
           return
         }
         return
       }
-      messagesEndRef.current.scrollIntoView({ behavior: "instant" })
+      messagesEndRef.current.scrollIntoView({
+        behavior: "instant",
+        ...scrollParams
+      })
     }
   }
 

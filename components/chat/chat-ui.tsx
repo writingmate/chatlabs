@@ -290,7 +290,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
         {loading ? (
           <Loading />
         ) : (
-          <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col transition-[width]">
+          <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col">
             {chatMessages?.length === 0 ? (
               <EmptyChatView
                 selectedAssistant={selectedAssistant}
@@ -300,7 +300,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
               <>
                 <div ref={messagesStartRef} />
                 <ChatMessages onPreviewContent={handlePreviewContent} />
-                <div className="min-h-20 flex-1" ref={messagesEndRef} />
+                <div ref={messagesEndRef} className="min-h-20 flex-1" />
               </>
             )}
             <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">

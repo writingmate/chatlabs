@@ -46,6 +46,7 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
           filename={content.filename}
           value={code.join("\n")}
           showCloseButton={true}
+          autoScroll={true}
         />
       )}
     </div>

@@ -44,6 +44,7 @@ interface MessageCodeBlockProps {
   className?: string
   onClose?: () => void
   showCloseButton?: boolean
+  autoScroll?: boolean
 }
 
 interface languageMap {
@@ -126,7 +127,8 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     onClose,
     isGenerating,
     showCloseButton = false,
-    filename
+    filename,
+    autoScroll = false
   }) => {
     const { user } = useAuth()
     const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
@@ -141,6 +143,10 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
     const { chatMessages, setSelectedHtmlElements } =
       useContext(ChatbotUIChatContext)
+
+    const { messagesEndRef, handleScroll } = useScroll({
+      block: "end"
+    })
 
     const { handleSendMessage } = useChatHandler()
 
@@ -329,7 +335,6 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     return useMemo(
       () => (
         <div
-          // ref={codeBlockRef}
           className={cn(
             "codeblock relative flex size-full flex-col overflow-hidden rounded-xl bg-zinc-950 font-sans shadow-lg",
             className
@@ -450,11 +455,15 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                   background: "transparent",
                   padding: "1rem"
                 }}
+                preTagProps={{
+                  onScroll: handleScroll
+                }}
                 codeTagProps={{
                   style: {
                     fontSize: "14px",
                     fontFamily: "var(--font-mono)"
-                  }
+                  },
+                  ref: autoScroll && value ? messagesEndRef : undefined
                 }}
               >
                 {value.trim()}
