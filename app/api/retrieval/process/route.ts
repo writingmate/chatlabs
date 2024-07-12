@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const fileBuffer = Buffer.from(await file.arrayBuffer())
     const blob = new Blob([fileBuffer])
 
-    const fileExtension = file.type.split("/")?.[1]
+    const fileExtension = file.name.split(".").pop()?.toLowerCase()
 
     if (embeddingsProvider === "openai") {
       if (profile.use_azure_openai) {
