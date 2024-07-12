@@ -79,6 +79,9 @@ export const useChatHandler = () => {
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
+    if (window.top !== window.self) {
+      return
+    }
     if (!isPromptPickerOpen || !isFilePickerOpen || !isToolPickerOpen) {
       chatInputRef.current?.focus()
     }
