@@ -7,7 +7,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CopyButton } from "@/components/messages/message-codeblock"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { createFile } from "@/db/files"
@@ -36,6 +36,11 @@ export function MessageSharingDialog({
   const [filename, setFilename] = useState<string>(defaultFilename)
   const [loading, setLoading] = useState<boolean>(false)
   const [url, setUrl] = useState<string>("")
+
+  useEffect(() => {
+    setFilename(defaultFilename)
+    setUrl("")
+  }, [filename, fileContent])
 
   const handleShare = () => {
     if (!selectedWorkspace || !chatSettings || !user) {

@@ -25,17 +25,13 @@ import {
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { createFile } from "@/db/files"
 import { useAuth } from "@/context/auth"
 import { ChatbotUIContext } from "@/context/context"
-import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
-import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { MessageSharingDialog } from "@/components/messages/message-sharing-dialog"
-import { fi } from "date-fns/locale"
 
 interface MessageCodeBlockProps {
   isGenerating?: boolean
@@ -151,6 +147,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
         return
       }
 
+      console.log("scrolling to bottom")
       scrollToBottom()
     }, [execute, value])
 
@@ -256,7 +253,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       () => (
         <div
           className={cn(
-            "codeblock relative size-full overflow-hidden rounded-xl bg-zinc-950 font-sans shadow-lg",
+            "codeblock relative flex size-full flex-col overflow-hidden rounded-xl bg-zinc-950 font-sans shadow-lg",
             className
           )}
         >
@@ -338,8 +335,45 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               )}
             </div>
           </div>
+          <div
+            className="relative w-full flex-1 overflow-auto"
+            onScroll={handleScroll}
+          >
+            {execute ? (
+              <iframe
+                className={"size-full min-h-[480px] border-none bg-white"}
+                srcDoc={
+                  language === "html"
+                    ? addScriptsToHtml(value)
+                    : `<html lang="en"><body>${errorHandlingScript}<script>${value}</script>${sendHeightJS}</body></html>`
+                }
+              />
+            ) : (
+              <>
+                <SyntaxHighlighter
+                  language={language}
+                  style={oneDark}
+                  customStyle={{
+                    overflowY: "auto",
+                    margin: 0,
+                    height: "100%",
+                    background: "transparent",
+                    padding: "1rem"
+                  }}
+                  codeTagProps={{
+                    style: {
+                      fontSize: "14px",
+                      fontFamily: "var(--font-mono)"
+                    }
+                  }}
+                >
+                  {value.trim()}
+                </SyntaxHighlighter>
+              </>
+            )}
+          </div>
           {error && (
-            <div className="absolute bottom-0 z-10 max-h-[200px] w-full overflow-auto bg-red-100 px-3 py-2 text-sm text-red-800">
+            <div className="z-10 max-h-[200px] w-full overflow-auto bg-red-100 px-3 py-2 text-sm text-red-800">
               <div className={"flex h-6 items-center justify-between gap-1"}>
                 <Label>Console errors</Label>
                 <div className={"flex items-center justify-between space-x-2"}>
@@ -368,44 +402,6 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               </div>
             </div>
           )}
-          <div
-            className="relative h-[calc(100%-40px)] w-full overflow-auto"
-            onScroll={handleScroll}
-          >
-            {execute ? (
-              <iframe
-                className={"size-full min-h-[480px] border-none bg-white"}
-                srcDoc={
-                  language === "html"
-                    ? addScriptsToHtml(value)
-                    : `<html lang="en"><body>${errorHandlingScript}<script>${value}</script>${sendHeightJS}</body></html>`
-                }
-              />
-            ) : (
-              <div className={"size-full"}>
-                <SyntaxHighlighter
-                  language={language}
-                  style={oneDark}
-                  customStyle={{
-                    overflowY: "auto",
-                    margin: 0,
-                    height: "100%",
-                    background: "transparent",
-                    padding: "1rem"
-                  }}
-                  codeTagProps={{
-                    style: {
-                      fontSize: "14px",
-                      fontFamily: "var(--font-mono)"
-                    }
-                  }}
-                >
-                  {value.trim()}
-                </SyntaxHighlighter>
-                <div ref={messagesEndRef} />
-              </div>
-            )}
-          </div>
           <MessageSharingDialog
             open={sharing}
             setOpen={setSharing}
