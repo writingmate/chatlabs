@@ -40,7 +40,7 @@ export function MessageSharingDialog({
   useEffect(() => {
     setFilename(defaultFilename)
     setUrl("")
-  }, [filename, fileContent])
+  }, [fileContent])
 
   const handleShare = () => {
     if (!selectedWorkspace || !chatSettings || !user) {
