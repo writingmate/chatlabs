@@ -23,6 +23,7 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { ChatRetrievalSettings } from "./chat-retrieval-settings"
 import { XIcon } from "@/components/ui/x-icon"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { guessFileExtensionByContentType } from "@/lib/content-type"
 
 interface ChatFilesDisplayProps {}
 
@@ -167,7 +168,9 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
 
                   <div className="truncate text-sm">
                     <div className="truncate">{file.name}</div>
-                    <div className="truncate opacity-50">{file.type}</div>
+                    <div className="truncate opacity-50">
+                      {guessFileExtensionByContentType(file.type)}
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -178,9 +181,9 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                 >
                   <div className="rounded bg-violet-500 p-2">
                     {(() => {
-                      let fileExtension = file.type.includes("/")
-                        ? file.type.split("/")[1]
-                        : file.type
+                      let fileExtension = guessFileExtensionByContentType(
+                        file.type
+                      )
 
                       switch (fileExtension) {
                         case "pdf":
@@ -203,7 +206,9 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
 
                   <div className="truncate text-sm">
                     <div className="truncate">{file.name}</div>
-                    <div className="truncate opacity-50">{file.type}</div>
+                    <div className="truncate opacity-50">
+                      {guessFileExtensionByContentType(file.type)}
+                    </div>
                   </div>
 
                   <XIcon

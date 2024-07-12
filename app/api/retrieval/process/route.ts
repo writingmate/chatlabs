@@ -13,6 +13,7 @@ import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
 import { createErrorResponse } from "@/lib/response"
+import { guessFileExtensionByContentType } from "@/lib/content-type"
 
 const maxDuration = 300
 export async function POST(req: Request) {
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
     const fileBuffer = Buffer.from(await file.arrayBuffer())
     const blob = new Blob([fileBuffer])
 
-    const fileExtension = file.name.split(".").pop()?.toLowerCase()
+    const fileExtension = guessFileExtensionByContentType(file.type)
 
     if (embeddingsProvider === "openai") {
       if (profile.use_azure_openai) {

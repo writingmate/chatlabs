@@ -5,6 +5,7 @@ import mammoth from "mammoth"
 import { useContext, useEffect, useState } from "react"
 import { toast } from "sonner"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { guessFileExtensionByContentType } from "@/lib/content-type"
 
 export const ACCEPTED_FILE_TYPES = [
   "text/csv",
@@ -55,7 +56,7 @@ export const useSelectFileHandler = () => {
     setUseRetrieval(true)
 
     if (file) {
-      let simplifiedFileType = file.type.split("/")[1]
+      let simplifiedFileType = guessFileExtensionByContentType(file.type)
 
       let reader = new FileReader()
 
