@@ -21,7 +21,7 @@ export interface ChatPayload {
   assistant: Tables<"assistants"> | null
   messageFileItems: Tables<"file_items">[]
   chatFileItems: Tables<"file_items">[]
-  messageHtmlElements: MessageHtmlElement[]
+  messageHtmlElements?: MessageHtmlElement[]
 }
 
 export interface ChatAPIPayload {

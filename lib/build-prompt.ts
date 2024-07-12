@@ -226,7 +226,7 @@ export async function buildFinalMessages(
     }
   }
 
-  if (messageHtmlElements.length > 0) {
+  if (messageHtmlElements && messageHtmlElements?.length > 0) {
     const elementsText = buildElementsText(messageHtmlElements)
 
     finalMessages[finalMessages.length - 1] = {
