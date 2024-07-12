@@ -139,18 +139,16 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
     const { chatMessages } = useContext(ChatbotUIChatContext)
 
-    const { handleScroll, messagesEndRef, scrollToBottom } = useScroll()
+    // const { handleScroll, messagesEndRef, scrollToBottom } = useScroll()
 
     const { handleSendMessage } = useChatHandler()
 
-    useEffect(() => {
-      if (execute || !value) {
-        return
-      }
-
-      console.log("scrolling to bottom")
-      scrollToBottom()
-    }, [execute, value])
+    // useEffect(() => {
+    //   if (execute || !value) {
+    //     return
+    //   }
+    //   scrollToBottom()
+    // }, [execute, value])
 
     const downloadAsFile = () => {
       if (typeof window === "undefined") {
@@ -338,7 +336,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           </div>
           <div
             className="relative w-full flex-1 overflow-auto"
-            onScroll={handleScroll}
+            // onScroll={handleScroll}
           >
             {execute ? (
               <iframe
