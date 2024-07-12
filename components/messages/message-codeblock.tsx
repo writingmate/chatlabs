@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { MessageSharingDialog } from "@/components/messages/message-sharing-dialog"
+import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
 
 interface MessageCodeBlockProps {
   isGenerating?: boolean
