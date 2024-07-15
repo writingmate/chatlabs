@@ -25,8 +25,6 @@ interface UpdateChatProps {
 export const PinChat: FC<UpdateChatProps> = ({ chat, className, setChats }) => {
   // const { setChats } = useContext(ChatbotUIContext)
 
-  const buttonRef = useRef<HTMLButtonElement>(null)
-
   const handlePinChat = async (e: React.MouseEvent<SVGSVGElement>) => {
     const updatedChat = await updateChat(chat.id, {
       pinned: !chat.pinned,

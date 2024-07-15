@@ -66,7 +66,13 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         return <PresetItem key={item.id} preset={item as Tables<"presets">} />
 
       case "prompts":
-        return <PromptItem key={item.id} prompt={item as Tables<"prompts">} />
+        return (
+          <PromptItem
+            key={item.id}
+            prompt={item as Tables<"prompts">}
+            setPrompts={setPrompts}
+          />
+        )
 
       case "files":
         return <FileItem key={item.id} file={item as Tables<"files">} />
@@ -230,8 +236,19 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     }
   }, [data])
 
-  const dataWithFolders = data.filter(item => item.folder_id)
-  const dataWithoutFolders = data.filter(item => item.folder_id === null)
+  function sortByPinned(a: any, b: any) {
+    if ("pinned" in a && "pinned" in b) {
+      if (a.pinned && !b.pinned) return -1
+      if (!a.pinned && b.pinned) return 1
+    }
+    return 0
+  }
+
+  // sort pinned items first if .pinned property is available
+  const dataWithFolders = data.filter(item => item.folder_id).sort(sortByPinned)
+  const dataWithoutFolders = data
+    .filter(item => item.folder_id === null)
+    .sort(sortByPinned)
 
   const getDescription = (contentType: ContentType) => {
     switch (contentType) {

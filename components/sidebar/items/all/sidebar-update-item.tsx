@@ -97,6 +97,7 @@ interface SidebarUpdateItemProps {
   name?: string
   isHovering?: boolean
   isActive?: boolean
+  actions?: React.ReactNode
 }
 
 export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
@@ -108,7 +109,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   updateState,
   isTyping,
   isHovering,
-  isActive
+  isActive,
+  actions
 }) => {
   const {
     workspaces,
@@ -656,45 +658,47 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       {children}
-      {isHovering && (
-        <div
-          onClick={e => {
-            e.stopPropagation()
-            e.preventDefault()
-          }}
-          className={`ml-2 flex items-center space-x-2 ${!isActive && "w-11 opacity-0 group-hover:opacity-100"}`}
-        >
-          <WithTooltip
-            delayDuration={1000}
-            display={<div>Edit {(name || contentType).slice(0, -1)}</div>}
-            trigger={
-              <SheetTrigger asChild>
-                <IconEdit
-                  className="cursor-pointer hover:opacity-50"
-                  size={18}
-                />
-              </SheetTrigger>
-            }
-          />
-          <WithTooltip
-            delayDuration={1000}
-            display={<div>Delete {(name || contentType).slice(0, -1)}</div>}
-            trigger={
-              <SidebarDeleteItem
-                item={item}
-                name={name}
-                contentType={contentType}
-                trigger={
-                  <IconTrash
-                    size={18}
-                    className="cursor-pointer hover:opacity-50"
-                  />
-                }
+      <div
+        onClick={e => {
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+        className={
+          `ml-2 flex items-center group space-x-2 shrink-0 ` +
+          (isActive ? "active" : "")
+        }
+      >
+        <WithTooltip
+          delayDuration={1000}
+          display={<div>Edit {(name || contentType).slice(0, -1)}</div>}
+          trigger={
+            <SheetTrigger asChild>
+              <IconEdit
+                className={"hidden group-hover:flex group-[.active]:flex"}
+                size={18}
               />
-            }
-          />
-        </div>
-      )}
+            </SheetTrigger>
+          }
+        />
+        <WithTooltip
+          delayDuration={1000}
+          display={<div>Delete {(name || contentType).slice(0, -1)}</div>}
+          trigger={
+            <SidebarDeleteItem
+              item={item}
+              name={name}
+              contentType={contentType}
+              trigger={
+                <IconTrash
+                  size={18}
+                  className={"hidden group-hover:flex group-[.active]:flex"}
+                />
+              }
+            />
+          }
+        />
+        {actions}
+      </div>
       <SheetContent
         className="min-w-3/4 flex flex-col justify-between sm:min-w-[450px]"
         side="left"

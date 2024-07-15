@@ -6,14 +6,6 @@ import { ContentType, DataItemType, LLMID } from "@/types"
 import { useRouter } from "next/navigation"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { SidebarUpdateItem } from "./sidebar-update-item"
-import {
-  IconEdit,
-  IconLock,
-  IconLockAccess,
-  IconSquarePlus
-} from "@tabler/icons-react"
-import { WithTooltip } from "@/components/ui/with-tooltip"
-import { unique } from "next/dist/build/utils"
 import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
 import {
   validatePlanForAssistant,
@@ -29,6 +21,7 @@ interface SidebarItemProps {
   updateState: any
   renderInputs: (renderState: any) => JSX.Element
   name?: string
+  actions?: React.ReactNode
 }
 
 export const SIDEBAR_ITEM_ICON_SIZE = 24
@@ -41,7 +34,8 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   renderInputs,
   icon,
   isTyping,
-  name
+  name,
+  actions
 }) => {
   const {
     selectedWorkspace,
@@ -184,6 +178,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
           contentType={contentType}
           updateState={updateState}
           renderInputs={renderInputs}
+          actions={actions}
         >
           {icon}
           <div className="ml-3 flex-1 justify-items-center truncate text-sm">

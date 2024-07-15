@@ -1414,6 +1414,7 @@ export interface Database {
           icon: string | null
           id: string
           name: string
+          pinned: boolean
           sharing: string
           updated_at: string | null
           user_id: string
@@ -1427,6 +1428,7 @@ export interface Database {
           icon?: string | null
           id?: string
           name: string
+          pinned?: boolean
           sharing?: string
           updated_at?: string | null
           user_id: string
@@ -1440,6 +1442,7 @@ export interface Database {
           icon?: string | null
           id?: string
           name?: string
+          pinned?: boolean
           sharing?: string
           updated_at?: string | null
           user_id?: string

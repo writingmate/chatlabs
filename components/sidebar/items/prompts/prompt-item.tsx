@@ -10,12 +10,15 @@ import {
   SIDEBAR_ITEM_ICON_STROKE,
   SidebarItem
 } from "../all/sidebar-display-item"
+import { PinPrompt } from "@/components/sidebar/items/prompts/pin-prompt"
+import { cn } from "@/lib/utils"
 
 interface PromptItemProps {
   prompt: Tables<"prompts">
+  setPrompts: React.Dispatch<React.SetStateAction<Tables<"prompts">[]>>
 }
 
-export const PromptItem: FC<PromptItemProps> = ({ prompt }) => {
+export const PromptItem: FC<PromptItemProps> = ({ prompt, setPrompts }) => {
   const [name, setName] = useState(prompt.name)
   const [content, setContent] = useState(prompt.content)
   const [isTyping, setIsTyping] = useState(false)
@@ -68,6 +71,16 @@ export const PromptItem: FC<PromptItemProps> = ({ prompt }) => {
             </div>
           </>
         )}
+        actions={
+          <PinPrompt
+            className={cn(
+              "group-hover:flex group-[.active]:flex",
+              prompt.pinned ? "flex" : "hidden"
+            )}
+            prompt={prompt}
+            setPrompts={setPrompts}
+          />
+        }
       />
     </div>
   )
