@@ -254,7 +254,6 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     } | null
   ): void => {
     setPreviewContent(prev => {
-      console.log(prev, content)
       if (content && !content.update) {
         setEditorOpen(true)
       }
