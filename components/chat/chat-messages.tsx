@@ -7,7 +7,11 @@ import { ChatbotUIChatContext } from "@/context/chat"
 import { as } from "@upstash/redis/zmscore-10fd3773"
 
 interface ChatMessagesProps {
-  onPreviewContent?: (content: { content: string; filename?: string }) => void
+  onPreviewContent?: (content: {
+    content: string
+    filename?: string
+    update: boolean
+  }) => void
 }
 
 export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {

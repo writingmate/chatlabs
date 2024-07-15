@@ -30,6 +30,7 @@ import { Annotation, Annotation2 } from "@/types/annotation"
 import { any } from "zod"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { bo } from "@upstash/redis/zmscore-10fd3773"
 
 const ICON_SIZE = 32
 
@@ -45,7 +46,11 @@ interface MessageProps {
   isGenerating: boolean
   firstTokenReceived: boolean
   setIsGenerating: (value: boolean) => void
-  onPreviewContent?: (content: { content: string; filename?: string }) => void
+  onPreviewContent?: (content: {
+    content: string
+    filename?: string
+    update: boolean
+  }) => void
 }
 
 export const Message: FC<MessageProps> = ({

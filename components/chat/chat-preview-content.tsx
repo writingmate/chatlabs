@@ -3,6 +3,7 @@ import { MessageCodeBlock } from "@/components/messages/message-codeblock"
 import { cn } from "@/lib/utils"
 
 interface ChatPreviewContentProps {
+  open: boolean
   isGenerating: boolean
   content: {
     content: string
@@ -12,10 +13,12 @@ interface ChatPreviewContentProps {
     content: {
       content: string
       filename?: string
+      update: boolean
     } | null
   ) => void
 }
 export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
+  open,
   isGenerating,
   content,
   onPreviewContent
@@ -34,10 +37,10 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
     <div
       className={cn(
         "fixed bottom-2 right-4 top-14 transition-[width]",
-        content ? "w-[calc(100%-30px)] lg:w-[calc(50%-30px)]" : "w-0"
+        open ? "w-[calc(100%-30px)] lg:w-[calc(50%-30px)]" : "w-0"
       )}
     >
-      {content && (
+      {open && content && (
         <MessageCodeBlock
           isGenerating={isGenerating}
           onClose={() => onPreviewContent?.(null)}

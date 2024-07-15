@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useState } from "react"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import { MessageCodeBlock } from "./message-codeblock"
@@ -11,7 +11,11 @@ import { FileIcon } from "@/components/ui/file-icon"
 interface MessageMarkdownProps {
   experimentalCodeEditor?: boolean
   content: string
-  onPreviewContent?: (content: { content: string; filename?: string }) => void
+  onPreviewContent?: (content: {
+    content: string
+    filename?: string
+    update: boolean
+  }) => void
 }
 
 function urlTransform(url: string) {
@@ -26,6 +30,18 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
   content,
   onPreviewContent
 }) => {
+  const handleEditorOpen = (
+    fileName: string,
+    language: string,
+    code: string
+  ) => {
+    onPreviewContent?.({
+      filename: fileName,
+      content: language + "\n" + code,
+      update: false
+    })
+  }
+
   return (
     <MessageMarkdownMemoized
       className="prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 min-h-[40px] min-w-full space-y-6 break-words"
@@ -105,7 +121,8 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
             if (experimentalCodeEditor) {
               onPreviewContent?.({
                 filename: fileName,
-                content: language + "\n" + fileContentWithoutFileName
+                content: language + "\n" + fileContentWithoutFileName,
+                update: true
               })
 
               return (
@@ -116,10 +133,11 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
                     "text-foreground flex h-auto w-[260px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:shadow"
                   }
                   onClick={() =>
-                    onPreviewContent?.({
-                      filename: fileName,
-                      content: language + "\n" + fileContentWithoutFileName
-                    })
+                    handleEditorOpen(
+                      fileName,
+                      language,
+                      fileContentWithoutFileName
+                    )
                   }
                 >
                   <div>

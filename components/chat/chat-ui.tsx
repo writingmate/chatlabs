@@ -41,6 +41,7 @@ import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
 import { Virtualizer } from "virtua"
+import { bo } from "@upstash/redis/zmscore-10fd3773"
 
 interface ChatUIProps {
   showModelSelector?: boolean
@@ -95,10 +96,12 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setIsAtBottom
   } = useScroll()
 
+  const [editorOpen, setEditorOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(true)
   const [previewContent, setPreviewContent] = useState<{
     content: string
     filename?: string
+    update: boolean
   } | null>(null)
 
   useHotkey("o", handleNewChat)
@@ -247,9 +250,19 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     content: {
       content: string
       filename?: string
+      update: boolean
     } | null
   ): void => {
-    setPreviewContent(content)
+    setPreviewContent(prev => {
+      console.log(prev, content)
+      if (content && !content.update) {
+        setEditorOpen(true)
+      }
+      if (!content) {
+        setEditorOpen(false)
+      }
+      return content
+    })
     if (content) {
       setShowSidebar(false)
     }
@@ -321,11 +334,12 @@ export const ChatUI: React.FC<ChatUIProps> = ({
         <div
           className={cn(
             "w-0 transition-[width] duration-100",
-            previewContent && "w-full lg:w-[calc(50%-2rem)]"
+            editorOpen && "w-full lg:w-[calc(50%-2rem)]"
           )}
         />
 
         <ChatPreviewContent
+          open={editorOpen}
           isGenerating={isGenerating}
           content={previewContent}
           onPreviewContent={handlePreviewContent}
