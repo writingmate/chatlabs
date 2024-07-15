@@ -14,6 +14,7 @@ import { LLMID } from "@/types"
 import { SharingField } from "@/components/sidebar/items/all/sharing-field"
 import { AssistantConversationStarters } from "@/components/sidebar/items/assistants/assistant-conversation-starters"
 import { set } from "date-fns"
+import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 
 interface CreateAssistantProps {
   isOpen: boolean
@@ -155,11 +156,14 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
           <div className="space-y-1 pt-2">
             <Label>Description</Label>
 
-            <Input
+            <TextareaAutosize
+              className="bg-background border-input border"
               placeholder="Assistant description..."
+              onValueChange={value => setDescription(value)}
               value={description}
-              onChange={e => setDescription(e.target.value)}
               maxLength={ASSISTANT_DESCRIPTION_MAX}
+              minRows={3}
+              maxRows={6}
             />
           </div>
 

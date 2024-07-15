@@ -19,6 +19,8 @@ import { AssistantToolSelect } from "./assistant-tool-select"
 import { AssistantConversationStarters } from "@/components/sidebar/items/assistants/assistant-conversation-starters"
 import { SharingField } from "@/components/sidebar/items/all/sharing-field"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import ReactTextareaAutosize from "react-textarea-autosize"
+import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 
 interface AssistantItemProps {
   assistant: Tables<"assistants">
@@ -179,11 +181,14 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
           <div className="space-y-1 pt-2">
             <Label>Description</Label>
 
-            <Input
+            <TextareaAutosize
+              className="bg-background border-input border"
               placeholder="Assistant description..."
+              onValueChange={value => setDescription(value)}
               value={description}
-              onChange={e => setDescription(e.target.value)}
               maxLength={ASSISTANT_DESCRIPTION_MAX}
+              minRows={3}
+              maxRows={6}
             />
           </div>
 
