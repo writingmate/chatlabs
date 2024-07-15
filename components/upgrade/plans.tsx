@@ -1,6 +1,16 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { WithTooltip } from "@/components/ui/with-tooltip"
-import { IconX, IconSparkles } from "@tabler/icons-react"
+import {
+  IconX,
+  IconSparkles,
+  IconKey,
+  IconRobot,
+  IconLayout2,
+  IconBooks,
+  IconFileDescription,
+  IconGlobe,
+  IconPhoto
+} from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { PlanFeature } from "@/components/upgrade/plan-picker"
 import { useContext, useState } from "react"
@@ -8,6 +18,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { supabase } from "@/lib/supabase/browser-client"
 import { createCheckoutSession } from "@/actions/stripe"
 import { router } from "next/client"
+import { Badge } from "@/components/ui/badge"
 
 const BYOK_PLAN_PREFIX = "byok"
 const PRO_PLAN_PREFIX = "pro"
@@ -17,9 +28,10 @@ const BILLING_CYCLE_MONTHLY = "monthly"
 type BILLING_CYCLE = typeof BILLING_CYCLE_YEARLY | typeof BILLING_CYCLE_MONTHLY
 
 interface PlansProps {
-  onClose: () => void // Function to close the dialog
+  onClose: () => void
   showCloseIcon: boolean
 }
+
 export default function Plans({ onClose, showCloseIcon }: PlansProps) {
   const { profile } = useContext(ChatbotUIContext)
 
@@ -59,20 +71,37 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
     setLoading(plan)
   }
 
-  // Function to close the dialog
   const closeDialog = () => {
     setIsDialogVisible(false)
     onClose()
   }
+
+  const FeatureGroup = ({
+    icon,
+    title,
+    children
+  }: {
+    icon: React.ReactNode
+    title: string
+    children: React.ReactNode
+  }) => (
+    <div className="mb-2">
+      <div className="mb-2 flex items-center">
+        {icon}
+        <span className="ml-2 font-semibold">{title}</span>
+      </div>
+      {children}
+    </div>
+  )
 
   return (
     <>
       <div
         className={`dialog-container ${isDialogVisible ? "visible" : "hidden"} relative`}
       >
-        <div className="absolute right-0 top-0 p-2">
+        <div className="absolute right-0 top-4">
           {showCloseIcon && (
-            <button onClick={closeDialog} className="p-2">
+            <button onClick={closeDialog}>
               <IconX size={24} />
             </button>
           )}
@@ -80,59 +109,52 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
         <div className="my-2">
           <form method={"POST"}>
             <input type={"hidden"} value={billingCycle} name={"billingCycle"} />
-            <div className="my-2">
+            <div className="mx-auto my-2 flex justify-center">
               <ToggleGroup
                 type={"single"}
+                className={"w-2/3 sm:translate-x-11"}
                 value={billingCycle}
                 onValueChange={value =>
                   setBillingCycle(value as "yearly" | "monthly")
                 }
               >
-                <ToggleGroupItem value={BILLING_CYCLE_YEARLY}>
-                  Yearly
-                </ToggleGroupItem>
                 <ToggleGroupItem value={BILLING_CYCLE_MONTHLY}>
                   Monthly
                 </ToggleGroupItem>
+                <ToggleGroupItem value={BILLING_CYCLE_YEARLY}>
+                  Yearly
+                  <span className="ml-2 line-clamp-1 text-nowrap rounded bg-green-500 px-2 py-1 text-xs text-white">
+                    4 months free
+                  </span>
+                </ToggleGroupItem>
               </ToggleGroup>
             </div>
-            <div className="flex flex-col md:flex-row">
+            <div className="flex flex-col-reverse md:flex-row">
               <div
-                className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t px-6 py-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
-                data-testid="Premium-pricing-modal-column"
+                className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t p-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
+                data-testid="BYOK-pricing-modal-column"
               >
                 <div className="bg-token-main-surface-primary relative flex flex-col">
                   <div className="flex flex-col gap-1">
-                    <WithTooltip
-                      side={"top"}
-                      display={"Bring your own key"}
-                      trigger={
-                        <p className="flex items-center gap-2 text-xl font-medium">
-                          <IconSparkles className={"text-violet-700"} />
-                          BYOK
-                        </p>
-                      }
-                    />
-                    <div className="flex items-baseline gap-[6px]">
-                      <div className="min-h-[56px] flex-col items-baseline gap-[6px]">
-                        <p
-                          className="text-token-text-tertiary text-base font-light"
-                          data-testid="Pro-pricing-column-cost"
-                        >
-                          {billingCycle === "yearly"
-                            ? "$6.99/month"
-                            : "$9.99/month"}
-                        </p>
-                        <p
-                          className={
-                            "text-token-text-tertiary text-xs font-light"
-                          }
-                        >
-                          {billingCycle === "yearly" &&
-                            "billed yearly $83.88/year"}
-                        </p>
-                      </div>
+                    <p className="text-xl font-semibold">
+                      Bring Your Keys Plan
+                    </p>
+                    <p className="text-foreground/60 mb-4 text-sm">
+                      Connect your API keys to access AI models and all features
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-xl font-semibold">
+                        ${billingCycle === "yearly" ? "6.99" : "9.99"}
+                      </p>
+                      {billingCycle === "yearly" && (
+                        <p className="text-foreground/50 line-through">$9.99</p>
+                      )}
                     </div>
+                    <p className="text-foreground/50 text-sm">
+                      {billingCycle === "yearly"
+                        ? "per month, billed annually ($83.88/year)"
+                        : "per month"}
+                    </p>
                   </div>
                 </div>
                 <div className="bg-token-main-surface-primary relative flex flex-col">
@@ -147,49 +169,51 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                   </Button>
                 </div>
                 <div className="flex grow flex-col gap-2">
-                  <PlanFeature
-                    title={
-                      <>
-                        <b>Use your API keys</b>
-                        <br /> to access OpenAI,
-                        <br /> Mistral, Claude, Gemini, and Perplexity
-                      </>
-                    }
-                  />
-                  <PlanFeature title={"Access to all AI Assistants"} />
-                  <PlanFeature title={"AI Image Generation"} />
-                  <PlanFeature title={"GPT-4 Vision"} />
-                  <PlanFeature title={"Web Browsing"} />
+                  <FeatureGroup
+                    icon={<IconKey size={20} />}
+                    title="API Key Access"
+                  >
+                    <PlanFeature title="Access to all Professional Plan features with the AI models for which you have API keys" />
+                    <PlanFeature title="Connect keys for GPT-4o, Mistral, Claude 3, Gemini Pro, LLama 3, Perplexity, Groq, and other models" />
+                  </FeatureGroup>
+                  <FeatureGroup
+                    icon={<IconRobot size={20} />}
+                    title="Free Models"
+                  >
+                    <PlanFeature title="Access to all free models without API keys" />
+                    <PlanFeature title="Including GPT-3.5 Turbo, Claude Haiku, DBRX Instruct, Mistral Tiny" />
+                  </FeatureGroup>
                 </div>
               </div>
               <div
-                className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t px-6 py-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
+                className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t p-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
                 data-testid="Pro-pricing-modal-column"
               >
                 <div className="bg-token-main-surface-primary relative flex flex-col">
                   <div className="flex flex-col gap-1">
-                    <p className="flex items-center gap-2 text-xl font-medium">
-                      <IconSparkles className={"text-violet-700"} />
-                      Pro
+                    <p className="flex items-center space-x-2 text-xl font-semibold">
+                      <span>Professional Plan</span>{" "}
+                      <Badge variant={"outline"}>Popular</Badge>
                     </p>
-                    <div className="min-h-[56px] flex-col items-baseline gap-[6px]">
-                      <p
-                        className="text-token-text-tertiary text-base font-light"
-                        data-testid="Pro-pricing-column-cost"
-                      >
-                        {billingCycle === "yearly"
-                          ? "$19.99/month"
-                          : "$29.99/month"}
+                    <p className="text-foreground/60 mb-4 text-sm">
+                      Unlimited access to all models and features. No API keys
+                      required
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-xl font-semibold">
+                        ${billingCycle === "yearly" ? "19.99" : "29.99"}
                       </p>
-                      <p
-                        className={
-                          "text-token-text-tertiary text-xs font-light"
-                        }
-                      >
-                        {billingCycle === "yearly" &&
-                          "billed yearly $239.88/year"}
-                      </p>
+                      {billingCycle === "yearly" && (
+                        <p className="text-foreground/50 line-through">
+                          $29.99
+                        </p>
+                      )}
                     </div>
+                    <p className="text-foreground/50 text-sm">
+                      {billingCycle === "yearly"
+                        ? "per month, billed annually ($239.88/year)"
+                        : "per month"}
+                    </p>
                   </div>
                 </div>
                 <div className="bg-token-main-surface-primary relative flex flex-col">
@@ -198,26 +222,56 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                     loading={loading === PRO_PLAN_PREFIX}
                     formAction={createFormAction(PRO_PLAN_PREFIX)}
                     onClick={() => handleClick(PRO_PLAN_PREFIX)}
-                    data-testid="select-plan-button-Pros-create"
+                    data-testid="select-plan-button-Pro-create"
                     className={"bg-violet-700 text-white"}
                   >
                     Upgrade now
                   </Button>
                 </div>
                 <div className="flex grow flex-col gap-2">
-                  <PlanFeature
-                    title={
-                      <>
-                        <b>No API keys required.</b>
-                        <br /> Unlimited access to OpenAI, Mistral, Claude,
-                        Gemini, and Perplexity
-                      </>
-                    }
-                  />
-                  <PlanFeature title={"Access to all AI Assistants"} />
-                  <PlanFeature title={"GPT-4 Vision"} />
-                  <PlanFeature title={"AI Image Generation"} />
-                  <PlanFeature title={"Web Browsing"} />
+                  <FeatureGroup
+                    icon={<IconRobot size={20} />}
+                    title="AI Models"
+                  >
+                    <PlanFeature title="Access to all 30+ AI models" />
+                    <PlanFeature title="Including GPT-4o, Mistral, Claude 3.5, Gemini Pro, LLama 3, Perplexity, Groq" />
+                  </FeatureGroup>
+                  <FeatureGroup
+                    icon={<IconPhoto size={20} />}
+                    title="Image Generation"
+                  >
+                    <PlanFeature title="Generate detailed visuals for work, study, and presentations with DALL-E 3 and Stable Diffusion 3" />
+                  </FeatureGroup>
+                  <FeatureGroup
+                    icon={<IconGlobe size={20} />}
+                    title="Web Access"
+                  >
+                    <PlanFeature title="Quickly access the latest research and online data" />
+                  </FeatureGroup>
+                  <FeatureGroup
+                    icon={<IconFileDescription size={20} />}
+                    title="File Chat"
+                  >
+                    <PlanFeature title="Upload documents to extract or summarize key information directly" />
+                  </FeatureGroup>
+                  <FeatureGroup
+                    icon={<IconSparkles size={20} />}
+                    title="AI Assistants"
+                  >
+                    <PlanFeature title="Get personalized help with pre-built and custom GPT assistants and create yours" />
+                  </FeatureGroup>
+                  <FeatureGroup
+                    icon={<IconLayout2 size={20} />}
+                    title="Model Comparison"
+                  >
+                    <PlanFeature title="Compare models based on quality, speed, cost, and the number of tokens used" />
+                  </FeatureGroup>
+                  <FeatureGroup
+                    icon={<IconBooks size={20} />}
+                    title="Prompt Library"
+                  >
+                    <PlanFeature title="A wide range of prompts to enhance interactions with AI and save your time" />
+                  </FeatureGroup>
                 </div>
               </div>
             </div>
