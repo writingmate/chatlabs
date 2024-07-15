@@ -1,46 +1,24 @@
 "use client"
 
-import { Brand } from "@/components/ui/brand"
-import { Button } from "@/components/ui/button"
-import { redirect, useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase/browser-client"
-import { GoogleSVG } from "@/components/icons/google-svg"
-import { MicrosoftSVG } from "@/components/icons/microsoft-svg"
-import { useEffect, useState } from "react"
-import { useTheme } from "next-themes"
-import Loading from "../loading"
-import { Input } from "@/components/ui/input"
-import { IconMail } from "@tabler/icons-react"
-import { Separator } from "@/components/ui/separator"
-import {
-  getHomeWorkspaceByUserId,
-  getWorkspacesByUserId
-} from "@/db/workspaces"
-import { getProfileByUserId } from "@/db/profile"
+import { useSearchParams } from "next/navigation"
 import LoginForm from "@/components/login/login-form"
 
-// export const metadata: Metadata = {
-//   title: "Login"
-// }
+export default function Login() {
+  const searchParams = useSearchParams()
 
-export default function Login({
-  searchParams
-}: {
-  searchParams: { message: string; error_description: string }
-}) {
   return (
     <div className="flex w-full flex-1 flex-col justify-center gap-2 px-8 sm:max-w-md">
       <LoginForm />
 
-      {searchParams?.message && (
+      {searchParams.get("message") && (
         <p className="bg-accent text-foreground mt-4 rounded-lg bg-purple-300 p-4 text-center">
-          {searchParams.message}
+          {searchParams.get("message")}
         </p>
       )}
 
-      {searchParams?.error_description && (
+      {searchParams.get("error_message") && (
         <p className="text-foreground mt-4 rounded-lg bg-red-300 p-4 text-center">
-          {searchParams.error_description}
+          {searchParams.get("error_message")}
         </p>
       )}
     </div>
