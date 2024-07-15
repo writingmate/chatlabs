@@ -262,7 +262,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
       }
       return content
     })
-    if (content) {
+    if (editorOpen) {
       setShowSidebar(false)
     }
   }
