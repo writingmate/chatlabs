@@ -134,9 +134,11 @@ function ModelSettings({ models }: { models?: LLM[] }) {
             size={24}
           />{" "}
           <div className={"flex flex-col"}>
-            <div className={"flex items-center space-x-3"}>Manage models</div>
+            <div className={"flex items-center space-x-3"}>
+              Discover and manage models
+            </div>
             <div className={"text-foreground/60 text-xs"}>
-              Discover all LLM models here.
+              Configure and discover all LLM models here.
             </div>
           </div>
         </div>
@@ -149,7 +151,7 @@ function ModelSettings({ models }: { models?: LLM[] }) {
               Model parameters
             </TabsTrigger>
             <TabsTrigger value={"visibility"} title={"Model visibility"}>
-              Model visibility
+              Discover models
             </TabsTrigger>
           </TabsList>
           <TabsContent value={"basic"}>
