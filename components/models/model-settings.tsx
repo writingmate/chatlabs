@@ -125,11 +125,20 @@ function ModelSettings({ models }: { models?: LLM[] }) {
       <DialogTrigger asChild>
         <div
           className={
-            "hover:bg-accent flex w-full cursor-pointer items-center justify-start space-x-3 truncate rounded p-2 text-sm hover:opacity-50"
+            "hover:bg-accent flex w-full cursor-pointer items-center justify-start truncate rounded p-2 text-sm hover:opacity-50"
           }
         >
-          <IconSettings stroke={1.5} className={"mr-2 opacity-50"} size={24} />{" "}
-          Manage models
+          <IconSettings
+            stroke={1.5}
+            className={"mr-2 shrink-0 opacity-50"}
+            size={24}
+          />{" "}
+          <div className={"flex flex-col"}>
+            <div className={"flex items-center space-x-3"}>Manage models</div>
+            <div className={"text-foreground/60 text-xs"}>
+              Discover all LLM models here.
+            </div>
+          </div>
         </div>
       </DialogTrigger>
       <DialogContent>
