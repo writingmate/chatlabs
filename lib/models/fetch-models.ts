@@ -208,10 +208,10 @@ export const fetchOpenRouterModels = async () => {
         SUPPORTED_OPENROUTER_MODELS.includes(modelId)
       )
       .map((model: any) => {
-        const knownModel = parseOpenRouterModelName(model.modelId)
+        const { modelName } = parseOpenRouterModelName(model.modelId)
         return {
           ...model,
-          ...knownModel
+          modelName
         }
       })
 
