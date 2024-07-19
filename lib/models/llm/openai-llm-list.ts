@@ -116,11 +116,31 @@ const GPT4O: LLM = {
   }
 }
 
+const GPT4O_Mini: LLM = {
+  modelId: "gpt-4o-mini",
+  modelName: "GPT-4o mini",
+  provider: "openai",
+  hostedId: "gpt-4o-mini",
+  platformLink: OPENAI_PLATORM_LINK,
+  imageInput: true,
+  tools: true,
+  paid: false,
+  new: true,
+  supportsStreaming: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 0.15,
+    outputCost: 0.6
+  }
+}
+
 export const OPENAI_LLM_LIST: LLM[] = [
   GPT4Turbo,
   GPT4TurboPreview,
   GPT4Vision,
   GPT4,
   GPT3_5Turbo,
-  GPT4O
+  GPT4O,
+  GPT4O_Mini
 ]

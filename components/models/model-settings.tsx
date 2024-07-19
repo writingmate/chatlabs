@@ -26,10 +26,11 @@ import { WithTooltip } from "@/components/ui/with-tooltip"
 import { updateWorkspace } from "@/db/workspaces"
 
 export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
-  "gpt-3.5-turbo-0125": true,
+  "gpt-3.5-turbo-0125": false,
   "gpt-4-vision-preview": false,
   "gpt-4-turbo-preview": false,
-  "gpt-4-turbo": true,
+  "gpt-4-turbo": false,
+  "gpt-4o-mini": true,
   "claude-3-haiku-20240307": true,
   "claude-3-sonnet-20240229": false,
   "claude-3-5-sonnet-20240620": true,
@@ -113,7 +114,7 @@ function ModelSettings({ models }: { models?: LLM[] }) {
       system_prompt_template: systemPromptTemplate
     })
     updateWorkspace(selectedWorkspace!.id, {
-      ...selectedWorkspace!,
+      // ...selectedWorkspace!,
       default_temperature: chatSettings?.temperature,
       default_context_length: chatSettings?.contextLength
     })
