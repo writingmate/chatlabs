@@ -95,6 +95,8 @@ export const Message: FC<MessageProps> = ({
 
   const [isVoiceToTextPlaying, setIsVoiceToTextPlaying] = useState(false)
 
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
   const handleCopy = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(message.content)
@@ -146,18 +148,52 @@ export const Message: FC<MessageProps> = ({
 
       const audioBlob = await response.blob()
       const audioUrl = URL.createObjectURL(audioBlob)
-      const audio = new Audio(audioUrl)
 
-      audio.onended = () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+      }
+      audioRef.current = new Audio(audioUrl)
+      audioRef.current.onended = () => {
         setIsVoiceToTextPlaying(false)
       }
-
-      audio.play()
+      audioRef.current.play()
     } catch (error) {
       console.error("Error in OpenAI text-to-speech:", error)
       setIsVoiceToTextPlaying(false)
     }
   }
+
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel()
+      }
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && isVoiceToTextPlaying) {
+        if (window.speechSynthesis) {
+          window.speechSynthesis.pause()
+        }
+        if (audioRef.current) {
+          audioRef.current.pause()
+        }
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [isVoiceToTextPlaying])
+
   const speakMessage = () => {
     if ("speechSynthesis" in window) {
       const utterance = new SpeechSynthesisUtterance(message.content)
