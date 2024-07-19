@@ -109,8 +109,11 @@ export const Message: FC<MessageProps> = ({
     }
   }
 
-  const handleSpeakMessage = () => {
-    if ("speechSynthesis" in window) {
+  const handleSpeakMessage = async () => {
+    if (profile?.plan !== "free") {
+      // PRO plan users can use OpenAI voice to text
+      await handleOpenAISpeech(message.content)
+    } else if ("speechSynthesis" in window) {
       if (window.speechSynthesis.paused) {
         // If speech synthesis is paused, resume it
         window.speechSynthesis.resume()
@@ -126,6 +129,35 @@ export const Message: FC<MessageProps> = ({
     }
   }
 
+  const handleOpenAISpeech = async (text: string) => {
+    try {
+      setIsVoiceToTextPlaying(true)
+      const response = await fetch("/api/text-to-speech", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text })
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to generate speech")
+      }
+
+      const audioBlob = await response.blob()
+      const audioUrl = URL.createObjectURL(audioBlob)
+      const audio = new Audio(audioUrl)
+
+      audio.onended = () => {
+        setIsVoiceToTextPlaying(false)
+      }
+
+      audio.play()
+    } catch (error) {
+      console.error("Error in OpenAI text-to-speech:", error)
+      setIsVoiceToTextPlaying(false)
+    }
+  }
   const speakMessage = () => {
     if ("speechSynthesis" in window) {
       const utterance = new SpeechSynthesisUtterance(message.content)
@@ -350,7 +382,10 @@ export const Message: FC<MessageProps> = ({
                   isLast={isLast}
                   isEditing={isEditing}
                   onRegenerate={handleRegenerate}
-                  onVoiceToText={() => {}}
+                  onVoiceToText={() => {
+                    // TODO: figure out await and Promise
+                    handleSpeakMessage()
+                  }}
                 />
               </div>
             </div>
