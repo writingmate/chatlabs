@@ -7,6 +7,7 @@ export type LLMID =
   | MistralLLMID
   | GroqLLMID
   | PerplexityLLMID
+  | OpenRouterLLMID
 
 // OpenAI Models (UPDATED 1/29/24)
 export type OpenAILLMID =
@@ -65,6 +66,21 @@ export type PerplexityLLMID =
   | "llama-3-sonar-small-32k-online" // Sonar Small Online
   | "llama-3-sonar-large-32k-chat" // Sonar Medium Chat
   | "llama-3-sonar-large-32k-online" // Sonar Medium Online
+
+export type OpenRouterLLMID =
+  | "databricks/dbrx-instruct"
+  | "cohere/command-r-plus"
+  | "mistralai/mixtral-8x22b-instruct"
+  | "microsoft/wizardlm-2-8x22b"
+  | "meta-llama/llama-3-70b-instruct"
+  | "openai/gpt-4o-2024-05-13"
+  | "openai/gpt-4-vision-preview"
+  | "google/gemini-pro-1.5"
+  | "google/gemini-pro-vision"
+  | "liuhaotian/llava-yi-34b"
+  | "fireworks/firellava-13b"
+  | "anthropic/claude-3-haiku"
+  | "anthropic/claude-3.5-sonnet"
 
 export interface LLM {
   modelId: LLMID

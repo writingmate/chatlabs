@@ -259,7 +259,7 @@ export const Message: FC<MessageProps> = ({
             {message.role === "system" ? (
               <div className="flex items-center space-x-4">
                 <IconTerminal2
-                  className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
+                  className="border-primary bg-primary text-secondary rounded border p-1"
                   size={ICON_SIZE}
                 />
                 <div className="text-lg font-semibold">Prompt</div>
@@ -302,7 +302,7 @@ export const Message: FC<MessageProps> = ({
                   />
                 ) : (
                   <IconMoodSmile
-                    className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+                    className="bg-primary text-secondary border-primary rounded border p-1"
                     size={ICON_SIZE}
                   />
                 )}

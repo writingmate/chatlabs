@@ -36,9 +36,9 @@ export const ModelIcon: FC<ModelIconProps> = ({
       return (
         <OpenAISVG
           className={cn(
-            "rounded-sm bg-[#fff] p-1 text-black",
+            "rounded-sm bg-white p-1 text-black",
             props.className,
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           width={width}
           height={height}
@@ -49,7 +49,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           src={mistral.src}
           alt="Mistral"
@@ -62,7 +62,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-0",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           src={groq.src}
           alt="Groq"
@@ -74,9 +74,9 @@ export const ModelIcon: FC<ModelIconProps> = ({
       return (
         <AnthropicSVG
           className={cn(
-            "rounded-sm bg-[#fff] p-1 text-black",
+            "rounded-sm bg-white p-1 text-black",
             props.className,
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           width={width}
           height={height}
@@ -86,9 +86,9 @@ export const ModelIcon: FC<ModelIconProps> = ({
       return (
         <GoogleSVG
           className={cn(
-            "rounded-sm bg-[#fff] p-1 text-black",
+            "rounded-sm bg-white p-1 text-black",
             props.className,
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           width={width}
           height={height}
@@ -99,7 +99,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           src={perplexity.src}
           alt="Mistral"
@@ -112,7 +112,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           src={databricks.src}
           alt="Databricks"
@@ -124,9 +124,9 @@ export const ModelIcon: FC<ModelIconProps> = ({
       return (
         <MicrosoftSVG
           className={cn(
-            "rounded-sm bg-[#fff] p-1 text-black",
+            "rounded-sm bg-white p-1 text-black",
             props.className,
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           width={width}
           height={height}
@@ -137,7 +137,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           src={meta.src}
           alt="Meta Llama"

@@ -64,7 +64,20 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "llama3-70b-8192": false,
   "llama3-8b-8192": false,
   "gpt-4o": true,
-  "gemini-1.5-flash-latest": true
+  "gemini-1.5-flash-latest": true,
+  "databricks/dbrx-instruct": false,
+  "cohere/command-r-plus": false,
+  "mistralai/mixtral-8x22b-instruct": false,
+  "microsoft/wizardlm-2-8x22b": false,
+  "meta-llama/llama-3-70b-instruct": false,
+  "openai/gpt-4o-2024-05-13": false,
+  "openai/gpt-4-vision-preview": false,
+  "google/gemini-pro-1.5": false,
+  "google/gemini-pro-vision": false,
+  "liuhaotian/llava-yi-34b": false,
+  "fireworks/firellava-13b": false,
+  "anthropic/claude-3-haiku": false,
+  "anthropic/claude-3.5-sonnet": false
 }
 
 const SYSTEM_PROMPT_DESCRIPTION = `

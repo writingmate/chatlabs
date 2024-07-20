@@ -30,6 +30,21 @@ const KNOWN_MODEL_NAMES: {
     provider: "deepseek",
     modelName: "DeepSeek Coder V2",
     new: true
+  },
+  "openai/gpt-4o-mini": {
+    provider: "openai",
+    modelName: "GPT-4o mini",
+    imageInput: true,
+    tools: true,
+    paid: false,
+    new: true,
+    supportsStreaming: true
+  },
+  "anthropic/claude-3.5-sonnet": {
+    provider: "anthropic",
+    modelName: "Claude 3.5 Sonnet",
+    new: true,
+    imageInput: true
   }
 }
 
@@ -56,7 +71,10 @@ function parseSupportedModelsFromEnv() {
     "mistralai/mixtral-8x22b-instruct",
     "microsoft/wizardlm-2-8x22b",
     "meta-llama/llama-3-70b-instruct",
-    "deepseek/deepseek-coder"
+    "deepseek/deepseek-coder",
+    "anthropic/claude-3.5-sonnet",
+    "openai/gpt-4o-2024-05-13",
+    "openai/gpt-4o-mini"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {
@@ -193,7 +211,7 @@ export const fetchOpenRouterModels = async () => {
           provider: "openrouter",
           hostedId: model.id,
           platformLink: "https://openrouter.dev",
-          imageInput: false,
+          imageInput: true,
           maxContext: model.context_length,
           description: model.description,
           pricing: {
