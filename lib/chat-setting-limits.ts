@@ -253,5 +253,83 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TEMPERATURE: 1.0,
     MAX_TOKEN_OUTPUT_LENGTH: 12000,
     MAX_CONTEXT_LENGTH: 12000
+  },
+  "databricks/dbrx-instruct": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "cohere/command-r-plus": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "mistralai/mixtral-8x22b-instruct": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "meta-llama/llama-3-70b-instruct": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "microsoft/wizardlm-2-8x22b": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "anthropic/claude-3.5-sonnet": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "openai/gpt-4o-2024-05-13": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "openai/gpt-4-vision-preview": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "google/gemini-pro-1.5": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "google/gemini-pro-vision": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "liuhaotian/llava-yi-34b": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "fireworks/firellava-13b": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "anthropic/claude-3-haiku": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
   }
 }
