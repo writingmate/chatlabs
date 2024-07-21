@@ -254,6 +254,8 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TOKEN_OUTPUT_LENGTH: 12000,
     MAX_CONTEXT_LENGTH: 12000
   },
+
+  //openrouter models
   "databricks/dbrx-instruct": {
     MIN_TEMPERATURE: 0,
     MAX_TEMPERATURE: 0,

@@ -65,6 +65,7 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "llama3-8b-8192": false,
   "gpt-4o": true,
   "gemini-1.5-flash-latest": true,
+  //openrouter models
   "databricks/dbrx-instruct": false,
   "cohere/command-r-plus": false,
   "mistralai/mixtral-8x22b-instruct": false,

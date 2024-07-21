@@ -113,3 +113,15 @@ export interface GoogleSearchResult extends ToolResultBase {
 export interface WebScraperResult {
   url: string
 }
+
+// New plugin
+export interface SearchResult {
+  // ... other properties
+  results: {
+    title: string
+    url: string
+    snippet: string
+    image: string | null
+  }[]
+  numResults: number
+}
