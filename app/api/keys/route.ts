@@ -5,6 +5,8 @@ import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   const envKeyMap: Record<string, VALID_ENV_KEYS> = {
     azure: VALID_ENV_KEYS.AZURE_OPENAI_API_KEY,
