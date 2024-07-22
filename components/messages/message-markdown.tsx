@@ -8,6 +8,7 @@ import { ImageWithPreview } from "@/components/image/image-with-preview"
 import { Button } from "@/components/ui/button"
 import { FileIcon } from "@/components/ui/file-icon"
 import Loading from "@/components/ui/loading"
+import { cn } from "@/lib/utils"
 
 interface MessageMarkdownProps {
   isGenerating?: boolean
@@ -48,12 +49,8 @@ const CodePreviewButton = memo(
         }
         onClick={onClick}
       >
-        <div className={"size-6"}>
-          {isGenerating ? (
-            <Loading />
-          ) : (
-            <FileIcon type={fileName.split(".")[1] || language} />
-          )}
+        <div className={cn("size-10", isGenerating ? "animate-pulse" : "")}>
+          <FileIcon type={fileName.split(".")[1] || language} />
         </div>
         <div className={"flex flex-col overflow-hidden"}>
           <div>{fileName}</div>
@@ -88,7 +85,10 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
 
   return (
     <MessageMarkdownMemoized
-      className="prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 min-h-[40px] min-w-full space-y-6 break-words"
+      className={cn(
+        "prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 min-h-[40px] min-w-full space-y-6 break-words",
+        isGenerating ? "generating" : ""
+      )}
       // remarkPlugins={[remarkGfm, remarkMath]}
       remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
       urlTransform={urlTransform}
