@@ -47,5 +47,7 @@ export async function GET() {
     return acc
   }, {})
 
+  console.log("api/keys", "isUsingEnvKeyMap", isUsingEnvKeyMap, profile?.plan)
+
   return createResponse({ isUsingEnvKeyMap }, 200)
 }
