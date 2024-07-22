@@ -402,6 +402,7 @@ export const Message: FC<MessageProps> = ({
             />
           ) : message.role === "assistant" ? (
             <MessageMarkdown
+              isGenerating={isGenerating}
               experimentalCodeEditor={!!profile?.experimental_code_editor}
               content={message.content}
               onPreviewContent={onPreviewContent}
