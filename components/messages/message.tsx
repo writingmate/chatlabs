@@ -97,6 +97,9 @@ export const Message: FC<MessageProps> = ({
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
+  // to reduce a delay probably caused by the OpenAI API call and audio processing.
+  const [isLoading, setIsLoading] = useState(false)
+
   const handleCopy = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(message.content)
@@ -140,6 +143,7 @@ export const Message: FC<MessageProps> = ({
 
   const handleOpenAISpeech = async (text: string) => {
     try {
+      setIsLoading(true)
       setIsVoiceToTextPlaying(true)
       const response = await fetch("/api/text-to-speech", {
         method: "POST",
@@ -163,10 +167,12 @@ export const Message: FC<MessageProps> = ({
       audioRef.current.onended = () => {
         setIsVoiceToTextPlaying(false)
       }
-      audioRef.current.play()
+      await audioRef.current.play()
     } catch (error) {
       console.error("Error in OpenAI text-to-speech:", error)
       setIsVoiceToTextPlaying(false)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -427,6 +433,7 @@ export const Message: FC<MessageProps> = ({
                   onRegenerate={handleRegenerate}
                   onVoiceToText={handleSpeakMessage}
                   isVoiceToTextPlaying={isVoiceToTextPlaying}
+                  isLoading={isLoading}
                 />
               </div>
             </div>

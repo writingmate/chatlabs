@@ -8,7 +8,8 @@ import {
   IconPlayerRecordFilled,
   IconPlayerPlay,
   IconPlayerStop,
-  IconClipboard
+  IconClipboard,
+  IconLoader2
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
@@ -26,6 +27,7 @@ interface MessageActionsProps {
   onRegenerate: () => void
   onVoiceToText: () => void
   isVoiceToTextPlaying?: boolean
+  isLoading?: boolean
 }
 
 export const MessageActions: FC<MessageActionsProps> = ({
@@ -37,7 +39,8 @@ export const MessageActions: FC<MessageActionsProps> = ({
   onEdit,
   onRegenerate,
   onVoiceToText,
-  isVoiceToTextPlaying
+  isVoiceToTextPlaying,
+  isLoading = false
 }) => {
   const [showCheckmark, setShowCheckmark] = useState(false)
 
@@ -91,9 +94,19 @@ export const MessageActions: FC<MessageActionsProps> = ({
       <WithTooltip
         delayDuration={1000}
         side="bottom"
-        display={<div>Play message</div>}
+        display={
+          <div>
+            {isLoading
+              ? "Loading..."
+              : isVoiceToTextPlaying
+                ? "Stop"
+                : "Play message"}
+          </div>
+        }
         trigger={
-          isVoiceToTextPlaying ? (
+          isLoading ? (
+            <IconLoader2 className="animate-spin" size={MESSAGE_ICON_SIZE} />
+          ) : isVoiceToTextPlaying ? (
             <IconPlayerStop
               className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
               size={MESSAGE_ICON_SIZE}
