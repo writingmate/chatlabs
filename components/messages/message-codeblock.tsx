@@ -329,7 +329,9 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
     useEffect(() => {
       if (isGenerating) {
-        setExecute(false)
+        if (!searchParams.has("run")) {
+          setExecute(false)
+        }
         setInspectMode(false)
       }
     }, [isGenerating])
