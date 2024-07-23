@@ -188,6 +188,7 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
 
           return (
             <MessageCodeBlock
+              isGenerating={isGenerating}
               language={(match && match[1]) || ""}
               value={fileContentWithoutFileName}
               {...props}

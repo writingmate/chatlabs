@@ -152,7 +152,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
       setChatSettings(prev => ({ ...prev, model: modelId as LLMID }))
     }
 
-    router.replace(pathname)
+    // router.replace(pathname)
   }
 
   const fetchMessages = async (): Promise<void> => {
