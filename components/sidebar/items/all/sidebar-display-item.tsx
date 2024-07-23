@@ -129,8 +129,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   }
 
   const readOnly =
-    item.sharing == "platform" ||
-    (item.sharing === "public" && item.user_id !== profile?.user_id)
+    item.sharing == "platform" || item.user_id !== profile?.user_id
 
   const handleClickAction = async (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
