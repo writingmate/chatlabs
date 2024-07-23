@@ -112,22 +112,29 @@ export const Message: FC<MessageProps> = ({
   }
 
   const handleSpeakMessage = async () => {
-    if (profile?.plan !== "free") {
-      // PRO plan users can use OpenAI voice to text
-      await handleOpenAISpeech(message.content)
-    } else if ("speechSynthesis" in window) {
-      if (window.speechSynthesis.paused) {
-        // If speech synthesis is paused, resume it
-        window.speechSynthesis.resume()
-      } else if (!window.speechSynthesis.speaking) {
-        // If speech synthesis is not speaking, start speaking the message
-        speakMessage()
-      } else {
-        // If speech synthesis is speaking, pause it
-        handlePauseSpeech()
+    if (isVoiceToTextPlaying) {
+      // Stop playback
+      if (profile?.plan !== "free" && audioRef.current) {
+        audioRef.current.pause()
+        setIsVoiceToTextPlaying(false)
+      } else if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel()
+        setIsVoiceToTextPlaying(false)
       }
     } else {
-      console.error("Speech synthesis is not supported in this browser.")
+      // Start playback
+      if (profile?.plan !== "free") {
+        await handleOpenAISpeech(message.content)
+      } else if ("speechSynthesis" in window) {
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume()
+          setIsVoiceToTextPlaying(true)
+        } else {
+          speakMessage()
+        }
+      } else {
+        console.error("Speech synthesis is not supported in this browser.")
+      }
     }
   }
 
@@ -418,10 +425,8 @@ export const Message: FC<MessageProps> = ({
                   isLast={isLast}
                   isEditing={isEditing}
                   onRegenerate={handleRegenerate}
-                  onVoiceToText={() => {
-                    // TODO: figure out await and Promise
-                    handleSpeakMessage()
-                  }}
+                  onVoiceToText={handleSpeakMessage}
+                  isVoiceToTextPlaying={isVoiceToTextPlaying}
                 />
               </div>
             </div>
