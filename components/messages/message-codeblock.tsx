@@ -35,6 +35,7 @@ import { MessageSharingDialog } from "@/components/messages/message-sharing-dial
 import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
 import { Switch } from "@/components/ui/switch"
 import Loading from "@/components/ui/loading"
+import { useSearchParams } from "next/navigation"
 
 interface MessageCodeBlockProps {
   isGenerating?: boolean
@@ -131,10 +132,11 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     autoScroll = false
   }) => {
     const { user } = useAuth()
+    const searchParams = useSearchParams()
     const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
     const [sharing, setSharing] = useState(false)
     const [inspectMode, setInspectMode] = useState(false)
-    const [execute, setExecute] = useState(false)
+    const [execute, setExecute] = useState(searchParams.has("run"))
     const [error, setError] = useState<string | null>(null)
 
     const [uniqueIFrameId] = useState(generateRandomString(6, true))
