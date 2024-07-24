@@ -134,7 +134,7 @@ export const fetchHostedModels = async (
           providerKey = `${provider}_api_key` as keyof typeof profile
         }
 
-        if (!profile?.[providerKey]) {
+        if (profile?.[providerKey]) {
           modelsToAdd.push(...models)
           continue
         }
