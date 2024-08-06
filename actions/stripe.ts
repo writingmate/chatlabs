@@ -51,6 +51,7 @@ export async function createCheckoutSession(
     await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
+      allow_promotion_codes: true,
       // subscription_data: {
       //   trial_period_days: STRIPE_TRIAL_PERIOD_DAYS,
       // },

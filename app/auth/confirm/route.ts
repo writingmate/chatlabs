@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
     if (!error) {
       return NextResponse.redirect(redirectTo)
     }
+    redirectTo.searchParams.set("message", error?.message ?? "Invalid token")
   }
 
   // return the user to an error page with some instructions
