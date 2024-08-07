@@ -30,7 +30,7 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
   const [name, setName] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState("")
-  const [sharing, setSharing] = useState("")
+  const [sharing, setSharing] = useState("private")
   const [conversationStarters, setConversationStarters] = useState<string[]>([])
   const [assistantChatSettings, setAssistantChatSettings] = useState({
     model: selectedWorkspace?.default_model,
