@@ -17,6 +17,8 @@ const POPUP_HTML = `
   </body>
 </html>`
 
+export const runtime = "edge"
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get("code")

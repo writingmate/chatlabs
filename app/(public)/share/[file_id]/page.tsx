@@ -23,6 +23,8 @@ export async function generateMetadata({
   }
 }
 
+export const runtime = "edge"
+
 function parseBoolean(value: string | boolean | undefined) {
   if (value === "true") {
     return true

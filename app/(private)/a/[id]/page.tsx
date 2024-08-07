@@ -7,6 +7,8 @@ import { cookies } from "next/headers"
 import LoginDialog from "@/components/login/login-dialog"
 import { PlanPicker } from "@/components/upgrade/plan-picker"
 
+export const runtime = "edge"
+
 export default async function AssistantPage({
   params
 }: {
