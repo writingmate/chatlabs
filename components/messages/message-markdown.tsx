@@ -7,7 +7,7 @@ import { defaultUrlTransform } from "react-markdown"
 import { ImageWithPreview } from "@/components/image/image-with-preview"
 import { Button } from "@/components/ui/button"
 import { FileIcon } from "@/components/ui/file-icon"
-import Loading from "@/components/ui/loading"
+import rehypeMathjax from "rehype-mathjax"
 import { cn } from "@/lib/utils"
 
 interface MessageMarkdownProps {
@@ -91,6 +91,7 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
       )}
       // remarkPlugins={[remarkGfm, remarkMath]}
       remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
+      rehypePlugins={[rehypeMathjax]}
       urlTransform={urlTransform}
       components={{
         a({ children, ...props }) {
