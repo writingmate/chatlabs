@@ -62,7 +62,7 @@ export const getPublicAssistants = async () => {
   const { data: assistants, error } = await supabase
     .from("assistants")
     .select("*")
-    .neq("sharing", "private")
+    .eq("sharing", "public")
 
   if (error) {
     throw new Error(error.message)
