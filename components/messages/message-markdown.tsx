@@ -8,6 +8,7 @@ import { ImageWithPreview } from "@/components/image/image-with-preview"
 import { Button } from "@/components/ui/button"
 import { FileIcon } from "@/components/ui/file-icon"
 import rehypeMathjax from "rehype-mathjax"
+import rehypeKatex from "rehype-katex"
 import { cn } from "@/lib/utils"
 
 interface MessageMarkdownProps {
