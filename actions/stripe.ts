@@ -91,6 +91,7 @@ export async function createBillingPortalSession(customerId: string) {
 }
 
 export async function redirectToBillingPortal() {
+  let redirectTo = headers().get("referer") || "/";
   try {
     const profile = await getServerProfile();
     if (!profile?.stripe_customer_id) {
@@ -100,10 +101,10 @@ export async function redirectToBillingPortal() {
     if (!url) {
       throw new Error("Failed to create billing portal session");
     }
-    redirect(url);
+    redirectTo = url;
   } catch (error) {
     console.error("Error in redirectToBillingPortal:", error);
     // Handle the error appropriately, e.g., redirect to an error page
-    redirect("/");
   }
+  redirect(redirectTo);
 }
