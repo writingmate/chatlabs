@@ -50,22 +50,23 @@ export default function LoginForm({
     return () => window.removeEventListener("message", handleMessage)
   }, [])
 
-  const openAuthPopup = (url: string) => {
+  const openAuthPopup = () => {
     const width = 500
     const height = 600
-    const popupUrl = new URL(url)
-    if (popup) {
-      popupUrl.searchParams.append("popup", "true")
-    }
     const left = window.screenX + (window.outerWidth - width) / 2
     const top = window.screenY + (window.outerHeight - height) / 2
     const features = `width=${width},height=${height},left=${left},top=${top}`
-    console.log(popupUrl.toString())
-    window.open(popupUrl.toString(), "Auth", features)
+    return window.open("", "Auth", features)
   }
 
   const handleOAuthLogin = async (provider: "azure" | "google") => {
     setDisabled(true)
+
+    let authPopup: Window | null = null
+    if (popup) {
+      // Open the popup immediately with a loading page if popup is true
+      authPopup = openAuthPopup()
+    }
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -79,13 +80,17 @@ export default function LoginForm({
     setDisabled(false)
 
     if (error) {
+      authPopup?.close()
       return router.push(
         `/login?message=${error.message}&${callbackRedirectSearchParams.toString()}`
       )
     }
 
     if (popup && data.url) {
-      openAuthPopup(data.url)
+      // Update the popup URL after OAuth process is initiated
+      const popupUrl = new URL(data.url)
+      popupUrl.searchParams.append("popup", "true")
+      authPopup?.location.replace(popupUrl.toString())
     }
   }
 
