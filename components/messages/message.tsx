@@ -112,6 +112,15 @@ export const Message: FC<MessageProps> = ({
     }
   }
 
+  function cleanupMessageForSpeech(message: string) {
+    const codeBlockRegex = /```[\s\S]*?```|(?:(?:^|\n)( {4}|\t).*)+/g
+    return (
+      message
+        // remove any ``` code blocks
+        .replace(codeBlockRegex, "see code example in the chat")
+    )
+  }
+
   const handleSpeakMessage = async () => {
     if (isVoiceToTextPlaying) {
       if (window.speechSynthesis) {
@@ -126,7 +135,7 @@ export const Message: FC<MessageProps> = ({
 
     if (profile?.plan !== "free") {
       // PRO plan users can use OpenAI voice to text
-      await handleOpenAISpeech(message.content)
+      await handleOpenAISpeech(cleanupMessageForSpeech(message.content))
     } else if ("speechSynthesis" in window) {
       if (window.speechSynthesis.paused) {
         // If speech synthesis is paused, resume it
@@ -209,7 +218,9 @@ export const Message: FC<MessageProps> = ({
 
   const speakMessage = () => {
     if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(message.content)
+      const utterance = new SpeechSynthesisUtterance(
+        cleanupMessageForSpeech(message.content)
+      )
       utterance.onerror = () => {
         console.error("An error occurred while speaking the message.")
         setIsVoiceToTextPlaying(false)
