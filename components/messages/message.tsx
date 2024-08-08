@@ -31,6 +31,7 @@ import { any } from "zod"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { bo } from "@upstash/redis/zmscore-10fd3773"
+import { toast } from "sonner"
 
 const ICON_SIZE = 32
 
@@ -95,6 +96,8 @@ export const Message: FC<MessageProps> = ({
 
   const [isVoiceToTextPlaying, setIsVoiceToTextPlaying] = useState(false)
 
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
   const handleCopy = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(message.content)
@@ -109,8 +112,22 @@ export const Message: FC<MessageProps> = ({
     }
   }
 
-  const handleSpeakMessage = () => {
-    if ("speechSynthesis" in window) {
+  const handleSpeakMessage = async () => {
+    if (isVoiceToTextPlaying) {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel()
+      }
+      if (audioRef.current) {
+        audioRef.current.pause()
+      }
+      setIsVoiceToTextPlaying(false)
+      return
+    }
+
+    if (profile?.plan !== "free") {
+      // PRO plan users can use OpenAI voice to text
+      await handleOpenAISpeech(message.content)
+    } else if ("speechSynthesis" in window) {
       if (window.speechSynthesis.paused) {
         // If speech synthesis is paused, resume it
         window.speechSynthesis.resume()
@@ -125,6 +142,70 @@ export const Message: FC<MessageProps> = ({
       console.error("Speech synthesis is not supported in this browser.")
     }
   }
+
+  const handleOpenAISpeech = async (text: string) => {
+    try {
+      setIsVoiceToTextPlaying(true)
+      const response = await fetch("/api/text-to-speech", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text })
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to generate speech")
+      }
+
+      const audioBlob = await response.blob()
+      const audioUrl = URL.createObjectURL(audioBlob)
+
+      if (audioRef.current) {
+        audioRef.current.pause()
+      }
+      audioRef.current = new Audio(audioUrl)
+      audioRef.current.onended = () => {
+        setIsVoiceToTextPlaying(false)
+      }
+      audioRef.current.play()
+    } catch (error) {
+      console.error("Error in OpenAI text-to-speech:", error)
+      toast.error("Failed to generate speech")
+      setIsVoiceToTextPlaying(false)
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel()
+      }
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && isVoiceToTextPlaying) {
+        if (window.speechSynthesis) {
+          window.speechSynthesis.pause()
+        }
+        if (audioRef.current) {
+          audioRef.current.pause()
+        }
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [isVoiceToTextPlaying])
 
   const speakMessage = () => {
     if ("speechSynthesis" in window) {
@@ -350,7 +431,11 @@ export const Message: FC<MessageProps> = ({
                   isLast={isLast}
                   isEditing={isEditing}
                   onRegenerate={handleRegenerate}
-                  onVoiceToText={() => {}}
+                  isVoiceToTextPlaying={isVoiceToTextPlaying}
+                  onVoiceToText={() => {
+                    // TODO: figure out await and Promise
+                    handleSpeakMessage()
+                  }}
                 />
               </div>
             </div>

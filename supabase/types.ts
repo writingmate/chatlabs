@@ -1597,6 +1597,47 @@ export interface Database {
           }
         ]
       }
+      user_questions: {
+        Row: {
+          company_name: string | null
+          company_size: string | null
+          created_at: string
+          id: string
+          job_role: string | null
+          purchase_reason: string | null
+          use_cases: string | null
+          user_id: string
+        }
+        Insert: {
+          company_name?: string | null
+          company_size?: string | null
+          created_at?: string
+          id?: string
+          job_role?: string | null
+          purchase_reason?: string | null
+          use_cases?: string | null
+          user_id: string
+        }
+        Update: {
+          company_name?: string | null
+          company_size?: string | null
+          created_at?: string
+          id?: string
+          job_role?: string | null
+          purchase_reason?: string | null
+          use_cases?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_questions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       workspaces: {
         Row: {
           created_at: string
