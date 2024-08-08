@@ -32,15 +32,22 @@ export async function POST(request: NextRequest) {
       baseURL: process.env.ANTHROPIC_BASE_URL || undefined
     })
 
-    const response = await anthropic.messages.create({
-      model: chatSettings.model,
-      messages: ANTHROPIC_FORMATTED_MESSAGES,
-      temperature: chatSettings.temperature,
-      system: messages[0].content,
-      max_tokens:
-        CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
-      stream: true
-    })
+    const response = await anthropic.messages.create(
+      {
+        model: chatSettings.model,
+        messages: ANTHROPIC_FORMATTED_MESSAGES,
+        temperature: chatSettings.temperature,
+        system: messages[0].content,
+        max_tokens:
+          CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
+        stream: true
+      },
+      {
+        headers: {
+          "anthropic-beta": "max-tokens-3-5-sonnet-2024-07-15"
+        }
+      }
+    )
 
     // @ts-ignore
     const stream = AnthropicStream(response)
