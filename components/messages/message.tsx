@@ -112,6 +112,17 @@ export const Message: FC<MessageProps> = ({
   }
 
   const handleSpeakMessage = async () => {
+    if (isVoiceToTextPlaying) {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel()
+      }
+      if (audioRef.current) {
+        audioRef.current.pause()
+      }
+      setIsVoiceToTextPlaying(false)
+      return
+    }
+
     if (profile?.plan !== "free") {
       // PRO plan users can use OpenAI voice to text
       await handleOpenAISpeech(message.content)
@@ -418,6 +429,7 @@ export const Message: FC<MessageProps> = ({
                   isLast={isLast}
                   isEditing={isEditing}
                   onRegenerate={handleRegenerate}
+                  isVoiceToTextPlaying={isVoiceToTextPlaying}
                   onVoiceToText={() => {
                     // TODO: figure out await and Promise
                     handleSpeakMessage()
