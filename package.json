@@ -121,6 +121,7 @@
     "@tailwindcss/typography": "^0.5.10",
     "@testing-library/jest-dom": "^6.2.0",
     "@testing-library/react": "^14.1.2",
+    "@types/canvas-confetti": "^1.6.4",
     "@types/jest": "^29.5.11",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20",

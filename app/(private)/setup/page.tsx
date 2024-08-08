@@ -11,7 +11,7 @@ import {
   fetchOpenRouterModels
 } from "@/lib/models/fetch-models"
 import { supabase } from "@/lib/supabase/browser-client"
-import { Tables, TablesUpdate } from "@/supabase/types"
+import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
 import { useRouter } from "next/navigation"
 import { useContext, useEffect, useState } from "react"
 import { FinishStep } from "@/components/setup/finish-step"
@@ -22,6 +22,7 @@ import {
 } from "@/components/setup/step-container"
 import Plans from "@/components/upgrade/plans"
 import { useAuth } from "@/context/auth"
+import { upsertUserQuestion } from "@/db/user_questions"
 
 export default function SetupPage() {
   const {
@@ -64,6 +65,9 @@ export default function SetupPage() {
   const [perplexityAPIKey, setPerplexityAPIKey] = useState("")
   const [openrouterAPIKey, setOpenrouterAPIKey] = useState("")
   const [isPaywallOpen, setIsPaywallOpen] = useState(true)
+  const [question, setQuestion] = useState<TablesInsert<"user_questions">>({
+    user_id: profile?.user_id || ""
+  })
 
   useEffect(() => {
     ;(async () => {
@@ -141,6 +145,10 @@ export default function SetupPage() {
     }
 
     const updatedProfile = await updateProfile(profile.id, updateProfilePayload)
+    await upsertUserQuestion({
+      ...question,
+      user_id: updatedProfile.user_id
+    })
     setProfile(updatedProfile)
 
     const workspaces = await getWorkspacesByUserId(profile.user_id)
@@ -165,12 +173,10 @@ export default function SetupPage() {
             showBackButton={false}
           >
             <ProfileStep
-              username={username}
-              usernameAvailable={usernameAvailable}
               displayName={displayName}
-              onUsernameAvailableChange={setUsernameAvailable}
-              onUsernameChange={setUsername}
               onDisplayNameChange={setDisplayName}
+              onUserQuestionChange={setQuestion}
+              userQuestion={question}
             />
           </StepContainer>
         )
