@@ -31,6 +31,7 @@ import { any } from "zod"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { bo } from "@upstash/redis/zmscore-10fd3773"
+import { toast } from "sonner"
 
 const ICON_SIZE = 32
 
@@ -170,6 +171,7 @@ export const Message: FC<MessageProps> = ({
       audioRef.current.play()
     } catch (error) {
       console.error("Error in OpenAI text-to-speech:", error)
+      toast.error("Failed to generate speech")
       setIsVoiceToTextPlaying(false)
     }
   }
