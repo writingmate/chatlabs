@@ -1,17 +1,23 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
+import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 
 export async function POST(req: NextRequest) {
   try {
-    const { text } = await req.json()
+    const { text, voice } = await req.json()
+
+    const profile = await getServerProfile()
+
+    checkApiKey(profile.openai_api_key, "OpenAI")
+
+    const openai = new OpenAI({
+      apiKey: profile.openai_api_key!,
+      baseURL: process.env.OPENAI_BASE_URL
+    })
 
     const mp3 = await openai.audio.speech.create({
       model: "tts-1",
-      voice: "alloy",
+      voice: voice || "alloy",
       input: text
     })
 
