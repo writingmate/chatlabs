@@ -33,6 +33,8 @@ import {
 
 export const maxDuration = 300
 
+export const runtime = "edge"
+
 export async function GET() {
   return new Response(JSON.stringify(platformToolDefinitions()), {
     headers: {

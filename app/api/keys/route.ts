@@ -7,6 +7,8 @@ import { Tables } from "@/supabase/types"
 
 export const dynamic = "force-dynamic"
 
+export const runtime = "edge"
+
 export async function GET() {
   const envKeyMap: Record<string, VALID_ENV_KEYS> = {
     azure: VALID_ENV_KEYS.AZURE_OPENAI_API_KEY,

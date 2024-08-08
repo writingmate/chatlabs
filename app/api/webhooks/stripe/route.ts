@@ -16,6 +16,8 @@ const supabaseAdmin = createClient<Database>(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+export const runtime = "edge"
+
 export async function POST(req: Request) {
   let event: Stripe.Event
   let subscription: Stripe.Subscription
