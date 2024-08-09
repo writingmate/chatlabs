@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getFileByHashId } from "@/db/files"
+import { copyFileAndFileItems, getFileByHashId } from "@/db/files"
 import { createChat } from "@/db/chats"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { getHomeWorkspaceByUserId, getWorkspaceById } from "@/db/workspaces"
 import { cookies } from "next/headers"
 import { createClient } from "@/lib/supabase/server"
-import { createMessages } from "@/db/messages"
+import { createMessage } from "@/db/messages"
+import { createChatFiles } from "@/db/chat-files"
 
 export async function POST(
   request: NextRequest,
@@ -37,10 +38,6 @@ export async function POST(
       )
     }
 
-    // Create a new chat
-
-    console.log("Creating chat with file:", file, profile)
-
     const createdChat = await createChat(
       {
         user_id: profile.user_id,
@@ -51,7 +48,7 @@ export async function POST(
         context_length: 0,
         include_profile_context: false,
         include_workspace_instructions: false,
-        model: workspace.default_model,
+        model: "claude-3-5-sonnet-20240620",
         name: "Remix " + file.name,
         temperature: workspace.default_temperature,
         embeddings_provider: workspace.embeddings_provider
@@ -59,25 +56,32 @@ export async function POST(
       supabase
     )
 
-    // Add the file content as the first message in the chat
-    const messageContent = `
-Let's modify this code 
-    
-\`\`\`html
-#filename=remix_${file.name}#
-${file.file_items[0].content}
-\`\`\``
+    const copiedFile = await copyFileAndFileItems(
+      file.id,
+      workspaceId,
+      profile.user_id,
+      supabase
+    )
 
-    await createMessages(
+    const message = await createMessage(
+      {
+        chat_id: createdChat.id,
+        role: "assistant",
+        content: "Remixing file: " + file.name,
+        user_id: profile.user_id,
+        model: "claude-3-5-sonnet-20240620",
+        image_paths: [],
+        sequence_number: 0
+      },
+      supabase
+    )
+
+    await createChatFiles(
       [
         {
           chat_id: createdChat.id,
-          role: "user",
-          content: messageContent,
-          user_id: profile.user_id,
-          model: workspace.default_model,
-          image_paths: [],
-          sequence_number: 0
+          file_id: copiedFile.id,
+          user_id: profile.user_id
         }
       ],
       supabase
