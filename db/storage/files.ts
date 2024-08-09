@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase/browser-client"
 import { toast } from "sonner"
 
 export const uploadFile = async (
-  file: File,
+  file: any,
   payload: {
     name: string
     user_id: string

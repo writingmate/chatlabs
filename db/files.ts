@@ -406,12 +406,8 @@ export const copyFileAndFileItems = async (
       // throw new Error(downloadError.message)
     }
 
-    const file = new File([fileData], originalFile.name, {
-      type: originalFile.type
-    })
-
     const newFilePath = await uploadFile(
-      file,
+      fileData,
       {
         name: newFile.name,
         user_id: userId,
