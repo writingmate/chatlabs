@@ -63,19 +63,6 @@ export async function POST(
       supabase
     )
 
-    const message = await createMessage(
-      {
-        chat_id: createdChat.id,
-        role: "assistant",
-        content: "Remixing file: " + file.name,
-        user_id: profile.user_id,
-        model: "claude-3-5-sonnet-20240620",
-        image_paths: [],
-        sequence_number: 0
-      },
-      supabase
-    )
-
     await createChatFiles(
       [
         {
