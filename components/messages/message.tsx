@@ -469,14 +469,14 @@ export const Message: FC<MessageProps> = ({
                         <IconCircleFilled className="animate-ping" size={20} />
                       </div>
                     )
-                  case "retrieval":
-                    return (
-                      <div className="flex animate-ping items-center space-x-2">
-                        <IconFileText stroke={1.5} size={20} />
-
-                        <div>Searching files...</div>
-                      </div>
-                    )
+                  // case "retrieval":
+                  //   return (
+                  //     <div className="flex animate-ping items-center space-x-2">
+                  //       <IconFileText stroke={1.5} size={20} />
+                  //
+                  //       <div>Searching files...</div>
+                  //     </div>
+                  //   )
                   default:
                     return (
                       <div className="flex items-center space-x-2">

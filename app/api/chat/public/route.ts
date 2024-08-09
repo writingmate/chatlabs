@@ -23,6 +23,7 @@ export async function POST(request: Request) {
       model: "gpt-4o-mini",
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
+      max_tokens: 16384, // 16k tokens
       stream: true
     })
 
