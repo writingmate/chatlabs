@@ -1,8 +1,11 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
 
-export const getHomeWorkspaceByUserId = async (userId: string) => {
-  const { data: homeWorkspace, error } = await supabase
+export const getHomeWorkspaceByUserId = async (
+  userId: string,
+  client = supabase
+) => {
+  const { data: homeWorkspace, error } = await client
     .from("workspaces")
     .select("*")
     .eq("user_id", userId)
@@ -16,8 +19,11 @@ export const getHomeWorkspaceByUserId = async (userId: string) => {
   return homeWorkspace.id
 }
 
-export const getWorkspaceById = async (workspaceId: string) => {
-  const { data: workspace, error } = await supabase
+export const getWorkspaceById = async (
+  workspaceId: string,
+  client = supabase
+) => {
+  const { data: workspace, error } = await client
     .from("workspaces")
     .select(
       `*, 

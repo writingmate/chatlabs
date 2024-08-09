@@ -8,6 +8,7 @@ import { OpenAIStream, StreamingTextResponse } from "ai"
 import { ServerRuntime } from "next"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
+import { OPENAI_LLM_LIST } from "@/lib/models/llm/openai-llm-list"
 
 export const runtime: ServerRuntime = "edge"
 
@@ -31,15 +32,15 @@ export async function POST(request: Request) {
       baseURL: process.env.OPENAI_BASE_URL || undefined
     })
 
+    const supportsVision =
+      OPENAI_LLM_LIST.find(x => x.modelId === chatSettings.model)?.imageInput ||
+      false
+
     const response = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens: ["gpt-4-vision-preview", "gpt-4-turbo", "gpt-4o"].includes(
-        chatSettings.model
-      )
-        ? 4096
-        : null, // TODO: Fix
+      max_tokens: supportsVision ? 4096 : null,
       stream: true
     })
 

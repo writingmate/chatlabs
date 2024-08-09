@@ -25,8 +25,11 @@ export const getChatsByWorkspaceId = async (workspaceId: string) => {
   return chats
 }
 
-export const createChat = async (chat: TablesInsert<"chats">) => {
-  const { data: createdChat, error } = await supabase
+export const createChat = async (
+  chat: TablesInsert<"chats">,
+  client = supabase
+) => {
+  const { data: createdChat, error } = await client
     .from("chats")
     .insert([chat])
     .select("*")

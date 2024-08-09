@@ -496,15 +496,13 @@ export const Message: FC<MessageProps> = ({
               onValueChange={setEditedMessage}
               maxRows={20}
             />
-          ) : message.role === "assistant" ? (
+          ) : (
             <MessageMarkdown
               isGenerating={isGenerating && isLast}
               experimentalCodeEditor={!!profile?.experimental_code_editor}
               content={message.content}
               onPreviewContent={onPreviewContent}
             />
-          ) : (
-            <div className={"whitespace-pre-wrap"}>{message.content}</div>
           )}
         </div>
 
