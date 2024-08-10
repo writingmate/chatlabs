@@ -2,6 +2,7 @@ import { Tables } from "@/supabase/types"
 import { LLM, LLMID, OpenRouterLLM } from "@/types"
 import { toast } from "sonner"
 import { LLM_LIST_MAP } from "./llm/llm-list"
+import { OPENROUTER_LLM_LIST } from "./llm/openrouter-llm-list"
 
 const KNOWN_MODEL_NAMES: {
   [key: string]: Partial<LLM>
@@ -31,11 +32,27 @@ const KNOWN_MODEL_NAMES: {
     modelName: "DeepSeek Coder V2",
     new: true
   },
+  "google/gemini-pro-1.5": {
+    provider: "google",
+    modelName: "Gemini Pro 1.5",
+    imageInput: true,
+    tools: false,
+    paid: true,
+    supportsStreaming: true
+  },
+  "openai/gpt-4o-2024-05-13": {
+    provider: "openai",
+    modelName: "GPT-4o 2024-05-13",
+    imageInput: true,
+    tools: false,
+    new: true,
+    supportsStreaming: true
+  },
   "openai/gpt-4o-mini": {
     provider: "openai",
     modelName: "GPT-4o mini",
     imageInput: true,
-    tools: true,
+    tools: false,
     paid: false,
     new: true,
     supportsStreaming: true
@@ -44,7 +61,8 @@ const KNOWN_MODEL_NAMES: {
     provider: "anthropic",
     modelName: "Claude 3.5 Sonnet",
     new: true,
-    imageInput: true
+    imageInput: true,
+    supportsStreaming: true
   }
 }
 
@@ -72,6 +90,7 @@ function parseSupportedModelsFromEnv() {
     "microsoft/wizardlm-2-8x22b",
     "meta-llama/llama-3-70b-instruct",
     "deepseek/deepseek-coder",
+    "google/gemini-pro-1.5",
     "anthropic/claude-3.5-sonnet",
     "openai/gpt-4o-2024-05-13",
     "openai/gpt-4o-mini"

@@ -75,6 +75,7 @@ export type OpenRouterLLMID =
   | "meta-llama/llama-3-70b-instruct"
   | "openai/gpt-4o-2024-05-13"
   | "openai/gpt-4-vision-preview"
+  | "openai/gpt-4o-mini"
   | "google/gemini-pro-1.5"
   | "google/gemini-pro-vision"
   | "liuhaotian/llava-yi-34b"

@@ -73,6 +73,7 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "meta-llama/llama-3-70b-instruct": false,
   "openai/gpt-4o-2024-05-13": false,
   "openai/gpt-4-vision-preview": false,
+  "openai/gpt-4o-mini": false,
   "google/gemini-pro-1.5": false,
   "google/gemini-pro-vision": false,
   "liuhaotian/llava-yi-34b": false,

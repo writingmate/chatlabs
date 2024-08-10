@@ -4,19 +4,37 @@ const OPENROUTER_PLATFORM_LINK = "https://openrouter.ai/api/v1"
 
 const GPT4O: LLM = {
   modelId: "openai/gpt-4o-2024-05-13",
-  modelName: "GPT-4o",
+  modelName: "GPT-4o 2024-05-13",
   provider: "openrouter",
   hostedId: "gpt-4o",
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
-  tools: true,
-  paid: true,
+  tools: false,
+
   supportsStreaming: true,
   pricing: {
     currency: "USD",
     unit: "1M tokens",
     inputCost: 5.0,
     outputCost: 15.0
+  }
+}
+
+const GPT4O_MINI: LLM = {
+  modelId: "openai/gpt-4o-mini",
+  modelName: "GPT-4o mini",
+  provider: "openrouter",
+  hostedId: "gpt-4o-mini",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: true,
+  tools: false,
+  paid: false,
+  supportsStreaming: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 0.15,
+    outputCost: 0.6
   }
 }
 
@@ -68,9 +86,8 @@ const CLAUDE_35_SONNET: LLM = {
   hostedId: "claude-3.5-sonnet",
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
-  tools: true,
-  supportsStreaming: true,
-  paid: true
+  tools: false,
+  supportsStreaming: true
 }
 
 const LLAVA_YI_34b: LLM = {
@@ -99,6 +116,7 @@ const FIRELLAVA_13b: LLM = {
 
 export const OPENROUTER_LLM_LIST: LLM[] = [
   GPT4O,
+  GPT4O_MINI,
   GPT4Vision,
   GEMINI_PRO_15,
   CLAUDE_3_HAIKU,
