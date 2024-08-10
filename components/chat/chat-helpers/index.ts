@@ -356,6 +356,7 @@ export const fetchChatResponse = async (
   })
 
   if (!response.ok) {
+    console.error("Error fetching chat response:", response)
     if (response.status === 404 && !isHosted) {
       toast.error(
         "Model not found. Make sure you have it downloaded via Ollama."
@@ -373,8 +374,14 @@ export const fetchChatResponse = async (
     if (response.status === 402) {
       toast.warning(errorData.message)
       setPaywallOpen?.(true)
+    } else if (response.status === 413) {
+      toast.error(
+        "Message is too long or image is too large. Please shorten it."
+      )
     } else {
-      toast.error(errorData.message)
+      toast.error(
+        errorData.message || "Failed to send the message. Please try again."
+      )
     }
 
     setIsGenerating(false)
