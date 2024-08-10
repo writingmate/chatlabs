@@ -3,11 +3,11 @@ import { TablesInsert, TablesUpdate } from "@/supabase/types"
 import mammoth from "mammoth"
 import { uploadFile } from "./storage/files"
 
-export const getFileById = async (fileId: string) => {
+export const getFileById = async (fileId: string, client = supabase) => {
   // if file_id is short, search by hashid field
   // otherwise, search by id field
 
-  const { data: file, error } = await supabase
+  const { data: file, error } = await client
     .from("files")
     .select("*, file_items (*)")
     .eq("id", fileId)
@@ -250,12 +250,15 @@ export const createFiles = async (
   return createdFiles
 }
 
-export const createFileWorkspace = async (item: {
-  user_id: string
-  file_id: string
-  workspace_id: string
-}) => {
-  const { data: createdFileWorkspace, error } = await supabase
+export const createFileWorkspace = async (
+  item: {
+    user_id: string
+    file_id: string
+    workspace_id: string
+  },
+  client = supabase
+) => {
+  const { data: createdFileWorkspace, error } = await client
     .from("file_workspaces")
     .insert([item])
     .select("*")
@@ -283,9 +286,10 @@ export const createFileWorkspaces = async (
 
 export const updateFile = async (
   fileId: string,
-  file: TablesUpdate<"files">
+  file: TablesUpdate<"files">,
+  client = supabase
 ) => {
-  const { data: updatedFile, error } = await supabase
+  const { data: updatedFile, error } = await client
     .from("files")
     .update(file)
     .eq("id", fileId)
@@ -322,4 +326,104 @@ export const deleteFileWorkspace = async (
   if (error) throw new Error(error.message)
 
   return true
+}
+
+export const copyFileAndFileItems = async (
+  fileId: string,
+  workspaceId: string,
+  userId: string,
+  client = supabase
+) => {
+  // Fetch the original file
+  const originalFile = await getFileById(fileId, client)
+
+  // Check if the file is public
+  if (originalFile.sharing !== "public") {
+    throw new Error("Cannot copy a non-public file")
+  }
+
+  // Prepare the new file record
+  const newFileRecord: TablesInsert<"files"> = {
+    name: `Copy of ${originalFile.name}`,
+    type: originalFile.type,
+    sharing: "private", // Set the new copy to private by default
+    user_id: userId,
+    description: originalFile.description,
+    file_path: "",
+    tokens: originalFile.tokens,
+    size: originalFile.size
+  }
+
+  // Create the new file
+  const { data: newFile, error: newFileError } = await client
+    .from("files")
+    .insert([newFileRecord])
+    .select("*")
+    .single()
+
+  if (newFileError) {
+    throw new Error(newFileError.message)
+  }
+
+  const newFileItems = originalFile.file_items.map(item => ({
+    content: item.content,
+    tokens: item.tokens,
+    openai_embedding: item.openai_embedding,
+    local_embedding: item.local_embedding,
+    user_id: userId,
+    sharing: "private",
+    file_id: newFile.id
+  }))
+
+  const { data: insertedFileItems, error: insertError } = await client
+    .from("file_items")
+    .insert(newFileItems)
+    .select("*")
+
+  if (insertError) {
+    throw new Error(insertError.message)
+  }
+
+  // Create file workspace association
+  await createFileWorkspace(
+    {
+      user_id: userId,
+      file_id: newFile.id,
+      workspace_id: workspaceId
+    },
+    client
+  )
+
+  // If there's a file_path, we need to copy the actual file in storage
+  if (originalFile.file_path) {
+    const { data: fileData, error: downloadError } = await client.storage
+      .from("files")
+      .download(originalFile.file_path)
+
+    if (downloadError) {
+      console.error(downloadError)
+      return { ...newFile, file_items: insertedFileItems }
+      // throw new Error(downloadError.message)
+    }
+
+    const newFilePath = await uploadFile(
+      fileData,
+      {
+        name: newFile.name,
+        user_id: userId,
+        file_id: newFile.id
+      },
+      client
+    )
+
+    await updateFile(
+      newFile.id,
+      {
+        file_path: newFilePath
+      },
+      client
+    )
+  }
+
+  return { ...newFile, file_items: insertedFileItems }
 }

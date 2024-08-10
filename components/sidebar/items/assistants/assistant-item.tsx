@@ -45,7 +45,7 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
   const [conversationStarters, setConversationStarters] = useState<string[]>(
     assistant.conversation_starters || []
   )
-  const [sharing, setSharing] = useState(assistant.sharing)
+  const [sharing, setSharing] = useState(assistant.sharing || "private")
 
   useEffect(() => {
     const assistantImage =

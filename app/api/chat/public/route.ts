@@ -1,14 +1,8 @@
-import {
-  checkApiKey,
-  getServerProfile,
-  validateModelAndMessageCount
-} from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import { ServerRuntime } from "next"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
-import { OPENAI_LLM_LIST } from "@/lib/models/llm/openai-llm-list"
 
 export const runtime: ServerRuntime = "edge"
 
@@ -20,27 +14,16 @@ export async function POST(request: Request) {
   }
 
   try {
-    const profile = await getServerProfile()
-
-    checkApiKey(profile.openai_api_key, "OpenAI")
-
-    await validateModelAndMessageCount(chatSettings.model, new Date())
-
     const openai = new OpenAI({
-      apiKey: profile.openai_api_key || "",
-      organization: profile.openai_organization_id,
+      apiKey: process.env.OPENAI_API_KEY || "",
       baseURL: process.env.OPENAI_BASE_URL || undefined
     })
 
-    const supportsVision =
-      OPENAI_LLM_LIST.find(x => x.modelId === chatSettings.model)?.imageInput ||
-      false
-
     const response = await openai.chat.completions.create({
-      model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
+      model: "gpt-4o-mini",
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens: supportsVision ? 4096 : null,
+      max_tokens: 16384, // 16k tokens
       stream: true
     })
 

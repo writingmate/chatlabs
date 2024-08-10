@@ -88,26 +88,28 @@ export const MessageActions: FC<MessageActionsProps> = ({
         }
       />
 
-      <WithTooltip
-        delayDuration={1000}
-        side="bottom"
-        display={<div>Play message</div>}
-        trigger={
-          isVoiceToTextPlaying ? (
-            <IconPlayerStop
-              className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
-              size={MESSAGE_ICON_SIZE}
-              onClick={onVoiceToText}
-            />
-          ) : (
-            <IconPlayerPlay
-              className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
-              size={MESSAGE_ICON_SIZE}
-              onClick={onVoiceToText}
-            />
-          )
-        }
-      />
+      {isAssistant && (
+        <WithTooltip
+          delayDuration={1000}
+          side="bottom"
+          display={<div>Play message</div>}
+          trigger={
+            isVoiceToTextPlaying ? (
+              <IconPlayerStop
+                className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
+                size={MESSAGE_ICON_SIZE}
+                onClick={onVoiceToText}
+              />
+            ) : (
+              <IconPlayerPlay
+                className="hidden cursor-pointer hover:opacity-50 group-hover:block group-[.is-last]:block"
+                size={MESSAGE_ICON_SIZE}
+                onClick={onVoiceToText}
+              />
+            )
+          }
+        />
+      )}
 
       <WithTooltip
         delayDuration={1000}

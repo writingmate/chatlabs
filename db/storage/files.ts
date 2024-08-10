@@ -2,12 +2,13 @@ import { supabase } from "@/lib/supabase/browser-client"
 import { toast } from "sonner"
 
 export const uploadFile = async (
-  file: File,
+  file: any,
   payload: {
     name: string
     user_id: string
     file_id: string
-  }
+  },
+  client = supabase
 ) => {
   const SIZE_LIMIT = 10000000 // 10MB
 
@@ -17,11 +18,9 @@ export const uploadFile = async (
 
   const filePath = `${payload.user_id}/${Buffer.from(payload.file_id).toString("base64")}`
 
-  const { error } = await supabase.storage
-    .from("files")
-    .upload(filePath, file, {
-      upsert: true
-    })
+  const { error } = await client.storage.from("files").upload(filePath, file, {
+    upsert: true
+  })
 
   if (error) {
     console.error(`Error uploading file with path: ${filePath}`, error)

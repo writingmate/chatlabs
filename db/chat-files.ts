@@ -35,9 +35,10 @@ export const createChatFile = async (chatFile: TablesInsert<"chat_files">) => {
 }
 
 export const createChatFiles = async (
-  chatFiles: TablesInsert<"chat_files">[]
+  chatFiles: TablesInsert<"chat_files">[],
+  client = supabase
 ) => {
-  const { data: createdChatFiles, error } = await supabase
+  const { data: createdChatFiles, error } = await client
     .from("chat_files")
     .insert(chatFiles)
     .select("*")

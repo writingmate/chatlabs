@@ -1,147 +1,108 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import {
-  PROFILE_DISPLAY_NAME_MAX,
-  PROFILE_USERNAME_MAX,
-  PROFILE_USERNAME_MIN
-} from "@/db/limits"
-import {
-  IconCircleCheckFilled,
-  IconCircleXFilled,
-  IconLoader2
-} from "@tabler/icons-react"
-import { FC, useCallback, useState } from "react"
-import { LimitDisplay } from "../ui/limit-display"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import { FC } from "react"
+import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
 
 interface ProfileStepProps {
-  username: string
-  usernameAvailable: boolean
   displayName: string
-  onUsernameAvailableChange: (isAvailable: boolean) => void
-  onUsernameChange: (username: string) => void
-  onDisplayNameChange: (name: string) => void
+  onDisplayNameChange: (value: string) => void
+  userQuestion: TablesInsert<"user_questions">
+  onUserQuestionChange: (value: TablesInsert<"user_questions">) => void
 }
 
 export const ProfileStep: FC<ProfileStepProps> = ({
-  username,
-  usernameAvailable,
   displayName,
-  onUsernameAvailableChange,
-  onUsernameChange,
-  onDisplayNameChange
+  onDisplayNameChange,
+  userQuestion,
+  onUserQuestionChange
 }) => {
-  const [loading, setLoading] = useState(false)
-
-  const debounce = (func: (...args: any[]) => void, wait: number) => {
-    let timeout: NodeJS.Timeout | null
-
-    return (...args: any[]) => {
-      const later = () => {
-        if (timeout) clearTimeout(timeout)
-        func(...args)
-      }
-
-      if (timeout) clearTimeout(timeout)
-      timeout = setTimeout(later, wait)
-    }
-  }
-
-  const checkUsernameAvailability = useCallback(
-    debounce(async (username: string) => {
-      if (!username) return
-
-      if (username.length < PROFILE_USERNAME_MIN) {
-        onUsernameAvailableChange(false)
-        return
-      }
-
-      if (username.length > PROFILE_USERNAME_MAX) {
-        onUsernameAvailableChange(false)
-        return
-      }
-
-      const usernameRegex = /^[a-zA-Z0-9_]+$/
-      if (!usernameRegex.test(username)) {
-        onUsernameAvailableChange(false)
-        alert(
-          "Username must be letters, numbers, or underscores only - no other characters or spacing allowed."
-        )
-        return
-      }
-
-      setLoading(true)
-
-      const response = await fetch(`/api/username/available`, {
-        method: "POST",
-        body: JSON.stringify({ username })
-      })
-
-      const data = await response.json()
-      const isAvailable = data.isAvailable
-
-      onUsernameAvailableChange(isAvailable)
-
-      setLoading(false)
-    }, 500),
-    []
-  )
-
   return (
     <>
-      {/*<div className="space-y-1">*/}
-      {/*<div className="flex items-center space-x-2">*/}
-      {/*  <Label>Username</Label>*/}
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <Label>Your Name</Label>
+          <Input
+            placeholder="Steve Jobs"
+            value={displayName}
+            onChange={e => onDisplayNameChange(e.target.value)}
+          />
+        </div>
+        <div className="space-y-1">
+          <Label>Job Role</Label>
+          <Input
+            placeholder="e.g. Marketing Manager, Software Engineer"
+            value={userQuestion.job_role || ""}
+            onChange={e =>
+              onUserQuestionChange({
+                ...userQuestion,
+                job_role: e.target.value
+              })
+            }
+          />
+        </div>
 
-      {/*  <div className="text-xs">*/}
-      {/*    {usernameAvailable ? (*/}
-      {/*      <div className="text-green-500">AVAILABLE</div>*/}
-      {/*    ) : (*/}
-      {/*      <div className="text-red-500">UNAVAILABLE</div>*/}
-      {/*    )}*/}
-      {/*  </div>*/}
-      {/*</div>*/}
+        <div className="space-y-1">
+          <Label>Company Name</Label>
+          <Input
+            placeholder="Your company name"
+            value={userQuestion.company_name || ""}
+            onChange={e =>
+              onUserQuestionChange({
+                ...userQuestion,
+                company_name: e.target.value
+              })
+            }
+          />
+        </div>
 
-      {/*<div className="relative">*/}
-      {/*  <Input*/}
-      {/*    className="pr-10"*/}
-      {/*    placeholder="username"*/}
-      {/*    value={username}*/}
-      {/*    onChange={e => {*/}
-      {/*      onUsernameChange(e.target.value)*/}
-      {/*      checkUsernameAvailability(e.target.value)*/}
-      {/*    }}*/}
-      {/*    minLength={PROFILE_USERNAME_MIN}*/}
-      {/*    maxLength={PROFILE_USERNAME_MAX}*/}
-      {/*  />*/}
+        <div className="space-y-1">
+          <Label>Company Size</Label>
+          <Select
+            value={userQuestion.company_size || ""}
+            onValueChange={e =>
+              onUserQuestionChange({ ...userQuestion, company_size: e })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select company size" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1-10">1-10 employees</SelectItem>
+              <SelectItem value="11-50">11-50 employees</SelectItem>
+              <SelectItem value="51-200">51-200 employees</SelectItem>
+              <SelectItem value="201-500">201-500 employees</SelectItem>
+              <SelectItem value="501-1000">501-1000 employees</SelectItem>
+              <SelectItem value="1001+">1001+ employees</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-      {/*  <div className="absolute inset-y-0 right-0 flex items-center pr-3">*/}
-      {/*    {loading ? (*/}
-      {/*      <IconLoader2 className="animate-spin" />*/}
-      {/*    ) : usernameAvailable ? (*/}
-      {/*      <IconCircleCheckFilled className="text-green-500" />*/}
-      {/*    ) : (*/}
-      {/*      <IconCircleXFilled className="text-red-500" />*/}
-      {/*    )}*/}
-      {/*  </div>*/}
-      {/*</div>*/}
-
-      {/*<LimitDisplay used={username.length} limit={PROFILE_USERNAME_MAX} />*/}
-      {/*</div>*/}
-
-      <div className="space-y-1">
-        <Label>Chat Display Name</Label>
-
-        <Input
-          placeholder="Your Name"
-          value={displayName}
-          onChange={e => onDisplayNameChange(e.target.value)}
-          maxLength={PROFILE_DISPLAY_NAME_MAX}
-        />
-
-        <LimitDisplay
-          used={displayName?.length}
-          limit={PROFILE_DISPLAY_NAME_MAX}
-        />
+        <div className="space-y-1">
+          <Label>Use Cases</Label>
+          <Textarea
+            placeholder="Describe how you plan to use ChatLabs"
+            value={(userQuestion.use_cases as string) || ""}
+            onChange={e =>
+              onUserQuestionChange({
+                ...userQuestion,
+                use_cases: e.target.value
+              })
+            }
+            rows={4}
+          />
+          <div className="text-xs text-gray-500">
+            e.g. customer support, lead generation, etc. Founders read every
+            response!
+          </div>
+        </div>
       </div>
     </>
   )

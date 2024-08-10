@@ -39,7 +39,7 @@ export const getPublicTools = async () => {
   const { data: tools, error } = await supabase
     .from("tools")
     .select("*")
-    .neq("sharing", "private")
+    .eq("sharing", "public")
 
   if (!tools) {
     throw new Error(error.message)

@@ -2,6 +2,7 @@ import { getFileByHashId } from "@/db/files"
 import { notFound } from "next/navigation"
 import { IconExternalLink } from "@tabler/icons-react"
 import { DOMParser } from "xmldom"
+import RemixButton from "@/components/remix/remix-button"
 
 interface SharePageProps {
   params: {
@@ -90,6 +91,7 @@ const SharePage = async ({
             </a>
             <IconExternalLink stroke={1.5} size={16} />
           </div>
+          <RemixButton fileId={file_id} />
         </div>
       )}
     </div>

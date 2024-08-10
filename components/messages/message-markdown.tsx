@@ -7,7 +7,8 @@ import { defaultUrlTransform } from "react-markdown"
 import { ImageWithPreview } from "@/components/image/image-with-preview"
 import { Button } from "@/components/ui/button"
 import { FileIcon } from "@/components/ui/file-icon"
-import Loading from "@/components/ui/loading"
+import rehypeMathjax from "rehype-mathjax"
+import rehypeKatex from "rehype-katex"
 import { cn } from "@/lib/utils"
 
 interface MessageMarkdownProps {
@@ -60,6 +61,13 @@ const CodePreviewButton = memo(
         </div>
       </Button>
     )
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.isGenerating === nextProps.isGenerating &&
+      prevProps.fileName === nextProps.fileName &&
+      prevProps.language === nextProps.language
+    )
   }
 )
 
@@ -91,6 +99,7 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
       )}
       // remarkPlugins={[remarkGfm, remarkMath]}
       remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
+      rehypePlugins={[rehypeMathjax]}
       urlTransform={urlTransform}
       components={{
         a({ children, ...props }) {

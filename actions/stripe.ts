@@ -1,95 +1,110 @@
 "use server";
 
 import type { Stripe } from "stripe";
-
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe";
 import { getOrCreateCustomer } from "@/lib/stripe/get-or-create-customer";
-import { STRIPE_TRIAL_PERIOD_DAYS, PLANS } from "@/lib/stripe/config";
+import { PLANS } from "@/lib/stripe/config";
 import { redirect } from "next/navigation";
-import { getProfileByUserId } from "@/db/profile";
-import { supabase } from "@/lib/supabase/browser-client";
 import { getServerProfile } from "@/lib/server/server-chat-helpers";
 
 export async function createCheckoutSession(
-  data: FormData,
+  data: FormData
 ): Promise<{ client_secret: string | null; url: string | null }> {
-  const plan = data.get(
-    "plan",
-  ) as string;
+  try {
+    const plan = data.get("plan") as string;
+    const userId = data.get('userId') as string;
+    const email = data.get("email") as string;
 
-  const userId = data.get('userId') as string;
+    if (!userId || !email || !plan) {
+      throw new Error("Missing required fields");
+    }
 
-  const email = data.get("email") as string
+    const origin = headers().get("origin");
+    if (!origin) {
+      throw new Error("Origin header is missing");
+    }
 
-  if (!userId) {
-    throw new Error("User ID is required");
-  }
+    if (!PLANS.includes(plan)) {
+      throw new Error("Invalid plan");
+    }
 
-  const origin: string = headers().get("origin") as string;
-
-  if (!PLANS.includes(plan)) {
-    throw new Error("Invalid plan")
-  }
-
-  const prices = await stripe.prices.list({
-    lookup_keys: [plan],
-  })
-
-  if (prices.data.length === 0) {
-    throw new Error("Invalid plan")
-  }
-
-  const customerId = await getOrCreateCustomer({
-    email,
-    userId
-  })
-
-  const price = prices.data[0].id
-
-  const checkoutSession: Stripe.Checkout.Session =
-    await stripe.checkout.sessions.create({
-      mode: "subscription",
-      customer: customerId,
-      // subscription_data: {
-      //   trial_period_days: STRIPE_TRIAL_PERIOD_DAYS,
-      // },
-      line_items: [
-        {
-          price: price,
-          quantity: 1,
-        },
-      ],
-      success_url: `${origin}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/subscription/cancel`,
+    const prices = await stripe.prices.list({
+      lookup_keys: [plan],
     });
 
-  return {
-    client_secret: checkoutSession.client_secret,
-    url: checkoutSession.url,
-  };
+    if (prices.data.length === 0) {
+      throw new Error("Invalid plan");
+    }
+
+    const customerId = await getOrCreateCustomer({
+      email,
+      userId
+    });
+
+    const price = prices.data[0].id;
+
+    const checkoutSession: Stripe.Checkout.Session =
+      await stripe.checkout.sessions.create({
+        mode: "subscription",
+        customer: customerId,
+        allow_promotion_codes: true,
+        line_items: [
+          {
+            price: price,
+            quantity: 1,
+          },
+        ],
+        success_url: `${origin}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/subscription/cancel`,
+      });
+
+    return {
+      client_secret: checkoutSession.client_secret,
+      url: checkoutSession.url,
+    };
+  } catch (error) {
+    console.error("Error in createCheckoutSession:", error);
+    throw error; // Re-throw the error to be handled by the caller
+  }
 }
 
 export async function createBillingPortalSession(customerId: string) {
+  try {
+    const origin = headers().get("origin");
+    if (!origin) {
+      throw new Error("Origin header is missing");
+    }
 
-  const origin: string = headers().get("origin") as string;
+    const billingPortalSession = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: origin,
+    });
 
-  const billingPortalSession = await stripe.billingPortal.sessions.create({
-    customer: customerId,
-    return_url: origin,
-  });
-
-  return {
-    url: billingPortalSession.url,
+    return {
+      url: billingPortalSession.url,
+    };
+  } catch (error) {
+    console.error("Error in createBillingPortalSession:", error);
+    throw error;
   }
 }
 
 export async function redirectToBillingPortal() {
-  const profile = await getServerProfile()
-  if (!profile?.stripe_customer_id) {
-    return
+  let redirectTo = headers().get("referer") || "/";
+  try {
+    const profile = await getServerProfile();
+    if (!profile?.stripe_customer_id) {
+      throw new Error("User does not have a Stripe customer ID");
+    }
+    const { url } = await createBillingPortalSession(profile.stripe_customer_id);
+    if (!url) {
+      throw new Error("Failed to create billing portal session");
+    }
+    redirectTo = url;
+  } catch (error) {
+    console.error("Error in redirectToBillingPortal:", error);
+    // Handle the error appropriately, e.g., redirect to an error page
   }
-  const { url } = await createBillingPortalSession(profile?.stripe_customer_id)
-
-  redirect(url);
+  redirect(redirectTo);
 }

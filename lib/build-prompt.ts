@@ -6,7 +6,9 @@ import { MessageHtmlElement } from "@/types/html"
 
 export const DEFAULT_SYSTEM_PROMPT = `Today is {local_date}.
 User info: "{profile_context}"
-{assistant}`
+{assistant}.
+Surround latex formulas with $$. For example, $$x^2$$ will render as x^2.
+`
 
 export const SYSTEM_PROMPT_CODE_EDITOR = `
 When working with code, small code snippets should be formatted this way:

@@ -50,9 +50,9 @@ LANGUAGE 'plpgsql'
 SECURITY DEFINER
 AS $$
 DECLARE
-  project_url TEXT := 'https://udixafygoiywvupxorvz.supabase.co';
-  service_role_key TEXT := 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkaXhhZnlnb2l5d3Z1cHhvcnZ6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyMDg1MDQ5NywiZXhwIjoyMDM2NDI2NDk3fQ.NiYVdiDVqXxXt2UvwNOH_7F8oeYpGAkpOtUiDo4LU_E'; -- full access needed for http request to storage
-  url TEXT := project_url || '/storage/v1/object/' || bucket || '/' || object;
+--  project_url TEXT := 'https://udixafygoiywvupxorvz.supabase.co';
+  project_url TEXT := 'http://supabase_kong_chatbotui:8000';
+  service_role_key TEXT := 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkaXhhZnlnb2l5d3Z1cHhvcnZ6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyMDg1MDQ5NywiZXhwIjoyMDM2NDI2NDk3fQ.NiYVdiDVqXxXt2UvwNOH_7F8oeYpGAkpOtUiDo4LU_E'; -- full access needed for http request to storage  url TEXT := project_url || '/storage/v1/object/' || bucket || '/' || object;
 BEGIN
   SELECT
       INTO status, content

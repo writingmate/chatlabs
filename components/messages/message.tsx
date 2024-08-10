@@ -31,6 +31,7 @@ import { any } from "zod"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { bo } from "@upstash/redis/zmscore-10fd3773"
+import { toast } from "sonner"
 
 const ICON_SIZE = 32
 
@@ -95,6 +96,8 @@ export const Message: FC<MessageProps> = ({
 
   const [isVoiceToTextPlaying, setIsVoiceToTextPlaying] = useState(false)
 
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
   const handleCopy = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(message.content)
@@ -109,8 +112,31 @@ export const Message: FC<MessageProps> = ({
     }
   }
 
-  const handleSpeakMessage = () => {
-    if ("speechSynthesis" in window) {
+  function cleanupMessageForSpeech(message: string) {
+    const codeBlockRegex = /```[\s\S]*?```|(?:(?:^|\n)( {4}|\t).*)+/g
+    return (
+      message
+        // remove any ``` code blocks
+        .replace(codeBlockRegex, "see code example in the chat")
+    )
+  }
+
+  const handleSpeakMessage = async () => {
+    if (isVoiceToTextPlaying) {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel()
+      }
+      if (audioRef.current) {
+        audioRef.current.pause()
+      }
+      setIsVoiceToTextPlaying(false)
+      return
+    }
+
+    if (profile?.plan !== "free") {
+      // PRO plan users can use OpenAI voice to text
+      await handleOpenAISpeech(cleanupMessageForSpeech(message.content))
+    } else if ("speechSynthesis" in window) {
       if (window.speechSynthesis.paused) {
         // If speech synthesis is paused, resume it
         window.speechSynthesis.resume()
@@ -126,9 +152,75 @@ export const Message: FC<MessageProps> = ({
     }
   }
 
+  const handleOpenAISpeech = async (text: string) => {
+    try {
+      setIsVoiceToTextPlaying(true)
+      const response = await fetch("/api/text-to-speech", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text })
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to generate speech")
+      }
+
+      const audioBlob = await response.blob()
+      const audioUrl = URL.createObjectURL(audioBlob)
+
+      if (audioRef.current) {
+        audioRef.current.pause()
+      }
+      audioRef.current = new Audio(audioUrl)
+      audioRef.current.onended = () => {
+        setIsVoiceToTextPlaying(false)
+      }
+      audioRef.current.play()
+    } catch (error) {
+      console.error("Error in OpenAI text-to-speech:", error)
+      toast.error("Failed to generate speech")
+      setIsVoiceToTextPlaying(false)
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel()
+      }
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && isVoiceToTextPlaying) {
+        if (window.speechSynthesis) {
+          window.speechSynthesis.pause()
+        }
+        if (audioRef.current) {
+          audioRef.current.pause()
+        }
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [isVoiceToTextPlaying])
+
   const speakMessage = () => {
     if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(message.content)
+      const utterance = new SpeechSynthesisUtterance(
+        cleanupMessageForSpeech(message.content)
+      )
       utterance.onerror = () => {
         console.error("An error occurred while speaking the message.")
         setIsVoiceToTextPlaying(false)
@@ -350,7 +442,11 @@ export const Message: FC<MessageProps> = ({
                   isLast={isLast}
                   isEditing={isEditing}
                   onRegenerate={handleRegenerate}
-                  onVoiceToText={() => {}}
+                  isVoiceToTextPlaying={isVoiceToTextPlaying}
+                  onVoiceToText={() => {
+                    // TODO: figure out await and Promise
+                    handleSpeakMessage()
+                  }}
                 />
               </div>
             </div>
@@ -373,14 +469,14 @@ export const Message: FC<MessageProps> = ({
                         <IconCircleFilled className="animate-ping" size={20} />
                       </div>
                     )
-                  case "retrieval":
-                    return (
-                      <div className="flex animate-ping items-center space-x-2">
-                        <IconFileText stroke={1.5} size={20} />
-
-                        <div>Searching files...</div>
-                      </div>
-                    )
+                  // case "retrieval":
+                  //   return (
+                  //     <div className="flex animate-ping items-center space-x-2">
+                  //       <IconFileText stroke={1.5} size={20} />
+                  //
+                  //       <div>Searching files...</div>
+                  //     </div>
+                  //   )
                   default:
                     return (
                       <div className="flex items-center space-x-2">
@@ -400,15 +496,13 @@ export const Message: FC<MessageProps> = ({
               onValueChange={setEditedMessage}
               maxRows={20}
             />
-          ) : message.role === "assistant" ? (
+          ) : (
             <MessageMarkdown
               isGenerating={isGenerating && isLast}
               experimentalCodeEditor={!!profile?.experimental_code_editor}
               content={message.content}
               onPreviewContent={onPreviewContent}
             />
-          ) : (
-            <div className={"whitespace-pre-wrap"}>{message.content}</div>
           )}
         </div>
 
