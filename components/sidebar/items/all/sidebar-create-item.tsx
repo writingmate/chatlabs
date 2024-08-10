@@ -69,7 +69,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   const resolvedName = name || contentType
 
   const createFunctions = {
-    chats: createChat,
+    chats: async (createState: TablesInsert<"chats">) =>
+      createChat(createState),
     presets: createPreset,
     prompts: createPrompt,
     files: async (

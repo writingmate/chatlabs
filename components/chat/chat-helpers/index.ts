@@ -492,8 +492,6 @@ export const processResponse = async (
     ): boolean {
       if (!data) return false
 
-      console.log(data)
-
       return data.some(x => {
         for (const key in x) {
           if (x[key].skipTokenCount) {

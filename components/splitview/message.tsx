@@ -344,14 +344,14 @@ export const Message: FC<MessageProps> = ({
                       return (
                         <IconCircleFilled className="animate-pulse" size={20} />
                       )
-                    case "retrieval":
-                      return (
-                        <div className="flex animate-pulse items-center space-x-2">
-                          <IconFileText size={20} />
-
-                          <div>Searching files...</div>
-                        </div>
-                      )
+                    // case "retrieval":
+                    //   return (
+                    //     <div className="flex animate-pulse items-center space-x-2">
+                    //       <IconFileText size={20} />
+                    //
+                    //       <div>Searching files...</div>
+                    //     </div>
+                    //   )
                     default:
                       return (
                         <div className="flex animate-pulse items-center space-x-2">

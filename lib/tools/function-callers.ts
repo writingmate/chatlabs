@@ -139,6 +139,7 @@ export class AnthropicFunctionCaller implements FunctionCaller {
 
     return {
       role: "assistant",
+      refusal: null,
       content: text.text,
       tool_calls: toolCalls
         ? [

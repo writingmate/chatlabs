@@ -61,6 +61,13 @@ const CodePreviewButton = memo(
         </div>
       </Button>
     )
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.isGenerating === nextProps.isGenerating &&
+      prevProps.fileName === nextProps.fileName &&
+      prevProps.language === nextProps.language
+    )
   }
 )
 

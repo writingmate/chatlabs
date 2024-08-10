@@ -47,8 +47,11 @@ export const getMessagesByChatId = async (chatId: string) => {
   return messages
 }
 
-export const createMessage = async (message: TablesInsert<"messages">) => {
-  const { data: createdMessage, error } = await supabase
+export const createMessage = async (
+  message: TablesInsert<"messages">,
+  client = supabase
+) => {
+  const { data: createdMessage, error } = await client
     .from("messages")
     .insert([message])
     .select("*")
@@ -61,8 +64,11 @@ export const createMessage = async (message: TablesInsert<"messages">) => {
   return createdMessage
 }
 
-export const createMessages = async (messages: TablesInsert<"messages">[]) => {
-  const { data: createdMessages, error } = await supabase
+export const createMessages = async (
+  messages: TablesInsert<"messages">[],
+  client = supabase
+) => {
+  const { data: createdMessages, error } = await client
     .from("messages")
     .insert(messages)
     .select("*")
