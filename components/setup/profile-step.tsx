@@ -8,8 +8,8 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { FC } from "react"
-import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
+import { FC, useState } from "react"
+import { TablesInsert } from "@/supabase/types"
 
 interface ProfileStepProps {
   displayName: string
@@ -24,6 +24,8 @@ export const ProfileStep: FC<ProfileStepProps> = ({
   userQuestion,
   onUserQuestionChange
 }) => {
+  const [showOtherSource, setShowOtherSource] = useState(false)
+
   return (
     <>
       <div className="space-y-4">
@@ -84,6 +86,47 @@ export const ProfileStep: FC<ProfileStepProps> = ({
             </SelectContent>
           </Select>
         </div>
+
+        <div className="space-y-1">
+          <Label>How did you hear about us?</Label>
+          <Select
+            value={userQuestion.source || ""}
+            onValueChange={value => {
+              onUserQuestionChange({ ...userQuestion, source: value })
+              setShowOtherSource(value === "Other")
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select an option" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Search Engine">Search Engine</SelectItem>
+              <SelectItem value="Social Media">Social Media</SelectItem>
+              <SelectItem value="Friend or Colleague">
+                Friend or Colleague
+              </SelectItem>
+              <SelectItem value="Blog or Article">Blog or Article</SelectItem>
+              <SelectItem value="Advertisement">Advertisement</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {showOtherSource && (
+          <div className="space-y-1">
+            <Label>Please specify:</Label>
+            <Input
+              placeholder="How did you hear about us?"
+              value={userQuestion.other_source || ""}
+              onChange={e =>
+                onUserQuestionChange({
+                  ...userQuestion,
+                  other_source: e.target.value
+                })
+              }
+            />
+          </div>
+        )}
 
         <div className="space-y-1">
           <Label>Use Cases</Label>
