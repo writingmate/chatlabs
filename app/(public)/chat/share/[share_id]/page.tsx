@@ -24,8 +24,6 @@ export default async function SharedChatPage({
   let chatName = ""
   let messages: Tables<"messages">[] = []
 
-  console.log("params", params)
-
   const { data: chatData } = await supabase
     .from("chats")
     .select("*")
