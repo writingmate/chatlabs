@@ -40,7 +40,7 @@ export const ProfileStep: FC<ProfileStepProps> = ({
         <div className="space-y-1">
           <Label>Job Role</Label>
           <Input
-            placeholder="e.g. Marketing Manager, Software Engineer"
+            placeholder="e.g. Marketing Manager, Software Engineer, or Student"
             value={userQuestion.job_role || ""}
             onChange={e =>
               onUserQuestionChange({
@@ -54,7 +54,7 @@ export const ProfileStep: FC<ProfileStepProps> = ({
         <div className="space-y-1">
           <Label>Company Name</Label>
           <Input
-            placeholder="Your company name"
+            placeholder="Your company or school name"
             value={userQuestion.company_name || ""}
             onChange={e =>
               onUserQuestionChange({
@@ -100,13 +100,14 @@ export const ProfileStep: FC<ProfileStepProps> = ({
               <SelectValue placeholder="Select an option" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Search Engine">Search Engine</SelectItem>
-              <SelectItem value="Social Media">Social Media</SelectItem>
-              <SelectItem value="Friend or Colleague">
-                Friend or Colleague
+              <SelectItem value="Google">Google</SelectItem>
+              <SelectItem value="Twitter">Twitter</SelectItem>
+              <SelectItem value="Github">Github</SelectItem>
+              <SelectItem value="Linkedin">Linked in</SelectItem>
+              <SelectItem value="Instagram/Facebook">
+                Instagram/Facebook
               </SelectItem>
-              <SelectItem value="Blog or Article">Blog or Article</SelectItem>
-              <SelectItem value="Advertisement">Advertisement</SelectItem>
+              <SelectItem value="Friends">Friend told me</SelectItem>
               <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
           </Select>
@@ -129,7 +130,7 @@ export const ProfileStep: FC<ProfileStepProps> = ({
         )}
 
         <div className="space-y-1">
-          <Label>Use Cases</Label>
+          <Label>What do you want to use ChatLabs for?</Label>
           <Textarea
             placeholder="Describe how you plan to use ChatLabs"
             value={(userQuestion.use_cases as string) || ""}
