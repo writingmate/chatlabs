@@ -1,4 +1,4 @@
-import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+"use client"
 import { ChatbotUIContext } from "@/context/context"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
@@ -27,26 +27,24 @@ import { YouTube } from "@/components/messages/annotations/youtube"
 import { WebSearch } from "@/components/messages/annotations/websearch"
 import AnnotationImage from "@/components/messages/annotations/image"
 import { Annotation, Annotation2 } from "@/types/annotation"
-import { any } from "zod"
-import { ChatbotUIChatContext } from "@/context/chat"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
-import { bo } from "@upstash/redis/zmscore-10fd3773"
 import { toast } from "sonner"
 
 const ICON_SIZE = 32
 
 interface MessageProps {
+  showActions?: boolean
   message: Tables<"messages">
   fileItems: Tables<"file_items">[]
   isEditing: boolean
   isLast: boolean
-  onStartEdit: (message: Tables<"messages">) => void
-  onCancelEdit: () => void
-  onSubmitEdit: (value: string, sequenceNumber: number) => void
-  onRegenerate: (editedMessage?: string) => void
+  onStartEdit?: (message: Tables<"messages">) => void
+  onCancelEdit?: () => void
+  onSubmitEdit?: (value: string, sequenceNumber: number) => void
+  onRegenerate?: (editedMessage?: string) => void
   isGenerating: boolean
   firstTokenReceived: boolean
-  setIsGenerating: (value: boolean) => void
+  setIsGenerating?: (value: boolean) => void
   onPreviewContent?: (content: {
     content: string
     filename?: string
@@ -66,7 +64,8 @@ export const Message: FC<MessageProps> = ({
   onCancelEdit,
   onRegenerate,
   onSubmitEdit,
-  onPreviewContent
+  onPreviewContent,
+  showActions = true
 }) => {
   const {
     assistants,
@@ -250,8 +249,8 @@ export const Message: FC<MessageProps> = ({
   }
 
   const handleSendEdit = () => {
-    onSubmitEdit(editedMessage, message.sequence_number)
-    onCancelEdit()
+    onSubmitEdit?.(editedMessage, message.sequence_number)
+    onCancelEdit?.()
   }
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -261,12 +260,12 @@ export const Message: FC<MessageProps> = ({
   }
 
   const handleRegenerate = async () => {
-    setIsGenerating(true)
-    onRegenerate(editedMessage)
+    setIsGenerating?.(true)
+    onRegenerate?.(editedMessage)
   }
 
   const handleStartEdit = () => {
-    onStartEdit(message)
+    onStartEdit?.(message)
   }
 
   useEffect(() => {
@@ -433,22 +432,24 @@ export const Message: FC<MessageProps> = ({
                       : MODEL_DATA?.modelName
                   : profile?.display_name ?? profile?.username}
               </div>
-              <div className={"absolute right-0"}>
-                <MessageActions
-                  isGenerating={isGenerating}
-                  onCopy={handleCopy}
-                  onEdit={handleStartEdit}
-                  isAssistant={message.role === "assistant"}
-                  isLast={isLast}
-                  isEditing={isEditing}
-                  onRegenerate={handleRegenerate}
-                  isVoiceToTextPlaying={isVoiceToTextPlaying}
-                  onVoiceToText={() => {
-                    // TODO: figure out await and Promise
-                    handleSpeakMessage()
-                  }}
-                />
-              </div>
+              {showActions && (
+                <div className={"absolute right-0"}>
+                  <MessageActions
+                    isGenerating={isGenerating}
+                    onCopy={handleCopy}
+                    onEdit={handleStartEdit}
+                    isAssistant={message.role === "assistant"}
+                    isLast={isLast}
+                    isEditing={isEditing}
+                    onRegenerate={handleRegenerate}
+                    isVoiceToTextPlaying={isVoiceToTextPlaying}
+                    onVoiceToText={() => {
+                      // TODO: figure out await and Promise
+                      handleSpeakMessage()
+                    }}
+                  />
+                </div>
+              )}
             </div>
           )}
           <Annotations annotation={message.annotation as Annotation} />

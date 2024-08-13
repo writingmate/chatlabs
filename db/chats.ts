@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
 
-export const getChatById = async (chatId: string) => {
-  const { data: chat } = await supabase
+export const getChatById = async (chatId: string, client = supabase) => {
+  const { data: chat } = await client
     .from("chats")
     .select("*")
     .eq("id", chatId)

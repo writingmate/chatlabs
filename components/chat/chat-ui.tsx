@@ -42,6 +42,7 @@ import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
 import { Virtualizer } from "virtua"
 import { bo } from "@upstash/redis/zmscore-10fd3773"
+import { ShareChatButton } from "@/components/chat/chat-share-button"
 
 interface ChatUIProps {
   showModelSelector?: boolean
