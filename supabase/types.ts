@@ -1604,7 +1604,9 @@ export interface Database {
           created_at: string
           id: string
           job_role: string | null
+          other_source: string | null
           purchase_reason: string | null
+          source: string | null
           use_cases: string | null
           user_id: string
         }
@@ -1614,7 +1616,9 @@ export interface Database {
           created_at?: string
           id?: string
           job_role?: string | null
+          other_source?: string | null
           purchase_reason?: string | null
+          source?: string | null
           use_cases?: string | null
           user_id: string
         }
@@ -1624,7 +1628,9 @@ export interface Database {
           created_at?: string
           id?: string
           job_role?: string | null
+          other_source?: string | null
           purchase_reason?: string | null
+          source?: string | null
           use_cases?: string | null
           user_id?: string
         }
