@@ -302,16 +302,20 @@ export class OpenRouterFunctionCaller extends OpenAIFunctionCaller {
     messages: any[]
     tools?: OpenAI.Chat.Completions.ChatCompletionTool[]
   }) {
-    const response = await this.client.chat.completions.create({
-      model: model,
-      messages: messages,
-      tools: tools,
-      tool_choice: "auto",
-      headers: {
-        "HTTP-Referer": "https://your-site-url.com", // Replace with your actual site URL
-        "X-Title": "Your App Name" // Replace with your app name
+    const response = await this.client.chat.completions.create(
+      {
+        model: model,
+        messages: messages,
+        tools: tools,
+        tool_choice: "auto"
+      },
+      {
+        headers: {
+          "HTTP-Referer": "https://your-site-url.com",
+          "X-Title": "Your App Name"
+        }
       }
-    })
+    )
 
     return response.choices[0].message
   }
@@ -327,15 +331,19 @@ export class OpenRouterFunctionCaller extends OpenAIFunctionCaller {
     tools: OpenAI.Chat.Completions.ChatCompletionTool[]
     streamData: experimental_StreamData
   }) {
-    const response = await this.client.chat.completions.create({
-      model: model,
-      messages,
-      stream: true,
-      headers: {
-        "HTTP-Referer": "https://your-site-url.com", // Replace with your actual site URL
-        "X-Title": "Your App Name" // Replace with your app name
+    const response = await this.client.chat.completions.create(
+      {
+        model: model,
+        messages,
+        stream: true
+      },
+      {
+        headers: {
+          "HTTP-Referer": "https://your-site-url.com",
+          "X-Title": "Your App Name"
+        }
       }
-    })
+    )
 
     return OpenAIStream(response, {
       onFinal(completion) {
