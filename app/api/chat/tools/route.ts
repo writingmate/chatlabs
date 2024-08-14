@@ -23,7 +23,8 @@ import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import {
   AnthropicFunctionCaller,
   GroqFunctionCaller,
-  OpenAIFunctionCaller
+  OpenAIFunctionCaller,
+  OpenRouterFunctionCaller
 } from "@/lib/tools/function-callers"
 import {
   buildSchemaDetails,
@@ -83,6 +84,11 @@ function getProviderCaller(model: string, profile: Tables<"profiles">) {
         baseURL: "https://api.groq.com/openai/v1"
       })
     )
+  }
+
+  if (provider === "openrouter") {
+    checkApiKey(profile.openrouter_api_key, "OpenRouter")
+    return new OpenRouterFunctionCaller(profile.openrouter_api_key || "")
   }
 
   throw new Error(`Provider not supported: ${provider}`)

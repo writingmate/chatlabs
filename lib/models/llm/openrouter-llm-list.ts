@@ -9,7 +9,7 @@ const GPT4O: LLM = {
   hostedId: "gpt-4o",
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
-  tools: false,
+  tools: true,
 
   supportsStreaming: true,
   pricing: {

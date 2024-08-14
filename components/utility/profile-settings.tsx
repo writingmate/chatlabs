@@ -12,7 +12,7 @@ import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
 import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 import { supabase } from "@/lib/supabase/browser-client"
 import { cn } from "@/lib/utils"
-import { OpenRouterLLM } from "@/types"
+import { LLM, OpenRouterLLM } from "@/types"
 import {
   IconCircleCheckFilled,
   IconCircleXFilled,

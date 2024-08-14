@@ -105,4 +105,7 @@ export interface LLM {
 
 export interface OpenRouterLLM extends LLM {
   maxContext: number
+  tools: boolean
+  supportsStreaming: boolean
+  imageInput: boolean
 }

@@ -238,7 +238,9 @@ export const fetchOpenRouterModels = async () => {
             inputCost: parseFloat(model.pricing.prompt) * 1000000,
             outputCost: parseFloat(model.pricing.completion) * 1000000,
             unit: "1M tokens"
-          }
+          },
+          tools: true,
+          supportsStreaming: true
         })
       )
       .filter(({ modelId }: { modelId: string }) =>

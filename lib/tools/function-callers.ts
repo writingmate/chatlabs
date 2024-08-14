@@ -11,7 +11,7 @@ import { TextBlock, ToolUseBlock } from "@anthropic-ai/sdk/resources"
 
 export class OpenAIFunctionCaller implements FunctionCaller {
   constructor(
-    private readonly client: OpenAI,
+    protected readonly client: OpenAI,
     public readonly supportsFunctionCallStreaming = false
   ) {
     this.supportsFunctionCallStreaming = supportsFunctionCallStreaming
@@ -275,6 +275,73 @@ export class GroqFunctionCaller extends OpenAIFunctionCaller {
       messages: updatedMessages,
       tools,
       streamData
+    })
+  }
+}
+
+export class OpenRouterFunctionCaller extends OpenAIFunctionCaller {
+  constructor(
+    private readonly apiKey: string,
+    supportsFunctionCallStreaming = false
+  ) {
+    super(
+      new OpenAI({
+        apiKey: apiKey,
+        baseURL: "https://openrouter.ai/api/v1"
+      }),
+      supportsFunctionCallStreaming
+    )
+  }
+
+  async findFunctionCalls({
+    model,
+    messages,
+    tools
+  }: {
+    model: string
+    messages: any[]
+    tools?: OpenAI.Chat.Completions.ChatCompletionTool[]
+  }) {
+    const response = await this.client.chat.completions.create({
+      model: model,
+      messages: messages,
+      tools: tools,
+      tool_choice: "auto",
+      headers: {
+        "HTTP-Referer": "https://your-site-url.com", // Replace with your actual site URL
+        "X-Title": "Your App Name" // Replace with your app name
+      }
+    })
+
+    return response.choices[0].message
+  }
+
+  async createResponseStream({
+    model,
+    messages,
+    tools,
+    streamData
+  }: {
+    model: string
+    messages: any[]
+    tools: OpenAI.Chat.Completions.ChatCompletionTool[]
+    streamData: experimental_StreamData
+  }) {
+    const response = await this.client.chat.completions.create({
+      model: model,
+      messages,
+      stream: true,
+      headers: {
+        "HTTP-Referer": "https://your-site-url.com", // Replace with your actual site URL
+        "X-Title": "Your App Name" // Replace with your app name
+      }
+    })
+
+    return OpenAIStream(response, {
+      onFinal(completion) {
+        streamData.close()
+      },
+      experimental_streamData: true
     })
   }
 }
