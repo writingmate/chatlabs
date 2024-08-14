@@ -102,7 +102,7 @@ const GPT4O: LLM = {
   modelId: "gpt-4o",
   modelName: "GPT-4o",
   provider: "openai",
-  hostedId: "gpt-4o",
+  hostedId: "gpt-4o-2024-08-06",
   platformLink: OPENAI_PLATORM_LINK,
   imageInput: true,
   tools: true,
@@ -111,8 +111,8 @@ const GPT4O: LLM = {
   pricing: {
     currency: "USD",
     unit: "1M tokens",
-    inputCost: 5.0,
-    outputCost: 15.0
+    inputCost: 2.5,
+    outputCost: 10.0
   }
 }
 

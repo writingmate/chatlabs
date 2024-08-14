@@ -304,7 +304,10 @@ export const handleHostedChat = async (
     provider === "custom" ? "/api/chat/custom" : `/api/chat/${provider}`
 
   const requestBody = {
-    chatSettings: payload.chatSettings,
+    chatSettings: {
+      ...payload.chatSettings,
+      model: modelData.hostedId || modelData.modelId
+    },
     messages: formattedMessages,
     customModelId: provider === "custom" ? modelData.hostedId : ""
   }

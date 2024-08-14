@@ -33,8 +33,9 @@ export async function POST(request: Request) {
     })
 
     const supportsVision =
-      OPENAI_LLM_LIST.find(x => x.modelId === chatSettings.model)?.imageInput ||
-      false
+      OPENAI_LLM_LIST.find(x =>
+        [x.modelId, x.hostedId].includes(chatSettings.model)
+      )?.imageInput || false
 
     const response = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],

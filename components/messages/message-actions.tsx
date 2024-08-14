@@ -1,18 +1,13 @@
-import { ChatbotUIContext } from "@/context/context"
 import {
   IconCheck,
-  IconCopy,
   IconEdit,
   IconRepeat,
-  IconMicrophone,
-  IconPlayerRecordFilled,
   IconPlayerPlay,
   IconPlayerStop,
   IconClipboard
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useState } from "react"
 import { WithTooltip } from "../ui/with-tooltip"
-import { ChatbotUIChatContext } from "@/context/chat"
 
 export const MESSAGE_ICON_SIZE = 18
 
