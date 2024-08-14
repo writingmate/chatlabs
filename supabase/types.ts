@@ -437,10 +437,14 @@ export interface Database {
           id: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
+          last_chat_message_id: string | null
+          last_shared_message_id: string | null
           model: string
           name: string
           pinned: boolean | null
           prompt: string
+          shared_at: string | null
+          shared_by: string | null
           sharing: string
           temperature: number
           updated_at: string | null
@@ -457,10 +461,14 @@ export interface Database {
           id?: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
+          last_chat_message_id?: string | null
+          last_shared_message_id?: string | null
           model: string
           name: string
           pinned?: boolean | null
           prompt: string
+          shared_at?: string | null
+          shared_by?: string | null
           sharing?: string
           temperature: number
           updated_at?: string | null
@@ -477,10 +485,14 @@ export interface Database {
           id?: string
           include_profile_context?: boolean
           include_workspace_instructions?: boolean
+          last_chat_message_id?: string | null
+          last_shared_message_id?: string | null
           model?: string
           name?: string
           pinned?: boolean | null
           prompt?: string
+          shared_at?: string | null
+          shared_by?: string | null
           sharing?: string
           temperature?: number
           updated_at?: string | null
@@ -500,6 +512,27 @@ export interface Database {
             columns: ["folder_id"]
             isOneToOne: false
             referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chats_last_chat_message_id_fkey"
+            columns: ["last_chat_message_id"]
+            isOneToOne: true
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chats_last_shared_message_id_fkey"
+            columns: ["last_shared_message_id"]
+            isOneToOne: true
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chats_shared_by_fkey"
+            columns: ["shared_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
@@ -1494,6 +1527,65 @@ export interface Database {
           }
         ]
       }
+      shared_chats: {
+        Row: {
+          chat_id: string
+          created_at: string
+          id: string
+          last_message_id: string
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          chat_id: string
+          created_at?: string
+          id?: string
+          last_message_id: string
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          chat_id?: string
+          created_at?: string
+          id?: string
+          last_message_id?: string
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_chats_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_chats_last_message_id_fkey"
+            columns: ["last_message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_chats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_chats_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       tool_workspaces: {
         Row: {
           created_at: string
@@ -1604,7 +1696,9 @@ export interface Database {
           created_at: string
           id: string
           job_role: string | null
+          other_source: string | null
           purchase_reason: string | null
+          source: string | null
           use_cases: string | null
           user_id: string
         }
@@ -1614,7 +1708,9 @@ export interface Database {
           created_at?: string
           id?: string
           job_role?: string | null
+          other_source?: string | null
           purchase_reason?: string | null
+          source?: string | null
           use_cases?: string | null
           user_id: string
         }
@@ -1624,7 +1720,9 @@ export interface Database {
           created_at?: string
           id?: string
           job_role?: string | null
+          other_source?: string | null
           purchase_reason?: string | null
+          source?: string | null
           use_cases?: string | null
           user_id?: string
         }

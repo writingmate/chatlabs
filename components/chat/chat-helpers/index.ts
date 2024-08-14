@@ -356,25 +356,50 @@ export const fetchChatResponse = async (
   })
 
   if (!response.ok) {
-    if (response.status === 404 && !isHosted) {
-      toast.error(
-        "Model not found. Make sure you have it downloaded via Ollama."
-      )
+    console.error("Error fetching chat response:", response)
+
+    let errorMessage = null
+    let errorLogLevel = toast.error
+
+    const statusToMessage = {
+      404: "Model not found. Make sure you have it downloaded via Ollama.",
+      429: "You are sending too many messages. Please try again in a few minutes.",
+      402: "You have reached the limit of free messages. Please upgrade to a paid plan.",
+      413: "Message is too long or image is too large. Please shorten it."
     }
 
-    if (response.status === 429) {
-      toast.warning(
-        "You are sending too many messages. Please try again in a few minutes."
-      )
+    const statusToErrorLogLevel = {
+      404: toast.error,
+      429: toast.warning,
+      402: toast.warning,
+      413: toast.error
     }
 
-    const errorData = await response.json()
+    if (response.status in statusToErrorLogLevel) {
+      errorLogLevel =
+        statusToErrorLogLevel[
+          response.status as keyof typeof statusToErrorLogLevel
+        ]
+    }
+
+    if (response.status in statusToMessage) {
+      errorMessage =
+        statusToMessage[response.status as keyof typeof statusToMessage]
+    }
+
+    if (!errorMessage) {
+      try {
+        const errorData = await response.json()
+        errorMessage = errorData.message
+      } catch (error) {
+        errorMessage = "Failed to send the message. Please try again."
+      }
+    }
+
+    errorLogLevel(errorMessage)
 
     if (response.status === 402) {
-      toast.warning(errorData.message)
       setPaywallOpen?.(true)
-    } else {
-      toast.error(errorData.message)
     }
 
     setIsGenerating(false)

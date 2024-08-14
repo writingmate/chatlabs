@@ -133,7 +133,8 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
   }) => {
     const { user } = useAuth()
     const searchParams = useSearchParams()
-    const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
+    const { selectedWorkspace, chatSettings, profile } =
+      useContext(ChatbotUIContext)
     const [sharing, setSharing] = useState(false)
     const [inspectMode, setInspectMode] = useState(false)
     const [execute, setExecute] = useState(searchParams.has("run"))
@@ -381,7 +382,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                       <span>Run</span>
                     </ToggleGroupItem>
                   </ToggleGroup>
-                  {language == "html" && (
+                  {language == "html" && profile && (
                     <>
                       <Button
                         disabled={isGenerating}

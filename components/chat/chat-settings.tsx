@@ -2,11 +2,12 @@ import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLMID, ModelProvider } from "@/types"
-import { FC, useContext, useEffect, useRef } from "react"
+import React, { FC, useContext, useEffect, useRef } from "react"
 import { ModelSelectChat } from "@/components/models/model-select-chat"
 import { ToolSelect } from "@/components/tools/tool-select"
 import { cn } from "@/lib/utils"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { ShareChatButton } from "@/components/chat/chat-share-button"
 
 interface ChatSettingsProps {
   className?: string
@@ -59,6 +60,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
 
   return (
     <div className={cn("flex items-center space-x-1", className)}>
+      <ShareChatButton />
       {selectedModel?.tools && (
         <ToolSelect
           selectedModelId={chatSettings.model}
