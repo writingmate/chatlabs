@@ -8,8 +8,8 @@ import { ImageWithPreview } from "@/components/image/image-with-preview"
 import { Button } from "@/components/ui/button"
 import { FileIcon } from "@/components/ui/file-icon"
 import rehypeMathjax from "rehype-mathjax"
-import rehypeKatex from "rehype-katex"
 import { cn } from "@/lib/utils"
+import { REGEX_FILENAME } from "@/lib/preview"
 
 interface MessageMarkdownProps {
   isGenerating?: boolean
@@ -158,13 +158,11 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
 
           const language = (match && match[1]) || ""
 
-          const regexFileName = /^#filename=(.*)#/
-
           const fileContent = String(childArray).replace(/\n$/, "")
 
-          const matchedNames = fileContent.match(regexFileName)
+          const matchedNames = fileContent.match(REGEX_FILENAME)
           const fileContentWithoutFileName = fileContent.replace(
-            regexFileName,
+            REGEX_FILENAME,
             ""
           )
 

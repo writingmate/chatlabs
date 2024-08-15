@@ -1,4 +1,3 @@
-import { createClient } from "@supabase/supabase-js"
 import { PlatformTool } from "@/types/platformTools"
 
 interface ImageGenerationViaStableDiffusion3Params {
@@ -95,7 +94,7 @@ async function uploadImageToSupabase(prompt: string, imageData: string) {
   const fileName = `${prompt.replace(/\s+/g, "_")}.png`
 
   const { data, error } = await supabase.storage
-    .from("your-bucket-name") // Replace with your actual bucket name
+    .from("generated_images") // Replace with your actual bucket name
     .upload(fileName, imageBuffer, {
       contentType: "image/png",
       upsert: true
@@ -106,7 +105,7 @@ async function uploadImageToSupabase(prompt: string, imageData: string) {
   }
 
   const { publicURL, error: urlError } = supabase.storage
-    .from("your-bucket-name") // Replace with your actual bucket name
+    .from("generated_images") // Replace with your actual bucket name
     .getPublicUrl(fileName)
 
   if (urlError) {
