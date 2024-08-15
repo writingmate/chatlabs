@@ -263,10 +263,13 @@ export const ChatUI: React.FC<ChatUIProps> = ({
       }
       return content
     })
+  }
+
+  useEffect(() => {
     if (editorOpen) {
       setShowSidebar(false)
     }
-  }
+  }, [editorOpen])
 
   return (
     <div

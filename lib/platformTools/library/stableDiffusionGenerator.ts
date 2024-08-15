@@ -1,3 +1,4 @@
+import { createClient } from "@supabase/supabase-js"
 import { PlatformTool } from "@/types/platformTools"
 
 interface ImageGenerationViaStableDiffusion3Params {
@@ -10,7 +11,6 @@ interface ImageGenerationViaStableDiffusion3UserSettings {
   model?: string
 }
 
-// This function fetches data from a URL and returns it in markdown format.
 async function stableDiffusion3(
   params:
     | ImageGenerationViaStableDiffusion3Params
@@ -36,11 +36,15 @@ async function stableDiffusion3(
   }
 
   try {
-    return await generateImageFromStabilityAPI(
+    const imageData = await generateImageFromStabilityAPI(
       stabilityAPIKey,
       prompt,
       userSettings
     )
+
+    const imageUrl = await uploadImageToSupabase(prompt, imageData)
+
+    return imageUrl
   } catch (error: any) {
     console.error("Error generating image:", error)
     throw new Error("Error: " + error.message)
@@ -83,40 +87,54 @@ async function generateImageFromStabilityAPI(
   }
 
   const data = await response.json()
-  return (
-    "![" +
-    prompt +
-    "](data:image/" +
-    (output_format || "png") +
-    ";base64," +
-    data.image +
-    ") \n\n" +
-    prompt
-  )
+  return data.image // Return the base64 image data
 }
 
-// This is the definition of the webscrapping tool.
+async function uploadImageToSupabase(prompt: string, imageData: string) {
+  const imageBuffer = Buffer.from(imageData, "base64")
+  const fileName = `${prompt.replace(/\s+/g, "_")}.png`
+
+  const { data, error } = await supabase.storage
+    .from("your-bucket-name") // Replace with your actual bucket name
+    .upload(fileName, imageBuffer, {
+      contentType: "image/png",
+      upsert: true
+    })
+
+  if (error) {
+    throw new Error("Supabase upload error: " + error.message)
+  }
+
+  const { publicURL, error: urlError } = supabase.storage
+    .from("your-bucket-name") // Replace with your actual bucket name
+    .getPublicUrl(fileName)
+
+  if (urlError) {
+    throw new Error("Supabase URL error: " + urlError.message)
+  }
+
+  return publicURL
+}
+
 export const stableDiffusionTools: PlatformTool = {
-  id: "b3f07a6e-5e01-423e-1f05-ee51830608dd", // This is the unique identifier of the tool.
-  name: "Stable Diffusion 3", // This is the name of the tool.
-  toolName: "stableDiffusion3", // This is the name of the tool in the code.
-  version: "v1.0.0", // This is the version of the tool.
-  // This is the description of the tool.
+  id: "b3f07a6e-5e01-423e-1f05-ee51830608dd",
+  name: "Stable Diffusion 3",
+  toolName: "stableDiffusion3",
+  version: "v1.0.0",
   description:
     "Generate images using Stable Diffusion v3 based on a text description.",
   toolsFunctions: [
     {
-      id: "imageGenerationViaStableDiffusion3", // This is the unique identifier of the tool function.
-      toolFunction: stableDiffusion3, // This is the function that will be called when the tool function is executed.
+      id: "imageGenerationViaStableDiffusion3",
+      toolFunction: stableDiffusion3,
       resultProcessingMode: "render_markdown",
       description: `Generate images using Stable Diffusion v3 based on a text description. 
 Returns the URL of the image. Never display the image in the response, nor include the link or url, it is handled in the frontend.
 Never include image url in the response for generated images. Do not say you can't display image. 
 Do not use semi-colons when describing the image. Never use html, always use Markdown.
 You should only return the function call in tools call sections.
-        `, // This is the description of the tool function.
+        `,
       parameters: [
-        // These are the parameters of the tool function.
         {
           name: "prompt",
           description:
