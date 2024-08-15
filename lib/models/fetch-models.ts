@@ -40,9 +40,9 @@ const KNOWN_MODEL_NAMES: {
     paid: true,
     supportsStreaming: true
   },
-  "openai/gpt-4o-2024-05-13": {
+  "openai/gpt-4o-2024-08-06": {
     provider: "openai",
-    modelName: "GPT-4o 2024-05-13",
+    modelName: "GPT-4o 2024-08-06",
     imageInput: true,
     tools: false,
     new: true,
@@ -63,6 +63,15 @@ const KNOWN_MODEL_NAMES: {
     new: true,
     imageInput: true,
     supportsStreaming: true
+  },
+  "meta-llama/llama-3.1-405b": {
+    provider: "meta",
+    modelName: "Meta Llama 3.1 405B",
+    new: true,
+    imageInput: false,
+    tools: true,
+    supportsStreaming: true,
+    paid: true
   }
 }
 
@@ -92,8 +101,9 @@ function parseSupportedModelsFromEnv() {
     "deepseek/deepseek-coder",
     "google/gemini-pro-1.5",
     "anthropic/claude-3.5-sonnet",
-    "openai/gpt-4o-2024-05-13",
-    "openai/gpt-4o-mini"
+    "openai/gpt-4o-2024-08-06",
+    "openai/gpt-4o-mini",
+    "meta-llama/llama-3.1-405b"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {
@@ -213,44 +223,27 @@ export const fetchOpenRouterModels = async () => {
     let SUPPORTED_OPENROUTER_MODELS = parseSupportedModelsFromEnv()
 
     const openRouterModels = data
-      .map(
-        (model: {
-          id: string
-          name: string
-          context_length: number
-          description: string
-          pricing: {
-            completion: string
-            image: string
-            prompt: string
-          }
-        }): OpenRouterLLM => ({
+      .filter((model: any) => SUPPORTED_OPENROUTER_MODELS.includes(model.id))
+      .map((model: any): OpenRouterLLM => {
+        const knownModel = OPENROUTER_LLM_LIST.find(m => m.modelId === model.id)
+        const { modelName } = parseOpenRouterModelName(model.id)
+        return {
           modelId: model.id as LLMID,
-          modelName: model.name,
+          modelName: modelName || model.name,
           provider: "openrouter",
           hostedId: model.id,
           platformLink: "https://openrouter.dev",
-          imageInput: true,
+          imageInput: knownModel?.imageInput ?? false,
           maxContext: model.context_length,
           description: model.description,
           pricing: {
             currency: "USD",
-            inputCost: parseFloat(model.pricing.prompt) * 1000000,
-            outputCost: parseFloat(model.pricing.completion) * 1000000,
+            inputCost: parseFloat(model.pricing?.prompt || "0") * 1000000,
+            outputCost: parseFloat(model.pricing?.completion || "0") * 1000000,
             unit: "1M tokens"
           },
-          tools: true,
+          tools: knownModel?.tools ?? false,
           supportsStreaming: true
-        })
-      )
-      .filter(({ modelId }: { modelId: string }) =>
-        SUPPORTED_OPENROUTER_MODELS.includes(modelId)
-      )
-      .map((model: any) => {
-        const { modelName } = parseOpenRouterModelName(model.modelId)
-        return {
-          ...model,
-          modelName
         }
       })
 
@@ -258,5 +251,6 @@ export const fetchOpenRouterModels = async () => {
   } catch (error) {
     console.error("Error fetching Open Router models: " + error)
     toast.error("Error fetching Open Router models: " + error)
+    return [] // Return an empty array in case of error
   }
 }

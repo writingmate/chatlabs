@@ -3,8 +3,8 @@ import { LLM } from "@/types"
 const OPENROUTER_PLATFORM_LINK = "https://openrouter.ai/api/v1"
 
 const GPT4O: LLM = {
-  modelId: "openai/gpt-4o-2024-05-13",
-  modelName: "GPT-4o 2024-05-13",
+  modelId: "openai/gpt-4o-2024-08-06",
+  modelName: "GPT-4o 2024-08-06",
   provider: "openrouter",
   hostedId: "gpt-4o",
   platformLink: OPENROUTER_PLATFORM_LINK,
@@ -114,6 +114,18 @@ const FIRELLAVA_13b: LLM = {
   paid: true
 }
 
+const LLAMA_3_1_405B: LLM = {
+  modelId: "meta-llama/llama-3.1-405b",
+  modelName: "Llama 3.1 405B",
+  provider: "openrouter",
+  hostedId: "llama-3.1-405b",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: true,
+  supportsStreaming: true,
+  paid: true
+}
+
 export const OPENROUTER_LLM_LIST: LLM[] = [
   GPT4O,
   GPT4O_MINI,
@@ -122,9 +134,11 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
   CLAUDE_3_HAIKU,
   CLAUDE_35_SONNET,
   LLAVA_YI_34b,
-  FIRELLAVA_13b
+  FIRELLAVA_13b,
+  LLAMA_3_1_405B
 ]
-//- openai/gpt-4o-2024-05-13
+//- openai/gpt-4o-2024-08-06
+//- openai/gpt-4o-mini
 //- openai/gpt-4-vision-preview
 //- google/gemini-pro-1.5
 //- google/gemini-pro-vision
@@ -132,3 +146,4 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
 //- fireworks/firellava-13b
 //- anthropic/claude-3-haiku
 //- anthropic/claude-3.5-sonnet
+//- meta-llama/llama-3.1-405b

@@ -75,9 +75,9 @@ export async function buildFinalMessages(
     CHUNK_SIZE = chatSettings.contextLength
   }
 
-  if (chatSettings.model in CHAT_SETTING_LIMITS) {
-    CHUNK_SIZE = CHAT_SETTING_LIMITS[chatSettings.model].MAX_CONTEXT_LENGTH
-  }
+  //if (chatSettings.model in CHAT_SETTING_LIMITS) {
+  //  CHUNK_SIZE = CHAT_SETTING_LIMITS[chatSettings.model].MAX_CONTEXT_LENGTH
+  //}
 
   const PROMPT_TOKENS = encode(chatSettings.prompt).length
 
@@ -196,6 +196,171 @@ export async function buildFinalMessages(
               image_url: {
                 url: formedUrl
               }
+            }
+          }
+
+          return {
+            type: "image_url",
+            image_url: {
+              url: formedUrl
+            }
+          }
+        })
+      ]
+    } else {
+      content = message.content
+    }
+
+    return {
+      role: message.role,
+      content
+    }
+  })
+
+  if (messageFileItems.length > 0) {
+    const retrievalText = buildRetrievalText(messageFileItems)
+
+    finalMessages[finalMessages.length - 1] = {
+      ...finalMessages[finalMessages.length - 1],
+      content: `${
+        finalMessages[finalMessages.length - 1].content
+      }\n\n${retrievalText}`
+    }
+  }
+
+  if (messageHtmlElements && messageHtmlElements?.length > 0) {
+    const elementsText = buildElementsText(messageHtmlElements)
+
+    finalMessages[finalMessages.length - 1] = {
+      ...finalMessages[finalMessages.length - 1],
+      content: `${
+        finalMessages[finalMessages.length - 1].content
+      }\n\n${elementsText}`
+    }
+  }
+
+  return { finalMessages, usedTokens }
+}
+
+export async function buildOpenRouterFinalMessages(
+  payload: ChatPayload,
+  profile: Tables<"profiles">,
+  chatImages: MessageImage[]
+) {
+  const {
+    chatSettings,
+    chatMessages,
+    assistant,
+    messageFileItems,
+    chatFileItems,
+    messageHtmlElements
+  } = payload
+
+  let BUILT_PROMPT = buildBasePrompt(
+    profile?.profile_context || "",
+    assistant,
+    profile?.system_prompt_template || DEFAULT_SYSTEM_PROMPT
+  )
+
+  if (profile?.experimental_code_editor) {
+    BUILT_PROMPT += SYSTEM_PROMPT_CODE_EDITOR
+  }
+
+  let CHUNK_SIZE = 4096 // sane default
+  if (chatSettings.contextLength) {
+    CHUNK_SIZE = chatSettings.contextLength
+  }
+
+  const PROMPT_TOKENS = encode(chatSettings.prompt).length
+
+  let remainingTokens = CHUNK_SIZE - PROMPT_TOKENS
+
+  let usedTokens = 0
+  usedTokens += PROMPT_TOKENS
+
+  const processedChatMessages = chatMessages.map((chatMessage, index) => {
+    const nextChatMessage = chatMessages[index + 1]
+
+    if (nextChatMessage === undefined) {
+      return chatMessage
+    }
+
+    const nextChatMessageFileItems = nextChatMessage.fileItems
+
+    if (nextChatMessageFileItems.length > 0) {
+      const findFileItems = nextChatMessageFileItems
+        .map(fileItemId =>
+          chatFileItems.find(chatFileItem => chatFileItem.id === fileItemId)
+        )
+        .filter(item => item !== undefined) as Tables<"file_items">[]
+
+      const retrievalText = buildRetrievalText(findFileItems)
+
+      return {
+        message: {
+          ...chatMessage.message,
+          content:
+            `${chatMessage.message.content}\n\n${retrievalText}` as string
+        },
+        fileItems: []
+      }
+    }
+
+    return chatMessage
+  })
+
+  let finalMessages = []
+
+  for (let i = processedChatMessages.length - 1; i >= 0; i--) {
+    const message = processedChatMessages[i].message
+    const messageTokens = encode(message.content).length
+
+    if (messageTokens <= remainingTokens) {
+      remainingTokens -= messageTokens
+      usedTokens += messageTokens
+      finalMessages.unshift(message)
+    } else {
+      break
+    }
+  }
+
+  let tempSystemMessage: Tables<"messages"> = {
+    chat_id: "",
+    assistant_id: null,
+    content: BUILT_PROMPT,
+    created_at: "",
+    id: processedChatMessages.length + "",
+    image_paths: [],
+    model: payload.chatSettings.model,
+    role: "system",
+    sequence_number: processedChatMessages.length,
+    updated_at: "",
+    user_id: "",
+    annotation: {},
+    word_count: 0
+  }
+
+  finalMessages.unshift(tempSystemMessage)
+
+  finalMessages = finalMessages.map(message => {
+    let content
+
+    if (message.image_paths.length > 0) {
+      content = [
+        {
+          type: "text",
+          text: message.content
+        },
+        ...message.image_paths.map(path => {
+          let formedUrl = ""
+
+          if (path.startsWith("data")) {
+            formedUrl = path
+          } else {
+            const chatImage = chatImages.find(image => image.path === path)
+
+            if (chatImage) {
+              formedUrl = chatImage.base64
             }
           }
 
