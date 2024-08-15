@@ -640,6 +640,8 @@ export const handleCreateMessages = async (
 
     const updatedMessage = await updateMessage(lastStartingMessage.id, {
       ...lastStartingMessage,
+      // @ts-ignore
+      file_items: undefined,
       content: cleanGeneratedText
     })
 

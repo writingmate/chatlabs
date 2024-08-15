@@ -29,6 +29,7 @@ import AnnotationImage from "@/components/messages/annotations/image"
 import { Annotation, Annotation2 } from "@/types/annotation"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { toast } from "sonner"
+import { LoadingMessage } from "@/components/messages/message-loading"
 
 const ICON_SIZE = 32
 
@@ -457,38 +458,7 @@ export const Message: FC<MessageProps> = ({
           isGenerating &&
           isLast &&
           message.role === "assistant" ? (
-            <>
-              {(() => {
-                switch (toolInUse) {
-                  case "none":
-                    return (
-                      <div
-                        className={
-                          "bg-foreground flex size-3 items-center justify-center rounded-full"
-                        }
-                      >
-                        <IconCircleFilled className="animate-ping" size={20} />
-                      </div>
-                    )
-                  // case "retrieval":
-                  //   return (
-                  //     <div className="flex animate-ping items-center space-x-2">
-                  //       <IconFileText stroke={1.5} size={20} />
-                  //
-                  //       <div>Searching files...</div>
-                  //     </div>
-                  //   )
-                  default:
-                    return (
-                      <div className="flex items-center space-x-2">
-                        <IconPuzzle stroke={1.5} size={20} />
-
-                        <div>Using {toolInUse}...</div>
-                      </div>
-                    )
-                }
-              })()}
-            </>
+            <LoadingMessage isGenerating={isGenerating} />
           ) : isEditing ? (
             <TextareaAutosize
               textareaRef={editInputRef}
