@@ -17,14 +17,15 @@ export async function getSubtitles({
 }) {
   const data = await fetchData(`https://www.youtube.com/watch?v=${videoID}`)
 
+  const noCaptionsErrorMessage = `Could not find captions for video: ${videoID}. Some videos may not have captions. ChatLabs only supports videos with captions.`
+
   // * ensure we have access to captions data
-  if (!data.includes("captionTracks"))
-    throw new Error(`Could not find captions for video: ${videoID}`)
+  if (!data.includes("captionTracks")) throw new Error(noCaptionsErrorMessage)
 
   const regex = /"captionTracks":(\[.*?\])/
   const match = regex.exec(data)
 
-  if (!match) throw new Error(`Could not find captions for video: ${videoID}`)
+  if (!match) throw new Error(noCaptionsErrorMessage)
 
   const { captionTracks } = JSON.parse(`{${match[0]}}`)
   const subtitle =
@@ -38,7 +39,7 @@ export async function getSubtitles({
 
   // * ensure we have found the correct subtitle lang
   if (!subtitle || (subtitle && !subtitle.baseUrl))
-    throw new Error(`Could not find ${lang} captions for ${videoID}`)
+    throw new Error(noCaptionsErrorMessage)
 
   const transcript = await fetchData(subtitle.baseUrl)
   const lines = transcript
