@@ -292,7 +292,7 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TOKEN_OUTPUT_LENGTH: 0,
     MAX_CONTEXT_LENGTH: 0
   },
-  "openai/gpt-4o-2024-05-13": {
+  "openai/gpt-4o-2024-08-06": {
     MIN_TEMPERATURE: 0,
     MAX_TEMPERATURE: 0,
     MAX_TOKEN_OUTPUT_LENGTH: 0,
@@ -335,6 +335,12 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_CONTEXT_LENGTH: 0
   },
   "anthropic/claude-3-haiku": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "perplexity/llama-3.1-sonar-huge-128k-online": {
     MIN_TEMPERATURE: 0,
     MAX_TEMPERATURE: 0,
     MAX_TOKEN_OUTPUT_LENGTH: 0,

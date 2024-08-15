@@ -71,7 +71,7 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "mistralai/mixtral-8x22b-instruct": false,
   "microsoft/wizardlm-2-8x22b": false,
   "meta-llama/llama-3-70b-instruct": false,
-  "openai/gpt-4o-2024-05-13": false,
+  "openai/gpt-4o-2024-08-06": false,
   "openai/gpt-4-vision-preview": false,
   "openai/gpt-4o-mini": false,
   "google/gemini-pro-1.5": false,
@@ -79,7 +79,8 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "liuhaotian/llava-yi-34b": false,
   "fireworks/firellava-13b": false,
   "anthropic/claude-3-haiku": false,
-  "anthropic/claude-3.5-sonnet": false
+  "anthropic/claude-3.5-sonnet": false,
+  "perplexity/llama-3.1-sonar-huge-128k-online": false
 }
 
 const SYSTEM_PROMPT_DESCRIPTION = `
@@ -213,19 +214,23 @@ function ModelSettings({ models }: { models?: LLM[] }) {
           </TabsContent>
           <TabsContent value={"visibility"}>
             <div className="max-h-[360px] w-full space-y-0 overflow-y-auto">
-              {models?.map(model => (
-                <ModelVisibilityOption
-                  key={model.modelId}
-                  selected={!!visibility?.[model.modelId]}
-                  model={model}
-                  onSelect={checked => {
-                    setVisibility({
-                      ...visibility,
-                      [model.modelId]: checked
-                    })
-                  }}
-                />
-              ))}
+              {models && models.length > 0 ? (
+                models.map(model => (
+                  <ModelVisibilityOption
+                    key={model.modelId}
+                    selected={!!visibility?.[model.modelId]}
+                    model={model}
+                    onSelect={checked => {
+                      setVisibility({
+                        ...visibility,
+                        [model.modelId]: checked
+                      })
+                    }}
+                  />
+                ))
+              ) : (
+                <p>No models available</p>
+              )}
             </div>
           </TabsContent>
         </Tabs>

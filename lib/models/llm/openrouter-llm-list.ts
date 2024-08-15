@@ -3,8 +3,8 @@ import { LLM } from "@/types"
 const OPENROUTER_PLATFORM_LINK = "https://openrouter.ai/api/v1"
 
 const GPT4O: LLM = {
-  modelId: "openai/gpt-4o-2024-05-13",
-  modelName: "GPT-4o 2024-05-13",
+  modelId: "openai/gpt-4o-2024-08-06",
+  modelName: "GPT-4o 2024-08-06",
   provider: "openrouter",
   hostedId: "gpt-4o",
   platformLink: OPENROUTER_PLATFORM_LINK,
@@ -15,8 +15,8 @@ const GPT4O: LLM = {
   pricing: {
     currency: "USD",
     unit: "1M tokens",
-    inputCost: 5.0,
-    outputCost: 15.0
+    inputCost: 2.5,
+    outputCost: 10
   }
 }
 
@@ -114,6 +114,18 @@ const FIRELLAVA_13b: LLM = {
   paid: true
 }
 
+const LLAMA_3_1_SONAR_HUGE_128K_ONLINE: LLM = {
+  modelId: "perplexity/llama-3.1-sonar-huge-128k-online",
+  modelName: "Llama 3.1 Sonar 405B Online",
+  provider: "openrouter",
+  hostedId: "llama-3.1-sonar-huge-128k-online",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  paid: true
+}
+
 export const OPENROUTER_LLM_LIST: LLM[] = [
   GPT4O,
   GPT4O_MINI,
@@ -122,9 +134,11 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
   CLAUDE_3_HAIKU,
   CLAUDE_35_SONNET,
   LLAVA_YI_34b,
-  FIRELLAVA_13b
+  FIRELLAVA_13b,
+  LLAMA_3_1_SONAR_HUGE_128K_ONLINE
 ]
-//- openai/gpt-4o-2024-05-13
+//- openai/gpt-4o-2024-08-06
+//- openai/gpt-4o-mini
 //- openai/gpt-4-vision-preview
 //- google/gemini-pro-1.5
 //- google/gemini-pro-vision
@@ -132,3 +146,4 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
 //- fireworks/firellava-13b
 //- anthropic/claude-3-haiku
 //- anthropic/claude-3.5-sonnet
+//- meta-llama/llama-3.1-405b

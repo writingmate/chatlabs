@@ -73,7 +73,7 @@ export type OpenRouterLLMID =
   | "mistralai/mixtral-8x22b-instruct"
   | "microsoft/wizardlm-2-8x22b"
   | "meta-llama/llama-3-70b-instruct"
-  | "openai/gpt-4o-2024-05-13"
+  | "openai/gpt-4o-2024-08-06"
   | "openai/gpt-4-vision-preview"
   | "openai/gpt-4o-mini"
   | "google/gemini-pro-1.5"
@@ -82,6 +82,7 @@ export type OpenRouterLLMID =
   | "fireworks/firellava-13b"
   | "anthropic/claude-3-haiku"
   | "anthropic/claude-3.5-sonnet"
+  | "perplexity/llama-3.1-sonar-huge-128k-online"
 
 export interface LLM {
   modelId: LLMID
