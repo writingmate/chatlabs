@@ -37,8 +37,8 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
 
   return (
     <div className={"text-foreground/80 w-full p-2 text-center text-xs"}>
-      You have messages {Math.max(LIMIT - messageCount, 0)}/{LIMIT} left. All
-      generated images and web search results are public.{" "}
+      {Math.max(LIMIT - messageCount, 0)}/{LIMIT} messages left. All generated
+      images and web search results are public.{" "}
       <Button
         size={"xs"}
         className={"px-0 text-xs"}
