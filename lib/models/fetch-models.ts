@@ -64,12 +64,12 @@ const KNOWN_MODEL_NAMES: {
     imageInput: true,
     supportsStreaming: true
   },
-  "meta-llama/llama-3.1-405b": {
-    provider: "meta",
-    modelName: "Meta Llama 3.1 405B",
+  "perplexity/llama-3.1-sonar-huge-128k-online": {
+    provider: "perplexity",
+    modelName: "Llama 3.1 Sonar 405B Online",
     new: true,
     imageInput: false,
-    tools: true,
+    tools: false,
     supportsStreaming: true,
     paid: true
   }
@@ -103,7 +103,7 @@ function parseSupportedModelsFromEnv() {
     "anthropic/claude-3.5-sonnet",
     "openai/gpt-4o-2024-08-06",
     "openai/gpt-4o-mini",
-    "meta-llama/llama-3.1-405b"
+    "perplexity/llama-3.1-sonar-huge-128k-online"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {

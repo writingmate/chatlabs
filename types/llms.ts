@@ -82,7 +82,7 @@ export type OpenRouterLLMID =
   | "fireworks/firellava-13b"
   | "anthropic/claude-3-haiku"
   | "anthropic/claude-3.5-sonnet"
-  | "meta-llama/llama-3.1-405b"
+  | "perplexity/llama-3.1-sonar-huge-128k-online"
 
 export interface LLM {
   modelId: LLMID

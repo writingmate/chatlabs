@@ -80,7 +80,7 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "fireworks/firellava-13b": false,
   "anthropic/claude-3-haiku": false,
   "anthropic/claude-3.5-sonnet": false,
-  "meta-llama/llama-3.1-405b": false
+  "perplexity/llama-3.1-sonar-huge-128k-online": false
 }
 
 const SYSTEM_PROMPT_DESCRIPTION = `

@@ -340,7 +340,7 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TOKEN_OUTPUT_LENGTH: 0,
     MAX_CONTEXT_LENGTH: 0
   },
-  "meta-llama/llama-3.1-405b": {
+  "perplexity/llama-3.1-sonar-huge-128k-online": {
     MIN_TEMPERATURE: 0,
     MAX_TEMPERATURE: 0,
     MAX_TOKEN_OUTPUT_LENGTH: 0,
