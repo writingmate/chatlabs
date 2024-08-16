@@ -356,7 +356,14 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           )}
         >
           <div className="z-10 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
-            <span className="text-xs lowercase">{language}</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs lowercase">{language}</span>
+              {isGenerating && (
+                <div className={"size-5 text-white"}>
+                  <Loading />
+                </div>
+              )}
+            </div>
             <div className="flex items-center space-x-2 py-3 ">
               {["javascript", "js", "html"].includes(
                 language.toLowerCase()
@@ -495,11 +502,6 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               >
                 {value.trim()}
               </MemoizedCodeHighlighter>
-            )}
-            {isGenerating && (
-              <div className={"absolute right-3 top-0 size-10 text-white"}>
-                <Loading />
-              </div>
             )}
           </div>
           {error && (
