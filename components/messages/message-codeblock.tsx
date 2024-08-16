@@ -224,15 +224,19 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
           }
           
           let tmpStyle = null;
+          let tmpOnClick = null;
 
           function handleMouseOver(e) {
             if (!inspectModeEnabled) return;
             if (e.target.style) {
-              tmpStyle = e.target.style;  
-              e.target.style.pointerEvents = 'none';
+              tmpStyle = e.target.style;
+              // e.target.style.pointerEvents = 'none';
               e.target.style.cursor = 'pointer';
               e.target.style.outline = '1px dashed blue';
               e.target.style.boxShadow = 'inset 0 0 0 1000px rgba(0,0,255,.1)';
+              e.target.onclick = function(e) {
+                e.preventDefault();
+              }
             }
           }
 
@@ -242,6 +246,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               e.target.style = {
                   ...tmpStyle,
               }
+              e.target.onclick = tmpOnClick;
             }
           }
 
