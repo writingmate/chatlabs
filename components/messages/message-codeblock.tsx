@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard"
 import {
   IconCheck,
+  IconClick,
   IconClipboard,
   IconCode,
   IconCopy,
@@ -36,6 +37,7 @@ import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
 import { Switch } from "@/components/ui/switch"
 import Loading from "@/components/ui/loading"
 import { useSearchParams } from "next/navigation"
+import { WithTooltip } from "@/components/ui/with-tooltip"
 
 interface MessageCodeBlockProps {
   isGenerating?: boolean
@@ -137,7 +139,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       useContext(ChatbotUIContext)
     const [sharing, setSharing] = useState(false)
     const [inspectMode, setInspectMode] = useState(false)
-    const [execute, setExecute] = useState(searchParams.has("run"))
+    const [execute, setExecute] = useState(searchParams.get("run") !== "false")
     const [error, setError] = useState<string | null>(null)
 
     const [uniqueIFrameId] = useState(generateRandomString(6, true))
@@ -221,22 +223,25 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
             }
           }
           
-          let lastHighlightedElementCursor = null;
+          let tmpStyle = null;
 
           function handleMouseOver(e) {
             if (!inspectModeEnabled) return;
             if (e.target.style) {
-              lastHighlightedElementCursor = e.target.style.cursor;  
+              tmpStyle = e.target.style;  
+              e.target.style.pointerEvents = 'none';
               e.target.style.cursor = 'pointer';
-              e.target.style.outline = '2px dashed fuchsia';
+              e.target.style.outline = '1px dashed blue';
+              e.target.style.boxShadow = 'inset 0 0 0 1000px rgba(0,0,255,.1)';
             }
           }
 
           function handleMouseOut(e) {
             if (!inspectModeEnabled) return;
             if (e.target.style) {
-              e.target.style.cursor = lastHighlightedElementCursor;
-              e.target.style.outline = '';
+              e.target.style = {
+                  ...tmpStyle,
+              }
             }
           }
 
@@ -330,9 +335,9 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
 
     useEffect(() => {
       if (isGenerating) {
-        if (!searchParams.has("run")) {
-          setExecute(false)
-        }
+        // if (!searchParams.has("run")) {
+        //   setExecute(false)
+        // }
         setInspectMode(false)
       }
     }, [isGenerating])
@@ -441,12 +446,24 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                   }
                 />
                 <div className="absolute right-3 top-2 flex items-center space-x-2">
-                  <Switch
-                    checked={inspectMode}
-                    onCheckedChange={setInspectMode}
-                    disabled={!execute}
+                  <WithTooltip
+                    display={
+                      "Inspect mode toggles highlighting of elements on the page. Click on an element to select and edit specific element."
+                    }
+                    trigger={
+                      <Button
+                        size={"icon"}
+                        className={"rounded-full"}
+                        variant={inspectMode ? "default" : "outline"}
+                        onClick={e => {
+                          setInspectMode(!inspectMode)
+                        }}
+                        disabled={!execute}
+                      >
+                        <IconClick stroke={1.5} />
+                      </Button>
+                    }
                   />
-                  <span className="text-xs">Inspect</span>
                 </div>
               </>
             ) : (
