@@ -542,7 +542,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
             user={user}
             selectedWorkspace={selectedWorkspace}
             chatSettings={chatSettings}
-            defaultFilename={filename || ""}
+            defaultFilename={filename || "Untitled"}
             fileContent={value}
           />
         </div>
