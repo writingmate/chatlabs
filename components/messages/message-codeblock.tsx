@@ -139,7 +139,9 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       useContext(ChatbotUIContext)
     const [sharing, setSharing] = useState(false)
     const [inspectMode, setInspectMode] = useState(false)
-    const [execute, setExecute] = useState(searchParams.get("run") !== "false")
+    const [execute, setExecute] = useState(
+      searchParams.get("run") !== "false" && language === "html"
+    )
     const [error, setError] = useState<string | null>(null)
 
     const [uniqueIFrameId] = useState(generateRandomString(6, true))
@@ -365,9 +367,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
               )}
             </div>
             <div className="flex items-center space-x-2 py-3 ">
-              {["javascript", "js", "html"].includes(
-                language.toLowerCase()
-              ) && (
+              {["html"].includes(language.toLowerCase()) && (
                 <>
                   <ToggleGroup
                     disabled={isGenerating}
@@ -458,24 +458,26 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
                   }
                 />
                 <div className="absolute right-3 top-2 flex items-center space-x-2">
-                  <WithTooltip
-                    display={
-                      "Inspect mode toggles highlighting of elements on the page. Click on an element to select and edit specific element."
-                    }
-                    trigger={
-                      <Button
-                        size={"icon"}
-                        className={"rounded-full"}
-                        variant={inspectMode ? "default" : "outline"}
-                        onClick={e => {
-                          setInspectMode(!inspectMode)
-                        }}
-                        disabled={!execute}
-                      >
-                        <IconClick stroke={1.5} />
-                      </Button>
-                    }
-                  />
+                  {!isGenerating && (
+                    <WithTooltip
+                      display={
+                        "Inspect mode toggles highlighting of elements on the page. Click on an element to select and edit specific element."
+                      }
+                      trigger={
+                        <Button
+                          size={"icon"}
+                          className={"rounded-full"}
+                          variant={inspectMode ? "default" : "outline"}
+                          onClick={e => {
+                            setInspectMode(!inspectMode)
+                          }}
+                          disabled={!execute}
+                        >
+                          <IconClick stroke={1.5} />
+                        </Button>
+                      }
+                    />
+                  )}
                 </div>
               </>
             ) : (
