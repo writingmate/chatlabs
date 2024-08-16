@@ -36,15 +36,15 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   return (
     <div
       className={cn(
-        "fixed bottom-2 right-4 top-14 transition-[width]",
-        open ? "w-[calc(100%-30px)] lg:w-[calc(50%-30px)]" : "w-0"
+        "max-w-[50%] shrink-0 overflow-hidden transition-[width] duration-200",
+        open ? "w-[100%]" : "w-[0%]"
       )}
     >
       {open && content && (
         <MessageCodeBlock
           isGenerating={isGenerating}
           onClose={() => onPreviewContent?.(null)}
-          className={"h-full"}
+          className={"h-full rounded-none"}
           language={language}
           filename={content.filename}
           value={code.join("\n")}

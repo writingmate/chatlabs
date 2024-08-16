@@ -94,10 +94,10 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
 
         <div
           className={cn(
-            `bg-background w-[ absolute z-50 h-full border-r transition-all duration-200${SIDEBAR_WIDTH}px] lg:relative`
+            `bg-background absolute z-50 h-full shrink-0 overflow-hidden border-r transition-[width] duration-200 lg:relative`
           )}
           style={{
-            marginLeft: showSidebar ? "0px" : `-${SIDEBAR_WIDTH}px`
+            width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"
           }}
         >
           <Tabs
@@ -115,7 +115,10 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         </div>
 
         <div
-          className="flex grow flex-col"
+          className={"flex grow transition-[width]"}
+          style={{
+            width: showSidebar ? `calc(100% - ${SIDEBAR_WIDTH}px)` : "100%"
+          }}
           onDrop={onFileDrop}
           onDragOver={onDragOver}
           onDragEnter={handleDragEnter}

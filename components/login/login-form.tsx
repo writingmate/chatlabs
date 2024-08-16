@@ -2,7 +2,7 @@
 
 import { Brand } from "@/components/ui/brand"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { supabase } from "@/lib/supabase/browser-client"
 import { GoogleSVG } from "@/components/icons/google-svg"
 import { useState, useEffect } from "react"
@@ -22,6 +22,9 @@ export default function LoginForm({
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [disabled, setDisabled] = useState(false)
+  const params = useSearchParams()
+
+  redirectTo = params.get("next") || redirectTo
 
   const { theme } = useTheme()
 

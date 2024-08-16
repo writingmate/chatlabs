@@ -21,6 +21,11 @@ const RemixButton: React.FC<RemixButtonProps> = ({ fileId }) => {
         const data = await response.json()
         window.location.href = `/chat/${data.chatId}` // Redirect to the new chat
       } else {
+        if (response.status === 401) {
+          // You might want to show a login dialog here
+          console.error("User is not authenticated")
+          window.location.href = "/login?next=" + window.location.pathname
+        }
         console.error("Failed to remix")
         // You might want to show an error message to the user here
       }

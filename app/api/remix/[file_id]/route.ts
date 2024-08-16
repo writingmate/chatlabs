@@ -5,7 +5,6 @@ import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { getHomeWorkspaceByUserId, getWorkspaceById } from "@/db/workspaces"
 import { cookies } from "next/headers"
 import { createClient } from "@/lib/supabase/server"
-import { createMessage } from "@/db/messages"
 import { createChatFiles } from "@/db/chat-files"
 
 export async function POST(
@@ -16,8 +15,14 @@ export async function POST(
 
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
+  let profile
 
-  const profile = await getServerProfile()
+  try {
+    profile = await getServerProfile()
+  } catch (error) {
+    console.error("Error getting profile:", error)
+    return NextResponse.json({ error: "Not authorized" }, { status: 401 })
+  }
 
   const workspaceId = await getHomeWorkspaceByUserId(profile.user_id, supabase)
 

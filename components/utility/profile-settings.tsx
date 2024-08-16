@@ -387,7 +387,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               )}
             </TabsList>
 
-            <TabsContent className="mt-4" value="profile">
+            <TabsContent className="mt-2" value="profile">
               <form className={"space-y-2"}>
                 {/*<div className="space-y-1">*/}
                 {/*  <div className="flex items-center space-x-2">*/}
@@ -515,7 +515,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </form>
             </TabsContent>
 
-            <TabsContent className="mt-4 space-y-4" value="keys">
+            <TabsContent className="mt-2 space-y-4" value="keys">
               <div className="mt-5 space-y-2">
                 <Label className="flex items-center">
                   {useAzureOpenai
@@ -807,7 +807,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 )}
               </div>
             </TabsContent>
-            <TabsContent className="mt-4 space-y-4 py-2" value="shortcuts">
+            <TabsContent className="mt-2 space-y-4 py-2" value="shortcuts">
               <div className="space-y-5">
                 <div className={"flex items-center justify-between"}>
                   <Label>
@@ -870,7 +870,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </Tabs>
         </div>
 
-        <div className="mt-2 flex items-center">
+        <div className="flex items-center">
           <div className="flex items-center space-x-1">
             <ThemeSwitcher />
 

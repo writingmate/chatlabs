@@ -123,12 +123,6 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     handleSearchParams()
   }, [searchParams])
 
-  useEffect(() => {
-    if (showSidebar) {
-      setPreviewContent(null)
-    }
-  }, [showSidebar])
-
   const fetchChatData = async (): Promise<void> => {
     await Promise.all([fetchMessages(), fetchChat()])
     scrollToBottom()
@@ -265,90 +259,78 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     })
   }
 
-  useEffect(() => {
-    if (editorOpen) {
-      setShowSidebar(false)
-    }
-  }, [editorOpen])
-
   return (
-    <div
-      ref={scrollRef}
-      onScroll={handleScroll}
-      className="relative flex size-full flex-1 flex-col overflow-hidden overflow-y-auto"
-    >
-      {/* Header */}
-      <div className="bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 justify-between p-2">
-        <div className="flex items-center">
-          {(!showSidebar || assistant) && (
-            <WithTooltip
-              delayDuration={200}
-              display={<div>Start a new chat</div>}
-              trigger={
-                <IconMessagePlus
-                  className="ml-2 cursor-pointer hover:opacity-50"
-                  size={24}
-                  stroke={1.5}
-                  onClick={() =>
-                    handleNewChat(assistant ? "/a/" + assistant.hashid : "")
-                  }
-                />
-              }
-            />
-          )}
-          {!assistant && <QuickSettings />}
-        </div>
-        {showModelSelector && <ChatSettings />}
-      </div>
-
-      {/* Chat Content */}
-      <div className="flex size-full">
-        {loading ? (
-          <Loading />
-        ) : (
-          <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col">
-            {chatMessages?.length === 0 ? (
-              <EmptyChatView
-                selectedAssistant={selectedAssistant}
-                theme={theme}
+    <>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="relative flex h-full flex-1 shrink-0 flex-col overflow-hidden overflow-y-auto"
+      >
+        {/* Header */}
+        <div className="bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 justify-between p-2">
+          <div className="flex items-center">
+            {(!showSidebar || assistant) && (
+              <WithTooltip
+                delayDuration={200}
+                display={<div>Start a new chat</div>}
+                trigger={
+                  <IconMessagePlus
+                    className="ml-2 cursor-pointer hover:opacity-50"
+                    size={24}
+                    stroke={1.5}
+                    onClick={() =>
+                      handleNewChat(assistant ? "/a/" + assistant.hashid : "")
+                    }
+                  />
+                }
               />
-            ) : (
-              <>
-                <div ref={messagesStartRef} />
-                <ChatMessages onPreviewContent={handlePreviewContent} />
-                <div ref={messagesEndRef} className="min-h-20 flex-1" />
-              </>
             )}
-            <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
-              {chatMessages?.length === 0 && (
-                <ConversationStarters
-                  values={selectedAssistant?.conversation_starters}
-                  onSelect={(value: string) =>
-                    handleSendMessage(value, chatMessages, false)
-                  }
-                />
-              )}
-              <ChatInput showAssistant={!selectedAssistant} />
-              <ChatMessageCounter />
-            </div>
+            {!assistant && <QuickSettings />}
           </div>
-        )}
+          {showModelSelector && <ChatSettings />}
+        </div>
 
-        <div
-          className={cn(
-            "w-0 transition-[width] duration-100",
-            editorOpen && "w-full lg:w-[calc(50%-2rem)]"
+        {/* Chat Content */}
+        <div className="flex size-full">
+          {loading ? (
+            <Loading />
+          ) : (
+            <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col">
+              {chatMessages?.length === 0 ? (
+                <EmptyChatView
+                  selectedAssistant={selectedAssistant}
+                  theme={theme}
+                />
+              ) : (
+                <>
+                  <div ref={messagesStartRef} />
+                  <ChatMessages onPreviewContent={handlePreviewContent} />
+                  <div ref={messagesEndRef} className="min-h-20 flex-1" />
+                </>
+              )}
+              <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
+                {chatMessages?.length === 0 && (
+                  <ConversationStarters
+                    values={selectedAssistant?.conversation_starters}
+                    onSelect={(value: string) =>
+                      handleSendMessage(value, chatMessages, false)
+                    }
+                  />
+                )}
+                <ChatInput showAssistant={!selectedAssistant} />
+                <ChatMessageCounter />
+              </div>
+            </div>
           )}
-        />
-
-        <ChatPreviewContent
-          open={editorOpen}
-          isGenerating={isGenerating}
-          content={previewContent}
-          onPreviewContent={handlePreviewContent}
-        />
+        </div>
       </div>
-    </div>
+      <ChatPreviewContent
+        open={editorOpen}
+        isGenerating={isGenerating}
+        content={previewContent}
+        onPreviewContent={handlePreviewContent}
+      />
+    </>
   )
 }
 
