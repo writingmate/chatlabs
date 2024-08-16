@@ -43,6 +43,7 @@ import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
 import { Virtualizer } from "virtua"
 import { bo } from "@upstash/redis/zmscore-10fd3773"
 import { ShareChatButton } from "@/components/chat/chat-share-button"
+import { getFileByHashId } from "@/db/files"
 
 interface ChatUIProps {
   showModelSelector?: boolean
@@ -76,6 +77,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
   } = useContext(ChatbotUIContext)
 
   const {
+    chatSettings,
     setSelectedChat,
     setChatSettings,
     setChatFileItems,
@@ -87,6 +89,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
 
   const { handleNewChat, handleFocusChatInput, handleSendMessage } =
     useChatHandler()
+
   const { handleSelectPromptWithVariables } = usePromptAndCommand()
   const {
     scrollRef,
@@ -131,9 +134,63 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setLoading(false)
   }
 
+  function handleRemixFile(fileId: string) {
+    getFileByHashId(fileId).then(file => {
+      if (chatMessages?.length > 0) {
+        return
+      }
+      const messageContent = `\`\`\`html
+#filename=${file.name}#
+${file.file_items[0].content}
+\`\`\``
+
+      if (file && file.type === "html") {
+        setChatMessages([
+          {
+            fileItems: [],
+            message: {
+              content: `Remixing ${file.name}`,
+              annotation: {},
+              assistant_id: null,
+              created_at: new Date().toISOString(),
+              role: "user",
+              chat_id: chatId,
+              id: "",
+              image_paths: [],
+              model: chatSettings?.model!,
+              sequence_number: 0,
+              updated_at: null,
+              user_id: user?.id!,
+              word_count: 0
+            }
+          },
+          {
+            fileItems: [],
+            message: {
+              content: messageContent,
+              annotation: {},
+              assistant_id: null,
+              created_at: new Date().toISOString(),
+              role: "assistant",
+              chat_id: chatId,
+              id: "",
+              image_paths: [],
+              model: chatSettings?.model!,
+              sequence_number: 1,
+              updated_at: null,
+              user_id: user?.id!,
+              word_count: 0
+            }
+          }
+        ])
+      }
+    })
+  }
+
   const handleSearchParams = (): void => {
     const promptId = searchParams.get("prompt_id")
     const modelId = searchParams.get("model")
+    const remixFileId = searchParams.get("remix")
 
     if (promptId) {
       getPromptById(parseIdFromSlug(promptId))
@@ -147,7 +204,9 @@ export const ChatUI: React.FC<ChatUIProps> = ({
       setChatSettings(prev => ({ ...prev, model: modelId as LLMID }))
     }
 
-    // router.replace(pathname)
+    if (remixFileId) {
+      handleRemixFile(remixFileId)
+    }
   }
 
   const fetchMessages = async (): Promise<void> => {
