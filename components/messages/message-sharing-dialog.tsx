@@ -73,6 +73,7 @@ export function MessageSharingDialog({
         setUrl(window.location.origin + `/share/${result.hashid}`)
       })
       .catch(error => {
+        console.error(error)
         toast.error("Failed to upload.")
       })
       .finally(() => {
