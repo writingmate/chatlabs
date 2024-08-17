@@ -1,4 +1,4 @@
-import React, { FC, memo, useMemo, useState } from "react"
+import React, { FC, memo, useCallback, useMemo, useState } from "react"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import { MessageCodeBlock } from "./message-codeblock"
@@ -10,6 +10,7 @@ import { FileIcon } from "@/components/ui/file-icon"
 import rehypeMathjax from "rehype-mathjax"
 import { cn } from "@/lib/utils"
 import { REGEX_FILENAME } from "@/lib/preview"
+import Loading from "@/components/ui/loading"
 
 interface MessageMarkdownProps {
   isGenerating?: boolean
@@ -50,8 +51,12 @@ const CodePreviewButton = memo(
         }
         onClick={onClick}
       >
-        <div className={cn("size-10", isGenerating ? "animate-pulse" : "")}>
-          <FileIcon type={fileName.split(".")[1] || language} />
+        <div className={cn("size-10")}>
+          {isGenerating ? (
+            <Loading />
+          ) : (
+            <FileIcon type={fileName.split(".")[1] || language} />
+          )}
         </div>
         <div className={"flex flex-col overflow-hidden"}>
           <div>{fileName}</div>

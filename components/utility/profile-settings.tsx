@@ -50,6 +50,7 @@ import { PLAN_FREE } from "@/lib/stripe/config"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { debounce } from "@/lib/debounce"
 
 interface ProfileSettingsProps {}
 
@@ -263,20 +264,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     })
 
     setIsOpen(false)
-  }
-
-  const debounce = (func: (...args: any[]) => void, wait: number) => {
-    let timeout: NodeJS.Timeout | null
-
-    return (...args: any[]) => {
-      const later = () => {
-        if (timeout) clearTimeout(timeout)
-        func(...args)
-      }
-
-      if (timeout) clearTimeout(timeout)
-      timeout = setTimeout(later, wait)
-    }
   }
 
   const checkUsernameAvailability = useCallback(

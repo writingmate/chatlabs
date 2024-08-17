@@ -38,6 +38,9 @@ import { Switch } from "@/components/ui/switch"
 import Loading from "@/components/ui/loading"
 import { useSearchParams } from "next/navigation"
 import { WithTooltip } from "@/components/ui/with-tooltip"
+import { useDebounce } from "@/lib/hooks/use-debounce"
+import { ThemeConfigurator } from "@/components/theme/theme-configurator"
+import { DEFAULT_THEME } from "@/lib/config"
 
 interface MessageCodeBlockProps {
   isGenerating?: boolean
@@ -122,69 +125,68 @@ export function CopyButton({
 
 const MemoizedCodeHighlighter = memo(SyntaxHighlighter)
 
-export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
-  ({
-    language,
-    value,
-    className,
-    onClose,
-    isGenerating,
-    showCloseButton = false,
-    filename,
-    autoScroll = false
-  }) => {
-    const { user } = useAuth()
-    const searchParams = useSearchParams()
-    const { selectedWorkspace, chatSettings, profile } =
-      useContext(ChatbotUIContext)
-    const [sharing, setSharing] = useState(false)
-    const [inspectMode, setInspectMode] = useState(false)
-    const [execute, setExecute] = useState(
-      searchParams.get("run") !== "false" && language === "html"
-    )
-    const [error, setError] = useState<string | null>(null)
+export const MessageCodeBlock: FC<MessageCodeBlockProps> = ({
+  language,
+  value,
+  className,
+  onClose,
+  isGenerating,
+  showCloseButton = false,
+  filename,
+  autoScroll = false
+}) => {
+  const { user } = useAuth()
+  const searchParams = useSearchParams()
+  const { selectedWorkspace, chatSettings, profile } =
+    useContext(ChatbotUIContext)
+  const [sharing, setSharing] = useState(false)
+  const [inspectMode, setInspectMode] = useState(false)
+  const [execute, setExecute] = useState(
+    searchParams.get("run") !== "false" && language === "html"
+  )
+  const [error, setError] = useState<string | null>(null)
 
-    const [uniqueIFrameId] = useState(generateRandomString(6, true))
+  const [uniqueIFrameId] = useState(generateRandomString(6, true))
 
-    const [iframeHeight, setIframeHeight] = useState<number | null>(null)
+  const [iframeHeight, setIframeHeight] = useState<number | null>(null)
 
-    const { chatMessages, setSelectedHtmlElements } =
-      useContext(ChatbotUIChatContext)
+  const { chatMessages, setSelectedHtmlElements } =
+    useContext(ChatbotUIChatContext)
 
-    const { messagesEndRef, handleScroll } = useScroll({
-      block: "end"
-    })
+  const { messagesEndRef, handleScroll } = useScroll({
+    block: "end"
+  })
 
-    const { handleSendMessage } = useChatHandler()
+  const { handleSendMessage } = useChatHandler()
 
-    const downloadAsFile = () => {
-      if (typeof window === "undefined") {
-        return
-      }
-      const fileExtension = programmingLanguages[language] || ".file"
-      const suggestedFileName = `file-${generateRandomString(
-        3,
-        true
-      )}${fileExtension}`
-      const fileName = window.prompt("Enter file name" || "", suggestedFileName)
+  const downloadAsFile = () => {
+    if (typeof window === "undefined") {
+      return
+    }
+    const fileExtension = programmingLanguages[language] || ".file"
+    const suggestedFileName = `file-${generateRandomString(
+      3,
+      true
+    )}${fileExtension}`
+    const fileName = window.prompt("Enter file name" || "", suggestedFileName)
 
-      if (!fileName) {
-        return
-      }
-
-      const blob = new Blob([value], { type: "text/plain" })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement("a")
-      link.download = fileName
-      link.href = url
-      link.style.display = "none"
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+    if (!fileName) {
+      return
     }
 
-    const errorHandlingScript = `
+    const blob = new Blob([value], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.download = fileName
+    link.href = url
+    link.style.display = "none"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
+  const errorHandlingScript = `
       <script>
         window.onerror = function(message, source, lineno, colno, error) {
           window.parent.postMessage({
@@ -200,7 +202,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       </script>
     `
 
-    const highlightScript = `
+  const highlightScript = `
       <script>
         let inspectModeEnabled = ${inspectMode ? "true" : "false"};
 
@@ -290,276 +292,291 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
       </script>
     `
 
-    function addScriptsToHtml(html: string) {
-      const parser = new DOMParser()
-      const doc = parser.parseFromString(html, "text/html")
-      const body = doc.querySelector("body")
-      if (body) {
-        body.innerHTML = [
-          body.innerHTML,
-          errorHandlingScript,
-          highlightScript
-        ].join("")
-      }
-      return doc.documentElement.outerHTML
+  function addScriptsToHtml(html: string) {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, "text/html")
+    const body = doc.querySelector("body")
+    if (body) {
+      body.innerHTML = [
+        body.innerHTML,
+        errorHandlingScript,
+        highlightScript
+      ].join("")
     }
+    return doc.documentElement.outerHTML
+  }
 
-    useEffect(() => {
-      const receiveMessage = (event: MessageEvent) => {
-        if (
-          event.data.type === "error" &&
-          event.data.iframeId === uniqueIFrameId
-        ) {
-          setError(
-            `Error: ${event.data.message}\nLine: ${event.data.lineno}, Column: ${event.data.colno}`
-          )
-        } else if (event.data.type === "elementClicked") {
-          setSelectedHtmlElements([
-            { xpath: event.data.xpath, innerText: event.data.innerText }
-          ])
-        }
-      }
-      window.addEventListener("message", receiveMessage)
-      return () => {
-        window.removeEventListener("message", receiveMessage)
-      }
-    }, [chatMessages, uniqueIFrameId])
-
-    useEffect(() => {
-      const iframe = document.querySelector(
-        `iframe[data-id="${uniqueIFrameId}"]`
-      ) as HTMLIFrameElement
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage(
-          {
-            type: "toggleInspectMode",
-            enabled: inspectMode
-          },
-          "*"
+  useEffect(() => {
+    const receiveMessage = (event: MessageEvent) => {
+      if (
+        event.data.type === "error" &&
+        event.data.iframeId === uniqueIFrameId
+      ) {
+        setError(
+          `Error: ${event.data.message}\nLine: ${event.data.lineno}, Column: ${event.data.colno}`
         )
+      } else if (event.data.type === "elementClicked") {
+        setSelectedHtmlElements([
+          { xpath: event.data.xpath, innerText: event.data.innerText }
+        ])
       }
-    }, [execute, inspectMode, uniqueIFrameId])
+    }
+    window.addEventListener("message", receiveMessage)
+    return () => {
+      window.removeEventListener("message", receiveMessage)
+    }
+  }, [chatMessages, uniqueIFrameId])
 
-    useEffect(() => {
-      if (isGenerating) {
-        // if (!searchParams.has("run")) {
-        //   setExecute(false)
-        // }
-        setInspectMode(false)
-      }
-    }, [isGenerating])
+  useEffect(() => {
+    const iframe = document.querySelector(
+      `iframe[data-id="${uniqueIFrameId}"]`
+    ) as HTMLIFrameElement
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage(
+        {
+          type: "toggleInspectMode",
+          enabled: inspectMode
+        },
+        "*"
+      )
+    }
+  }, [execute, inspectMode, uniqueIFrameId])
 
-    return useMemo(
-      () => (
-        <div
-          className={cn(
-            "codeblock relative flex size-full flex-col overflow-hidden rounded-xl bg-zinc-950 font-sans shadow-lg",
-            className
-          )}
-        >
-          <div className="z-10 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
-            <div className="flex items-center space-x-2">
-              <span className="text-xs lowercase">{language}</span>
-              {isGenerating && (
-                <div className={"size-5 text-white"}>
-                  <Loading />
-                </div>
-              )}
-            </div>
-            <div className="flex items-center space-x-2 py-3 ">
-              {["html"].includes(language.toLowerCase()) && (
-                <>
-                  <ToggleGroup
-                    disabled={isGenerating}
-                    onValueChange={value => {
-                      setExecute(value === "execute")
-                      setError(null) // Clear any previous errors when switching modes
-                    }}
-                    size={"xs"}
-                    variant={"default"}
-                    className={"gap-0 overflow-hidden rounded-md"}
-                    type={"single"}
-                    value={execute ? "execute" : "code"}
-                  >
-                    <ToggleGroupItem
-                      title={"View the code"}
-                      value={"code"}
-                      className="space-x-1 rounded-r-none border border-r-0 text-xs text-white"
-                    >
-                      <IconCode size={16} stroke={1.5} />
-                      <span>Code</span>
-                    </ToggleGroupItem>
-                    <ToggleGroupItem
-                      title={"Run the code"}
-                      value={"execute"}
-                      disabled={value === ""}
-                      className="space-x-1 rounded-l-none border border-l-0 text-xs text-white"
-                    >
-                      <IconPlayerPlay size={16} stroke={1.5} />
-                      <span>Run</span>
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                  {language == "html" && profile && (
-                    <>
-                      <Button
-                        disabled={isGenerating}
-                        title={"Share you app with others"}
-                        className="bg-transparent px-2 text-xs text-white hover:opacity-50"
-                        onClick={() => setSharing(true)}
-                        variant="outline"
-                        size="xs"
-                      >
-                        <IconWorld className={"mr-1"} size={16} /> Share
-                      </Button>
-                    </>
-                  )}
-                </>
-              )}
+  useEffect(() => {
+    if (isGenerating) {
+      // if (!searchParams.has("run")) {
+      //   setExecute(false)
+      // }
+      setInspectMode(false)
+    }
+  }, [isGenerating])
 
-              <Button
-                disabled={isGenerating}
-                title={"Download as file"}
-                variant="link"
-                size="icon"
-                className="size-4 text-white hover:opacity-50"
-                onClick={downloadAsFile}
-              >
-                <IconDownload size={16} />
-              </Button>
-
-              <CopyButton className={"text-white"} value={value} />
-
-              {showCloseButton && (
-                <Button
-                  title={"Close"}
-                  className="size-4 text-white hover:opacity-50"
-                  onClick={() => onClose?.()}
-                  variant="link"
-                  size="icon"
-                >
-                  <IconX size={16} />
-                </Button>
-              )}
-            </div>
-          </div>
-          <div
-            className="relative w-full flex-1 overflow-auto"
-            // onScroll={handleScroll}
-          >
-            {execute ? (
-              <>
-                <iframe
-                  data-id={uniqueIFrameId}
-                  className={"size-full min-h-[480px] border-none bg-white"}
-                  srcDoc={
-                    language === "html"
-                      ? addScriptsToHtml(value)
-                      : `<html lang="en"><body>${errorHandlingScript}<script>${value}</script></body></html>`
-                  }
-                />
-                <div className="absolute right-3 top-2 flex items-center space-x-2">
-                  {!isGenerating && (
-                    <WithTooltip
-                      display={
-                        "Inspect mode toggles highlighting of elements on the page. Click on an element to select and edit specific element."
-                      }
-                      trigger={
-                        <Button
-                          size={"icon"}
-                          className={"rounded-full"}
-                          variant={inspectMode ? "default" : "outline"}
-                          onClick={e => {
-                            setInspectMode(!inspectMode)
-                          }}
-                          disabled={!execute}
-                        >
-                          <IconClick stroke={1.5} />
-                        </Button>
-                      }
-                    />
-                  )}
-                </div>
-              </>
-            ) : (
-              <MemoizedCodeHighlighter
-                language={language}
-                style={oneDark}
-                customStyle={{
-                  overflowY: "auto",
-                  margin: 0,
-                  height: "100%",
-                  background: "transparent",
-                  padding: "1rem"
-                }}
-                preTagProps={{
-                  onScroll: handleScroll
-                }}
-                codeTagProps={{
-                  style: {
-                    fontSize: "14px",
-                    fontFamily: "var(--font-mono)"
-                  },
-                  ref: autoScroll && value ? messagesEndRef : undefined
-                }}
-              >
-                {value.trim()}
-              </MemoizedCodeHighlighter>
+  return useMemo(
+    () => (
+      <div
+        className={cn(
+          "codeblock relative flex size-full flex-col overflow-hidden rounded-xl bg-zinc-950 font-sans shadow-lg",
+          className
+        )}
+      >
+        <div className="z-10 flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
+          <div className="flex items-center space-x-2">
+            <span className="text-xs lowercase">{language}</span>
+            {isGenerating && (
+              <div className={"size-5 text-white"}>
+                <Loading />
+              </div>
             )}
           </div>
-          {error && (
-            <div className="z-10 max-h-[200px] w-full overflow-auto bg-red-100 px-3 py-2 text-sm text-red-800">
-              <div className={"flex h-6 items-center justify-between gap-1"}>
-                <Label>Console errors</Label>
-                <div className={"flex items-center justify-between space-x-2"}>
-                  <Button
-                    size={"xs"}
-                    variant={"outline"}
-                    onClick={() =>
-                      handleSendMessage(error, chatMessages, false)
-                    }
-                    className={
-                      "h-6 border-red-800 bg-transparent text-xs hover:opacity-50"
-                    }
+          <div className="flex items-center space-x-3 py-3">
+            {["html"].includes(language.toLowerCase()) && (
+              <>
+                <ToggleGroup
+                  disabled={isGenerating}
+                  onValueChange={value => {
+                    setExecute(value === "execute")
+                    setError(null) // Clear any previous errors when switching modes
+                  }}
+                  size={"xs"}
+                  variant={"default"}
+                  className={"gap-0 overflow-hidden rounded-md"}
+                  type={"single"}
+                  value={execute ? "execute" : "code"}
+                >
+                  <ToggleGroupItem
+                    title={"View the code"}
+                    value={"code"}
+                    className="space-x-1 rounded-r-none border border-r-0 text-xs text-white"
                   >
-                    <IconWand size={16} stroke={1.5} />
-                    Fix this
-                  </Button>
-                  <CopyButton value={error} title={"Copy error message"} />
-                </div>
-              </div>
-              <div
-                className={
-                  "margin-0 relative whitespace-pre-wrap bg-red-100 font-mono text-xs text-red-800"
-                }
+                    <IconCode size={16} stroke={1.5} />
+                    <span>Code</span>
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    title={"Run the code"}
+                    value={"execute"}
+                    disabled={value === ""}
+                    className="space-x-1 rounded-l-none border border-l-0 text-xs text-white"
+                  >
+                    <IconPlayerPlay size={16} stroke={1.5} />
+                    <span>Run</span>
+                  </ToggleGroupItem>
+                </ToggleGroup>
+                {profile && (
+                  <>
+                    <Button
+                      disabled={isGenerating}
+                      title={"Share you app with others"}
+                      className="bg-transparent px-2 text-xs text-white hover:opacity-50"
+                      onClick={() => setSharing(true)}
+                      variant="outline"
+                      size="xs"
+                    >
+                      <IconWorld className={"mr-1"} size={16} /> Share
+                    </Button>
+                  </>
+                )}
+                <ThemeConfigurator
+                  onThemeChange={value => {
+                    handleSendMessage(
+                      `
+\`\`\`theme                  
+Change theme to
+Font: ${value.font}
+Corner radius: ${value.cornerRadius}
+Font size: ${value.fontSize}
+Color palette: ${value.colorPalette.join(", ")}
+Shadow size: ${value.shadowSize}
+\`\`\`
+                  `,
+                      chatMessages,
+                      false
+                    )
+                  }}
+                />
+              </>
+            )}
+
+            <Button
+              disabled={isGenerating}
+              title={"Download as file"}
+              variant="link"
+              size="icon"
+              className="size-4 text-white hover:opacity-50"
+              onClick={downloadAsFile}
+            >
+              <IconDownload size={16} />
+            </Button>
+
+            <CopyButton className={"text-white"} value={value} />
+
+            {showCloseButton && (
+              <Button
+                title={"Close"}
+                className="size-4 text-white hover:opacity-50"
+                onClick={() => onClose?.()}
+                variant="link"
+                size="icon"
               >
-                {error}
+                <IconX size={16} />
+              </Button>
+            )}
+          </div>
+        </div>
+        <div
+          className="relative w-full flex-1 overflow-auto"
+          // onScroll={handleScroll}
+        >
+          {execute ? (
+            <>
+              <iframe
+                data-id={uniqueIFrameId}
+                className={"size-full min-h-[480px] border-none bg-white"}
+                srcDoc={
+                  language === "html"
+                    ? addScriptsToHtml(value)
+                    : `<html lang="en"><body>${errorHandlingScript}<script>${value}</script></body></html>`
+                }
+              />
+              <div className="absolute right-3 top-2 flex items-center space-x-2">
+                {!isGenerating && (
+                  <WithTooltip
+                    display={
+                      "Inspect mode toggles highlighting of elements on the page. Click on an element to select and edit specific element."
+                    }
+                    trigger={
+                      <Button
+                        size={"icon"}
+                        className={"rounded-full"}
+                        variant={inspectMode ? "default" : "outline"}
+                        onClick={e => {
+                          setInspectMode(!inspectMode)
+                        }}
+                        disabled={!execute}
+                      >
+                        <IconClick stroke={1.5} />
+                      </Button>
+                    }
+                  />
+                )}
+              </div>
+            </>
+          ) : (
+            <MemoizedCodeHighlighter
+              language={language}
+              style={oneDark}
+              customStyle={{
+                overflowY: "auto",
+                margin: 0,
+                height: "100%",
+                background: "transparent",
+                padding: "1rem"
+              }}
+              preTagProps={{
+                onScroll: handleScroll
+              }}
+              codeTagProps={{
+                style: {
+                  fontSize: "14px",
+                  fontFamily: "var(--font-mono)"
+                },
+                ref: autoScroll && value ? messagesEndRef : undefined
+              }}
+            >
+              {value.trim()}
+            </MemoizedCodeHighlighter>
+          )}
+        </div>
+        {error && (
+          <div className="z-10 max-h-[200px] w-full overflow-auto bg-red-100 px-3 py-2 text-sm text-red-800">
+            <div className={"flex h-6 items-center justify-between gap-1"}>
+              <Label>Console errors</Label>
+              <div className={"flex items-center justify-between space-x-2"}>
+                <Button
+                  size={"xs"}
+                  variant={"outline"}
+                  onClick={() => handleSendMessage(error, chatMessages, false)}
+                  className={
+                    "h-6 border-red-800 bg-transparent text-xs hover:opacity-50"
+                  }
+                >
+                  <IconWand size={16} stroke={1.5} />
+                  Fix this
+                </Button>
+                <CopyButton value={error} title={"Copy error message"} />
               </div>
             </div>
-          )}
-          <MessageSharingDialog
-            open={sharing}
-            setOpen={setSharing}
-            user={user}
-            selectedWorkspace={selectedWorkspace}
-            chatSettings={chatSettings}
-            defaultFilename={filename || "Untitled"}
-            fileContent={value}
-          />
-        </div>
-      ),
-      [
-        inspectMode,
-        isGenerating,
-        language,
-        value,
-        error,
-        execute,
-        sharing,
-        iframeHeight,
-        uniqueIFrameId
-      ]
-    )
-  }
-)
+            <div
+              className={
+                "margin-0 relative whitespace-pre-wrap bg-red-100 font-mono text-xs text-red-800"
+              }
+            >
+              {error}
+            </div>
+          </div>
+        )}
+        <MessageSharingDialog
+          open={sharing}
+          setOpen={setSharing}
+          user={user}
+          selectedWorkspace={selectedWorkspace}
+          chatSettings={chatSettings}
+          defaultFilename={filename || "Untitled"}
+          fileContent={value}
+        />
+      </div>
+    ),
+    [
+      inspectMode,
+      isGenerating,
+      language,
+      value,
+      error,
+      execute,
+      sharing,
+      iframeHeight,
+      uniqueIFrameId
+    ]
+  )
+}
 
 MessageCodeBlock.displayName = "MessageCodeBlock"

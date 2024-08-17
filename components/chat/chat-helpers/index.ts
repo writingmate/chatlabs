@@ -365,7 +365,7 @@ export const fetchChatResponse = async (
     let errorLogLevel = toast.error
 
     const statusToMessage = {
-      404: "Model not found. Make sure you have it downloaded via Ollama.",
+      404: "Model not found.",
       429: "You are sending too many messages. Please try again in a few minutes.",
       402: "You have reached the limit of free messages. Please upgrade to a paid plan.",
       413: "Message is too long or image is too large. Please shorten it."

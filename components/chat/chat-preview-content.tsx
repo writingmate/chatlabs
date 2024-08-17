@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useState } from "react"
 import { MessageCodeBlock } from "@/components/messages/message-codeblock"
 import { cn } from "@/lib/utils"
 
@@ -23,15 +23,7 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   content,
   onPreviewContent
 }) => {
-  // language is the first line of the content
-  // the rest is the code
-
-  let language = "",
-    code: string[] = []
-
-  if (content) {
-    ;[language, ...code] = content.content.split("\n")
-  }
+  const [language, ...code] = content?.content.split("\n") ?? []
 
   return (
     <div
