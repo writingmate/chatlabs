@@ -19,7 +19,7 @@ const tavilySearch = async (
     throw new Error("Tavily API key is required")
   }
 
-  const apiUrl = "https://api.tavily.com/"
+  const apiUrl = "https://api.tavily.com/search"
   let numResults = 0 // Declare numResults here
   try {
     const response = await fetch(apiUrl, {
@@ -28,7 +28,10 @@ const tavilySearch = async (
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ query })
+      body: JSON.stringify({
+        api_key: apiKey,
+        query
+      })
     })
 
     if (!response.ok) {
@@ -67,10 +70,10 @@ export const webSearchTool: PlatformTool = {
     {
       id: "search", // This is the unique identifier of the tool function.
       toolFunction: tavilySearch, // This is the function that will be called when the tool function is executed.
-      description: `Perform a web search using Tavily's API. 
-Returns search results including title, url, snippet, and optional image URL. 
+      description: `Perform a web search using Tavily's API.
+Returns search results including title, url, snippet, and optional image URL.
 Never display the image in the response, nor include the link or URL, it is handled in the frontend.
-Never include image URL in the response for generated images. Do not say you can't display image. 
+Never include image URL in the response for generated images. Do not say you can't display image.
 Do not use semi-colons when describing the image. Never use html, always use Markdown.
 You should only return the function call in tools call sections.
         `, // This is the description of the tool function.
