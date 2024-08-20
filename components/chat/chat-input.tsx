@@ -225,7 +225,9 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
 
   const handlePaste = (event: React.ClipboardEvent) => {
     const imagesAllowed = LLM_LIST.find(
-      llm => llm.modelId === chatSettings?.model
+      llm =>
+        llm.modelId === chatSettings?.model ||
+        llm.hostedId === chatSettings?.model
     )?.imageInput
 
     const items = event.clipboardData.items
