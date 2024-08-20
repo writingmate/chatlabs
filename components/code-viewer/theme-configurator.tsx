@@ -16,7 +16,12 @@ import {
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { COLOR_SCHEMES, DEFAULT_THEME, FONT_FAMILIES } from "@/lib/config"
+import {
+  COLOR_SCHEMES,
+  DEFAULT_THEME,
+  FONT_FAMILIES
+} from "@/components/code-viewer/theme-config"
+import NavbarButton from "@/components/code-viewer/code-navbar-button"
 
 export interface UITheme {
   colorScheme: string
@@ -29,11 +34,13 @@ export interface UITheme {
 
 interface ThemeConfiguratorProps {
   theme?: UITheme
+  disabled?: boolean
   onThemeChange: (theme: UITheme) => void
 }
 
 export const ThemeConfigurator: FC<ThemeConfiguratorProps> = ({
   theme = DEFAULT_THEME,
+  disabled,
   onThemeChange
 }) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -59,10 +66,12 @@ export const ThemeConfigurator: FC<ThemeConfiguratorProps> = ({
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={isOpen => setIsOpen(isOpen)}>
-      <DropdownMenuTrigger className="flex size-6 items-center justify-center border-0 text-white">
-        <div>
-          <IconPalette size={18} stroke={1.5} />
-        </div>
+      <DropdownMenuTrigger asChild>
+        <NavbarButton
+          title={"Change theme"}
+          icon={<IconPalette size={16} stroke={1.5} />}
+          disabled={disabled}
+        />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
@@ -83,21 +92,21 @@ export const ThemeConfigurator: FC<ThemeConfiguratorProps> = ({
                 <SelectItem
                   key={palette.name}
                   value={palette.name}
-                  className={"w-full"}
+                  className={"block w-full"}
                 >
                   <div className="flex w-full items-center justify-between">
                     <div className="mr-2">{palette.name}</div>
-                    <div className="flex">
+                    <div className="border-input flex overflow-hidden rounded-full border">
                       {palette.colors.map((color, index) => (
                         <span
                           key={index}
                           style={{
                             backgroundColor: color,
-                            width: 12,
-                            height: 12,
-                            display: "inline-block",
-                            marginLeft: 2,
-                            borderRadius: "50%"
+                            width: 14,
+                            height: 14,
+                            display: "inline-block"
+                            // marginLeft: 2,
+                            // borderRadius: "50%"
                           }}
                         />
                       ))}

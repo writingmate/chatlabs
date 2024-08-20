@@ -1,7 +1,6 @@
 import React, { FC, memo, useCallback, useMemo, useState } from "react"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
-import { MessageCodeBlock } from "./message-codeblock"
 import { MessageMarkdownMemoized } from "./message-markdown-memoized"
 import { defaultUrlTransform } from "react-markdown"
 import { ImageWithPreview } from "@/components/image/image-with-preview"
@@ -11,6 +10,7 @@ import rehypeMathjax from "rehype-mathjax"
 import { cn } from "@/lib/utils"
 import { REGEX_FILENAME } from "@/lib/preview"
 import Loading from "@/components/ui/loading"
+import { CodeViewer } from "@/components/code-viewer/code-viewer"
 
 interface MessageMarkdownProps {
   isGenerating?: boolean
@@ -199,7 +199,7 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
           // eslint-disable-next-line tailwindcss/no-contradicting-classname
 
           return (
-            <MessageCodeBlock
+            <CodeViewer
               isGenerating={isGenerating}
               language={(match && match[1]) || ""}
               value={fileContentWithoutFileName}

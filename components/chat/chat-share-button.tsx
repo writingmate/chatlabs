@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { updateChat } from "@/db/chats"
-import { CopyButton } from "@/components/messages/message-codeblock"
+import { CopyButton } from "@/components/ui/copy-button"
 
 export const ShareChatButton: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)

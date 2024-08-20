@@ -1,6 +1,6 @@
 import { FC, useState } from "react"
-import { MessageCodeBlock } from "@/components/messages/message-codeblock"
 import { cn } from "@/lib/utils"
+import { CodeViewer } from "@/components/code-viewer/code-viewer"
 
 interface ChatPreviewContentProps {
   open: boolean
@@ -33,7 +33,7 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
       )}
     >
       {open && content && (
-        <MessageCodeBlock
+        <CodeViewer
           isGenerating={isGenerating}
           onClose={() => onPreviewContent?.(null)}
           className={"h-full rounded-none"}
