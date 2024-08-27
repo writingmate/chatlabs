@@ -415,24 +415,25 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = ({
                     </Button>
                   </>
                 )}
-                <ThemeConfigurator
-                  onThemeChange={value => {
-                    handleSendMessage(
-                      `
-\`\`\`theme                  
-Change theme to
-Font: ${value.font}
-Corner radius: ${value.cornerRadius}
-Font size: ${value.fontSize}
-Color palette: ${value.colorPalette.join(", ")}
-Shadow size: ${value.shadowSize}
-\`\`\`
-                  `,
-                      chatMessages,
-                      false
-                    )
-                  }}
-                />
+                {/*                <ThemeConfigurator*/}
+                {/*                  disabled={isGenerating}*/}
+                {/*                  onThemeChange={value => {*/}
+                {/*                    handleSendMessage(*/}
+                {/*                      `*/}
+                {/*\`\`\`theme                  */}
+                {/*Change theme to*/}
+                {/*Font: ${value.font}*/}
+                {/*Corner radius: ${value.cornerRadius}*/}
+                {/*Font size: ${value.fontSize}*/}
+                {/*Color palette: ${value.colorPalette.join(", ")}*/}
+                {/*Shadow size: ${value.shadowSize}*/}
+                {/*\`\`\`*/}
+                {/*                  `,*/}
+                {/*                      chatMessages,*/}
+                {/*                      false*/}
+                {/*                    )*/}
+                {/*                  }}*/}
+                {/*                />*/}
               </>
             )}
 

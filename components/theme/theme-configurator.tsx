@@ -29,11 +29,13 @@ export interface UITheme {
 
 interface ThemeConfiguratorProps {
   theme?: UITheme
+  disabled?: boolean
   onThemeChange: (theme: UITheme) => void
 }
 
 export const ThemeConfigurator: FC<ThemeConfiguratorProps> = ({
   theme = DEFAULT_THEME,
+  disabled = false,
   onThemeChange
 }) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -59,7 +61,10 @@ export const ThemeConfigurator: FC<ThemeConfiguratorProps> = ({
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={isOpen => setIsOpen(isOpen)}>
-      <DropdownMenuTrigger className="flex size-6 items-center justify-center border-0 text-white">
+      <DropdownMenuTrigger
+        disabled={disabled}
+        className="flex size-6 items-center justify-center border-0 text-white"
+      >
         <div>
           <IconPalette size={18} stroke={1.5} />
         </div>
