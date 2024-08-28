@@ -91,13 +91,12 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
                 title="Share your app with others"
                 onClick={() => setSharing(true)}
                 disabled={isGenerating}
-                className="bg-transparent px-2 text-xs"
               />
             )}
-            <ThemeConfigurator
-              disabled={isGenerating}
-              onThemeChange={onThemeChange}
-            />
+            {/*<ThemeConfigurator*/}
+            {/*  disabled={isGenerating}*/}
+            {/*  onThemeChange={onThemeChange}*/}
+            {/*/>*/}
           </>
         )}
         <NavbarButton
