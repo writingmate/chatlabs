@@ -56,7 +56,8 @@ function parseSupportedModelsFromEnv() {
     "mistralai/mixtral-8x22b-instruct",
     "microsoft/wizardlm-2-8x22b",
     "meta-llama/llama-3-70b-instruct",
-    "deepseek/deepseek-coder"
+    "deepseek/deepseek-coder",
+    "meta-llama/llama-3.1-405b-instruct"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {

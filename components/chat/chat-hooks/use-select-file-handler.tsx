@@ -38,7 +38,9 @@ export const useSelectFileHandler = () => {
 
   const handleFilesToAccept = () => {
     const model = chatSettings?.model
-    const FULL_MODEL = LLM_LIST.find(llm => llm.modelId === model)
+    const FULL_MODEL = LLM_LIST.find(
+      llm => llm.modelId === model || llm.hostedId === model
+    )
 
     if (!FULL_MODEL) return
 

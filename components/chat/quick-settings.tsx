@@ -166,7 +166,9 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
       )?.url || ""
 
   const modelDetails = LLM_LIST.find(
-    model => model.modelId === selectedPreset?.model
+    model =>
+      model.modelId === selectedPreset?.model ||
+      model.hostedId === selectedPreset?.model
   )
 
   return useMemo(

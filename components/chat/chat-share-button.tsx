@@ -24,13 +24,15 @@ import { Input } from "@/components/ui/input"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { updateChat } from "@/db/chats"
 import { CopyButton } from "@/components/ui/copy-button"
+import { toast } from "sonner"
+import { getMessagesByChatId } from "@/db/messages"
 
 export const ShareChatButton: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [shareUrl, setShareUrl] = useState("")
   const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
-  const { chatMessages, selectedChat } = useContext(ChatbotUIChatContext)
+  const { selectedChat } = useContext(ChatbotUIChatContext)
 
   useEffect(() => {
     if (isDialogOpen) {
@@ -60,23 +62,32 @@ export const ShareChatButton: React.FC = () => {
   const handleShareChat = async () => {
     if (!selectedChat || !profile?.user_id || !selectedWorkspace?.id) return
 
-    setIsLoading(true)
+    try {
+      setIsLoading(true)
 
-    const lastMessage = chatMessages?.[chatMessages.length - 1]?.message
-    if (!lastMessage) {
+      const messages = await getMessagesByChatId(selectedChat.id)
+
+      if (messages.length === 0) {
+        setIsLoading(false)
+        return
+      }
+
+      const lastMessage = messages[messages.length - 1]
+
+      await updateChat(selectedChat.id, {
+        sharing: "public",
+        last_shared_message_id: lastMessage.id,
+        shared_by: profile.user_id,
+        shared_at: new Date().toISOString()
+      })
+
+      setShareUrl(`${window.location.origin}/chat/share/${lastMessage.id}`)
       setIsLoading(false)
-      return
+    } catch (error) {
+      toast.error("Error sharing chat")
+      console.error("Error sharing chat:", error)
+      setIsLoading(false)
     }
-
-    await updateChat(selectedChat.id, {
-      sharing: "public",
-      last_shared_message_id: lastMessage.id,
-      shared_by: profile.user_id,
-      shared_at: new Date().toISOString()
-    })
-
-    setShareUrl(`${window.location.origin}/chat/share/${lastMessage.id}`)
-    setIsLoading(false)
   }
 
   const handleCopyUrl = () => {
@@ -108,10 +119,6 @@ export const ShareChatButton: React.FC = () => {
   const handleOpenDialog = async () => {
     setIsDialogOpen(true)
     await checkIfShared()
-  }
-
-  const handleDiscoverableChange = async (checked: boolean) => {
-    await handleShareChat()
   }
 
   if (!selectedChat) return null

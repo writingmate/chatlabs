@@ -23,7 +23,9 @@ export default async function AssistantPage({
 
   return (
     <ChatbotUIChatProvider id={"one"}>
-      <ChatUI showModelSelector={false} assistant={assistant} />
+      <div className={"size-full"}>
+        <ChatUI showModelSelector={false} assistant={assistant} />
+      </div>
       <PlanPicker />
       {user?.data?.user ? null : <LoginDialog />}
     </ChatbotUIChatProvider>

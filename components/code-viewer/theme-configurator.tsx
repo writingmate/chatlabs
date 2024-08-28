@@ -40,7 +40,7 @@ interface ThemeConfiguratorProps {
 
 export const ThemeConfigurator: FC<ThemeConfiguratorProps> = ({
   theme = DEFAULT_THEME,
-  disabled,
+  disabled = false,
   onThemeChange
 }) => {
   const [isOpen, setIsOpen] = useState(false)

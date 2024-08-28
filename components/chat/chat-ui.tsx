@@ -114,6 +114,16 @@ export const ChatUI: React.FC<ChatUIProps> = ({
   useEffect(() => {
     if (assistant) {
       setSelectedAssistant(assistant)
+      setChatSettings({
+        ...chatSettings,
+        model: assistant.model as LLMID,
+        prompt: assistant.prompt,
+        temperature: assistant.temperature,
+        contextLength: assistant.context_length,
+        includeProfileContext: assistant.include_profile_context,
+        includeWorkspaceInstructions: assistant.include_workspace_instructions,
+        embeddingsProvider: assistant.embeddings_provider as "openai" | "local"
+      })
     }
     if (!chatId) {
       setLoading(false)

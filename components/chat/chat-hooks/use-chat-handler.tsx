@@ -204,7 +204,9 @@ export const useChatHandler = () => {
       setAbortController(newAbortController)
 
       const modelData = allModels.find(
-        llm => llm.modelId === chatSettings?.model
+        llm =>
+          llm.modelId === chatSettings?.model ||
+          llm.hostedId === chatSettings?.model
       )
 
       validateChatSettings(
