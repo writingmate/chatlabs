@@ -1,4 +1,11 @@
-import React, { FC, useState, useContext, useMemo, useEffect } from "react"
+import React, {
+  FC,
+  useState,
+  useContext,
+  useMemo,
+  useEffect,
+  useCallback
+} from "react"
 import { useAuth } from "@/context/auth"
 import { ChatbotUIContext } from "@/context/context"
 import { MessageSharingDialog } from "@/components/messages/message-sharing-dialog"
@@ -40,9 +47,8 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   const [execute, setExecute] = useState(false)
   const [inspectMode, setInspectMode] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [uniqueIFrameId] = useState(generateRandomString(6, true))
 
-  const downloadAsFile = () => {
+  const downloadAsFile = useCallback(() => {
     if (typeof window === "undefined") return
     const fileExtension = programmingLanguages[language] || ".file"
     const suggestedFileName = `file-${generateRandomString(3, true)}${fileExtension}`
@@ -60,10 +66,11 @@ export const CodeViewer: FC<CodeViewerProps> = ({
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
-  }
+  }, [language, value])
 
-  const handleThemeChange = (theme: UITheme) => {
-    const themeMessage = `
+  const handleThemeChange = useCallback(
+    (theme: UITheme) => {
+      const themeMessage = `
 \`\`\`theme                  
 Change theme to
 Font: ${theme.font}
@@ -73,8 +80,10 @@ Color palette: ${theme.colorPalette.join(", ")}
 Shadow size: ${theme.shadowSize}
 \`\`\`
     `
-    handleSendMessage(themeMessage, [], false)
-  }
+      handleSendMessage(themeMessage, [], false)
+    },
+    [handleSendMessage]
+  )
 
   useEffect(() => {
     if (language !== "html") {
@@ -106,7 +115,6 @@ Shadow size: ${theme.shadowSize}
         <div className="relative w-full flex-1 overflow-auto bg-zinc-950">
           {execute ? (
             <CodeViewerPreview2
-              uniqueIFrameId={uniqueIFrameId}
               value={value}
               language={language}
               inspectMode={inspectMode}
@@ -135,16 +143,7 @@ Shadow size: ${theme.shadowSize}
         />
       </div>
     ),
-    [
-      language,
-      value,
-      execute,
-      inspectMode,
-      error,
-      sharing,
-      uniqueIFrameId,
-      isGenerating
-    ]
+    [language, value, execute, inspectMode, error, sharing, isGenerating]
   )
 }
 

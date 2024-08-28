@@ -6,12 +6,11 @@ import {
   IconTerminal2,
   IconX
 } from "@tabler/icons-react"
-import { cn } from "@/lib/utils"
+import { cn, generateRandomString } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { MessageHtmlElement } from "@/types/html"
 
 interface PreviewProps2 {
-  uniqueIFrameId: string
   value: string
   language: string
   inspectMode: boolean
@@ -183,7 +182,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
     <div className="flex h-full min-h-[400px] flex-col">
       <iframe ref={iframeRef} title="Full HTML Renderer" className="flex-1" />
       <div
-        className={`bg-foreground border-background/60 text-background overflow-auto border-t font-mono text-xs transition-all duration-300 ${
+        className={`bg-accent text-foreground border-accent/60 overflow-auto border-t font-mono text-xs transition-all duration-300 ${
           isConsoleExpanded ? "h-48 p-4" : "h-0 p-0"
         }`}
       >
@@ -192,7 +191,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
           <Button
             size={"icon"}
             variant={"link"}
-            className="size-5 text-white hover:opacity-50 active:opacity-75"
+            className="text-foreground size-5 hover:opacity-50 active:opacity-75"
             onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
           >
             <IconX />
@@ -205,12 +204,12 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
         ))}
         <div ref={consoleEndRef} />
       </div>
-      <div className="bg-foreground flex items-center justify-end space-x-3 p-3 px-4 text-white">
+      <div className="bg-accent text-foreground flex items-center justify-end space-x-3 p-3 px-4">
         <Button
           size={"icon"}
           variant={"link"}
           className={cn(
-            "size-5 text-white hover:opacity-50 active:opacity-75",
+            "size-5 hover:opacity-50 active:opacity-75",
             inspectMode && "text-violet-500"
           )}
           onClick={() => setInspectMode(!inspectMode)}
@@ -221,7 +220,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
           variant="link"
           size={"icon"}
           className={cn(
-            "console-toggle size-5 text-white hover:opacity-50 active:opacity-75",
+            "console-toggle size-5 hover:opacity-50 active:opacity-75",
             isConsoleExpanded && "text-violet-500"
           )}
           onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}

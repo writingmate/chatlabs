@@ -1,5 +1,5 @@
-import { FC, useState } from "react"
-import { cn } from "@/lib/utils"
+import { FC, memo, useMemo, useState } from "react"
+import { cn, isEqual } from "@/lib/utils"
 import { CodeViewer } from "@/components/code-viewer/code-viewer"
 
 interface ChatPreviewContentProps {
@@ -17,6 +17,7 @@ interface ChatPreviewContentProps {
     } | null
   ) => void
 }
+
 export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   open,
   isGenerating,
@@ -24,26 +25,31 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   onPreviewContent
 }) => {
   const [language, ...code] = content?.content.split("\n") ?? []
+  const filename = content?.filename
+  const codeString = code.join("\n")
 
-  return (
-    <div
-      className={cn(
-        "max-w-[50%] shrink-0 overflow-hidden transition-[width] duration-200",
-        open ? "w-[100%]" : "w-[0%]"
-      )}
-    >
-      {open && content && (
-        <CodeViewer
-          isGenerating={isGenerating}
-          onClose={() => onPreviewContent?.(null)}
-          className={"h-full rounded-none"}
-          language={language}
-          filename={content.filename}
-          value={code.join("\n")}
-          showCloseButton={true}
-          autoScroll={true}
-        />
-      )}
-    </div>
+  return useMemo(
+    () => (
+      <div
+        className={cn(
+          "max-w-[50%] shrink-0 overflow-hidden transition-[width] duration-200",
+          open ? "w-[100%]" : "w-[0%]"
+        )}
+      >
+        {open && content && (
+          <CodeViewer
+            isGenerating={isGenerating}
+            onClose={() => onPreviewContent?.(null)}
+            className={"h-full rounded-none"}
+            language={language}
+            filename={filename}
+            value={codeString}
+            showCloseButton={true}
+            autoScroll={true}
+          />
+        )}
+      </div>
+    ),
+    [open, isGenerating, codeString, filename]
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useContext, useEffect, useState } from "react"
+import React, { useCallback, useContext, useEffect, useState } from "react"
 import {
   useParams,
   usePathname,
@@ -40,9 +40,6 @@ import { getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
-import { Virtualizer } from "virtua"
-import { bo } from "@upstash/redis/zmscore-10fd3773"
-import { ShareChatButton } from "@/components/chat/chat-share-button"
 import { getFileByHashId } from "@/db/files"
 
 interface ChatUIProps {
@@ -310,23 +307,26 @@ ${file.file_items[0].content}
     })
   }
 
-  const handlePreviewContent = (
-    content: {
-      content: string
-      filename?: string
-      update: boolean
-    } | null
-  ): void => {
-    setPreviewContent(prev => {
-      if (content && !content.update) {
-        setEditorOpen(true)
-      }
-      if (!content) {
-        setEditorOpen(false)
-      }
-      return content
-    })
-  }
+  const handlePreviewContent = useCallback(
+    (
+      content: {
+        content: string
+        filename?: string
+        update: boolean
+      } | null
+    ): void => {
+      setPreviewContent(prev => {
+        if (content && !content.update) {
+          setEditorOpen(true)
+        }
+        if (!content) {
+          setEditorOpen(false)
+        }
+        return content
+      })
+    },
+    []
+  )
 
   return (
     <>
