@@ -47,7 +47,7 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
   const downloadButtonRef = useRef<HTMLButtonElement>(null)
 
   return (
-    <div className="border-accent/60 bg-accent text-foreground z-10 flex w-full items-center justify-between border-b px-4">
+    <div className="bg-accent text-foreground z-10 flex w-full items-center justify-between border-b px-4">
       <div className="flex items-center space-x-2">
         <span className="text-xs lowercase">{language}</span>
         {isGenerating && (
