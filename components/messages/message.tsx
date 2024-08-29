@@ -472,6 +472,7 @@ export const Message: FC<MessageProps> = ({
               codeBlocks={codeBlocks}
               content={message.content}
               onSelectCodeBlock={onSelectCodeBlock}
+              experimental_code_editor={!!profile?.experimental_code_editor}
             />
           )}
         </div>

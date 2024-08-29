@@ -33,10 +33,14 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
 
   // Scroll to the bottom of the console whenever a new message is added
   useEffect(() => {
-    if (consoleEndRef.current) {
+    if (
+      consoleEndRef.current &&
+      consoleMessages.length > 0 &&
+      isConsoleExpanded
+    ) {
       consoleEndRef.current.scrollIntoView({ behavior: "smooth" })
     }
-  }, [consoleMessages])
+  }, [consoleMessages, isConsoleExpanded])
 
   useEffect(() => {
     const iframe = iframeRef.current

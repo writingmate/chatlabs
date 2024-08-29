@@ -1,22 +1,21 @@
-import React, {
-  FC,
-  useState,
-  useContext,
-  useMemo,
-  useEffect,
-  useCallback
-} from "react"
-import { useAuth } from "@/context/auth"
-import { ChatbotUIContext } from "@/context/context"
-import { MessageSharingDialog } from "@/components/messages/message-sharing-dialog"
-import { cn, generateRandomString, programmingLanguages } from "@/lib/utils"
-import { CodeViewerNavbar } from "@/components/code-viewer/code-viewer-navbar"
-import { CodeViewerPreview } from "@/components/code-viewer/code-viewer-preview"
-import { CodeViewerCode } from "@/components/code-viewer/code-viewer-code"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
-import { UITheme } from "@/components/code-viewer/theme-configurator"
+import { CodeViewerCode } from "@/components/code-viewer/code-viewer-code"
+import { CodeViewerNavbar } from "@/components/code-viewer/code-viewer-navbar"
 import CodeViewerPreview2 from "@/components/code-viewer/code-viewer-preview-2"
+import { UITheme } from "@/components/code-viewer/theme-configurator"
+import { MessageSharingDialog } from "@/components/messages/message-sharing-dialog"
+import { useAuth } from "@/context/auth"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { ChatbotUIContext } from "@/context/context"
+import { cn, generateRandomString, programmingLanguages } from "@/lib/utils"
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState
+} from "react"
 
 interface CodeViewerProps {
   isGenerating?: boolean
@@ -95,7 +94,7 @@ Shadow size: ${theme.shadowSize}
     () => (
       <div
         className={cn(
-          `codeblock relative flex size-full flex-col overflow-hidden rounded-xl font-sans shadow-lg`,
+          `codeblock relative flex w-full flex-col overflow-hidden rounded-xl font-sans shadow-lg`,
           className
         )}
       >

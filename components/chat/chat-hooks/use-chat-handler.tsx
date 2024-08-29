@@ -327,6 +327,8 @@ export const useChatHandler = () => {
           setChatFiles,
           setSelectedTools
         )
+
+        window.history.pushState({}, "", `/chat/${currentChat.id}`)
       } else {
         const updatedChat = await updateChat(currentChat.id, {
           updated_at: new Date().toISOString()

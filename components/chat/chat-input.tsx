@@ -180,6 +180,8 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
     if (!isTyping && isSendShortcut(event) && !isUploading) {
       event.preventDefault()
       setIsPromptPickerOpen(false)
+      setTranscript("")
+      setUserInputBeforeRecording("")
       handleSendMessage(userInput, chatMessages, false)
     }
 
@@ -372,6 +374,8 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
                   onClick={() => {
                     if (!userInput || isUploading) return
                     handleSendMessage(userInput, chatMessages, false)
+                    setTranscript("")
+                    setUserInputBeforeRecording("")
                   }}
                   stroke={1.5}
                   size={24}

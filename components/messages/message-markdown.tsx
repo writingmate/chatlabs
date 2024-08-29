@@ -9,12 +9,15 @@ import { Button } from "@/components/ui/button"
 import { FileIcon } from "@/components/ui/file-icon"
 import { CodeBlock } from "@/types/chat-message"
 import Loading from "@/components/ui/loading"
+import { ImageWithPreview } from "../image/image-with-preview"
+import { defaultUrlTransform } from "react-markdown"
 
 interface MessageMarkdownProps {
   isGenerating?: boolean
   content: string
   codeBlocks?: CodeBlock[]
   onSelectCodeBlock?: (codeBlock: CodeBlock | null) => void
+  experimental_code_editor?: boolean
 }
 
 const CodeBlockButton: FC<
@@ -44,14 +47,24 @@ const CodeBlockButton: FC<
   </Button>
 )
 
+function urlTransform(url: string) {
+  if (url.startsWith("data:")) {
+    return url
+  }
+  return defaultUrlTransform(url)
+}
+
 export const MessageMarkdown: FC<MessageMarkdownProps> = ({
   isGenerating,
   content,
   codeBlocks,
-  onSelectCodeBlock
+  onSelectCodeBlock,
+  experimental_code_editor
 }) => {
   const handleCodeBlockClick = (block: CodeBlock) => {
-    onSelectCodeBlock?.(block)
+    if (experimental_code_editor) {
+      onSelectCodeBlock?.(block)
+    }
   }
 
   const contentParts = useMemo(() => {
@@ -62,16 +75,29 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
         const blockIndex = parseInt(match[1])
         const block = codeBlocks?.[blockIndex]
         if (!block) {
-          return ""
+          return null
         }
-        return (
-          <CodeBlockButton
-            loading={!!isGenerating}
-            key={`code-block-${index}`}
-            {...block}
-            onClick={() => handleCodeBlockClick(block)}
-          />
-        )
+        if (experimental_code_editor) {
+          return (
+            <CodeBlockButton
+              loading={!!isGenerating}
+              key={`code-block-${index}`}
+              {...block}
+              onClick={() => handleCodeBlockClick(block)}
+            />
+          )
+        } else {
+          return (
+            <CodeViewer
+              key={`code-block-${index}`}
+              language={block.language}
+              filename={block.filename}
+              value={block.code}
+              isGenerating={isGenerating}
+              autoScroll={false}
+            />
+          )
+        }
       }
       return (
         <MessageMarkdownMemoized
@@ -85,12 +111,38 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
             [remarkMath, { singleDollarTextMath: false }]
           ]}
           rehypePlugins={[rehypeMathjax]}
+          urlTransform={urlTransform}
+          components={{
+            a({ children, ...props }) {
+              if (typeof children === "string" && /^\d+$/.test(children)) {
+                return (
+                  <a
+                    {...props}
+                    title={props.href}
+                    target={"_blank"}
+                    className="bg-foreground/20 ml-1 inline-flex size-[16px] items-center justify-center rounded-full text-[10px] no-underline"
+                  >
+                    {children}
+                  </a>
+                )
+              }
+              return <a {...props}>{children}</a>
+            },
+            p({ children }) {
+              return (
+                <p className="mb-2 whitespace-pre-wrap last:mb-0">{children}</p>
+              )
+            },
+            img({ node, src, ...props }) {
+              return <ImageWithPreview src={src!} alt={props.alt || "image"} />
+            }
+          }}
         >
           {part}
         </MessageMarkdownMemoized>
       )
     })
-  }, [content, codeBlocks, isGenerating])
+  }, [content, codeBlocks, isGenerating, experimental_code_editor])
 
   return <>{contentParts}</>
 }
