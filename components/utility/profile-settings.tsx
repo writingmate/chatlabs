@@ -17,6 +17,7 @@ import {
   IconCircleCheckFilled,
   IconCircleXFilled,
   IconFileDownload,
+  IconInfoCircle,
   IconLoader2,
   IconLogout,
   IconUser
@@ -467,11 +468,24 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   />
                 </div>
                 <div className="flex items-center justify-between space-y-1">
-                  <div>
-                    <Label>Enable Experimental Code Editor</Label>
-                    <div className={"text-foreground/60 text-xs"}>
-                      Try experimental side-by-side code editor.
-                    </div>
+                  <div className="flex items-center space-x-2">
+                    <Label>Side-by-Side Code Viewer</Label>
+                    <WithTooltip
+                      trigger={
+                        <IconInfoCircle
+                          size={18}
+                          stroke={1.5}
+                          className="text-foreground/60"
+                        />
+                      }
+                      display={
+                        <div className={"text-xs"}>
+                          If enabled, code will be displayed in a side-by-side
+                          editor on the right from the message thread. This
+                          feature is currently in beta.
+                        </div>
+                      }
+                    />
                   </div>
                   <Switch
                     checked={experimentalCodeEditor}
