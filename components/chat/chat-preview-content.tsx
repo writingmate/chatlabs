@@ -1,32 +1,24 @@
-import { FC, memo, useMemo, useState } from "react"
-import { cn, isEqual } from "@/lib/utils"
+import { FC, useMemo } from "react"
+import { cn } from "@/lib/utils"
 import { CodeViewer } from "@/components/code-viewer/code-viewer"
+import { CodeBlock } from "@/types/chat-message"
 
 interface ChatPreviewContentProps {
   open: boolean
   isGenerating: boolean
-  content: {
-    content: string
-    filename?: string
-  } | null
-  onPreviewContent?: (
-    content: {
-      content: string
-      filename?: string
-      update: boolean
-    } | null
-  ) => void
+  selectedCodeBlock: CodeBlock | null
+  onSelectCodeBlock?: (codeBlock: CodeBlock | null) => void
 }
 
 export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   open,
   isGenerating,
-  content,
-  onPreviewContent
+  selectedCodeBlock,
+  onSelectCodeBlock
 }) => {
-  const [language, ...code] = content?.content.split("\n") ?? []
-  const filename = content?.filename
-  const codeString = code.join("\n")
+  const language = selectedCodeBlock?.language ?? ""
+  const filename = selectedCodeBlock?.filename
+  const codeString = selectedCodeBlock?.code ?? ""
 
   return useMemo(
     () => (
@@ -36,10 +28,10 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
           open ? "w-[100%]" : "w-[0%]"
         )}
       >
-        {open && content && (
+        {open && selectedCodeBlock && (
           <CodeViewer
             isGenerating={isGenerating}
-            onClose={() => onPreviewContent?.(null)}
+            onClose={() => onSelectCodeBlock?.(null)}
             className={"h-full rounded-none"}
             language={language}
             filename={filename}
@@ -50,6 +42,6 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
         )}
       </div>
     ),
-    [open, isGenerating, codeString, filename]
+    [open, isGenerating, selectedCodeBlock, language, filename, codeString]
   )
 }

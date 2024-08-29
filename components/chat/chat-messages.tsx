@@ -4,17 +4,13 @@ import { Tables } from "@/supabase/types"
 import { FC, useContext, useMemo, useState } from "react"
 import { Message } from "../messages/message"
 import { ChatbotUIChatContext } from "@/context/chat"
-import { as } from "@upstash/redis/zmscore-10fd3773"
+import { CodeBlock } from "@/types/chat-message"
 
 interface ChatMessagesProps {
-  onPreviewContent?: (content: {
-    content: string
-    filename?: string
-    update: boolean
-  }) => void
+  onSelectCodeBlock: (codeBlock: CodeBlock | null) => void
 }
 
-export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {
+export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
   const {
     chatMessages,
     chatFileItems,
@@ -54,6 +50,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {
               setIsGenerating={setIsGenerating}
               firstTokenReceived={firstTokenReceived}
               key={chatMessage.message.sequence_number}
+              codeBlocks={chatMessage.codeBlocks}
               message={chatMessage.message}
               fileItems={messageFileItems}
               isEditing={editingMessage?.id === chatMessage.message.id}
@@ -61,7 +58,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {
               onStartEdit={setEditingMessage}
               onCancelEdit={() => setEditingMessage(undefined)}
               onSubmitEdit={handleSendEdit}
-              onPreviewContent={onPreviewContent}
+              onSelectCodeBlock={onSelectCodeBlock}
               onRegenerate={handleRegenerate}
             />
           )
@@ -71,7 +68,8 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {
       chatFileItems,
       editingMessage,
       isGenerating,
-      firstTokenReceived
+      firstTokenReceived,
+      onSelectCodeBlock
     ]
   )
 }

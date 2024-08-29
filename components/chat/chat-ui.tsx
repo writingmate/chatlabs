@@ -41,6 +41,11 @@ import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
 import { getFileByHashId } from "@/db/files"
+import {
+  parseChatMessageCodeBlocksAndContent,
+  parseDBMessageCodeBlocksAndContent
+} from "@/lib/messages"
+import { CodeBlock } from "@/types/chat-message"
 
 interface ChatUIProps {
   showModelSelector?: boolean
@@ -53,8 +58,6 @@ export const ChatUI: React.FC<ChatUIProps> = ({
 }) => {
   const params = useParams()
   const chatId = params.chatid as string
-  const router = useRouter()
-  const pathname = usePathname()
   const searchParams = useSearchParams()
   const { theme } = useTheme()
 
@@ -99,11 +102,9 @@ export const ChatUI: React.FC<ChatUIProps> = ({
 
   const [editorOpen, setEditorOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(true)
-  const [previewContent, setPreviewContent] = useState<{
-    content: string
-    filename?: string
-    update: boolean
-  } | null>(null)
+  const [selectedCodeBlock, setSelectedCodeBlock] = useState<CodeBlock | null>(
+    null
+  )
 
   useHotkey("o", handleNewChat)
   useHotkey("l", handleFocusChatInput)
@@ -152,44 +153,46 @@ ${file.file_items[0].content}
 \`\`\``
 
       if (file && file.type === "html") {
-        setChatMessages([
-          {
-            fileItems: [],
-            message: {
-              content: `Remixing ${file.name}`,
-              annotation: {},
-              assistant_id: null,
-              created_at: new Date().toISOString(),
-              role: "user",
-              chat_id: chatId,
-              id: "",
-              image_paths: [],
-              model: chatSettings?.model!,
-              sequence_number: 0,
-              updated_at: null,
-              user_id: user?.id!,
-              word_count: 0
+        setChatMessages(
+          [
+            {
+              fileItems: [],
+              message: {
+                content: `Remixing ${file.name}`,
+                annotation: {},
+                assistant_id: null,
+                created_at: new Date().toISOString(),
+                role: "user",
+                chat_id: chatId,
+                id: "",
+                image_paths: [],
+                model: chatSettings?.model!,
+                sequence_number: 0,
+                updated_at: null,
+                user_id: user?.id!,
+                word_count: 0
+              }
+            },
+            {
+              fileItems: [],
+              message: {
+                content: messageContent,
+                annotation: {},
+                assistant_id: null,
+                created_at: new Date().toISOString(),
+                role: "assistant",
+                chat_id: chatId,
+                id: "",
+                image_paths: [],
+                model: chatSettings?.model!,
+                sequence_number: 1,
+                updated_at: null,
+                user_id: user?.id!,
+                word_count: 0
+              }
             }
-          },
-          {
-            fileItems: [],
-            message: {
-              content: messageContent,
-              annotation: {},
-              assistant_id: null,
-              created_at: new Date().toISOString(),
-              role: "assistant",
-              chat_id: chatId,
-              id: "",
-              image_paths: [],
-              model: chatSettings?.model!,
-              sequence_number: 1,
-              updated_at: null,
-              user_id: user?.id!,
-              word_count: 0
-            }
-          }
-        ])
+          ].map(parseChatMessageCodeBlocksAndContent)
+        )
       }
     })
   }
@@ -238,13 +241,18 @@ ${file.file_items[0].content}
         file: null
       }))
     )
-    setChatMessages(
-      fetchedMessages.map(message => ({
-        message,
-        fileItems: message.file_items.map(fileItem => fileItem.id)
-      }))
-    )
+    setChatMessages(fetchedMessages.map(parseDBMessageCodeBlocksAndContent))
   }
+
+  useEffect(() => {
+    if (chatMessages?.length > 0 && isGenerating) {
+      const lastMessage = chatMessages[chatMessages.length - 1]
+      const codeBlocks = lastMessage?.codeBlocks
+      if (codeBlocks && codeBlocks.length > 0) {
+        setSelectedCodeBlock(codeBlocks[codeBlocks.length - 1])
+      }
+    }
+  }, [chatMessages, isGenerating])
 
   const fetchMessageImages = async (
     messages: Tables<"messages">[]
@@ -307,22 +315,15 @@ ${file.file_items[0].content}
     })
   }
 
-  const handlePreviewContent = useCallback(
-    (
-      content: {
-        content: string
-        filename?: string
-        update: boolean
-      } | null
-    ): void => {
-      setPreviewContent(prev => {
-        if (content && !content.update) {
+  const handleSelectCodeBlock = useCallback(
+    (codeBlock: CodeBlock | null): void => {
+      setSelectedCodeBlock(prev => {
+        if (codeBlock) {
           setEditorOpen(true)
-        }
-        if (!content) {
+        } else {
           setEditorOpen(false)
         }
-        return content
+        return codeBlock
       })
     },
     []
@@ -373,7 +374,7 @@ ${file.file_items[0].content}
               ) : (
                 <>
                   <div ref={messagesStartRef} />
-                  <ChatMessages onPreviewContent={handlePreviewContent} />
+                  <ChatMessages onSelectCodeBlock={handleSelectCodeBlock} />
                   <div ref={messagesEndRef} className="min-h-20 flex-1" />
                 </>
               )}
@@ -396,8 +397,8 @@ ${file.file_items[0].content}
       <ChatPreviewContent
         open={editorOpen}
         isGenerating={isGenerating}
-        content={previewContent}
-        onPreviewContent={handlePreviewContent}
+        selectedCodeBlock={selectedCodeBlock}
+        onSelectCodeBlock={handleSelectCodeBlock}
       />
     </>
   )

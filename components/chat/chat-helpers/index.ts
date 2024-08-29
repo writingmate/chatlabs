@@ -31,6 +31,7 @@ import {
   validateProPlan
 } from "@/lib/subscription"
 import { encode } from "gpt-tokenizer"
+import { parseChatMessageCodeBlocksAndContent } from "@/lib/messages"
 
 export const validateChatSettings = (
   chatSettings: ChatSettings | null,
@@ -155,7 +156,7 @@ export const createTempMessages = (
     ]
   }
 
-  setChatMessages(newMessages)
+  setChatMessages(newMessages.map(parseChatMessageCodeBlocksAndContent))
 
   return {
     tempUserChatMessage,
@@ -494,22 +495,24 @@ export const processResponse = async (
         setResponseTimeTotal?.(prev => (Date.now() - startTime) / 1000)
 
         setChatMessages(prev =>
-          prev.map(chatMessage => {
-            if (chatMessage.message.id === lastChatMessage.message.id) {
-              const updatedChatMessage: ChatMessage = {
-                message: {
-                  ...chatMessage.message,
-                  content: fullText,
-                  annotation: data
-                },
-                fileItems: chatMessage.fileItems
+          prev
+            .map(chatMessage => {
+              if (chatMessage.message.id === lastChatMessage.message.id) {
+                const updatedChatMessage: ChatMessage = {
+                  message: {
+                    ...chatMessage.message,
+                    content: fullText,
+                    annotation: data
+                  },
+                  fileItems: chatMessage.fileItems
+                }
+
+                return updatedChatMessage
               }
 
-              return updatedChatMessage
-            }
-
-            return chatMessage
-          })
+              return chatMessage
+            })
+            .map(parseChatMessageCodeBlocksAndContent)
         )
       },
       controller.signal
@@ -718,7 +721,9 @@ export const handleCreateMessages = async (
     })
 
     if (updateState) {
-      setChatMessages(finalChatMessages)
+      setChatMessages(
+        finalChatMessages.map(parseChatMessageCodeBlocksAndContent)
+      )
     }
   }
 }

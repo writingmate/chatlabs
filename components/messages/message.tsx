@@ -3,7 +3,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
-import { LLM, LLMID, MessageImage, ModelProvider } from "@/types"
+import { CodeBlock, LLM, LLMID, MessageImage, ModelProvider } from "@/types"
 import {
   IconCaretDownFilled,
   IconCaretRightFilled,
@@ -30,11 +30,13 @@ import { Annotation, Annotation2 } from "@/types/annotation"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { toast } from "sonner"
 import { LoadingMessage } from "@/components/messages/message-loading"
+import { CodeBlock as ChatMessageCodeBlock } from "@/types/chat-message"
 
 const ICON_SIZE = 32
 
 interface MessageProps {
   showActions?: boolean
+  codeBlocks?: ChatMessageCodeBlock[]
   message: Tables<"messages">
   fileItems: Tables<"file_items">[]
   isEditing: boolean
@@ -46,11 +48,7 @@ interface MessageProps {
   isGenerating: boolean
   firstTokenReceived: boolean
   setIsGenerating?: (value: boolean) => void
-  onPreviewContent?: (content: {
-    content: string
-    filename?: string
-    update: boolean
-  }) => void
+  onSelectCodeBlock?: (codeBlock: ChatMessageCodeBlock | null) => void
 }
 
 export const Message: FC<MessageProps> = ({
@@ -65,8 +63,9 @@ export const Message: FC<MessageProps> = ({
   onCancelEdit,
   onRegenerate,
   onSubmitEdit,
-  onPreviewContent,
-  showActions = true
+  onSelectCodeBlock,
+  showActions = true,
+  codeBlocks
 }) => {
   const {
     assistants,
@@ -470,9 +469,9 @@ export const Message: FC<MessageProps> = ({
           ) : (
             <MessageMarkdown
               isGenerating={isGenerating && isLast}
-              experimentalCodeEditor={!!profile?.experimental_code_editor}
+              codeBlocks={codeBlocks}
               content={message.content}
-              onPreviewContent={onPreviewContent}
+              onSelectCodeBlock={onSelectCodeBlock}
             />
           )}
         </div>
