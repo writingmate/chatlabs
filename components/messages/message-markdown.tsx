@@ -77,7 +77,7 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
         if (!block) {
           return null
         }
-        if (experimental_code_editor) {
+        if (experimental_code_editor && !!block.filename) {
           return (
             <CodeBlockButton
               loading={!!isGenerating}
