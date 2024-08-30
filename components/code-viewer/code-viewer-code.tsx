@@ -2,18 +2,17 @@ import React, { FC, memo, useMemo } from "react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism"
 import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
+import { CodeBlock } from "@/types"
 
 interface CodeViewerProps {
-  language: string
-  value: string
+  codeBlock: CodeBlock
   autoScroll?: boolean
 }
 
 const MemoizedCodeHighlighter = memo(SyntaxHighlighter)
 
 export const CodeViewerCode: FC<CodeViewerProps> = ({
-  language,
-  value,
+  codeBlock: { language, code: value },
   autoScroll
 }) => {
   const { messagesEndRef, handleScroll } = useScroll({ block: "end" })

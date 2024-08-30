@@ -2,19 +2,16 @@ import React, { FC, useRef } from "react"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   IconCode,
-  IconPlayerPlay,
   IconWorld,
   IconX,
   IconDownload,
-  IconEye
+  IconEye,
+  IconArrowFork
 } from "@tabler/icons-react"
 
 import { CopyButton } from "@/components/ui/copy-button"
 import Loading from "@/components/ui/loading"
-import {
-  ThemeConfigurator,
-  UITheme
-} from "@/components/code-viewer/theme-configurator"
+import { UITheme } from "@/components/code-viewer/theme-configurator"
 import NavbarButton from "@/components/code-viewer/code-navbar-button"
 
 interface NavbarProps {
@@ -27,6 +24,8 @@ interface NavbarProps {
   onThemeChange: (theme: UITheme) => void
   showCloseButton: boolean
   downloadAsFile: () => void
+  onFork: () => void
+  showForkButton?: boolean
   showShareButton?: any
   copyValue: string // Add prop for the value to be copied
 }
@@ -38,16 +37,18 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
   setExecute,
   setSharing,
   onClose,
+  showForkButton,
   showCloseButton,
   downloadAsFile,
   onThemeChange,
   copyValue, // Use the new prop
-  showShareButton = true
+  showShareButton = true,
+  onFork
 }) => {
   const downloadButtonRef = useRef<HTMLButtonElement>(null)
 
   return (
-    <div className="bg-accent text-foreground z-10 flex w-full items-center justify-between border-b px-4">
+    <div className="bg-accent text-foreground z-5 flex w-full items-center justify-between border-b px-4">
       <div className="flex items-center space-x-2">
         <span className="text-xs lowercase">{language}</span>
         {isGenerating && (
@@ -97,6 +98,14 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
             {/*  disabled={isGenerating}*/}
             {/*  onThemeChange={onThemeChange}*/}
             {/*/>*/}
+            {showForkButton && (
+              <NavbarButton
+                icon={<IconArrowFork size={16} />}
+                title="Fork"
+                onClick={onFork}
+                disabled={isGenerating}
+              />
+            )}
           </>
         )}
         <NavbarButton

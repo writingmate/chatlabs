@@ -22,6 +22,7 @@ import {
 import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -253,10 +254,10 @@ export const useChatHandler = () => {
 
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
-        // workspaceInstructions: selectedWorkspace?.instructions || "",
-        chatMessages: isRegeneration
+        chatMessages: (isRegeneration
           ? [...chatMessages]
-          : [...chatMessages, tempUserChatMessage],
+          : [...chatMessages, tempUserChatMessage]
+        ).map(reconstructContentWithCodeBlocksInChatMessage),
         assistant: selectedAssistant,
         messageFileItems: retrievedFileItems,
         chatFileItems: chatFileItems,

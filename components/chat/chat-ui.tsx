@@ -36,7 +36,7 @@ import { IconMessagePlus } from "@tabler/icons-react"
 import { getPromptById } from "@/db/prompts"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getChatFilesByChatId } from "@/db/chat-files"
-import { getMessagesByChatId } from "@/db/messages"
+import { getMessageById, getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
@@ -142,56 +142,68 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setLoading(false)
   }
 
+  const createRemixMessages = (filename: string, content: string) =>
+    [
+      {
+        fileItems: [],
+        message: {
+          content: `Remixing ${filename}`,
+          annotation: {},
+          assistant_id: null,
+          created_at: new Date().toISOString(),
+          role: "user",
+          chat_id: chatId,
+          id: "",
+          image_paths: [],
+          model: chatSettings?.model!,
+          sequence_number: 0,
+          updated_at: null,
+          user_id: user?.id!,
+          word_count: 0
+        }
+      },
+      {
+        fileItems: [],
+        message: {
+          content: `\`\`\`html
+#filename=${filename}#
+${content}
+\`\`\``,
+          annotation: {},
+          assistant_id: null,
+          created_at: new Date().toISOString(),
+          role: "assistant",
+          chat_id: chatId,
+          id: "",
+          image_paths: [],
+          model: chatSettings?.model!,
+          sequence_number: 1,
+          updated_at: null,
+          user_id: user?.id!,
+          word_count: 0
+        }
+      }
+    ].map(parseChatMessageCodeBlocksAndContent)
+
+  function handleForkMessage(messageId: string, sequenceNo: number) {
+    getMessageById(messageId).then(message => {
+      if (message) {
+        const codeBlock =
+          parseDBMessageCodeBlocksAndContent(message)?.codeBlocks?.[sequenceNo]
+        if (codeBlock && codeBlock.language === "html" && codeBlock.filename) {
+          setChatMessages(
+            createRemixMessages(codeBlock.filename, codeBlock.code)
+          )
+        }
+      }
+    })
+  }
+
   function handleRemixFile(fileId: string) {
     getFileByHashId(fileId).then(file => {
-      if (chatMessages?.length > 0) {
-        return
-      }
-      const messageContent = `\`\`\`html
-#filename=${file.name}#
-${file.file_items[0].content}
-\`\`\``
-
-      if (file && file.type === "html") {
+      if (chatMessages?.length === 0 && file && file.type === "html") {
         setChatMessages(
-          [
-            {
-              fileItems: [],
-              message: {
-                content: `Remixing ${file.name}`,
-                annotation: {},
-                assistant_id: null,
-                created_at: new Date().toISOString(),
-                role: "user",
-                chat_id: chatId,
-                id: "",
-                image_paths: [],
-                model: chatSettings?.model!,
-                sequence_number: 0,
-                updated_at: null,
-                user_id: user?.id!,
-                word_count: 0
-              }
-            },
-            {
-              fileItems: [],
-              message: {
-                content: messageContent,
-                annotation: {},
-                assistant_id: null,
-                created_at: new Date().toISOString(),
-                role: "assistant",
-                chat_id: chatId,
-                id: "",
-                image_paths: [],
-                model: chatSettings?.model!,
-                sequence_number: 1,
-                updated_at: null,
-                user_id: user?.id!,
-                word_count: 0
-              }
-            }
-          ].map(parseChatMessageCodeBlocksAndContent)
+          createRemixMessages(file.name, file.file_items[0].content)
         )
       }
     })
@@ -201,6 +213,8 @@ ${file.file_items[0].content}
     const promptId = searchParams.get("prompt_id")
     const modelId = searchParams.get("model")
     const remixFileId = searchParams.get("remix")
+    const forkMessageId = searchParams.get("forkMessageId")
+    const forkSequenceNo = parseInt(searchParams.get("forkSequenceNo") || "-1")
 
     if (promptId) {
       getPromptById(parseIdFromSlug(promptId))
@@ -216,6 +230,10 @@ ${file.file_items[0].content}
 
     if (remixFileId) {
       handleRemixFile(remixFileId)
+    }
+
+    if (forkMessageId && forkSequenceNo > -1) {
+      handleForkMessage(forkMessageId, forkSequenceNo)
     }
   }
 

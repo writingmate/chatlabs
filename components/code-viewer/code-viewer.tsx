@@ -8,6 +8,8 @@ import { useAuth } from "@/context/auth"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { cn, generateRandomString, programmingLanguages } from "@/lib/utils"
+import { CodeBlock } from "@/types"
+import { useRouter } from "next/navigation"
 import {
   FC,
   useCallback,
@@ -19,9 +21,7 @@ import {
 
 interface CodeViewerProps {
   isGenerating?: boolean
-  language: string
-  filename?: string
-  value: string
+  codeBlock: CodeBlock
   className?: string
   onClose?: () => void
   showCloseButton?: boolean
@@ -29,16 +29,15 @@ interface CodeViewerProps {
 }
 
 export const CodeViewer: FC<CodeViewerProps> = ({
-  language,
-  value,
+  codeBlock: { language, code: value, filename, messageId, sequenceNo },
   className,
   onClose,
   isGenerating,
   showCloseButton = false,
-  filename,
   autoScroll = false
 }) => {
   const { user } = useAuth()
+  const router = useRouter()
   const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
   const { setSelectedHtmlElements } = useContext(ChatbotUIChatContext)
   const { handleSendMessage } = useChatHandler()
@@ -51,14 +50,11 @@ export const CodeViewer: FC<CodeViewerProps> = ({
     if (typeof window === "undefined") return
     const fileExtension = programmingLanguages[language] || ".file"
     const suggestedFileName = `file-${generateRandomString(3, true)}${fileExtension}`
-    const fileName = window.prompt("Enter file name", suggestedFileName)
-
-    if (!fileName) return
 
     const blob = new Blob([value], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
-    link.download = fileName
+    link.download = suggestedFileName
     link.href = url
     link.style.display = "none"
     document.body.appendChild(link)
@@ -66,6 +62,10 @@ export const CodeViewer: FC<CodeViewerProps> = ({
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
   }, [language, value])
+
+  const onFork = useCallback(() => {
+    router.push(`/chat?forkMessageId=${messageId}&forkSequenceNo=${sequenceNo}`)
+  }, [messageId, sequenceNo])
 
   const handleThemeChange = useCallback(
     (theme: UITheme) => {
@@ -110,6 +110,8 @@ Shadow size: ${theme.shadowSize}
           copyValue={value}
           showShareButton={true}
           onThemeChange={handleThemeChange}
+          onFork={onFork}
+          showForkButton={!!messageId && sequenceNo > -1}
         />
         <div className="relative w-full flex-1 overflow-auto bg-zinc-950">
           {execute ? (
@@ -125,8 +127,13 @@ Shadow size: ${theme.shadowSize}
             />
           ) : (
             <CodeViewerCode
-              language={language}
-              value={value}
+              codeBlock={{
+                language,
+                code: value,
+                filename,
+                messageId,
+                sequenceNo
+              }}
               autoScroll={autoScroll}
             />
           )}
