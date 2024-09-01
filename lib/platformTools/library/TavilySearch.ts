@@ -29,7 +29,7 @@ const tavilySearch = async (
       },
       body: JSON.stringify({
         api_key: apiKey,
-        query,
+        query: query,
         include_images: true
       })
     })
@@ -44,6 +44,7 @@ const tavilySearch = async (
       title: result.title,
       url: result.url,
       image: null,
+      snippet: result.snippet,
       content: result.content
     }))
 
@@ -82,9 +83,9 @@ export const webSearchTool: PlatformTool = {
       toolFunction: tavilySearch, // This is the function that will be called when the tool function is executed.
       description: `Perform a web search using Tavily's API.
 Returns search results including title, url, snippet, and optional image URL.
-Never display the image in the response, nor include the link or URL, it is handled in the frontend.
-Never include image URL in the response for generated images. Do not say you can't display image.
-Do not use semi-colons when describing the image. Never use html, always use Markdown.
+Display the image in the response, include the link or URL, it is handled in the frontend.
+Include image URL in the response for generated images.
+Do not use semi-colons when describing the image. Use html.
 You should only return the function call in tools call sections.
         `, // This is the description of the tool function.
       parameters: [
