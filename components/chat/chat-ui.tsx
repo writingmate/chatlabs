@@ -139,7 +139,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
 
   const handleSearchParams = (): void => {
     const promptId = searchParams.get("prompt_id")
-    const modelId = searchParams.get("model")
+    const modelId = searchParams.get("model") as LLMID
 
     if (promptId) {
       getPromptById(parseIdFromSlug(promptId))

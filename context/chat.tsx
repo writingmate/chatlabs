@@ -144,7 +144,7 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
     if (chatSettings) {
       localStorage.setItem(chatSettingsKey, JSON.stringify(chatSettings))
     }
-  }, [chatSettings])
+  }, [chatSettings, chatSettingsKey])
 
   return (
     <ChatbotUIChatContext.Provider

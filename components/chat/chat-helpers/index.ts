@@ -648,14 +648,14 @@ export const handleCreateMessages = async (
 
     setChatMessages([...chatMessages])
   } else {
-    const createdMessages = cleanGeneratedText
+    let createdMessages = cleanGeneratedText
       ? await createMessages([finalUserMessage, finalAssistantMessage])
       : await createMessages([finalUserMessage])
 
     const uploadPromises = newMessageImages
       .filter(obj => obj.file !== null)
       .map(obj => {
-        const filePath = `${profile.user_id}/${currentChat.id}/${createdMessages[0].id}/${uuidv4()}`
+        const filePath = `${profile.user_id}/${currentChat.id}/${createdMessages && createdMessages[0].id}/${uuidv4()}`
         return uploadMessageImage(filePath, obj.file as File).catch(error => {
           console.error(`Failed to upload image at ${filePath}:`, error)
           return null
@@ -666,17 +666,20 @@ export const handleCreateMessages = async (
       Boolean
     ) as string[]
 
+    let createdMessagesId =
+      createdMessages !== null ? createdMessages[0].id : ""
+
     setChatImages(prevImages => [
       ...prevImages,
       ...newMessageImages.map((obj, index) => ({
         ...obj,
-        messageId: createdMessages[0].id,
+        messageId: createdMessagesId,
         path: paths[index]
       }))
     ])
 
-    const updatedMessage = await updateMessage(createdMessages[0].id, {
-      ...createdMessages[0],
+    const updatedMessage = await updateMessage(createdMessagesId, {
+      ...finalUserMessage,
       image_paths: paths
     })
 
@@ -685,7 +688,7 @@ export const handleCreateMessages = async (
         retrievedFileItems.map(fileItem => {
           return {
             user_id: profile.user_id,
-            message_id: createdMessages[1].id,
+            message_id: createdMessagesId,
             file_item_id: fileItem.id
           }
         })
@@ -701,7 +704,7 @@ export const handleCreateMessages = async (
       ...(cleanGeneratedText
         ? [
             {
-              message: createdMessages[1],
+              message: finalAssistantMessage,
               fileItems: retrievedFileItems.map(fileItem => fileItem.id)
             }
           ]
@@ -717,7 +720,7 @@ export const handleCreateMessages = async (
     })
 
     if (updateState) {
-      setChatMessages(finalChatMessages)
+      setChatMessages(finalChatMessages as ChatMessage[])
     }
   }
 }

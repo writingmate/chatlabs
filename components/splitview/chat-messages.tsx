@@ -45,7 +45,7 @@ const ChatMessages = forwardRef<ChatMessagesProps>(({}, ref) => {
           />
         )
       })
-  }, [chatMessages, chatFileItems, editingMessage])
+  }, [chatMessages, chatFileItems, editingMessage, handleSendEdit])
 })
 
 ChatMessages.displayName = "ChatMessages"

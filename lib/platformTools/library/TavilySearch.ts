@@ -20,17 +20,17 @@ const tavilySearch = async (
   }
 
   const apiUrl = "https://api.tavily.com/search"
-  let numResults = 0 // Declare numResults here
+  let numResults = 0
   try {
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         api_key: apiKey,
-        query
+        query,
+        include_images: true
       })
     })
 
@@ -39,18 +39,28 @@ const tavilySearch = async (
     }
 
     const data = await response.json()
-    const searchResults = data.results.map((result: any) => ({
+
+    let searchResults = data.results.map((result: any) => ({
       title: result.title,
       url: result.url,
-      snippet: result.snippet,
-      image: result.image || null
+      image: null,
+      content: result.content
     }))
 
-    numResults = data.numResults || searchResults.length
+    const searchImages = data.images || []
+
+    searchResults = searchResults.map((result: any, index: number) => {
+      return {
+        ...result,
+        image: searchImages[index] || null
+      }
+    })
+
+    console.log("Combined search results with images:", searchResults)
 
     return {
       results: searchResults,
-      numResults
+      numResults: data.numResults || searchResults.length
     }
   } catch (error: any) {
     console.error("Failed to perform web search", error, numResults)

@@ -80,6 +80,8 @@ const ChatWrapper = forwardRef(
       setResponseTimeToFirstToken
     } = useContext(ChatbotUIChatContext)
 
+    console.log(selectedTools)
+
     const responseTimePadding = getResponseTimePadding(
       chatMessages[chatMessages.length - 1]?.message.annotation
     )

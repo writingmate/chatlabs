@@ -74,7 +74,7 @@ export const createMessages = async (
     .select("*")
 
   if (error) {
-    throw new Error(error.message)
+    // throw new Error(error.message)
   }
 
   return createdMessages

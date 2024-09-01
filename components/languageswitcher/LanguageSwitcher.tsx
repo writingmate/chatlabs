@@ -19,6 +19,7 @@ export default function LanguageSwitcher() {
     >
       <option value="en">English</option>
       <option value="de">Deutsch</option>
+      <option value="fr">French</option>
       <option value="zh">简体中文</option>
     </select>
   )
