@@ -316,7 +316,7 @@ export const Message: FC<MessageProps> = ({
                       : selectedAssistant
                         ? selectedAssistant?.name
                         : MODEL_DATA?.modelName
-                    : profile?.display_name ?? profile?.username}
+                    : (profile?.display_name ?? profile?.username)}
                 </div>
                 <div className={"absolute right-0"}>
                   <MessageActions

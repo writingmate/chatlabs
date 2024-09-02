@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type Database = {
+export interface Database {
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -77,7 +77,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       assistant_files: {
@@ -123,7 +123,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       assistant_platform_tools: {
@@ -162,7 +162,52 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
+          }
+        ]
+      }
+      assistant_prompts: {
+        Row: {
+          assistant_id: string
+          content: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          assistant_id: string
+          content: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          assistant_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_prompts_assistant_id_fkey"
+            columns: ["assistant_id"]
+            isOneToOne: false
+            referencedRelation: "assistants"
+            referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "assistant_prompts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
         ]
       }
       assistant_tools: {
@@ -208,7 +253,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       assistant_workspaces: {
@@ -254,7 +299,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       assistants: {
@@ -332,7 +377,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       chat_files: {
@@ -378,7 +423,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       chats: {
@@ -392,6 +437,7 @@ export type Database = {
           id: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
+          last_chat_message_id: string | null
           last_shared_message_id: string | null
           model: string
           name: string
@@ -415,6 +461,7 @@ export type Database = {
           id?: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
+          last_chat_message_id?: string | null
           last_shared_message_id?: string | null
           model: string
           name: string
@@ -438,6 +485,7 @@ export type Database = {
           id?: string
           include_profile_context?: boolean
           include_workspace_instructions?: boolean
+          last_chat_message_id?: string | null
           last_shared_message_id?: string | null
           model?: string
           name?: string
@@ -467,6 +515,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "chats_last_chat_message_id_fkey"
+            columns: ["last_chat_message_id"]
+            isOneToOne: true
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "chats_last_shared_message_id_fkey"
             columns: ["last_shared_message_id"]
             isOneToOne: true
@@ -493,7 +548,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       collection_files: {
@@ -539,7 +594,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       collection_workspaces: {
@@ -585,7 +640,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       collections: {
@@ -633,7 +688,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       file_items: {
@@ -687,7 +742,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       file_workspaces: {
@@ -733,7 +788,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       files: {
@@ -796,7 +851,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       folders: {
@@ -844,7 +899,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       message_file_items: {
@@ -890,7 +945,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       messages: {
@@ -960,7 +1015,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       model_workspaces: {
@@ -1006,7 +1061,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       models: {
@@ -1066,7 +1121,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       preset_workspaces: {
@@ -1112,7 +1167,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       presets: {
@@ -1181,7 +1236,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       profiles: {
@@ -1306,7 +1361,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       prompt_category: {
@@ -1379,7 +1434,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       prompts: {
@@ -1439,7 +1494,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       prompts_categories: {
@@ -1469,7 +1524,66 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "prompts"
             referencedColumns: ["id"]
+          }
+        ]
+      }
+      shared_chats: {
+        Row: {
+          chat_id: string
+          created_at: string
+          id: string
+          last_message_id: string
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          chat_id: string
+          created_at?: string
+          id?: string
+          last_message_id: string
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          chat_id?: string
+          created_at?: string
+          id?: string
+          last_message_id?: string
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_chats_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "shared_chats_last_message_id_fkey"
+            columns: ["last_message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_chats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_chats_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          }
         ]
       }
       tool_workspaces: {
@@ -1515,7 +1629,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       tools: {
@@ -1572,7 +1686,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       user_questions: {
@@ -1619,7 +1733,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       workspaces: {
@@ -1687,7 +1801,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
     }
@@ -1705,7 +1819,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
     }
@@ -1758,7 +1872,7 @@ export type Database = {
         Args: {
           "": string
         }
-        Returns: number[]
+        Returns: unknown
       }
       id_decode_once: {
         Args: {
@@ -2088,7 +2202,7 @@ export type Database = {
         Args: {
           name: string
         }
-        Returns: string[]
+        Returns: unknown
       }
       get_size_by_bucket: {
         Args: Record<PropertyKey, never>
