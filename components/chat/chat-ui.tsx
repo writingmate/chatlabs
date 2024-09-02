@@ -266,7 +266,11 @@ ${content}
     if (chatMessages?.length > 0 && isGenerating) {
       const lastMessage = chatMessages[chatMessages.length - 1]
       const codeBlocks = lastMessage?.codeBlocks
-      if (codeBlocks && codeBlocks.length > 0) {
+      if (
+        codeBlocks &&
+        codeBlocks.length > 0 &&
+        !!codeBlocks[codeBlocks.length - 1].filename
+      ) {
         setSelectedCodeBlock(codeBlocks[codeBlocks.length - 1])
       }
     }
