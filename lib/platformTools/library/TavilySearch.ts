@@ -19,16 +19,19 @@ const tavilySearch = async (
     throw new Error("Tavily API key is required")
   }
 
-  const apiUrl = "https://api.tavily.com/"
-  let numResults = 0 // Declare numResults here
+  const apiUrl = "https://api.tavily.com/search"
+  let numResults = 0
   try {
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ query })
+      body: JSON.stringify({
+        api_key: apiKey,
+        query: query,
+        include_images: true
+      })
     })
 
     if (!response.ok) {
@@ -36,18 +39,29 @@ const tavilySearch = async (
     }
 
     const data = await response.json()
-    const searchResults = data.results.map((result: any) => ({
+
+    let searchResults = data.results.map((result: any) => ({
       title: result.title,
       url: result.url,
+      image: null,
       snippet: result.snippet,
-      image: result.image || null
+      content: result.content
     }))
 
-    numResults = data.numResults || searchResults.length
+    const searchImages = data.images || []
+
+    searchResults = searchResults.map((result: any, index: number) => {
+      return {
+        ...result,
+        image: searchImages[index] || null
+      }
+    })
+
+    console.log("Combined search results with images:", searchResults)
 
     return {
       results: searchResults,
-      numResults
+      numResults: data.numResults || searchResults.length
     }
   } catch (error: any) {
     console.error("Failed to perform web search", error, numResults)
@@ -67,11 +81,11 @@ export const webSearchTool: PlatformTool = {
     {
       id: "search", // This is the unique identifier of the tool function.
       toolFunction: tavilySearch, // This is the function that will be called when the tool function is executed.
-      description: `Perform a web search using Tavily's API. 
-Returns search results including title, url, snippet, and optional image URL. 
-Never display the image in the response, nor include the link or URL, it is handled in the frontend.
-Never include image URL in the response for generated images. Do not say you can't display image. 
-Do not use semi-colons when describing the image. Never use html, always use Markdown.
+      description: `Perform a web search using Tavily's API.
+Returns search results including title, url, snippet, and optional image URL.
+Display the image in the response, include the link or URL, it is handled in the frontend.
+Include image URL in the response for generated images.
+Do not use semi-colons when describing the image. Use html.
 You should only return the function call in tools call sections.
         `, // This is the description of the tool function.
       parameters: [

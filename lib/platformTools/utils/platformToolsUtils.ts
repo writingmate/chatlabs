@@ -64,6 +64,9 @@ export const platformToolFunctionSpec = (functionName: string) => {
   const toolFunction = tool.toolsFunctions.find(
     toolFunction => toolFunction.id === toolFunctionId
   )
+
+  console.log("toolFunction", toolFunction)
+
   if (!toolFunction) {
     return null
   }
@@ -72,6 +75,8 @@ export const platformToolFunctionSpec = (functionName: string) => {
 
 export const platformToolFunction = (functionName: string): Function => {
   const toolFunctionSpec = platformToolFunctionSpec(functionName)
+  console.log("toolFunctionSpec", toolFunctionSpec)
+
   return toolFunctionSpec
     ? toolFunctionSpec.toolFunction
     : () => Promise.resolve("Tool function not found.")

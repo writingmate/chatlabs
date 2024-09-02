@@ -8,6 +8,7 @@ import { ToolSelect } from "@/components/tools/tool-select"
 import { cn } from "@/lib/utils"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ShareChatButton } from "@/components/chat/chat-share-button"
+import LanguageSwitcher from "../languageswitcher/LanguageSwitcher"
 
 interface ChatSettingsProps {
   className?: string
@@ -60,6 +61,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
 
   return (
     <div className={cn("flex items-center space-x-1", className)}>
+      <LanguageSwitcher />
       <ShareChatButton />
       {selectedModel?.tools && (
         <ToolSelect

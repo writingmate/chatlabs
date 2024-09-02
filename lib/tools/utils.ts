@@ -43,6 +43,8 @@ export async function executeTool(
   // Reroute to local executor for local tools
   if (schemaDetail.url === "local://executor") {
     const toolFunctionSpec = platformToolFunctionSpec(functionName)
+    console.log("toolFunctionSpec", toolFunctionSpec)
+
     if (!toolFunctionSpec) {
       throw new Error(`Function ${functionName} not found`)
     }
