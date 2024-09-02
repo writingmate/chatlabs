@@ -6,7 +6,8 @@ import {
   IconX,
   IconDownload,
   IconEye,
-  IconArrowFork
+  IconArrowFork,
+  IconLayoutSidebar
 } from "@tabler/icons-react"
 
 import { CopyButton } from "@/components/ui/copy-button"
@@ -21,6 +22,7 @@ interface NavbarProps {
   setExecute: (execute: boolean) => void
   setSharing: (sharing: boolean) => void
   onClose?: () => void
+  toggleSidebar: () => void
   onThemeChange: (theme: UITheme) => void
   showCloseButton: boolean
   downloadAsFile: () => void
@@ -37,6 +39,7 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
   setExecute,
   setSharing,
   onClose,
+  toggleSidebar,
   showForkButton,
   showCloseButton,
   downloadAsFile,
@@ -106,6 +109,12 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
                 disabled={isGenerating}
               />
             )}
+            <NavbarButton
+              icon={<IconLayoutSidebar size={16} />}
+              title="Sidebar"
+              onClick={toggleSidebar}
+              disabled={isGenerating}
+            />
           </>
         )}
         <NavbarButton

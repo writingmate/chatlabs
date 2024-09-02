@@ -629,10 +629,13 @@ export const handleCreateMessages = async (
     annotation: {}
   }
 
-  const reconstructedAssistantContent = reconstructContentWithCodeBlocks(
-    generatedText,
-    chatMessages[chatMessages.length - 1].codeBlocks || []
-  )
+  const reconstructedAssistantContent =
+    chatMessages.length > 0
+      ? reconstructContentWithCodeBlocks(
+          generatedText,
+          chatMessages[chatMessages.length - 1].codeBlocks || []
+        )
+      : generatedText
 
   const finalAssistantMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
@@ -730,8 +733,10 @@ export const handleCreateMessages = async (
       return [...prevFileItems, ...newFileItems]
     })
 
-    // if (/) {
-    setChatMessages(finalChatMessages.map(parseChatMessageCodeBlocksAndContent))
-    // }
+    if (updateState) {
+      setChatMessages(
+        finalChatMessages.map(parseChatMessageCodeBlocksAndContent)
+      )
+    }
   }
 }

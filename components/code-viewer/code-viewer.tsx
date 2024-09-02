@@ -18,6 +18,8 @@ import {
   useMemo,
   useState
 } from "react"
+import CodeViewerSidebar from "./code-viewer-sidebar"
+import { DEFAULT_THEME, THEMES } from "./theme-config"
 
 interface CodeViewerProps {
   isGenerating?: boolean
@@ -45,6 +47,10 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   const [execute, setExecute] = useState(false)
   const [inspectMode, setInspectMode] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [theme, setTheme] = useState<{ name: string; theme: UITheme }>(
+    THEMES[0]
+  )
 
   const downloadAsFile = useCallback(() => {
     if (typeof window === "undefined") return
@@ -67,22 +73,22 @@ export const CodeViewer: FC<CodeViewerProps> = ({
     router.push(`/chat?forkMessageId=${messageId}&forkSequenceNo=${sequenceNo}`)
   }, [messageId, sequenceNo])
 
-  const handleThemeChange = useCallback(
-    (theme: UITheme) => {
-      const themeMessage = `
-\`\`\`theme                  
-Change theme to
-Font: ${theme.font}
-Corner radius: ${theme.cornerRadius}
-Font size: ${theme.fontSize}
-Color palette: ${theme.colorPalette.join(", ")}
-Shadow size: ${theme.shadowSize}
-\`\`\`
-    `
-      handleSendMessage(themeMessage, [], false)
-    },
-    [handleSendMessage]
-  )
+  //   const handleThemeChange = useCallback(
+  //     (theme: UITheme) => {
+  //       const themeMessage = `
+  // \`\`\`theme
+  // Change theme to
+  // Font: ${theme.font}
+  // Corner radius: ${theme.cornerRadius}
+  // Font size: ${theme.fontSize}
+  // Color palette: ${theme.colorPalette.join(", ")}
+  // Shadow size: ${theme.shadowSize}
+  // \`\`\`
+  //     `
+  //       handleSendMessage(themeMessage, [], false)
+  //     },
+  //     [handleSendMessage]
+  //   )
 
   useEffect(() => {
     if (language !== "html") {
@@ -99,6 +105,7 @@ Shadow size: ${theme.shadowSize}
         )}
       >
         <CodeViewerNavbar
+          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           language={language}
           isGenerating={isGenerating}
           execute={execute}
@@ -109,13 +116,14 @@ Shadow size: ${theme.shadowSize}
           downloadAsFile={downloadAsFile}
           copyValue={value}
           showShareButton={true}
-          onThemeChange={handleThemeChange}
+          onThemeChange={() => {}}
           onFork={onFork}
           showForkButton={!!messageId && sequenceNo > -1}
         />
         <div className="relative w-full flex-1 overflow-auto bg-zinc-950">
           {execute ? (
             <CodeViewerPreview2
+              theme={theme}
               value={value}
               language={language}
               inspectMode={inspectMode}
@@ -138,6 +146,12 @@ Shadow size: ${theme.shadowSize}
             />
           )}
         </div>
+        <CodeViewerSidebar
+          theme={theme}
+          setTheme={setTheme}
+          isOpen={isSidebarOpen}
+          setIsOpen={setIsSidebarOpen}
+        />
         <MessageSharingDialog
           open={sharing}
           setOpen={setSharing}
@@ -149,7 +163,17 @@ Shadow size: ${theme.shadowSize}
         />
       </div>
     ),
-    [language, value, execute, inspectMode, error, sharing, isGenerating]
+    [
+      language,
+      value,
+      execute,
+      inspectMode,
+      error,
+      sharing,
+      isGenerating,
+      isSidebarOpen,
+      theme
+    ]
   )
 }
 
