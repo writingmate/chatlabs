@@ -119,7 +119,7 @@ export const CodeViewer: FC<CodeViewerProps> = ({
           showShareButton={true}
           onThemeChange={() => {}}
           onFork={onFork}
-          showSidebarButton={user?.email?.endsWith("@writingmate.ai")}
+          showSidebarButton={!!user?.email?.endsWith("@writingmate.ai")}
           showForkButton={!!messageId && sequenceNo > -1}
         />
         <div className="relative w-full flex-1 overflow-auto bg-zinc-950">
