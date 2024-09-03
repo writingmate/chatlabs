@@ -50,6 +50,7 @@ export interface UITheme {
   "--rounded-box"?: string
   "--rounded-btn"?: string
   "--rounded-badge"?: string
+  "--tab-border"?: string
   "--tab-radius"?: string
   "--animation-btn"?: string
   "--animation-input"?: string

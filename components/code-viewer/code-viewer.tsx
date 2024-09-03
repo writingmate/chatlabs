@@ -40,7 +40,8 @@ export const CodeViewer: FC<CodeViewerProps> = ({
 }) => {
   const { user } = useAuth()
   const router = useRouter()
-  const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
+  const { selectedWorkspace, chatSettings, profile } =
+    useContext(ChatbotUIContext)
   const { setSelectedHtmlElements } = useContext(ChatbotUIChatContext)
   const { handleSendMessage } = useChatHandler()
   const [sharing, setSharing] = useState(false)
@@ -118,6 +119,7 @@ export const CodeViewer: FC<CodeViewerProps> = ({
           showShareButton={true}
           onThemeChange={() => {}}
           onFork={onFork}
+          showSidebarButton={user?.email?.endsWith("@writingmate.ai")}
           showForkButton={!!messageId && sequenceNo > -1}
         />
         <div className="relative w-full flex-1 overflow-auto bg-zinc-950">

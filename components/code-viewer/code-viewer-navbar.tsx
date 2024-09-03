@@ -14,8 +14,10 @@ import { CopyButton } from "@/components/ui/copy-button"
 import Loading from "@/components/ui/loading"
 import { UITheme } from "@/components/code-viewer/theme-configurator"
 import NavbarButton from "@/components/code-viewer/code-navbar-button"
+import { Tables } from "@/supabase/types"
 
 interface NavbarProps {
+  showSidebarButton: boolean
   language: string
   isGenerating?: boolean
   execute: boolean
@@ -41,6 +43,7 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
   onClose,
   toggleSidebar,
   showForkButton,
+  showSidebarButton,
   showCloseButton,
   downloadAsFile,
   onThemeChange,
@@ -109,12 +112,14 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
                 disabled={isGenerating}
               />
             )}
-            <NavbarButton
-              icon={<IconLayoutSidebar size={16} />}
-              title="Sidebar"
-              onClick={toggleSidebar}
-              disabled={isGenerating}
-            />
+            {showSidebarButton && (
+              <NavbarButton
+                icon={<IconLayoutSidebar size={16} />}
+                title="Sidebar"
+                onClick={toggleSidebar}
+                disabled={isGenerating}
+              />
+            )}
           </>
         )}
         <NavbarButton
