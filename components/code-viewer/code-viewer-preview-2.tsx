@@ -23,9 +23,6 @@ interface PreviewProps2 {
 }
 
 function addTailwindTheme(doc: Document, theme: UITheme) {
-  // <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-  // <script src="https://cdn.tailwindcss.com"></script>
-
   const daisyuiLinkElement = doc.createElement("link")
   daisyuiLinkElement.href =
     "https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
@@ -95,7 +92,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
         doc.close()
 
         if (theme) {
-          addTailwindTheme(doc, theme.theme)
+          // addTailwindTheme(doc, theme.theme)
         }
 
         const iframeWindow = iframe.contentWindow
