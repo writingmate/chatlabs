@@ -228,11 +228,11 @@ ${content}
       setChatSettings(prev => ({ ...prev, model: modelId as LLMID }))
     }
 
-    if (remixFileId) {
+    if (chatMessages?.length === 0 && remixFileId) {
       handleRemixFile(remixFileId)
     }
 
-    if (forkMessageId && forkSequenceNo > -1) {
+    if (chatMessages?.length === 0 && forkMessageId && forkSequenceNo > -1) {
       handleForkMessage(forkMessageId, forkSequenceNo)
     }
   }
