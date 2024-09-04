@@ -34,28 +34,34 @@ function addTailwindTheme(doc: Document, theme: UITheme) {
   tailwindScriptElement.src = "https://cdn.tailwindcss.com"
   doc.head.appendChild(tailwindScriptElement)
 
-  const scriptElement = doc.createElement("script")
-  scriptElement.textContent = `
-document.addEventListener("DOMContentLoaded", function() {
-  document.body.setAttribute("data-theme", "custom");
-});
-`
+  //   const scriptElement = doc.createElement("script")
+  //   scriptElement.textContent = `
+  // document.addEventListener("DOMContentLoaded", function() {
+  //   document.body.setAttribute("data-theme", "custom");
+  // });
+  // `
 
   const styleElement = doc.createElement("style")
   styleElement.textContent = `
-    [data-theme="custom"] {
-      --webkit-font-smoothing: antialiased;
-      --moz-osx-font-smoothing: grayscale;
-      ${daisyui.convertThemeToCSS(theme)}
-    }
     body {
       width: 100%;
       height: 100%;
-    }
-    ${theme.fontSize ? `html { font-size: ${theme.fontSize}; }` : ""}
-  `
+      }
+    `
+  // styleElement.textContent = `
+  //   [data-theme="custom"] {
+  //     --webkit-font-smoothing: antialiased;
+  //     --moz-osx-font-smoothing: grayscale;
+  //     ${daisyui.convertThemeToCSS(theme)}
+  //   }
+  //   body {
+  //     width: 100%;
+  //     height: 100%;
+  //   }
+  //   ${theme.fontSize ? `html { font-size: ${theme.fontSize}; }` : ""}
+
   doc.head.appendChild(styleElement)
-  doc.head.appendChild(scriptElement)
+  // doc.head.appendChild(scriptElement)
 }
 
 const CodeViewerPreview2: React.FC<PreviewProps2> = ({
@@ -68,7 +74,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
 }) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const consoleEndRef = useRef<HTMLDivElement | null>(null)
-  const renderRef = useRef<boolean>(false)
+  const renderRef = useRef<string>("")
   const [consoleMessages, setConsoleMessages] = useState<string[]>([])
   const [isConsoleExpanded, setIsConsoleExpanded] = useState<boolean>(false)
 
@@ -91,16 +97,16 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
     const iframeWindow = iframe.contentWindow
     if (!doc) return
     if (!iframeWindow) return
-    if (renderRef.current) return
+    if (renderRef.current === fullHtmlContent) return
 
     doc.open()
     doc.write(fullHtmlContent)
     doc.close()
 
-    renderRef.current = true
+    renderRef.current = fullHtmlContent
 
     if (theme) {
-      // addTailwindTheme(doc, theme.theme)
+      addTailwindTheme(doc, theme.theme)
     }
     const captureConsole = (methodName: keyof Console, messageType: string) => {
       const originalMethod = iframeWindow.console[methodName]
