@@ -68,6 +68,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
 }) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const consoleEndRef = useRef<HTMLDivElement | null>(null)
+  const renderRef = useRef<boolean>(false)
   const [consoleMessages, setConsoleMessages] = useState<string[]>([])
   const [isConsoleExpanded, setIsConsoleExpanded] = useState<boolean>(false)
 
@@ -84,147 +85,155 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
 
   useEffect(() => {
     const iframe = iframeRef.current
-    if (iframe) {
-      const doc = iframe.contentDocument || iframe.contentWindow?.document
-      if (doc) {
-        doc.open()
-        doc.write(fullHtmlContent)
-        doc.close()
+    if (!iframe) return
 
-        if (theme) {
-          // addTailwindTheme(doc, theme.theme)
-        }
+    const doc = iframe.contentDocument || iframe.contentWindow?.document
+    const iframeWindow = iframe.contentWindow
+    if (!doc) return
+    if (!iframeWindow) return
+    if (renderRef.current) return
 
-        const iframeWindow = iframe.contentWindow
-        if (iframeWindow) {
-          const captureConsole = (
-            methodName: keyof Console,
-            messageType: string
-          ) => {
-            const originalMethod = iframeWindow.console[methodName]
-            iframeWindow.console[methodName] = (...args: any[]) => {
-              setConsoleMessages(prevMessages => [
-                ...prevMessages,
-                `[${messageType}] ${args.join(" ")}`
-              ])
-              originalMethod.apply(iframeWindow.console, args)
-            }
-          }
+    doc.open()
+    doc.write(fullHtmlContent)
+    doc.close()
 
-          // Capture different types of console messages
-          captureConsole("log", "LOG")
-          captureConsole("warn", "WARN")
-          captureConsole("error", "ERROR")
-          captureConsole("info", "INFO")
+    renderRef.current = true
 
-          // Capture unhandled errors
-          // @ts-ignore
-          iframeWindow.onerror = (
-            message: string,
-            source: string,
-            lineno: number,
-            colno: number,
-            error: Error
-          ) => {
-            setConsoleMessages(prevMessages => [
-              ...prevMessages,
-              `[ERROR] ${message} at ${source}:${lineno}:${colno}`
-            ])
-          }
+    if (theme) {
+      // addTailwindTheme(doc, theme.theme)
+    }
+    const captureConsole = (methodName: keyof Console, messageType: string) => {
+      const originalMethod = iframeWindow.console[methodName]
+      iframeWindow.console[methodName] = (...args: any[]) => {
+        setConsoleMessages(prevMessages => [
+          ...prevMessages,
+          `[${messageType}] ${args.join(" ")}`
+        ])
+        originalMethod.apply(iframeWindow.console, args)
+      }
+    }
 
-          const styleElement = doc.createElement("style")
-          styleElement.textContent = `
+    // Capture different types of console messages
+    captureConsole("log", "LOG")
+    captureConsole("warn", "WARN")
+    captureConsole("error", "ERROR")
+    captureConsole("info", "INFO")
+
+    // Capture unhandled errors
+    // @ts-ignore
+    iframeWindow.onerror = (
+      message: string,
+      source: string,
+      lineno: number,
+      colno: number,
+      error: Error
+    ) => {
+      setConsoleMessages(prevMessages => [
+        ...prevMessages,
+        `[ERROR] ${message} at ${source}:${lineno}:${colno}`
+      ])
+    }
+
+    const styleElement = doc.createElement("style")
+    styleElement.textContent = `
             .highlighted {
               outline: dashed 1px blue;
             }
           `
-          doc.head.appendChild(styleElement)
+    doc.head.appendChild(styleElement)
 
-          const handleMouseOver = (event: MouseEvent) => {
-            if (inspectMode) {
-              ;(event.target as HTMLElement).classList.add("highlighted")
-            }
-          }
+    return () => {
+      // Reset console methods to original
+      ;["log", "warn", "error", "info"].forEach(methodName => {
+        const originalMethod = console[methodName as keyof Console]
+        if (iframeWindow) {
+          iframeWindow.console[methodName as keyof Console] = originalMethod
+        }
+      })
+    }
+  }, [fullHtmlContent, inspectMode, theme])
 
-          const handleMouseOut = (event: MouseEvent) => {
-            if (inspectMode) {
-              ;(event.target as HTMLElement).classList.remove("highlighted")
-            }
-          }
+  useEffect(() => {
+    const iframe = iframeRef.current
+    if (!iframe) return
+    const doc = iframe.contentDocument || iframe.contentWindow?.document
+    if (!doc) return
+    const iframeWindow = iframe.contentWindow
+    if (!iframeWindow) return
 
-          function getElementXPath(element: HTMLElement): string {
-            if (
-              element.id !== "" &&
-              element.id !== null &&
-              element.id !== undefined
-            ) {
-              return 'id("' + element.id + '")'
-            }
-            if (element.tagName === "BODY") {
-              return "/body"
-            }
+    const handleMouseOver = (event: MouseEvent) => {
+      if (inspectMode) {
+        ;(event.target as HTMLElement).classList.add("highlighted")
+      }
+    }
 
-            var ix = 0
-            var siblings = element.parentNode?.childNodes
-            if (!siblings) return ""
-            for (var i = 0; i < siblings.length; i++) {
-              var sibling = siblings[i] as HTMLElement
-              if (sibling === element) {
-                if (element.parentNode === null) return ""
-                return (
-                  getElementXPath(element.parentNode as HTMLElement) +
-                  "/" +
-                  element.tagName.toLowerCase() +
-                  "[" +
-                  (ix + 1) +
-                  "]"
-                )
-              }
-              if (
-                sibling.nodeType === 1 &&
-                sibling.tagName === element.tagName
-              ) {
-                ix++
-              }
-            }
+    const handleMouseOut = (event: MouseEvent) => {
+      if (inspectMode) {
+        ;(event.target as HTMLElement).classList.remove("highlighted")
+      }
+    }
 
-            return ""
-          }
+    function getElementXPath(element: HTMLElement): string {
+      if (
+        element.id !== "" &&
+        element.id !== null &&
+        element.id !== undefined
+      ) {
+        return 'id("' + element.id + '")'
+      }
+      if (element.tagName === "BODY") {
+        return "/body"
+      }
 
-          const handleClick = (event: MouseEvent) => {
-            if (inspectMode) {
-              event.preventDefault()
-              event.stopImmediatePropagation() // Ensures no other click events are triggered
-              const target = event.target as HTMLElement
-              if (target) {
-                onElementClick({
-                  xpath: getElementXPath(target),
-                  innerText: target.innerText
-                })
-              }
-            }
-          }
+      var ix = 0
+      var siblings = element.parentNode?.childNodes
+      if (!siblings) return ""
+      for (var i = 0; i < siblings.length; i++) {
+        var sibling = siblings[i] as HTMLElement
+        if (sibling === element) {
+          if (element.parentNode === null) return ""
+          return (
+            getElementXPath(element.parentNode as HTMLElement) +
+            "/" +
+            element.tagName.toLowerCase() +
+            "[" +
+            (ix + 1) +
+            "]"
+          )
+        }
+        if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
+          ix++
+        }
+      }
 
-          doc.addEventListener("mouseover", handleMouseOver)
-          doc.addEventListener("mouseout", handleMouseOut)
-          doc.addEventListener("click", handleClick, true) // Use capture phase
+      return ""
+    }
 
-          // Cleanup function to remove event listeners and reset console methods
-          return () => {
-            doc.removeEventListener("mouseover", handleMouseOver)
-            doc.removeEventListener("mouseout", handleMouseOut)
-            doc.removeEventListener("click", handleClick, true)
-
-            // Reset console methods to original
-            ;["log", "warn", "error", "info"].forEach(methodName => {
-              const originalMethod = console[methodName as keyof Console]
-              iframeWindow.console[methodName as keyof Console] = originalMethod
-            })
-          }
+    const handleClick = (event: MouseEvent) => {
+      if (inspectMode) {
+        event.preventDefault()
+        event.stopImmediatePropagation() // Ensures no other click events are triggered
+        const target = event.target as HTMLElement
+        if (target) {
+          onElementClick({
+            xpath: getElementXPath(target),
+            innerText: target.innerText
+          })
         }
       }
     }
-  }, [fullHtmlContent, inspectMode, theme])
+
+    doc.addEventListener("mouseover", handleMouseOver)
+    doc.addEventListener("mouseout", handleMouseOut)
+    doc.addEventListener("click", handleClick, true) // Use capture phase
+
+    // Cleanup function to remove event listeners and reset console methods
+    return () => {
+      doc.removeEventListener("mouseover", handleMouseOver)
+      doc.removeEventListener("mouseout", handleMouseOut)
+      doc.removeEventListener("click", handleClick, true)
+    }
+  }, [inspectMode, onElementClick])
 
   return (
     <div className="flex h-full min-h-[400px] flex-col">

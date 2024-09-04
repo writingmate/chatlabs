@@ -88,11 +88,14 @@ export const useChatHandler = () => {
     }
   }, [isPromptPickerOpen, isFilePickerOpen, isToolPickerOpen])
 
-  const handleNewChat = async (redirectTo = "") => {
+  const handleNewChat = async (
+    redirectTo = "",
+    chatMessages: ChatMessage[] = []
+  ) => {
     if (!selectedWorkspace) return
 
     setUserInput("")
-    setChatMessages([])
+    setChatMessages(chatMessages)
     setSelectedChat(null)
     setChatFileItems([])
 

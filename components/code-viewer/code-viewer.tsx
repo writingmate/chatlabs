@@ -71,25 +71,11 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   }, [language, value])
 
   const onFork = useCallback(() => {
-    router.push(`/chat?forkMessageId=${messageId}&forkSequenceNo=${sequenceNo}`)
+    window.open(
+      `/chat?forkMessageId=${messageId}&forkSequenceNo=${sequenceNo}`,
+      "_blank"
+    )
   }, [messageId, sequenceNo])
-
-  //   const handleThemeChange = useCallback(
-  //     (theme: UITheme) => {
-  //       const themeMessage = `
-  // \`\`\`theme
-  // Change theme to
-  // Font: ${theme.font}
-  // Corner radius: ${theme.cornerRadius}
-  // Font size: ${theme.fontSize}
-  // Color palette: ${theme.colorPalette.join(", ")}
-  // Shadow size: ${theme.shadowSize}
-  // \`\`\`
-  //     `
-  //       handleSendMessage(themeMessage, [], false)
-  //     },
-  //     [handleSendMessage]
-  //   )
 
   useEffect(() => {
     if (language !== "html") {

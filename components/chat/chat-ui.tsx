@@ -1,12 +1,7 @@
 "use client"
 
 import React, { useCallback, useContext, useEffect, useState } from "react"
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams
-} from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { ChatbotUIContext } from "@/context/context"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { useAuth } from "@/context/auth"
@@ -15,10 +10,9 @@ import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and
 import { useScroll } from "./chat-hooks/use-scroll"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { useTheme } from "next-themes"
-import { LLMID, MessageImage } from "@/types"
+import { ChatMessage, LLMID, MessageImage } from "@/types"
 import { Tables } from "@/supabase/types"
 import { parseIdFromSlug } from "@/lib/slugify"
-import { cn } from "@/lib/utils"
 
 import Loading from "@/components/ui/loading"
 import { ChatInput } from "./chat-input"
@@ -142,7 +136,10 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setLoading(false)
   }
 
-  const createRemixMessages = (filename: string, content: string) =>
+  const createRemixMessages = (
+    filename: string,
+    content: string
+  ): ChatMessage[] =>
     [
       {
         fileItems: [],
@@ -185,18 +182,18 @@ ${content}
       }
     ].map(parseChatMessageCodeBlocksAndContent)
 
-  function handleForkMessage(messageId: string, sequenceNo: number) {
-    getMessageById(messageId).then(message => {
-      if (message) {
-        const codeBlock =
-          parseDBMessageCodeBlocksAndContent(message)?.codeBlocks?.[sequenceNo]
-        if (codeBlock && codeBlock.language === "html" && codeBlock.filename) {
-          setChatMessages(
-            createRemixMessages(codeBlock.filename, codeBlock.code)
-          )
-        }
+  async function handleForkMessage(messageId: string, sequenceNo: number) {
+    const message = await getMessageById(messageId)
+    if (message) {
+      const codeBlock =
+        parseDBMessageCodeBlocksAndContent(message)?.codeBlocks?.[sequenceNo]
+      if (codeBlock && codeBlock.language === "html" && codeBlock.filename) {
+        await handleNewChat(
+          "",
+          createRemixMessages(codeBlock.filename, codeBlock.code)
+        )
       }
-    })
+    }
   }
 
   function handleRemixFile(fileId: string) {
