@@ -295,8 +295,11 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
                       )
                     ]
               }
-              onAssistantToolsSelect={tool =>
-                handleToolSelect(tool, renderState.setSelectedAssistantTools)
+              onAssistantToolsSelect={tools =>
+                handleToolSelect(
+                  tools[0],
+                  renderState.setSelectedAssistantTools
+                )
               }
             />
           </div>

@@ -8,6 +8,8 @@ import { useAuth } from "@/context/auth"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { cn, generateRandomString, programmingLanguages } from "@/lib/utils"
+import { CodeBlock } from "@/types"
+import { useRouter } from "next/navigation"
 import {
   FC,
   useCallback,
@@ -16,12 +18,12 @@ import {
   useMemo,
   useState
 } from "react"
+import CodeViewerSidebar from "./code-viewer-sidebar"
+import { DEFAULT_THEME, THEMES } from "./theme-config"
 
 interface CodeViewerProps {
   isGenerating?: boolean
-  language: string
-  filename?: string
-  value: string
+  codeBlock: CodeBlock
   className?: string
   onClose?: () => void
   showCloseButton?: boolean
@@ -29,36 +31,37 @@ interface CodeViewerProps {
 }
 
 export const CodeViewer: FC<CodeViewerProps> = ({
-  language,
-  value,
+  codeBlock: { language, code: value, filename, messageId, sequenceNo },
   className,
   onClose,
   isGenerating,
   showCloseButton = false,
-  filename,
   autoScroll = false
 }) => {
   const { user } = useAuth()
-  const { selectedWorkspace, chatSettings } = useContext(ChatbotUIContext)
+  const router = useRouter()
+  const { selectedWorkspace, chatSettings, profile } =
+    useContext(ChatbotUIContext)
   const { setSelectedHtmlElements } = useContext(ChatbotUIChatContext)
   const { handleSendMessage } = useChatHandler()
   const [sharing, setSharing] = useState(false)
   const [execute, setExecute] = useState(false)
   const [inspectMode, setInspectMode] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [theme, setTheme] = useState<{ name: string; theme: UITheme }>(
+    THEMES[0]
+  )
 
   const downloadAsFile = useCallback(() => {
     if (typeof window === "undefined") return
     const fileExtension = programmingLanguages[language] || ".file"
     const suggestedFileName = `file-${generateRandomString(3, true)}${fileExtension}`
-    const fileName = window.prompt("Enter file name", suggestedFileName)
-
-    if (!fileName) return
 
     const blob = new Blob([value], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
-    link.download = fileName
+    link.download = suggestedFileName
     link.href = url
     link.style.display = "none"
     document.body.appendChild(link)
@@ -67,22 +70,12 @@ export const CodeViewer: FC<CodeViewerProps> = ({
     URL.revokeObjectURL(url)
   }, [language, value])
 
-  const handleThemeChange = useCallback(
-    (theme: UITheme) => {
-      const themeMessage = `
-\`\`\`theme                  
-Change theme to
-Font: ${theme.font}
-Corner radius: ${theme.cornerRadius}
-Font size: ${theme.fontSize}
-Color palette: ${theme.colorPalette.join(", ")}
-Shadow size: ${theme.shadowSize}
-\`\`\`
-    `
-      handleSendMessage(themeMessage, [], false)
-    },
-    [handleSendMessage]
-  )
+  const onFork = useCallback(() => {
+    window.open(
+      `/chat?forkMessageId=${messageId}&forkSequenceNo=${sequenceNo}`,
+      "_blank"
+    )
+  }, [messageId, sequenceNo])
 
   useEffect(() => {
     if (language !== "html") {
@@ -99,6 +92,7 @@ Shadow size: ${theme.shadowSize}
         )}
       >
         <CodeViewerNavbar
+          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           language={language}
           isGenerating={isGenerating}
           execute={execute}
@@ -109,11 +103,15 @@ Shadow size: ${theme.shadowSize}
           downloadAsFile={downloadAsFile}
           copyValue={value}
           showShareButton={true}
-          onThemeChange={handleThemeChange}
+          onThemeChange={() => {}}
+          onFork={onFork}
+          showSidebarButton={!!user?.email?.endsWith("@writingmate.ai")}
+          showForkButton={!!messageId && sequenceNo > -1}
         />
         <div className="relative w-full flex-1 overflow-auto bg-zinc-950">
           {execute ? (
             <CodeViewerPreview2
+              theme={theme}
               value={value}
               language={language}
               inspectMode={inspectMode}
@@ -125,12 +123,23 @@ Shadow size: ${theme.shadowSize}
             />
           ) : (
             <CodeViewerCode
-              language={language}
-              value={value}
+              codeBlock={{
+                language,
+                code: value,
+                filename,
+                messageId,
+                sequenceNo
+              }}
               autoScroll={autoScroll}
             />
           )}
         </div>
+        <CodeViewerSidebar
+          theme={theme}
+          setTheme={setTheme}
+          isOpen={isSidebarOpen}
+          setIsOpen={setIsSidebarOpen}
+        />
         <MessageSharingDialog
           open={sharing}
           setOpen={setSharing}
@@ -142,7 +151,17 @@ Shadow size: ${theme.shadowSize}
         />
       </div>
     ),
-    [language, value, execute, inspectMode, error, sharing, isGenerating]
+    [
+      language,
+      value,
+      execute,
+      inspectMode,
+      error,
+      sharing,
+      isGenerating,
+      isSidebarOpen,
+      theme
+    ]
   )
 }
 

@@ -22,6 +22,7 @@ import {
 import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -87,11 +88,14 @@ export const useChatHandler = () => {
     }
   }, [isPromptPickerOpen, isFilePickerOpen, isToolPickerOpen])
 
-  const handleNewChat = async (redirectTo = "") => {
+  const handleNewChat = async (
+    redirectTo = "",
+    chatMessages: ChatMessage[] = []
+  ) => {
     if (!selectedWorkspace) return
 
     setUserInput("")
-    setChatMessages([])
+    setChatMessages(chatMessages)
     setSelectedChat(null)
     setChatFileItems([])
 
@@ -253,10 +257,10 @@ export const useChatHandler = () => {
 
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
-        // workspaceInstructions: selectedWorkspace?.instructions || "",
-        chatMessages: isRegeneration
+        chatMessages: (isRegeneration
           ? [...chatMessages]
-          : [...chatMessages, tempUserChatMessage],
+          : [...chatMessages, tempUserChatMessage]
+        ).map(reconstructContentWithCodeBlocksInChatMessage),
         assistant: selectedAssistant,
         messageFileItems: retrievedFileItems,
         chatFileItems: chatFileItems,

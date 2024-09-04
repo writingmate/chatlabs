@@ -31,7 +31,10 @@ import {
   validateProPlan
 } from "@/lib/subscription"
 import { encode } from "gpt-tokenizer"
-import { parseChatMessageCodeBlocksAndContent } from "@/lib/messages"
+import {
+  parseChatMessageCodeBlocksAndContent,
+  reconstructContentWithCodeBlocks
+} from "@/lib/messages"
 
 export const validateChatSettings = (
   chatSettings: ChatSettings | null,
@@ -155,6 +158,8 @@ export const createTempMessages = (
       tempAssistantChatMessage
     ]
   }
+
+  console.log("newMessages", newMessages)
 
   setChatMessages(newMessages.map(parseChatMessageCodeBlocksAndContent))
 
@@ -616,7 +621,7 @@ export const handleCreateMessages = async (
     chat_id: currentChat.id,
     assistant_id: null,
     user_id: profile.user_id,
-    content: messageContent,
+    content: messageContent, // This doesn't need reconstruction as it's the original user input
     model: modelData.modelId,
     role: "user",
     sequence_number: chatMessages.length,
@@ -624,11 +629,19 @@ export const handleCreateMessages = async (
     annotation: {}
   }
 
+  const reconstructedAssistantContent =
+    chatMessages.length > 0
+      ? reconstructContentWithCodeBlocks(
+          generatedText,
+          chatMessages[chatMessages.length - 1].codeBlocks || []
+        )
+      : generatedText
+
   const finalAssistantMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
     assistant_id: selectedAssistant?.id || null,
     user_id: profile.user_id,
-    content: generatedText,
+    content: reconstructedAssistantContent, // Use the reconstructed content here
     model: modelData.modelId,
     role: "assistant",
     sequence_number: chatMessages.length + 1,

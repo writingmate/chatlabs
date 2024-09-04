@@ -16,10 +16,6 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   selectedCodeBlock,
   onSelectCodeBlock
 }) => {
-  const language = selectedCodeBlock?.language ?? ""
-  const filename = selectedCodeBlock?.filename
-  const codeString = selectedCodeBlock?.code ?? ""
-
   return useMemo(
     () => (
       <div
@@ -33,15 +29,13 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
             isGenerating={isGenerating}
             onClose={() => onSelectCodeBlock?.(null)}
             className={"h-full rounded-none"}
-            language={language}
-            filename={filename}
-            value={codeString}
+            codeBlock={selectedCodeBlock}
             showCloseButton={true}
             autoScroll={true}
           />
         )}
       </div>
     ),
-    [open, isGenerating, selectedCodeBlock, language, filename, codeString]
+    [open, isGenerating, selectedCodeBlock]
   )
 }

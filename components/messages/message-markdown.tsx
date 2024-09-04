@@ -69,7 +69,7 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
 
   const contentParts = useMemo(() => {
     const parts = content.split(/(\[CODE_BLOCK_\d+\])/)
-    return parts.map((part, index) => {
+    return parts.filter(Boolean).map((part, index) => {
       const match = part.match(/\[CODE_BLOCK_(\d+)\]/)
       if (match) {
         const blockIndex = parseInt(match[1])
@@ -90,9 +90,7 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
           return (
             <CodeViewer
               key={`code-block-${index}`}
-              language={block.language}
-              filename={block.filename}
-              value={block.code}
+              codeBlock={block}
               isGenerating={isGenerating}
               autoScroll={false}
             />

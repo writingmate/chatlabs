@@ -205,7 +205,7 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
 
               <AssistantToolSelect
                 selectedAssistantTools={selectedAssistantToolItems}
-                onAssistantToolsSelect={handleToolSelect}
+                onAssistantToolsSelect={tools => handleToolSelect(tools[0])}
               />
             </div>
           ) : (
