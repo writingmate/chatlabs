@@ -1,4 +1,4 @@
-import { FC, useContext, useState } from "react"
+import { FC, useContext, useState, useEffect } from "react"
 import {
   Sheet,
   SheetContent,
@@ -18,12 +18,14 @@ import {
   UITheme
 } from "@/components/code-viewer/theme-configurator"
 import { ChatbotUIContext } from "@/context/context"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { Tables } from "@/supabase/types"
 import { IconCircleCheckFilled } from "@tabler/icons-react"
 import { MultiSelect } from "@/components/ui/multi-select"
 import { Button } from "../ui/button"
 import { Label } from "../ui/label"
 import { Separator } from "../ui/separator"
+import { Schema } from "zod"
 
 type CodeViewerSidebarProps = {
   isOpen: boolean
@@ -39,11 +41,51 @@ const CodeViewerSidebar: FC<CodeViewerSidebarProps> = ({
   setIsOpen
 }) => {
   const { tools: plugins, allModels } = useContext(ChatbotUIContext)
+  const { chatSettings, setChatSettings, setSelectedTools } =
+    useContext(ChatbotUIChatContext)
 
   const [selectedLLM, setSelectedLLM] = useState<string>(
     allModels[0]?.modelId ?? ""
   )
-  const [selectedPlugins, setSelectedPlugins] = useState<string[]>([])
+  const [selectedPlugins, setSelectedPlugins] = useState<Tables<"tools">[]>([])
+
+  useEffect(() => {
+    updateSystemPromptWithTools()
+  }, [selectedPlugins])
+
+  const updateSystemPromptWithTools = () => {
+    const toolsInfo = selectedPlugins.map(tool => {
+      const schema = JSON.parse(tool.schema as string)
+      schema.servers = [
+        {
+          url: "/api/tools/" + tool.id
+        }
+      ]
+      return {
+        name: tool.name,
+        description: tool.description,
+        schema: schema
+      }
+    })
+
+    const toolsPrompt = `
+You have access to the following tools:
+${toolsInfo
+  .map(
+    tool => `
+- ${tool.name}: ${tool.description}
+  Schema: ${JSON.stringify(tool.schema)}
+`
+  )
+  .join("")}`
+
+    console.log(toolsPrompt, toolsInfo, selectedPlugins, plugins)
+
+    setChatSettings(prevSettings => ({
+      ...prevSettings,
+      prompt: prevSettings.prompt + "\n\n" + toolsPrompt
+    }))
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -56,7 +98,6 @@ const CodeViewerSidebar: FC<CodeViewerSidebarProps> = ({
             <div className="flex flex-col">
               <ThemeConfigurator theme={theme} onThemeChange={setTheme} />
             </div>
-            {/* <Separator /> */}
             <div className="space-y-1">
               <Label>Plugins</Label>
               <div className="text-foreground/60 text-xs">

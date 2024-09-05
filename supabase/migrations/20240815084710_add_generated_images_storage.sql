@@ -23,17 +23,16 @@ BEGIN
 END;
 $$;
 
--- TRIGGERS --
-
-CREATE TRIGGER delete_old_generated_image
-AFTER DELETE ON users
-FOR EACH ROW
-EXECUTE PROCEDURE delete_old_generated_image();
+-- Remove the trigger on users table (it's not needed for generated images)
+DROP TRIGGER IF EXISTS delete_old_generated_image ON users;
 
 -- STORAGE --
 
-INSERT INTO storage.buckets (id, name, public) VALUES ('generated_images', 'generated_images', false);
+-- Ensure the bucket exists (if not already created)
+INSERT INTO storage.buckets (id, name, public) VALUES ('generated_images', 'generated_images', true)
+ON CONFLICT (id) DO NOTHING;
 
+-- Update the non_private_generated_exists function
 CREATE OR REPLACE FUNCTION public.non_private_generated_exists(p_name text)
 RETURNS boolean
 LANGUAGE sql
@@ -41,23 +40,24 @@ SECURITY DEFINER
 AS $$
     SELECT EXISTS (
         SELECT 1
-        FROM generateds
-        WHERE (id::text = (storage.filename(p_name))) AND sharing <> 'private'
+        FROM messages
+        WHERE (id::text = split_part(p_name, '/', 2)) AND chat_id IN (SELECT id FROM chats WHERE sharing <> 'private')
     );
 $$;
 
+-- Update policies for the generated_images bucket
 CREATE POLICY "Allow public read access on non-private generated images"
     ON storage.objects FOR SELECT TO public
     USING (bucket_id = 'generated_images' AND public.non_private_generated_exists(name));
 
-CREATE POLICY "Allow insert access to own generated images"
+CREATE POLICY "Allow insert access to authenticated users for generated images"
     ON storage.objects FOR INSERT TO authenticated
-    WITH CHECK (bucket_id = 'generated_images' AND (storage.foldername(name))[1] = auth.uid()::text);
+    WITH CHECK (bucket_id = 'generated_images');
 
-CREATE POLICY "Allow update access to own generated images"
+CREATE POLICY "Allow update access to authenticated users for generated images"
     ON storage.objects FOR UPDATE TO authenticated
-    USING (bucket_id = 'generated_images' AND (storage.foldername(name))[1] = auth.uid()::text);
+    USING (bucket_id = 'generated_images');
 
-CREATE POLICY "Allow delete access to own generated images"
+CREATE POLICY "Allow delete access to authenticated users for generated images"
     ON storage.objects FOR DELETE TO authenticated
-    USING (bucket_id = 'generated_images' AND (storage.foldername(name))[1] = auth.uid()::text);
+    USING (bucket_id = 'generated_images');

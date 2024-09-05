@@ -1,4 +1,6 @@
 import { PlatformTool } from "@/types/platformTools"
+import { createClient } from "@/lib/supabase/server"
+import { cookies } from "next/headers"
 
 interface ImageGenerationViaStableDiffusion3Params {
   prompt: string
@@ -92,6 +94,7 @@ async function generateImageFromStabilityAPI(
 async function uploadImageToSupabase(prompt: string, imageData: string) {
   const imageBuffer = Buffer.from(imageData, "base64")
   const fileName = `${prompt.replace(/\s+/g, "_")}.png`
+  const supabase = createClient(cookies())
 
   const { data, error } = await supabase.storage
     .from("generated_images") // Replace with your actual bucket name
@@ -104,15 +107,17 @@ async function uploadImageToSupabase(prompt: string, imageData: string) {
     throw new Error("Supabase upload error: " + error.message)
   }
 
-  const { publicURL, error: urlError } = supabase.storage
+  const {
+    data: { publicUrl }
+  } = supabase.storage
     .from("generated_images") // Replace with your actual bucket name
     .getPublicUrl(fileName)
 
-  if (urlError) {
-    throw new Error("Supabase URL error: " + urlError.message)
+  if (!publicUrl) {
+    throw new Error("Supabase URL error: No public URL returned")
   }
 
-  return publicURL
+  return publicUrl
 }
 
 export const stableDiffusionTools: PlatformTool = {
