@@ -5,6 +5,7 @@ import { FC, useContext, useMemo, useState } from "react"
 import { Message } from "../messages/message"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { CodeBlock } from "@/types/chat-message"
+import { isMobileScreen } from "@/lib/mobile"
 
 interface ChatMessagesProps {
   onSelectCodeBlock: (codeBlock: CodeBlock | null) => void
@@ -34,6 +35,8 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
 
   const [editingMessage, setEditingMessage] = useState<Tables<"messages">>()
 
+  const isMobile = isMobileScreen()
+
   return useMemo(
     () =>
       chatMessages
@@ -61,7 +64,9 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
               onSubmitEdit={handleSendEdit}
               onSelectCodeBlock={onSelectCodeBlock}
               onRegenerate={handleRegenerate}
-              isExperimentalCodeEditor={!!profile?.experimental_code_editor}
+              isExperimentalCodeEditor={
+                !!profile?.experimental_code_editor && !isMobile
+              }
             />
           )
         }),
@@ -71,7 +76,8 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
       editingMessage,
       isGenerating,
       firstTokenReceived,
-      onSelectCodeBlock
+      onSelectCodeBlock,
+      isMobile
     ]
   )
 }
