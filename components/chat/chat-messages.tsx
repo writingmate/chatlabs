@@ -20,6 +20,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
   } = useContext(ChatbotUIChatContext)
 
   const { handleSendEdit, handleSendMessage } = useChatHandler()
+  const { profile } = useContext(ChatbotUIContext)
 
   async function handleRegenerate(editedMessage?: string) {
     setIsGenerating(true)
@@ -60,6 +61,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
               onSubmitEdit={handleSendEdit}
               onSelectCodeBlock={onSelectCodeBlock}
               onRegenerate={handleRegenerate}
+              isExperimentalCodeEditor={!!profile?.experimental_code_editor}
             />
           )
         }),
