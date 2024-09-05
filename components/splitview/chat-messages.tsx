@@ -16,33 +16,36 @@ const ChatMessages = forwardRef<ChatMessagesProps>(({}, ref) => {
   const [editingMessage, setEditingMessage] = useState<Tables<"messages">>()
 
   return useMemo(() => {
-    return chatMessages
-      .sort((a, b) => a.message.sequence_number - b.message.sequence_number)
-      .map((chatMessage, index, array) => {
-        const parsedMessage = parseChatMessageCodeBlocksAndContent(chatMessage)
-        const messageFileItems = chatFileItems.filter(
-          (chatFileItem, _, self) =>
-            parsedMessage.fileItems.includes(chatFileItem.id) &&
-            self.findIndex(item => item.id === chatFileItem.id) === _
-        )
+    return (
+      chatMessages
+        // .sort((a, b) => a.message.sequence_number - b.message.sequence_number)
+        .map((chatMessage, index, array) => {
+          const parsedMessage =
+            parseChatMessageCodeBlocksAndContent(chatMessage)
+          const messageFileItems = chatFileItems.filter(
+            (chatFileItem, _, self) =>
+              parsedMessage.fileItems.includes(chatFileItem.id) &&
+              self.findIndex(item => item.id === chatFileItem.id) === _
+          )
 
-        return (
-          <Message
-            isGenerating={isGenerating}
-            firstTokenReceived={firstTokenReceived}
-            codeBlocks={parsedMessage.codeBlocks}
-            key={parsedMessage.message.sequence_number}
-            message={parsedMessage.message}
-            fileItems={messageFileItems}
-            isEditing={editingMessage?.id === parsedMessage.message.id}
-            isLast={index === array.length - 1}
-            onStartEdit={setEditingMessage}
-            onCancelEdit={() => setEditingMessage(undefined)}
-            onSubmitEdit={handleSendEdit}
-            isExperimentalCodeEditor={false}
-          />
-        )
-      })
+          return (
+            <Message
+              isGenerating={isGenerating}
+              firstTokenReceived={firstTokenReceived}
+              codeBlocks={parsedMessage.codeBlocks}
+              key={index}
+              message={parsedMessage.message}
+              fileItems={messageFileItems}
+              isEditing={editingMessage?.id === parsedMessage.message.id}
+              isLast={index === array.length - 1}
+              onStartEdit={setEditingMessage}
+              onCancelEdit={() => setEditingMessage(undefined)}
+              onSubmitEdit={handleSendEdit}
+              isExperimentalCodeEditor={false}
+            />
+          )
+        })
+    )
   }, [
     chatMessages,
     chatFileItems,
