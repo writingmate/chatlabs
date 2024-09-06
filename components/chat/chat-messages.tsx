@@ -5,6 +5,7 @@ import { FC, useContext, useMemo, useState } from "react"
 import { Message } from "../messages/message"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { CodeBlock } from "@/types/chat-message"
+import { isMobileScreen } from "@/lib/mobile"
 
 interface ChatMessagesProps {
   onSelectCodeBlock: (codeBlock: CodeBlock | null) => void
@@ -20,6 +21,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
   } = useContext(ChatbotUIChatContext)
 
   const { handleSendEdit, handleSendMessage } = useChatHandler()
+  const { profile } = useContext(ChatbotUIContext)
 
   async function handleRegenerate(editedMessage?: string) {
     setIsGenerating(true)
@@ -33,10 +35,12 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
 
   const [editingMessage, setEditingMessage] = useState<Tables<"messages">>()
 
+  const isMobile = isMobileScreen()
+
   return useMemo(
     () =>
       chatMessages
-        .sort((a, b) => a.message.sequence_number - b.message.sequence_number)
+        // .sort((a, b) => a.message.sequence_number - b.message.sequence_number)
         .map((chatMessage, index, array) => {
           const messageFileItems = chatFileItems.filter(
             (chatFileItem, _, self) =>
@@ -49,7 +53,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
               isGenerating={isGenerating}
               setIsGenerating={setIsGenerating}
               firstTokenReceived={firstTokenReceived}
-              key={chatMessage.message.sequence_number}
+              key={index}
               codeBlocks={chatMessage.codeBlocks}
               message={chatMessage.message}
               fileItems={messageFileItems}
@@ -60,6 +64,9 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
               onSubmitEdit={handleSendEdit}
               onSelectCodeBlock={onSelectCodeBlock}
               onRegenerate={handleRegenerate}
+              isExperimentalCodeEditor={
+                !!profile?.experimental_code_editor && !isMobile
+              }
             />
           )
         }),
@@ -69,7 +76,8 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
       editingMessage,
       isGenerating,
       firstTokenReceived,
-      onSelectCodeBlock
+      onSelectCodeBlock,
+      isMobile
     ]
   )
 }

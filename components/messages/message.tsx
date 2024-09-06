@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { CodeBlock, LLM, LLMID, MessageImage, ModelProvider } from "@/types"
 import {
+  IconApi,
   IconCaretDownFilled,
   IconCaretRightFilled,
   IconCircleFilled,
@@ -14,7 +15,7 @@ import {
   IconTerminal2
 } from "@tabler/icons-react"
 import Image from "next/image"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
 import { FileIcon } from "../ui/file-icon"
@@ -31,6 +32,10 @@ import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { toast } from "sonner"
 import { LoadingMessage } from "@/components/messages/message-loading"
 import { CodeBlock as ChatMessageCodeBlock } from "@/types/chat-message"
+import {
+  ResponseTime,
+  ToolCalls
+} from "@/components/messages/annotations/toolCalls"
 
 const ICON_SIZE = 32
 
@@ -49,6 +54,7 @@ interface MessageProps {
   firstTokenReceived: boolean
   setIsGenerating?: (value: boolean) => void
   onSelectCodeBlock?: (codeBlock: ChatMessageCodeBlock | null) => void
+  isExperimentalCodeEditor?: boolean
 }
 
 export const Message: FC<MessageProps> = ({
@@ -65,23 +71,20 @@ export const Message: FC<MessageProps> = ({
   onSubmitEdit,
   onSelectCodeBlock,
   showActions = true,
-  codeBlocks
+  codeBlocks,
+  isExperimentalCodeEditor
 }) => {
   const {
     assistants,
     profile,
-    availableLocalModels,
-    availableOpenRouterModels,
+    allModels,
     selectedAssistant,
     chatImages,
-    toolInUse,
-    files,
-    models
+    files
   } = useContext(ChatbotUIContext)
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
 
-  const [isHovering, setIsHovering] = useState(false)
   const [editedMessage, setEditedMessage] = useState(message.content)
 
   const [showImagePreview, setShowImagePreview] = useState(false)
@@ -278,19 +281,7 @@ export const Message: FC<MessageProps> = ({
     }
   }, [isEditing])
 
-  const MODEL_DATA = [
-    ...models.map(model => ({
-      modelId: model.model_id as LLMID,
-      modelName: model.name,
-      provider: "custom" as ModelProvider,
-      hostedId: model.id,
-      platformLink: "",
-      imageInput: false
-    })),
-    ...LLM_LIST,
-    ...availableLocalModels,
-    ...availableOpenRouterModels
-  ].find(llm => llm.modelId === message.model) as LLM
+  const MODEL_DATA = allModels.find(llm => llm.modelId === message.model) as LLM
 
   const fileAccumulator: Record<
     string,
@@ -342,15 +333,39 @@ export const Message: FC<MessageProps> = ({
     } = {
       imageGenerator__generateImage: AnnotationImage,
       webScraper__youtubeCaptions: YouTube,
-      webScraper__googleSearch: WebSearch
+      webScraper__googleSearch: WebSearch,
+      toolCalls: ToolCalls
+    }
+
+    const annotationResponseTimeLabelMap: {
+      [key: string]: string
+    } = {
+      imageGenerator__generateImage: "Image",
+      webScraper__youtubeCaptions: "YouTube",
+      webScraper__googleSearch: "Google Search"
     }
 
     return Object.keys(annotation).map(key => {
       if (!annotationMap[key]) {
         return null
       }
+      const responseTimeLabel = annotationResponseTimeLabelMap[key]
       const AnnotationComponent = annotationMap[key]!
-      return <AnnotationComponent key={key} annotation={annotation} />
+      // @ts-ignore
+      const responseTime = responseTimeLabel ? annotation[key]?.responseTime : 0
+      return (
+        <div key={key} className={"flex flex-col space-y-3"}>
+          <AnnotationComponent annotation={annotation} />
+          {responseTime && (
+            <ResponseTime
+              icon={<IconApi stroke={1.5} size={18} />}
+              label={responseTimeLabel}
+              // @ts-ignore
+              value={responseTime}
+            />
+          )}
+        </div>
+      )
     })
   }
 
@@ -472,7 +487,7 @@ export const Message: FC<MessageProps> = ({
               codeBlocks={codeBlocks}
               content={message.content}
               onSelectCodeBlock={onSelectCodeBlock}
-              experimental_code_editor={!!profile?.experimental_code_editor}
+              experimental_code_editor={isExperimentalCodeEditor}
             />
           )}
         </div>
