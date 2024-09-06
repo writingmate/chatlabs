@@ -98,6 +98,7 @@ ${toolsInfo
             <div className="flex flex-col">
               <ThemeConfigurator theme={theme} onThemeChange={setTheme} />
             </div>
+            {/* <Separator /> */}
             <div className="space-y-1">
               <Label>Plugins</Label>
               <div className="text-foreground/60 text-xs">

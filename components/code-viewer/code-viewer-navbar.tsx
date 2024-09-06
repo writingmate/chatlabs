@@ -112,14 +112,14 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
                 disabled={isGenerating}
               />
             )}
-            {/* {showSidebarButton && ( */}
-            <NavbarButton
-              icon={<IconLayoutSidebar size={16} />}
-              title="Sidebar"
-              onClick={toggleSidebar}
-              disabled={isGenerating}
-            />
-            {/* )} */}
+            {showSidebarButton && (
+              <NavbarButton
+                icon={<IconLayoutSidebar size={16} />}
+                title="Sidebar"
+                onClick={toggleSidebar}
+                disabled={isGenerating}
+              />
+            )}
           </>
         )}
         <NavbarButton
