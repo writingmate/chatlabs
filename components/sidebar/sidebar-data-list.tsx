@@ -22,6 +22,7 @@ import { PresetItem } from "./items/presets/preset-item"
 import { PromptItem } from "./items/prompts/prompt-item"
 import { ToolItem } from "./items/tools/tool-item"
 import { VList } from "virtua"
+import { useTranslation } from "react-i18next"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -250,22 +251,31 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     .filter(item => item.folder_id === null)
     .sort(sortByPinned)
 
+  const { t } = useTranslation()
   const getDescription = (contentType: ContentType) => {
     switch (contentType) {
       case "chats":
-        return "Your chat history will be displayed here."
+        return t("Your chat history will be displayed here.")
 
       case "prompts":
-        return "Prompts are pre-saved text inputs designed to generate specific responses and communicate with AI quicker. Prompts you create will be displayed here."
+        return t(
+          "Prompts are pre-saved text inputs designed to generate specific responses and communicate with AI quicker. Prompts you create will be displayed here."
+        )
 
       case "files":
-        return "Upload files to enrich conversations and assistants with context, data analysis, feedback, or customization. Uploaded files will be displayed here."
+        return t(
+          "Upload files to enrich conversations and assistants with context, data analysis, feedback, or customization. Uploaded files will be displayed here."
+        )
 
       case "tools":
-        return "Plugins are special add-ons that allow you to do extra things beyond just chatting, such as using up-to-date information from the web or checking the weather by connecting to external services or databases."
+        return t(
+          "Plugins are special add-ons that allow you to do extra things beyond just chatting, such as using up-to-date information from the web or checking the weather by connecting to external services or databases."
+        )
 
       case "assistants":
-        return "Assistants are special AI characters instructed to provide information, solve specific problems, simulate conversations or offer creative content based on user queries."
+        return t(
+          "Assistants are special AI characters instructed to provide information, solve specific problems, simulate conversations or offer creative content based on user queries."
+        )
 
       default:
         return null

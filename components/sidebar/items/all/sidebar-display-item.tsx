@@ -163,7 +163,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       {readOnly ? (
         <>
           {icon}
-          <div className="ml-3 flex-1 justify-items-center truncate text-sm">
+          <div className="ml-3 hidden truncate text-sm md:block">
             {item.name}
           </div>
         </>

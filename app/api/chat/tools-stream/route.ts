@@ -62,8 +62,7 @@ function getClient(model: string, profile: Tables<"profiles">) {
     })
   }
 
-  if (provider === undefined) {
-    // special case for openrouter
+  if (provider === "openrouter") {
     checkApiKey(profile.openrouter_api_key, "OpenRouter")
     return new OpenAI({
       apiKey: profile.openrouter_api_key || "",

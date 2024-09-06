@@ -39,73 +39,73 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 
   const router = useRouter()
   return (
-    <div className="flex flex-col justify-between border-r pb-5">
-      <TabsList className="bg-background grid h-[400px] grid-rows-7">
-        <SidebarSwitchItem
-          icon={<IconMessage size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
-          contentType="chats"
-          onContentTypeChange={onContentTypeChange}
-        />
+    <div className="flex h-full flex-col justify-between border-r">
+      <TabsList className="bg-background flex h-full flex-col items-center justify-center space-y-6">
+        <div className="flex flex-col items-center">
+          <SidebarSwitchItem
+            icon={<IconMessage size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
+            contentType="chats"
+            onContentTypeChange={onContentTypeChange}
+          />
+          <span className="mt-1 text-xs">Chat</span>
+        </div>
 
-        {/*<SidebarSwitchItem*/}
-        {/*  icon={<IconAdjustmentsHorizontal size={SIDEBAR_ICON_SIZE} />}*/}
-        {/*  contentType="presets"*/}
-        {/*  onContentTypeChange={onContentTypeChange}*/}
-        {/*/>*/}
+        <div className="flex flex-col items-center">
+          <SidebarSwitchItem
+            icon={<IconTerminal2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
+            contentType="prompts"
+            onContentTypeChange={onContentTypeChange}
+          />
+          <span className="mt-1 text-xs">Prompt</span>
+        </div>
 
-        <SidebarSwitchItem
-          icon={<IconTerminal2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
-          contentType="prompts"
-          onContentTypeChange={onContentTypeChange}
-        />
+        <div className="flex flex-col items-center">
+          <SidebarSwitchItem
+            icon={<IconFile size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
+            contentType="files"
+            onContentTypeChange={onContentTypeChange}
+          />
+          <span className="mt-1 text-xs">File</span>
+        </div>
 
-        {/*<SidebarSwitchItem*/}
-        {/*  icon={<IconSparkles size={SIDEBAR_ICON_SIZE} />}*/}
-        {/*  contentType="models"*/}
-        {/*  onContentTypeChange={onContentTypeChange}*/}
-        {/*/>*/}
+        <div className="flex flex-col items-center">
+          <SidebarSwitchItem
+            icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
+            contentType="assistants"
+            onContentTypeChange={onContentTypeChange}
+          />
+          <span className="mt-1 text-xs">Assistant</span>
+        </div>
 
-        <SidebarSwitchItem
-          icon={<IconFile size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
-          contentType="files"
-          onContentTypeChange={onContentTypeChange}
-        />
+        <div className="flex flex-col items-center">
+          <SidebarSwitchItem
+            icon={<IconPuzzle size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
+            contentType="tools"
+            name="Plugins"
+            onContentTypeChange={onContentTypeChange}
+          />
+          <span className="mt-1 text-xs">Plugin</span>
+        </div>
 
-        {/*<SidebarSwitchItem*/}
-        {/*  icon={<IconBooks size={SIDEBAR_ICON_SIZE} />}*/}
-        {/*  contentType="collections"*/}
-        {/*  onContentTypeChange={onContentTypeChange}*/}
-        {/*/>*/}
-
-        <SidebarSwitchItem
-          icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
-          contentType="assistants"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <SidebarSwitchItem
-          icon={<IconPuzzle size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
-          contentType="tools"
-          name="Plugins"
-          onContentTypeChange={onContentTypeChange}
-        />
-
-        <WithTooltip
-          display={"Split Screen"}
-          asChild
-          trigger={
-            <Button
-              className="mx-auto hover:opacity-50"
-              variant="ghost"
-              size="icon"
-              onClick={e => {
-                window.open(`/splitview`, "_blank")
-              }}
-            >
-              <IconLayoutColumns size={SIDEBAR_ICON_SIZE} stroke={1.5} />
-            </Button>
-          }
-        />
+        <div className="flex flex-col items-center">
+          <WithTooltip
+            display={"Split Screen"}
+            asChild
+            trigger={
+              <Button
+                className="hover:opacity-50"
+                variant="ghost"
+                size="icon"
+                onClick={e => {
+                  window.open(`/splitview`, "_blank")
+                }}
+              >
+                <IconLayoutColumns size={SIDEBAR_ICON_SIZE} stroke={1.5} />
+              </Button>
+            }
+          />
+          <span className="mt-1 text-xs">Split Screen</span>
+        </div>
       </TabsList>
 
       <div className="flex flex-col items-center space-y-4">

@@ -1,5 +1,14 @@
 {
   "Ask anything. Type \"/\" for prompts, \"@\" for files, and \"#\" for tools.": "Ask anything. Type \"/\" for prompts, \"@\" for files, and \"#\" for tools.",
   "Quick Settings": "Quick Settings",
-  "More than 30 AI models in one place.": "More than 30 AI models in one place."
+  "More than 30 AI models in one place.": "More than 30 AI models in one place.",
+  "Show Help": "Show Help",
+  "Show Workspaces": "Show Workspaces",
+  "New Chat": "New Chat",
+  "Focus Chat": "Focus Chat",
+  "Toggle Files": "Toggle Files",
+  "Toggle Retrieval": "Toggle Retrieval",
+  "Open Settings": "Open Settings",
+  "Open Quick Settings": "Open Quick Settings",
+  "Toggle Sidebar": "Toggle Sidebar"
 }

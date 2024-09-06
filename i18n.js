@@ -33,7 +33,7 @@ i18n
             loadPath: '/locales/{{lng}}/translation.json', // path to translation files
         },
         detection: {
-            order: ['querystring', 'cookie', 'localStorage', 'navigator', 'htmlTag', 'path', 'subdomain'],
+            order: ['querystring', 'cookie', 'localStorage', 'navigator', 'htmlTag', 'path', 'subdomain', 'classname'],
             caches: ['cookie'],
         },
         interpolation: {
