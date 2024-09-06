@@ -23,6 +23,7 @@ import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
+import { createApplication } from "@/db/applications"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -398,6 +399,46 @@ export const useChatHandler = () => {
     setChatMessages(filteredMessages)
 
     handleSendMessage(editedContent, filteredMessages, false)
+  }
+
+  const handleNewMessage = async (
+    message: string,
+    chatSettings: ChatSettings
+  ) => {
+    if (message.toLowerCase().startsWith("/create application")) {
+      // Parse application details from the message
+      const applicationDetails = parseApplicationDetails(message)
+
+      try {
+        const createdApplication = await createApplication(
+          applicationDetails,
+          [],
+          []
+        )
+        // Add a system message about the created application
+        addMessage({
+          role: "system",
+          content: `Application "${createdApplication.name}" has been created.`
+        })
+      } catch (error) {
+        console.error("Error creating application:", error)
+        addMessage({
+          role: "system",
+          content: "Failed to create the application. Please try again."
+        })
+      }
+      return
+    }
+
+    // ... rest of the function
+  }
+
+  function parseApplicationDetails(message: string) {
+    // Implement logic to parse application details from the message
+    // This is a simplified example
+    const [, name, description] =
+      message.match(/\/create application\s+"([^"]+)"\s+"([^"]+)"/) || []
+    return { name, description }
   }
 
   return {

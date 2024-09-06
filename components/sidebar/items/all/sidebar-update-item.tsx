@@ -676,6 +676,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
               <IconEdit
                 className={"hidden group-hover:flex group-[.active]:flex"}
                 size={18}
+                strokeWidth={1.5}
               />
             </SheetTrigger>
           }
@@ -691,6 +692,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
               trigger={
                 <IconTrash
                   size={18}
+                  strokeWidth={1.5}
                   className={"hidden group-hover:flex group-[.active]:flex"}
                 />
               }

@@ -39,6 +39,7 @@ export const PinChat: FC<UpdateChatProps> = ({ chat, className, setChats }) => {
     <IconPin
       className={cn("hover:opacity-50", className)}
       size={18}
+      stroke={1.5}
       onClick={handlePinChat}
     />
   )

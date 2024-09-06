@@ -11,7 +11,7 @@ import {
   IconArrowUp,
   IconPrompt,
   IconPlus,
-  IconTerminal2
+  IconBulb
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Input } from "../ui/input"

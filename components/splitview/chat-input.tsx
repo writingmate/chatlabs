@@ -23,6 +23,7 @@ import { useSelectFileHandler } from "@/components/splitview/splitview-hooks/use
 import { ToolSelect } from "@/components/tools/tool-select"
 import { ChatFilesDisplay } from "@/components/chat/chat-files-display"
 import { PromptCatalog } from "@/components/splitview/prompt-catalog"
+import { reconstructContentWithCodeBlocks } from "@/lib/messages"
 
 interface ChatInputProps {
   isGenerating: boolean
@@ -105,7 +106,11 @@ export const ChatInput: FC<ChatInputProps> = ({
     if (!isTyping && isSendShortcut(event)) {
       event.preventDefault()
       setIsPromptPickerOpen(false)
-      handleSendMessage(userInput, false)
+      const reconstructedContent = reconstructContentWithCodeBlocks(
+        userInput,
+        []
+      )
+      handleSendMessage(reconstructedContent, false)
     }
     //
     // // Consolidate conditions to avoid TypeScript error

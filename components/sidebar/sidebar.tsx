@@ -1,137 +1,231 @@
+import { FC, useState, useContext, useRef, useEffect } from "react"
+import { SidebarItem } from "./sidebar-item"
+import { SlidingSubmenu } from "./sliding-submenu"
+import { SidebarCreateButtons } from "./sidebar-create-buttons"
+import {
+  IconMessage,
+  IconPuzzle,
+  IconFolder,
+  IconTool,
+  IconApps,
+  IconChevronRight,
+  IconChevronLeft,
+  IconMessagePlus,
+  IconRobot
+} from "@tabler/icons-react"
 import { ChatbotUIContext } from "@/context/context"
-import { Tables } from "@/supabase/types"
+import { Button } from "../ui/button"
+import { cn } from "@/lib/utils"
+import { SIDEBAR_ITEM_ICON_SIZE } from "@/components/sidebar/items/all/sidebar-display-item"
+import { useParams, useRouter } from "next/navigation"
+import { SearchInput } from "../ui/search-input"
+import { ProfileSettings } from "../utility/profile-settings"
+import { useChatHandler } from "../chat/chat-hooks/use-chat-handler"
+import { SidebarDataList } from "./sidebar-data-list"
 import { ContentType } from "@/types"
-import { FC, useContext, useMemo } from "react"
-import { SIDEBAR_WIDTH } from "../ui/dashboard"
-import { TabsContent } from "../ui/tabs"
-import { WorkspaceSwitcher } from "../utility/workspace-switcher"
-import { WorkspaceSettings } from "../workspace/workspace-settings"
-import { SidebarContent } from "./sidebar-content"
 
-interface SidebarProps {
-  contentType: ContentType
-}
-
-export const Sidebar: FC<SidebarProps> = ({ contentType }) => {
+export const Sidebar: FC = () => {
   const {
-    folders,
     chats,
-    presets,
     prompts,
     files,
-    collections,
-    assistants,
     tools,
-    models,
-    workspaces
+    assistants,
+    folders,
+    setChats,
+    setPrompts,
+    setFiles,
+    setTools,
+    setAssistants
   } = useContext(ChatbotUIContext)
+  const { handleNewChat } = useChatHandler()
+  const [activeSubmenu, setActiveSubmenu] = useState<ContentType | null>(null)
+  const [isCreating, setIsCreating] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const sidebarRef = useRef<HTMLDivElement>(null)
+  const params = useParams()
+  const router = useRouter()
 
-  const chatFolders = folders.filter(folder => folder.type === "chats")
-  const presetFolders = folders.filter(folder => folder.type === "presets")
-  const promptFolders = folders.filter(folder => folder.type === "prompts")
-  const filesFolders = folders.filter(folder => folder.type === "files")
-  const collectionFolders = folders.filter(
-    folder => folder.type === "collections"
-  )
-  const assistantFolders = folders.filter(
-    folder => folder.type === "assistants"
-  )
-  const toolFolders = folders.filter(folder => folder.type === "tools")
-  const modelFolders = folders.filter(folder => folder.type === "models")
+  const [searchQueries, setSearchQueries] = useState({
+    chats: "",
+    prompts: "",
+    assistants: "",
+    files: "",
+    tools: ""
+  })
 
-  const renderSidebarContent = (
-    contentType: ContentType,
-    data: any[],
-    folders: Tables<"folders">[],
-    name?: string
-  ) => {
-    return (
-      <SidebarContent
-        name={name}
-        contentType={contentType}
-        data={data}
-        folders={folders}
-      />
-    )
+  useEffect(() => {
+    const storedCollapsedState = localStorage.getItem("sidebarCollapsed")
+    setIsCollapsed(storedCollapsedState === "true")
+    setIsLoaded(true)
+  }, [])
+
+  const handleSubmenuOpen = (menuName: ContentType) => {
+    if (isCollapsed) {
+      setIsCollapsed(false)
+    }
+    setActiveSubmenu(menuName === activeSubmenu ? null : menuName)
   }
 
-  return useMemo(
-    () => (
-      <TabsContent
-        className="m-0 w-full space-y-2"
-        style={{
-          // Sidebar - SidebarSwitcher
-          minWidth: SIDEBAR_WIDTH - 60 + "px", //  showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-          maxWidth: SIDEBAR_WIDTH - 60 + "px", // ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px",
-          width: SIDEBAR_WIDTH - 60 + "px" // showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)` : "0px"
-        }}
-        value={contentType}
+  const handleCreateItem = (contentType: ContentType) => {
+    setIsCreating(true)
+  }
+
+  const toggleCollapseOrSubmenu = () => {
+    if (activeSubmenu) {
+      setActiveSubmenu(null)
+    } else {
+      setIsCollapsed(!isCollapsed)
+      localStorage.setItem("sidebarCollapsed", (!isCollapsed).toString())
+    }
+  }
+
+  const handleCreateChat = () => {
+    handleNewChat()
+  }
+
+  const iconProps = {
+    size: SIDEBAR_ITEM_ICON_SIZE,
+    stroke: 1.5,
+    className: "text-muted-foreground"
+  }
+
+  const getDataForContentType = (contentType: ContentType) => {
+    switch (contentType) {
+      case "chats":
+        return chats
+      case "prompts":
+        return prompts
+      case "assistants":
+        return assistants
+      case "files":
+        return files
+      case "tools":
+        return tools
+      default:
+        return []
+    }
+  }
+
+  return (
+    <div
+      ref={sidebarRef}
+      className={cn(
+        "bg-background relative flex h-screen flex-col overflow-hidden border-r transition-[width] duration-300",
+        isLoaded ? (isCollapsed ? "w-16" : "w-[300px]") : "w-[300px]",
+        !isLoaded && "invisible"
+      )}
+    >
+      <div
+        className={cn(
+          "flex border-b",
+          isCollapsed
+            ? "flex-col items-center py-2"
+            : "items-center justify-between p-2"
+        )}
       >
-        <div className="flex h-full flex-col p-3">
-          {workspaces?.length > 1 && (
-            <div className="flex items-center border-b pb-2">
-              <WorkspaceSwitcher />
-              <WorkspaceSettings />
-            </div>
+        <Button
+          variant="ghost"
+          size={"icon"}
+          onClick={handleCreateChat}
+          title="New Chat"
+        >
+          <IconMessagePlus {...iconProps} className="text-foreground" />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={toggleCollapseOrSubmenu}>
+          {isCollapsed ? (
+            <IconChevronRight {...iconProps} />
+          ) : (
+            <IconChevronLeft {...iconProps} />
           )}
+        </Button>
+      </div>
 
-          {(() => {
-            switch (contentType) {
-              case "chats":
-                return renderSidebarContent("chats", chats, chatFolders)
-
-              case "presets":
-                return renderSidebarContent("presets", presets, presetFolders)
-
-              case "prompts":
-                return renderSidebarContent("prompts", prompts, promptFolders)
-
-              case "files":
-                return renderSidebarContent("files", files, filesFolders)
-
-              case "collections":
-                return renderSidebarContent(
-                  "collections",
-                  collections,
-                  collectionFolders
-                )
-
-              case "assistants":
-                return renderSidebarContent(
-                  "assistants",
-                  assistants,
-                  assistantFolders
-                )
-
-              case "tools":
-                return renderSidebarContent(
-                  "tools",
-                  tools,
-                  toolFolders,
-                  "Plugins"
-                )
-
-              case "models":
-                return renderSidebarContent("models", models, modelFolders)
-
-              default:
-                return null
-            }
-          })()}
+      <div className="flex grow flex-col overflow-y-auto">
+        <div className="p-2">
+          <SidebarItem
+            icon={<IconPuzzle {...iconProps} />}
+            label="Prompts"
+            onClick={() => handleSubmenuOpen("prompts")}
+            hasSubmenu
+            isCollapsed={isCollapsed}
+          />
+          <SidebarItem
+            icon={<IconRobot {...iconProps} />}
+            label="Assistants"
+            onClick={() => handleSubmenuOpen("assistants")}
+            hasSubmenu
+            isCollapsed={isCollapsed}
+          />
+          <SidebarItem
+            icon={<IconFolder {...iconProps} />}
+            label="Files"
+            onClick={() => handleSubmenuOpen("files")}
+            hasSubmenu
+            isCollapsed={isCollapsed}
+          />
+          <SidebarItem
+            icon={<IconTool {...iconProps} />}
+            label="Tools"
+            onClick={() => handleSubmenuOpen("tools")}
+            hasSubmenu
+            isCollapsed={isCollapsed}
+          />
         </div>
-      </TabsContent>
-    ),
-    [
-      workspaces,
-      chats,
-      presets,
-      contentType,
-      files,
-      models,
-      tools,
-      prompts,
-      assistants
-      // showSidebar
-    ]
+
+        {!isCollapsed && (
+          <div className="flex grow flex-col border-t">
+            <div className="flex grow flex-col p-2">
+              <SearchInput
+                placeholder="Search chats"
+                value={searchQueries.chats}
+                onChange={value =>
+                  setSearchQueries(prev => ({ ...prev, chats: value }))
+                }
+              />
+              <SidebarDataList
+                contentType="chats"
+                data={chats}
+                folders={folders.filter(folder => folder.type === "chats")}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="p-2">
+        <ProfileSettings isCollapsed={isCollapsed} />
+      </div>
+
+      {(["prompts", "assistants", "files", "tools"] as ContentType[]).map(
+        contentType => (
+          <SlidingSubmenu
+            key={contentType}
+            isOpen={activeSubmenu === contentType}
+          >
+            <div className="mb-2 flex items-center justify-between space-x-2">
+              <SearchInput
+                className="w-full"
+                placeholder={`Search ${contentType}`}
+                value={searchQueries[contentType]}
+                onChange={value =>
+                  setSearchQueries(prev => ({ ...prev, [contentType]: value }))
+                }
+              />
+              <SidebarCreateButtons
+                contentType={contentType}
+                hasData={getDataForContentType(contentType).length > 0}
+              />
+            </div>
+            <SidebarDataList
+              contentType={contentType}
+              data={getDataForContentType(contentType)}
+              folders={folders.filter(folder => folder.type === contentType)}
+            />
+          </SlidingSubmenu>
+        )
+      )}
+    </div>
   )
 }

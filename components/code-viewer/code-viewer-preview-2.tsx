@@ -3,7 +3,7 @@ import {
   IconChevronDown,
   IconChevronUp,
   IconClick,
-  IconTerminal2,
+  IconBulb,
   IconX
 } from "@tabler/icons-react"
 import { cn, generateRandomString } from "@/lib/utils"
@@ -292,7 +292,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
           )}
           onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
         >
-          <IconTerminal2 size={16} stroke={1.5} />
+          <IconBulb size={16} stroke={1.5} />
         </Button>
       </div>
     </div>

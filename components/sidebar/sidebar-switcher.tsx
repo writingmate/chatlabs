@@ -13,7 +13,7 @@ import {
   IconPuzzle,
   IconRobotFace,
   IconSparkles,
-  IconTerminal2
+  IconBulb
 } from "@tabler/icons-react"
 import { FC, useContext } from "react"
 import { TabsList, TabsTrigger } from "../ui/tabs"
@@ -54,7 +54,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         {/*/>*/}
 
         <SidebarSwitchItem
-          icon={<IconTerminal2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
+          icon={<IconBulb size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
           contentType="prompts"
           onContentTypeChange={onContentTypeChange}
         />

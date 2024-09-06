@@ -22,23 +22,25 @@ export const FileIcon: FC<FileIconProps> = ({
   size = 32,
   stroke = 1.5
 }) => {
+  const iconProps = { size, stroke, className: "text-muted-foreground" }
+
   if (type.includes("image")) {
-    return <IconPhoto size={size} stroke={stroke} />
+    return <IconPhoto {...iconProps} />
   } else if (type.includes("pdf")) {
-    return <IconFileTypePdf size={size} stroke={stroke} />
+    return <IconFileTypePdf {...iconProps} />
   } else if (type.includes("csv")) {
-    return <IconFileTypeCsv size={size} stroke={stroke} />
+    return <IconFileTypeCsv {...iconProps} />
   } else if (type.includes("docx")) {
-    return <IconFileTypeDocx size={size} stroke={stroke} />
+    return <IconFileTypeDocx {...iconProps} />
   } else if (type.includes("plain")) {
-    return <IconFileText size={size} stroke={stroke} />
+    return <IconFileText {...iconProps} />
   } else if (type.includes("json")) {
-    return <IconJson size={size} stroke={stroke} />
+    return <IconJson {...iconProps} />
   } else if (type.includes("markdown")) {
-    return <IconMarkdown size={size} stroke={stroke} />
+    return <IconMarkdown {...iconProps} />
   } else if (type.includes("html")) {
-    return <IconFileTypeHtml size={size} stroke={stroke} />
+    return <IconFileTypeHtml {...iconProps} />
   } else {
-    return <IconFile size={size} stroke={stroke} />
+    return <IconFile {...iconProps} />
   }
 }

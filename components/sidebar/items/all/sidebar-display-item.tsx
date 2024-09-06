@@ -162,7 +162,9 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     >
       {readOnly ? (
         <>
-          {icon}
+          <div className="text-muted-foreground flex size-5 items-center justify-center">
+            {icon}
+          </div>
           <div className="ml-3 flex-1 justify-items-center truncate text-sm">
             {item.name}
           </div>
@@ -179,7 +181,9 @@ export const SidebarItem: FC<SidebarItemProps> = ({
           renderInputs={renderInputs}
           actions={actions}
         >
-          {icon}
+          <div className="text-muted-foreground flex size-5 items-center justify-center">
+            {icon}
+          </div>
           <div className="ml-3 flex-1 justify-items-center truncate text-sm">
             {item.name}
           </div>

@@ -77,7 +77,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         <CommandK />
         <PlanPicker />
 
-        <Button
+        {/* <Button
           className={cn(
             "absolute left-[4px] top-[50%] z-10 size-[32px] cursor-pointer"
           )}
@@ -90,29 +90,29 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
           onClick={handleToggleSidebar}
         >
           <IconChevronCompactRight size={24} />
-        </Button>
+        </Button> */}
 
-        <div
+        {/* <div
           className={cn(
             `bg-background absolute z-50 h-full shrink-0 overflow-hidden border-r transition-[width] duration-200 lg:relative`
           )}
           style={{
             width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"
           }}
-        >
-          <Tabs
+        > */}
+        {/* <Tabs
             className={"z-50 flex h-full"}
             value={contentType}
             onValueChange={tabValue => {
               setContentType(tabValue as ContentType)
               router.replace(`${pathname}?tab=${tabValue}`)
             }}
-          >
-            <SidebarSwitcher onContentTypeChange={setContentType} />
+          > */}
+        {/* <SidebarSwitcher onContentTypeChange={setContentType} /> */}
 
-            <Sidebar contentType={contentType} />
-          </Tabs>
-        </div>
+        <Sidebar contentType={contentType} />
+        {/* </Tabs> */}
+        {/* </div> */}
 
         <div
           className={"flex grow transition-[width]"}
