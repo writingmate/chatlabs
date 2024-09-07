@@ -336,7 +336,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
         <Button
           variant="ghost"
           size="sm"
-          className="w-full justify-start space-x-2 rounded-lg px-3 py-2 text-sm"
+          className="w-full items-center justify-start space-x-2 rounded-lg px-3 py-2 text-sm"
         >
           <Avatar className="size-6">
             <AvatarImage src={profile.image_url!} />
@@ -345,7 +345,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
             </AvatarFallback>
           </Avatar>
           {!isCollapsed && (
-            <div className="flex w-full justify-between">
+            <div className="flex w-full items-center justify-between">
               <div>{profile.display_name}</div>
               <IconSettings
                 size={18}

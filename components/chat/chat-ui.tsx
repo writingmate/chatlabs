@@ -358,22 +358,6 @@ ${content}
         {/* Header */}
         <div className="bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 justify-between p-2">
           <div className="flex items-center">
-            {(!showSidebar || assistant) && (
-              <WithTooltip
-                delayDuration={200}
-                display={<div>Start a new chat</div>}
-                trigger={
-                  <IconMessagePlus
-                    className="ml-2 cursor-pointer hover:opacity-50"
-                    size={24}
-                    stroke={1.5}
-                    onClick={() =>
-                      handleNewChat(assistant ? "/a/" + assistant.hashid : "")
-                    }
-                  />
-                }
-              />
-            )}
             {!assistant && <QuickSettings />}
           </div>
           {showModelSelector && <ChatSettings />}

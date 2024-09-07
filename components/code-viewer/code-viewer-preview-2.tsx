@@ -43,10 +43,10 @@ function addTailwindTheme(doc: Document, theme: UITheme) {
 
   const styleElement = doc.createElement("style")
   styleElement.textContent = `
-    body {
+    body, html {
       width: 100%;
       height: 100%;
-      }
+    }
     `
   // styleElement.textContent = `
   //   [data-theme="custom"] {

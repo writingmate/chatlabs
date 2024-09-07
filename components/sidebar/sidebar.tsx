@@ -11,7 +11,10 @@ import {
   IconChevronRight,
   IconChevronLeft,
   IconMessagePlus,
-  IconRobot
+  IconRobot,
+  IconX,
+  IconMenu2,
+  IconMessage2Plus
 } from "@tabler/icons-react"
 import { ChatbotUIContext } from "@/context/context"
 import { Button } from "../ui/button"
@@ -36,7 +39,9 @@ export const Sidebar: FC = () => {
     setPrompts,
     setFiles,
     setTools,
-    setAssistants
+    setAssistants,
+    showSidebar,
+    setShowSidebar
   } = useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
   const [activeSubmenu, setActiveSubmenu] = useState<ContentType | null>(null)
@@ -109,123 +114,153 @@ export const Sidebar: FC = () => {
   }
 
   return (
-    <div
-      ref={sidebarRef}
-      className={cn(
-        "bg-background relative flex h-screen flex-col overflow-hidden border-r transition-[width] duration-300",
-        isLoaded ? (isCollapsed ? "w-16" : "w-[300px]") : "w-[300px]",
-        !isLoaded && "invisible"
+    <>
+      {/* Hamburger menu for mobile */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="fixed left-2 top-2 z-50 md:hidden"
+        onClick={() => handleCreateChat()}
+      >
+        <IconMessagePlus {...iconProps} className="text-foreground" />
+      </Button>
+
+      {/* Mobile overlay */}
+      {showSidebar && (
+        <div
+          className="bg-background/80 fixed inset-0 z-40 backdrop-blur-sm md:hidden"
+          onClick={() => setShowSidebar(false)}
+        />
       )}
-    >
+
+      {/* Sidebar */}
       <div
+        ref={sidebarRef}
         className={cn(
-          "flex border-b",
-          isCollapsed
-            ? "flex-col items-center py-2"
-            : "items-center justify-between p-2"
+          "bg-background fixed inset-y-0 left-0 z-50 flex h-full flex-col border-r transition-all duration-300 ease-in-out md:relative",
+          isLoaded ? (isCollapsed ? "w-16" : "w-[300px]") : "w-[300px]",
+          !isLoaded && "invisible",
+          showSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
-        <Button
-          variant="ghost"
-          size={"icon"}
-          onClick={handleCreateChat}
-          title="New Chat"
-        >
-          <IconMessagePlus {...iconProps} className="text-foreground" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={toggleCollapseOrSubmenu}>
-          {isCollapsed ? (
-            <IconChevronRight {...iconProps} />
-          ) : (
-            <IconChevronLeft {...iconProps} />
+        <div
+          className={cn(
+            "flex border-b",
+            isCollapsed
+              ? "flex-col items-center py-2"
+              : "items-center justify-between p-2"
           )}
-        </Button>
-      </div>
-
-      <div className="flex grow flex-col overflow-y-auto">
-        <div className="p-2">
-          <SidebarItem
-            icon={<IconPuzzle {...iconProps} />}
-            label="Prompts"
-            onClick={() => handleSubmenuOpen("prompts")}
-            hasSubmenu
-            isCollapsed={isCollapsed}
-          />
-          <SidebarItem
-            icon={<IconRobot {...iconProps} />}
-            label="Assistants"
-            onClick={() => handleSubmenuOpen("assistants")}
-            hasSubmenu
-            isCollapsed={isCollapsed}
-          />
-          <SidebarItem
-            icon={<IconFolder {...iconProps} />}
-            label="Files"
-            onClick={() => handleSubmenuOpen("files")}
-            hasSubmenu
-            isCollapsed={isCollapsed}
-          />
-          <SidebarItem
-            icon={<IconTool {...iconProps} />}
-            label="Tools"
-            onClick={() => handleSubmenuOpen("tools")}
-            hasSubmenu
-            isCollapsed={isCollapsed}
-          />
+        >
+          <Button
+            variant="ghost"
+            size={"icon"}
+            onClick={handleCreateChat}
+            title="New Chat"
+          >
+            <IconMessagePlus {...iconProps} className="text-foreground" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleCollapseOrSubmenu}
+            className="hidden md:flex"
+          >
+            {isCollapsed ? (
+              <IconChevronRight {...iconProps} />
+            ) : (
+              <IconChevronLeft {...iconProps} />
+            )}
+          </Button>
         </div>
 
-        {!isCollapsed && (
-          <div className="flex grow flex-col border-t">
-            <div className="flex grow flex-col p-2">
-              <SearchInput
-                placeholder="Search chats"
-                value={searchQueries.chats}
-                onChange={value =>
-                  setSearchQueries(prev => ({ ...prev, chats: value }))
-                }
-              />
-              <SidebarDataList
-                contentType="chats"
-                data={chats}
-                folders={folders.filter(folder => folder.type === "chats")}
-              />
-            </div>
+        <div className="flex grow flex-col overflow-y-auto">
+          <div className="p-2">
+            <SidebarItem
+              icon={<IconPuzzle {...iconProps} />}
+              label="Prompts"
+              onClick={() => handleSubmenuOpen("prompts")}
+              hasSubmenu
+              isCollapsed={isCollapsed}
+            />
+            <SidebarItem
+              icon={<IconRobot {...iconProps} />}
+              label="Assistants"
+              onClick={() => handleSubmenuOpen("assistants")}
+              hasSubmenu
+              isCollapsed={isCollapsed}
+            />
+            <SidebarItem
+              icon={<IconFolder {...iconProps} />}
+              label="Files"
+              onClick={() => handleSubmenuOpen("files")}
+              hasSubmenu
+              isCollapsed={isCollapsed}
+            />
+            <SidebarItem
+              icon={<IconTool {...iconProps} />}
+              label="Tools"
+              onClick={() => handleSubmenuOpen("tools")}
+              hasSubmenu
+              isCollapsed={isCollapsed}
+            />
           </div>
+
+          {!isCollapsed && (
+            <div className="flex grow flex-col border-t">
+              <div className="flex grow flex-col p-2">
+                <SearchInput
+                  placeholder="Search chats"
+                  value={searchQueries.chats}
+                  onChange={value =>
+                    setSearchQueries(prev => ({ ...prev, chats: value }))
+                  }
+                />
+                <SidebarDataList
+                  contentType="chats"
+                  data={chats}
+                  folders={folders.filter(folder => folder.type === "chats")}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="p-2">
+          <ProfileSettings isCollapsed={isCollapsed} />
+        </div>
+
+        {(["prompts", "assistants", "files", "tools"] as const).map(
+          contentType => (
+            <SlidingSubmenu
+              key={contentType}
+              isOpen={activeSubmenu === contentType}
+            >
+              <div className="mb-2 flex items-center justify-between space-x-2">
+                <SearchInput
+                  className="w-full"
+                  placeholder={`Search ${contentType}`}
+                  value={searchQueries[contentType]}
+                  onChange={value =>
+                    setSearchQueries(prev => ({
+                      ...prev,
+                      [contentType]: value
+                    }))
+                  }
+                />
+                <SidebarCreateButtons
+                  contentType={contentType}
+                  hasData={getDataForContentType(contentType).length > 0}
+                />
+              </div>
+              <SidebarDataList
+                contentType={contentType}
+                data={getDataForContentType(contentType)}
+                folders={folders.filter(folder => folder.type === contentType)}
+              />
+            </SlidingSubmenu>
+          )
         )}
       </div>
-
-      <div className="p-2">
-        <ProfileSettings isCollapsed={isCollapsed} />
-      </div>
-
-      {(["prompts", "assistants", "files", "tools"] as ContentType[]).map(
-        contentType => (
-          <SlidingSubmenu
-            key={contentType}
-            isOpen={activeSubmenu === contentType}
-          >
-            <div className="mb-2 flex items-center justify-between space-x-2">
-              <SearchInput
-                className="w-full"
-                placeholder={`Search ${contentType}`}
-                value={searchQueries[contentType]}
-                onChange={value =>
-                  setSearchQueries(prev => ({ ...prev, [contentType]: value }))
-                }
-              />
-              <SidebarCreateButtons
-                contentType={contentType}
-                hasData={getDataForContentType(contentType).length > 0}
-              />
-            </div>
-            <SidebarDataList
-              contentType={contentType}
-              data={getDataForContentType(contentType)}
-              folders={folders.filter(folder => folder.type === contentType)}
-            />
-          </SlidingSubmenu>
-        )
-      )}
-    </div>
+    </>
   )
 }
