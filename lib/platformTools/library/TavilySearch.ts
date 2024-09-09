@@ -15,7 +15,14 @@ interface ExtendedSearchResult {
 // This function performs a web search using Tavily's API and returns the search results.
 const tavilySearch = async (
   params: { parameters: { query: string } } | { query: string }
-): Promise<Omit<SearchResult, "responseTime"> & { report: string }> => {
+): Promise<
+  Omit<SearchResult, "responseTime"> & {
+    report: string
+    results: any[]
+    numResults: number
+    snippet: string
+  }
+> => {
   if ("parameters" in params) {
     params = params.parameters
   }
@@ -76,7 +83,14 @@ const tavilySearch = async (
     return {
       results: searchResults,
       numResults: data.numResults || searchResults.length,
-      report: report
+      report: report,
+      score: 1, // Add a default score
+      title: query, // Use the query as the title
+      id: Date.now().toString(), // Generate a unique ID
+      url: "", // Add an empty URL or generate one if available
+      snippet: "", // Now this is valid
+      publishedDate: "", // Add this line
+      author: "" // Add this line
     }
   } catch (error: any) {
     console.error("Failed to perform web search", error, numResults)
