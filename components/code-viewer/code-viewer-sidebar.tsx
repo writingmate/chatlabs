@@ -105,17 +105,36 @@ ${toolsInfo
                 Select the plugins that app can use
               </div>
               <MultiSelect
-                options={plugins}
-                selectedOptions={selectedPlugins}
-                onChange={setSelectedPlugins}
+                options={plugins.map(plugin => ({
+                  value: plugin.id,
+                  label: plugin.name
+                }))}
+                selectedOptions={selectedPlugins.map(plugin => ({
+                  value: plugin.id,
+                  label: plugin.name
+                }))}
+                onChange={selected => {
+                  setSelectedPlugins(
+                    selected.map(
+                      s =>
+                        plugins.find(
+                          plugin => plugin.id === s.value
+                        ) as Tables<"tools">
+                    ) as Tables<"tools">[]
+                  )
+                }}
                 renderOption={(
-                  plugin: Tables<"tools">,
+                  plugin: { value: string; label: string },
                   selected: boolean,
                   onSelect: () => void
                 ) => (
                   <PluginItem
-                    key={plugin.id}
-                    plugin={plugin}
+                    key={plugin.value}
+                    plugin={
+                      plugins.find(
+                        p => p.id === plugin.value
+                      ) as Tables<"tools">
+                    }
                     selected={selected}
                     onSelect={onSelect}
                   />

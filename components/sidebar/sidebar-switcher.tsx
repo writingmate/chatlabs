@@ -132,7 +132,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 
         <WithTooltip
           display={<div>Profile Settings</div>}
-          trigger={<ProfileSettings />}
+          trigger={<ProfileSettings isCollapsed={false} />}
         />
       </div>
     </div>

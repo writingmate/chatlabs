@@ -1,4 +1,5 @@
 import { FC, useState, useContext, useRef, useEffect } from "react"
+import { motion } from "framer-motion"
 import { SidebarItem } from "./sidebar-item"
 import { SlidingSubmenu } from "./sliding-submenu"
 import { SidebarCreateButtons } from "./sidebar-create-buttons"
@@ -26,6 +27,7 @@ import { ProfileSettings } from "../utility/profile-settings"
 import { useChatHandler } from "../chat/chat-hooks/use-chat-handler"
 import { SidebarDataList } from "./sidebar-data-list"
 import { ContentType } from "@/types"
+import Link from "next/link"
 
 export const Sidebar: FC = () => {
   const {
@@ -59,6 +61,7 @@ export const Sidebar: FC = () => {
     files: "",
     tools: ""
   })
+  const [expandDelay, setExpandDelay] = useState(false)
 
   useEffect(() => {
     const storedCollapsedState = localStorage.getItem("sidebarCollapsed")
@@ -68,7 +71,11 @@ export const Sidebar: FC = () => {
 
   const handleSubmenuOpen = (menuName: ContentType) => {
     if (isCollapsed) {
-      setIsCollapsed(false)
+      setExpandDelay(true)
+      setTimeout(() => {
+        setIsCollapsed(false)
+        setExpandDelay(false)
+      }, 150)
     }
     setActiveSubmenu(menuName === activeSubmenu ? null : menuName)
   }
@@ -133,15 +140,22 @@ export const Sidebar: FC = () => {
         />
       )}
 
-      {/* Sidebar */}
-      <div
+      <>{/* Sidebar */}</>
+      <motion.div
         ref={sidebarRef}
         className={cn(
-          "bg-background fixed inset-y-0 left-0 z-50 flex h-full flex-col border-r transition-all duration-300 ease-in-out md:relative",
-          isLoaded ? (isCollapsed ? "w-16" : "w-[300px]") : "w-[300px]",
+          "bg-background fixed inset-y-0 left-0 z-50 flex h-full flex-col border-r md:relative",
           !isLoaded && "invisible",
           showSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
+        animate={{
+          width: isCollapsed ? 64 : 300
+        }}
+        transition={{
+          duration: 0.3,
+          ease: "easeInOut",
+          delay: expandDelay ? 0.15 : 0
+        }}
       >
         <div
           className={cn(
@@ -203,6 +217,14 @@ export const Sidebar: FC = () => {
               hasSubmenu
               isCollapsed={isCollapsed}
             />
+            {/*<Link href="/applications" passHref>*/}
+            {/*  <SidebarItem*/}
+            {/*    icon={<IconApps {...iconProps} />}*/}
+            {/*    label="Applications"*/}
+            {/*    onClick={() => {}} // This onClick is now optional*/}
+            {/*    isCollapsed={isCollapsed}*/}
+            {/*  />*/}
+            {/*</Link>*/}
           </div>
 
           {!isCollapsed && (
@@ -234,33 +256,39 @@ export const Sidebar: FC = () => {
             <SlidingSubmenu
               key={contentType}
               isOpen={activeSubmenu === contentType}
+              contentType={contentType}
+              isCollapsed={isCollapsed}
             >
-              <div className="mb-2 flex items-center justify-between space-x-2">
-                <SearchInput
-                  className="w-full"
-                  placeholder={`Search ${contentType}`}
-                  value={searchQueries[contentType]}
-                  onChange={value =>
-                    setSearchQueries(prev => ({
-                      ...prev,
-                      [contentType]: value
-                    }))
-                  }
-                />
-                <SidebarCreateButtons
+              <>
+                <div className="mb-2 flex items-center justify-between space-x-2">
+                  <SearchInput
+                    className="w-full"
+                    placeholder={`Search ${contentType}`}
+                    value={searchQueries[contentType]}
+                    onChange={value =>
+                      setSearchQueries(prev => ({
+                        ...prev,
+                        [contentType]: value
+                      }))
+                    }
+                  />
+                  <SidebarCreateButtons
+                    contentType={contentType}
+                    hasData={getDataForContentType(contentType).length > 0}
+                  />
+                </div>
+                <SidebarDataList
                   contentType={contentType}
-                  hasData={getDataForContentType(contentType).length > 0}
+                  data={getDataForContentType(contentType)}
+                  folders={folders.filter(
+                    folder => folder.type === contentType
+                  )}
                 />
-              </div>
-              <SidebarDataList
-                contentType={contentType}
-                data={getDataForContentType(contentType)}
-                folders={folders.filter(folder => folder.type === contentType)}
-              />
+              </>
             </SlidingSubmenu>
           )
         )}
-      </div>
+      </motion.div>
     </>
   )
 }

@@ -1,13 +1,8 @@
 "use client"
 
 import { Sidebar } from "@/components/sidebar/sidebar"
-import { SidebarSwitcher } from "@/components/sidebar/sidebar-switcher"
-import { Button } from "@/components/ui/button"
-import { Tabs } from "@/components/ui/tabs"
 import useHotkey from "@/lib/hooks/use-hotkey"
-import { cn } from "@/lib/utils"
 import { ContentType } from "@/types"
-import { IconChevronCompactRight } from "@tabler/icons-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useState, useContext, useMemo } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
@@ -110,7 +105,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
           > */}
         {/* <SidebarSwitcher onContentTypeChange={setContentType} /> */}
 
-        <Sidebar contentType={contentType} />
+        <Sidebar />
         {/* </Tabs> */}
         {/* </div> */}
 

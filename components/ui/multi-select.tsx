@@ -12,7 +12,7 @@ interface MultiSelectProps<T> {
   options: T[]
   selectedOptions: T[]
   onChange: (selected: T[]) => void
-  renderOption: (
+  renderOption?: (
     option: T,
     selected: boolean,
     onSelect: () => void
@@ -21,11 +21,31 @@ interface MultiSelectProps<T> {
   searchPlaceholder?: string
 }
 
-export const MultiSelect: FC<MultiSelectProps<any>> = ({
+interface ModelOption {
+  value: string
+  label: string
+}
+
+const defaultRenderOption = (
+  option: ModelOption,
+  selected: boolean,
+  onSelect: () => void
+) => (
+  <div
+    key={option.value}
+    className={`hover:bg-primary/5 flex cursor-pointer items-center justify-between p-1`}
+    onClick={onSelect}
+  >
+    <span>{option.label}</span>
+    {selected && <IconCircleCheckFilled className="text-primary" size={20} />}
+  </div>
+)
+
+export const MultiSelect: FC<MultiSelectProps<ModelOption>> = ({
   options,
   selectedOptions,
   onChange,
-  renderOption,
+  renderOption = defaultRenderOption,
   placeholder = "Select options",
   searchPlaceholder = "Search..."
 }) => {
@@ -42,9 +62,9 @@ export const MultiSelect: FC<MultiSelectProps<any>> = ({
     }
   }, [isOpen])
 
-  const handleSelect = (option: any) => {
-    if (selectedOptions.includes(option)) {
-      onChange(selectedOptions.filter(item => item !== option))
+  const handleSelect = (option: ModelOption) => {
+    if (selectedOptions.some(selected => selected.value === option.value)) {
+      onChange(selectedOptions.filter(item => item.value !== option.value))
     } else {
       onChange([...selectedOptions, option])
     }
@@ -91,11 +111,13 @@ export const MultiSelect: FC<MultiSelectProps<any>> = ({
 
         {options
           .filter(option =>
-            option.name.toLowerCase().includes(search.toLowerCase())
+            option.value?.toLowerCase().includes(search.toLowerCase())
           )
           .map(option =>
-            renderOption(option, selectedOptions.includes(option), () =>
-              handleSelect(option)
+            renderOption(
+              option,
+              selectedOptions.some(selected => selected.value === option.value),
+              () => handleSelect(option)
             )
           )}
       </DropdownMenuContent>
