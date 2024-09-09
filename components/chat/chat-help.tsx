@@ -1,4 +1,5 @@
 import useHotkey from "@/lib/hooks/use-hotkey"
+import { useTranslation } from "react-i18next"
 import {
   IconBrandGithub,
   IconBrandX,
@@ -20,6 +21,7 @@ import { Announcements } from "../utility/announcements"
 interface ChatHelpProps {}
 
 export const ChatHelp: FC<ChatHelpProps> = ({}) => {
+  const { t } = useTranslation()
   useHotkey("/", () => setIsOpen(prevState => !prevState))
 
   const [isOpen, setIsOpen] = useState(false)
@@ -60,7 +62,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem className="flex justify-between">
-          <div>Show Help</div>
+          <div>{t("Show Help")}</div>
           <div className="flex opacity-60">
             <div className="min-w-[30px] rounded border p-1 text-center">⌘</div>
             <div className="min-w-[30px] rounded border p-1 text-center">
@@ -71,7 +73,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="flex justify-between">
-          <div>Show Workspaces</div>
+          <div>{t("Show Workspaces")}</div>
           <div className="flex opacity-60">
             <div className="min-w-[30px] rounded border p-1 text-center">⌘</div>
             <div className="min-w-[30px] rounded border p-1 text-center">
@@ -82,7 +84,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="flex w-[300px] justify-between">
-          <div>New Chat</div>
+          <div>{t("New Chat")}</div>
           <div className="flex opacity-60">
             <div className="min-w-[30px] rounded border p-1 text-center">⌘</div>
             <div className="min-w-[30px] rounded border p-1 text-center">
@@ -93,7 +95,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="flex justify-between">
-          <div>Focus Chat</div>
+          <div>{t("Focus Chat")}</div>
           <div className="flex opacity-60">
             <div className="min-w-[30px] rounded border p-1 text-center">⌘</div>
             <div className="min-w-[30px] rounded border p-1 text-center">
@@ -104,7 +106,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="flex justify-between">
-          <div>Toggle Files</div>
+          <div>{t("Toggle Files")}</div>
           <div className="flex opacity-60">
             <div className="min-w-[30px] rounded border p-1 text-center">⌘</div>
             <div className="min-w-[30px] rounded border p-1 text-center">
@@ -115,7 +117,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="flex justify-between">
-          <div>Toggle Retrieval</div>
+          <div>{t("Toggle Retrieval")}</div>
           <div className="flex opacity-60">
             <div className="min-w-[30px] rounded border p-1 text-center">⌘</div>
             <div className="min-w-[30px] rounded border p-1 text-center">
@@ -126,7 +128,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="flex justify-between">
-          <div>Open Settings</div>
+          <div>{t("Open Settings")}</div>
           <div className="flex opacity-60">
             <div className="min-w-[30px] rounded border p-1 text-center">⌘</div>
             <div className="min-w-[30px] rounded border p-1 text-center">
@@ -137,7 +139,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="flex justify-between">
-          <div>Open Quick Settings</div>
+          <div>{t("Open Quick Settings")}</div>
           <div className="flex opacity-60">
             <div className="min-w-[30px] rounded border p-1 text-center">⌘</div>
             <div className="min-w-[30px] rounded border p-1 text-center">
@@ -148,7 +150,7 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="flex justify-between">
-          <div>Toggle Sidebar</div>
+          <div>{t("Toggle Sidebar")}</div>
           <div className="flex opacity-60">
             <div className="min-w-[30px] rounded border p-1 text-center">⌘</div>
             <div className="min-w-[30px] rounded border p-1 text-center">

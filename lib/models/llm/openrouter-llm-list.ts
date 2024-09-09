@@ -27,9 +27,10 @@ const GPT4O_MINI: LLM = {
   hostedId: "gpt-4o-mini",
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
-  tools: false,
+  tools: true,
   paid: false,
   supportsStreaming: true,
+  new: true,
   pricing: {
     currency: "USD",
     unit: "1M tokens",
@@ -86,7 +87,7 @@ const CLAUDE_35_SONNET: LLM = {
   hostedId: "claude-3.5-sonnet",
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
-  tools: false,
+  tools: true,
   supportsStreaming: true
 }
 
@@ -126,6 +127,19 @@ const LLAMA_3_1_SONAR_HUGE_128K_ONLINE: LLM = {
   paid: true
 }
 
+const REFLECTION_70B: LLM = {
+  modelId: "mattshumer/reflection-70b",
+  modelName: "Reflection 70B",
+  provider: "openrouter",
+  hostedId: "reflection-70b",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  paid: true,
+  new: true
+}
+
 export const OPENROUTER_LLM_LIST: LLM[] = [
   GPT4O,
   GPT4O_MINI,
@@ -135,7 +149,8 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
   CLAUDE_35_SONNET,
   LLAVA_YI_34b,
   FIRELLAVA_13b,
-  LLAMA_3_1_SONAR_HUGE_128K_ONLINE
+  LLAMA_3_1_SONAR_HUGE_128K_ONLINE,
+  REFLECTION_70B
 ]
 //- openai/gpt-4o-2024-08-06
 //- openai/gpt-4o-mini

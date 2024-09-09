@@ -84,6 +84,7 @@ export type OpenRouterLLMID =
   | "anthropic/claude-3-haiku"
   | "anthropic/claude-3.5-sonnet"
   | "perplexity/llama-3.1-sonar-huge-128k-online"
+  | "mattshumer/reflection-70b"
 
 export interface LLM {
   modelId: LLMID
@@ -110,4 +111,5 @@ export interface OpenRouterLLM extends LLM {
   tools: boolean
   supportsStreaming: boolean
   imageInput: boolean
+  new?: boolean
 }

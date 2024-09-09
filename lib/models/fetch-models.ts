@@ -52,7 +52,7 @@ const KNOWN_MODEL_NAMES: {
     provider: "openai",
     modelName: "GPT-4o mini",
     imageInput: true,
-    tools: false,
+    tools: true,
     paid: false,
     new: true,
     supportsStreaming: true
@@ -74,6 +74,7 @@ const KNOWN_MODEL_NAMES: {
     paid: true
   }
 }
+//add things to KNOWN_MODEL_NAMES casuse crash at this moment. Reason unknow
 
 export function parseOpenRouterModelName(modelId: string): Partial<LLM> {
   if (Object.keys(KNOWN_MODEL_NAMES).includes(modelId)) {
@@ -103,7 +104,8 @@ function parseSupportedModelsFromEnv() {
     "anthropic/claude-3.5-sonnet",
     "openai/gpt-4o-2024-08-06",
     "openai/gpt-4o-mini",
-    "perplexity/llama-3.1-sonar-huge-128k-online"
+    "perplexity/llama-3.1-sonar-huge-128k-online",
+    "mattshumer/reflection-70b"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {
@@ -243,7 +245,8 @@ export const fetchOpenRouterModels = async () => {
             unit: "1M tokens"
           },
           tools: knownModel?.tools ?? false,
-          supportsStreaming: true
+          supportsStreaming: true,
+          new: knownModel?.new ?? false
         }
       })
 

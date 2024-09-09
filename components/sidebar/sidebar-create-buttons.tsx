@@ -14,6 +14,7 @@ import { CreatePrompt } from "./items/prompts/create-prompt"
 import { CreateTool } from "./items/tools/create-tool"
 import { isMobileScreen } from "@/lib/mobile"
 import { useTranslation } from "react-i18next"
+import { Dialog, DialogContent } from "../ui/dialog"
 
 interface SidebarCreateButtonsProps {
   contentType: ContentType

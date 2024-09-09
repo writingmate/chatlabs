@@ -80,6 +80,8 @@
     "d3-dsv": "^2.0.0",
     "date-fns": "^2.30.0",
     "endent": "^2.1.0",
+    "exa-js": "^1.0.14",
+    "focus-trap-react": "^10.2.3",
     "gpt-tokenizer": "^2.1.2",
     "groq": "^3.43.0",
     "groq-sdk": "^0.3.3",

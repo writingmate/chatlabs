@@ -15,7 +15,7 @@ import {
   IconSparkles,
   IconTerminal2
 } from "@tabler/icons-react"
-import { FC, useContext } from "react"
+import { FC, useContext, useCallback, useState } from "react"
 import { TabsList, TabsTrigger } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "../utility/profile-settings"
@@ -23,7 +23,7 @@ import { SidebarSwitchItem } from "./sidebar-switch-item"
 import { ChatbotUIContext } from "@/context/context"
 import { validateProPlan } from "@/lib/subscription"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
 export const SIDEBAR_ICON_SIZE = 28
 
@@ -38,6 +38,38 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
     useContext(ChatbotUIContext)
 
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // Keep track of the currently active sidebar item
+  const [activeSidebarItem, setActiveSidebarItem] =
+    useState<ContentType>("chats")
+
+  // Handle icon click
+  const handleIconClick = useCallback(
+    (contentType: ContentType) => {
+      // Update the active sidebar item visually
+      setActiveSidebarItem(contentType)
+
+      // Only change the content if it's 'chats'
+      if (contentType === "chats") {
+        onContentTypeChange(contentType)
+      } else {
+        // Optionally, show a message or tooltip for other content types
+        console.log(`${contentType} clicked, but content remains unchanged`)
+      }
+
+      // Prevent default navigation and URL change
+      const current = new URLSearchParams(Array.from(searchParams.entries()))
+      current.set("tab", contentType)
+      const search = current.toString()
+      const query = search ? `?${search}` : ""
+
+      router.push(`${pathname}${query}`, { scroll: false })
+    },
+    [onContentTypeChange, router, pathname, searchParams]
+  )
+
   return (
     <div className="flex h-full flex-col justify-between border-r">
       <TabsList className="bg-background flex h-full flex-col items-center justify-center space-y-6">
@@ -45,7 +77,8 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           <SidebarSwitchItem
             icon={<IconMessage size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
             contentType="chats"
-            onContentTypeChange={onContentTypeChange}
+            isActive={activeSidebarItem === "chats"}
+            onClick={() => handleIconClick("chats")}
           />
           <span className="mt-1 text-xs">Chat</span>
         </div>
@@ -54,7 +87,8 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           <SidebarSwitchItem
             icon={<IconTerminal2 size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
             contentType="prompts"
-            onContentTypeChange={onContentTypeChange}
+            isActive={activeSidebarItem === "prompts"}
+            onClick={() => handleIconClick("prompts")}
           />
           <span className="mt-1 text-xs">Prompt</span>
         </div>
@@ -63,7 +97,8 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           <SidebarSwitchItem
             icon={<IconFile size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
             contentType="files"
-            onContentTypeChange={onContentTypeChange}
+            isActive={activeSidebarItem === "files"}
+            onClick={() => handleIconClick("files")}
           />
           <span className="mt-1 text-xs">File</span>
         </div>
@@ -72,7 +107,8 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           <SidebarSwitchItem
             icon={<IconRobotFace size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
             contentType="assistants"
-            onContentTypeChange={onContentTypeChange}
+            isActive={activeSidebarItem === "assistants"}
+            onClick={() => handleIconClick("assistants")}
           />
           <span className="mt-1 text-xs">Assistant</span>
         </div>
@@ -82,7 +118,8 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
             icon={<IconPuzzle size={SIDEBAR_ICON_SIZE} stroke={1.5} />}
             contentType="tools"
             name="Plugins"
-            onContentTypeChange={onContentTypeChange}
+            isActive={activeSidebarItem === "tools"}
+            onClick={() => handleIconClick("tools")}
           />
           <span className="mt-1 text-xs">Plugin</span>
         </div>

@@ -6,6 +6,8 @@ import { ChatbotUIContext } from "@/context/context"
 import { PROMPT_NAME_MAX } from "@/db/limits"
 import { TablesInsert } from "@/supabase/types"
 import { FC, useContext, useState } from "react"
+import { CenterCreateItem } from "../all/center-create-item"
+import { useTranslation } from "react-i18next"
 
 interface CreatePromptProps {
   isOpen: boolean
@@ -16,6 +18,8 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
   isOpen,
   onOpenChange
 }) => {
+  const { t } = useTranslation()
+
   const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
   const [isTyping, setIsTyping] = useState(false)
   const [name, setName] = useState("")
@@ -25,7 +29,7 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
   if (!selectedWorkspace) return null
 
   return (
-    <SidebarCreateItem
+    <CenterCreateItem
       contentType="prompts"
       isOpen={isOpen}
       isTyping={isTyping}
@@ -40,10 +44,10 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
       renderInputs={() => (
         <>
           <div className="space-y-1">
-            <Label>Name</Label>
+            <Label>{t("name")}</Label>
 
             <Input
-              placeholder="Prompt name..."
+              placeholder={t("prompt_name")}
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={PROMPT_NAME_MAX}
@@ -53,10 +57,10 @@ export const CreatePrompt: FC<CreatePromptProps> = ({
           </div>
 
           <div className="space-y-1">
-            <Label>Prompt</Label>
+            <Label>{t("prompt")}</Label>
 
             <TextareaAutosize
-              placeholder="Prompt content..."
+              placeholder={t("prompt_content")}
               value={content}
               onValueChange={setContent}
               minRows={6}

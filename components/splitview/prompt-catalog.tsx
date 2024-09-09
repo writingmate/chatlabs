@@ -31,7 +31,7 @@ export function PromptCatalog({
   }
 
   return (
-    <Dialog open={isDialogOpen}>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger onClick={() => setIsDialogOpen(true)}>
         <IconPencil
           size={32}
