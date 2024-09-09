@@ -88,7 +88,7 @@ function getProviderCaller(model: string, profile: Tables<"profiles">) {
 
   if (provider === "openrouter") {
     checkApiKey(profile.openrouter_api_key, "OpenRouter")
-    return new OpenRouterFunctionCaller(profile.openrouter_api_key || "")
+    return new OpenRouterFunctionCaller(profile.openrouter_api_key || "", true)
   }
 
   throw new Error(`Provider not supported: ${provider}`)

@@ -116,12 +116,16 @@ export interface WebScraperResult {
 
 // New plugin
 export interface SearchResult {
-  // ... other properties
-  results: {
-    title: string
-    url: string
-    snippet: string
-    image: string | null
-  }[]
-  numResults: number
+  score: number
+  title: string
+  id: string
+  url: string
+  publishedDate: string
+  author: string | null
+}
+
+export interface ExaSearchResponse {
+  autopromptString: string
+  results: SearchResult[]
+  requestId: string
 }

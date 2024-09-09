@@ -18,9 +18,9 @@ export default function LanguageSwitcher() {
       className="text-md rounded-lg border border-gray-300 bg-white p-1 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
     >
       <option value="en">English</option>
-      <option value="de">Deutsch</option>
-      <option value="fr">French</option>
-      <option value="zh">简体中文</option>
+      <option value="jp">日本語</option>
+      <option value="kr">한국어</option>
+      <option value="zh">繁體中文</option>
     </select>
   )
 }

@@ -351,5 +351,11 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TEMPERATURE: 0,
     MAX_TOKEN_OUTPUT_LENGTH: 0,
     MAX_CONTEXT_LENGTH: 0
+  },
+  "mattshumer/reflection-70b": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
   }
 }

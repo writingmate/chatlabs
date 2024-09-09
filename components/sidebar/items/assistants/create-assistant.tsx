@@ -1,3 +1,5 @@
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
 import { ChatSettingsForm } from "@/components/ui/chat-settings-form"
 import ImagePicker from "@/components/ui/image-picker"
@@ -15,6 +17,7 @@ import { SharingField } from "@/components/sidebar/items/all/sharing-field"
 import { AssistantConversationStarters } from "@/components/sidebar/items/assistants/assistant-conversation-starters"
 import { set } from "date-fns"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
+import { CenterCreateItem } from "@/components/sidebar/items/all/center-create-item"
 
 interface CreateAssistantProps {
   isOpen: boolean
@@ -110,7 +113,7 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
   if (!selectedWorkspace) return null
 
   return (
-    <SidebarCreateItem
+    <CenterCreateItem
       contentType="assistants"
       createState={
         {

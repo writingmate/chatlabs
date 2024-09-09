@@ -34,6 +34,7 @@ interface ChatInputProps {
   hasMessages: boolean
   imagesAllowed?: boolean
   toolsAllowed?: boolean
+  chatSettings?: any // Add this prop
 }
 
 export const ChatInput: FC<ChatInputProps> = ({
@@ -41,9 +42,9 @@ export const ChatInput: FC<ChatInputProps> = ({
   hasMessages,
   handleSendMessage,
   handleStopMessage,
-  imagesAllowed,
   toolsAllowed,
-  handleReset
+  handleReset,
+  chatSettings
 }) => {
   const { t } = useTranslation()
 
@@ -73,7 +74,7 @@ export const ChatInput: FC<ChatInputProps> = ({
 
   const { filesToAccept, handleSelectDeviceFile, isUploading } =
     useSelectFileHandler({
-      imagesAllowed
+      imagesAllowed: true // Always allow images
     })
 
   // const {
@@ -165,15 +166,11 @@ export const ChatInput: FC<ChatInputProps> = ({
     const items = event.clipboardData.items
     for (const item of items) {
       if (item.type.indexOf("image") === 0) {
-        if (!imagesAllowed) {
-          toast.error(
-            `Images are not supported for this model. Use models like GPT-4 Vision instead.`
-          )
-          return
-        }
         const file = item.getAsFile()
-        if (!file) return
-        handleSelectDeviceFile(file)
+        if (file) {
+          console.log("Handling image file:", file.name)
+          handleSelectDeviceFile(file)
+        }
       }
     }
   }
@@ -246,7 +243,7 @@ export const ChatInput: FC<ChatInputProps> = ({
               minRows={1}
               maxRows={18}
               onKeyDown={handleKeyDown}
-              // onPaste={handlePaste}
+              onPaste={handlePaste}
               onCompositionStart={() => setIsTyping(true)}
               onCompositionEnd={() => setIsTyping(false)}
             />

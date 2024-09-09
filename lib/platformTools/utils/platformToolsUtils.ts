@@ -62,7 +62,7 @@ export const platformToolFunctionSpec = (functionName: string) => {
     return null
   }
   const toolFunction = tool.toolsFunctions.find(
-    toolFunction => toolFunction.id === toolFunctionId
+    (toolFunction: any) => toolFunction.id === toolFunctionId
   )
 
   console.log("toolFunction", toolFunction)

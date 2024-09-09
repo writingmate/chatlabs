@@ -167,7 +167,7 @@ async function googleSearch(
   const result = await response.json()
 
   return {
-    organic: result.organic.slice(0, 3)
+    organic: result.organic.slice(0, 10) // Increase this number to get more results
   }
 }
 
@@ -206,9 +206,18 @@ export const webScraperTool: PlatformTool = {
 Always add references for google search results at the end of each sentence like this:
 <sentence1>[1](<link1>).
 <sentence2>[2](<link2>).
+<sentence3>[3](<link3>).
+<sentence4>[4](<link4>).
+<sentence5>[5](<link5>).
+<sentence6>[6](<link6>).
+<sentence7>[7](<link7>).
+<sentence8>[8](<link8>).
+<sentence9>[9](<link9>).
+<sentence10>[10](<link10>).
 
 Each unique link has unique reference number.
-      `,
+Return up to 10 relevant results.
+  `,
       parameters: [
         {
           name: "query",

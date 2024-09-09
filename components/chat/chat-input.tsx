@@ -26,6 +26,7 @@ import { toast } from "sonner"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatSelectedHtmlElements } from "@/components/chat/chat-selected-html-elements"
+import { useTranslation } from "react-i18next"
 
 interface ChatInputProps {
   showAssistant: boolean
@@ -276,6 +277,8 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
     }
   }
 
+  const { t } = useTranslation()
+
   return (
     <div className={"relative"}>
       <ChatFilesDisplay />
@@ -324,7 +327,7 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
           <TextareaAutosize
             textareaRef={chatInputRef}
             className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full resize-none rounded-md border-none bg-transparent p-1.5 px-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            placeholder={`Ask anything...`}
+            placeholder={t("Ask anything...")}
             onValueChange={handleInputChange}
             value={userInput}
             minRows={1}

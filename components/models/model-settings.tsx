@@ -63,7 +63,7 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "codellama-70b-instruct": false,
   "llama3-70b-8192": false,
   "llama3-8b-8192": false,
-  "llama3-groq-70b-8192-tool-use-preview": false,
+  "llama3-groq-70b-8192-tool-use-preview": true,
   "gpt-4o": true,
   "gemini-1.5-flash-latest": true,
   //openrouter models
@@ -81,7 +81,8 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "fireworks/firellava-13b": false,
   "anthropic/claude-3-haiku": false,
   "anthropic/claude-3.5-sonnet": false,
-  "perplexity/llama-3.1-sonar-huge-128k-online": false
+  "perplexity/llama-3.1-sonar-huge-128k-online": false,
+  "mattshumer/reflection-70b": false
 }
 
 const SYSTEM_PROMPT_DESCRIPTION = `
