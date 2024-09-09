@@ -27,6 +27,7 @@ import { reconstructContentWithCodeBlocks } from "@/lib/messages"
 
 interface ChatInputProps {
   isGenerating: boolean
+  className?: string
   // userInput: string
   // setUserInput: (input: string) => void,
   handleSendMessage: (input: string, isRegeneration: boolean) => void
@@ -38,6 +39,7 @@ interface ChatInputProps {
 }
 
 export const ChatInput: FC<ChatInputProps> = ({
+  className,
   isGenerating,
   hasMessages,
   handleSendMessage,
@@ -186,7 +188,7 @@ export const ChatInput: FC<ChatInputProps> = ({
   return (
     <>
       <ChatFilesDisplay />
-      <div className={"relative"}>
+      <div className={cn("relative", className)}>
         {/*<ChatCommandInput/>*/}
         <div className="border-input my-3 flex min-h-[60px] w-full flex-col justify-end overflow-hidden rounded-xl border backdrop-blur-xl">
           {/*{selectedAssistant && (*/}

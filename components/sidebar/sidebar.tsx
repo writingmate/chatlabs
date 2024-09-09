@@ -15,7 +15,8 @@ import {
   IconRobot,
   IconX,
   IconMenu2,
-  IconMessage2Plus
+  IconMessage2Plus,
+  IconLayoutColumns
 } from "@tabler/icons-react"
 import { ChatbotUIContext } from "@/context/context"
 import { Button } from "../ui/button"
@@ -226,6 +227,14 @@ export const Sidebar: FC = () => {
                 hasSubmenu
                 isCollapsed={isCollapsed}
               />
+              <Link href="/splitview" passHref>
+                <SidebarItem
+                  icon={<IconLayoutColumns {...iconProps} />}
+                  label="Split view"
+                  onClick={() => {}} // This onClick is now optional
+                  isCollapsed={isCollapsed}
+                />
+              </Link>
               {/*<Link href="/applications" passHref>*/}
               {/*  <SidebarItem*/}
               {/*    icon={<IconApps {...iconProps} />}*/}
