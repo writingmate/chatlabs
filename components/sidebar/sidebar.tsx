@@ -1,4 +1,4 @@
-import { FC, useState, useContext, useRef, useEffect } from "react"
+import { FC, useState, useContext, useRef, useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
 import { SidebarItem } from "./sidebar-item"
 import { SlidingSubmenu } from "./sliding-submenu"
@@ -120,175 +120,195 @@ export const Sidebar: FC = () => {
     }
   }
 
-  return (
-    <>
-      {/* Hamburger menu for mobile */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed left-2 top-2 z-50 md:hidden"
-        onClick={() => handleCreateChat()}
-      >
-        <IconMessagePlus {...iconProps} className="text-foreground" />
-      </Button>
+  const foldersMap = {
+    chats: folders.filter(folder => folder.type === "chats"),
+    prompts: folders.filter(folder => folder.type === "prompts"),
+    assistants: folders.filter(folder => folder.type === "assistants"),
+    files: folders.filter(folder => folder.type === "files"),
+    tools: folders.filter(folder => folder.type === "tools")
+  }
 
-      {/* Mobile overlay */}
-      {showSidebar && (
-        <div
-          className="bg-background/80 fixed inset-0 z-40 backdrop-blur-sm md:hidden"
-          onClick={() => setShowSidebar(false)}
-        />
-      )}
-
-      <>{/* Sidebar */}</>
-      <motion.div
-        ref={sidebarRef}
-        className={cn(
-          "bg-background fixed inset-y-0 left-0 z-50 flex h-full flex-col border-r md:relative",
-          !isLoaded && "invisible",
-          showSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        )}
-        animate={{
-          width: isCollapsed ? 64 : 300
-        }}
-        transition={{
-          duration: 0.3,
-          ease: "easeInOut",
-          delay: expandDelay ? 0.15 : 0
-        }}
-      >
-        <div
-          className={cn(
-            "flex border-b",
-            isCollapsed
-              ? "flex-col items-center py-2"
-              : "items-center justify-between p-2"
-          )}
+  return useMemo(
+    () => (
+      <>
+        {/* Hamburger menu for mobile */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="fixed left-2 top-2 z-50 md:hidden"
+          onClick={() => handleCreateChat()}
         >
-          <Button
-            variant="ghost"
-            size={"icon"}
-            onClick={handleCreateChat}
-            title="New Chat"
-          >
-            <IconMessagePlus {...iconProps} className="text-foreground" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleCollapseOrSubmenu}
-            className="hidden md:flex"
-          >
-            {isCollapsed ? (
-              <IconChevronRight {...iconProps} />
-            ) : (
-              <IconChevronLeft {...iconProps} />
-            )}
-          </Button>
-        </div>
+          <IconMessagePlus {...iconProps} className="text-foreground" />
+        </Button>
 
-        <div className="flex grow flex-col overflow-y-auto">
-          <div className="p-2">
-            <SidebarItem
-              icon={<IconPuzzle {...iconProps} />}
-              label="Prompts"
-              onClick={() => handleSubmenuOpen("prompts")}
-              hasSubmenu
-              isCollapsed={isCollapsed}
-            />
-            <SidebarItem
-              icon={<IconRobot {...iconProps} />}
-              label="Assistants"
-              onClick={() => handleSubmenuOpen("assistants")}
-              hasSubmenu
-              isCollapsed={isCollapsed}
-            />
-            <SidebarItem
-              icon={<IconFolder {...iconProps} />}
-              label="Files"
-              onClick={() => handleSubmenuOpen("files")}
-              hasSubmenu
-              isCollapsed={isCollapsed}
-            />
-            <SidebarItem
-              icon={<IconTool {...iconProps} />}
-              label="Tools"
-              onClick={() => handleSubmenuOpen("tools")}
-              hasSubmenu
-              isCollapsed={isCollapsed}
-            />
-            {/*<Link href="/applications" passHref>*/}
-            {/*  <SidebarItem*/}
-            {/*    icon={<IconApps {...iconProps} />}*/}
-            {/*    label="Applications"*/}
-            {/*    onClick={() => {}} // This onClick is now optional*/}
-            {/*    isCollapsed={isCollapsed}*/}
-            {/*  />*/}
-            {/*</Link>*/}
+        {/* Mobile overlay */}
+        {showSidebar && (
+          <div
+            className="bg-background/80 fixed inset-0 z-40 backdrop-blur-sm md:hidden"
+            onClick={() => setShowSidebar(false)}
+          />
+        )}
+
+        <>{/* Sidebar */}</>
+        <motion.div
+          ref={sidebarRef}
+          className={cn(
+            "bg-background fixed inset-y-0 left-0 z-50 flex h-full flex-col border-r md:relative",
+            !isLoaded && "invisible",
+            showSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          )}
+          animate={{
+            width: isCollapsed ? 64 : 300
+          }}
+          transition={{
+            duration: 0.3,
+            ease: "easeInOut",
+            delay: expandDelay ? 0.15 : 0
+          }}
+        >
+          <div
+            className={cn(
+              "flex border-b",
+              isCollapsed
+                ? "flex-col items-center py-2"
+                : "items-center justify-between p-2"
+            )}
+          >
+            <Button
+              variant="ghost"
+              size={"icon"}
+              onClick={handleCreateChat}
+              title="New Chat"
+            >
+              <IconMessagePlus {...iconProps} className="text-foreground" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleCollapseOrSubmenu}
+              className="hidden md:flex"
+            >
+              {isCollapsed ? (
+                <IconChevronRight {...iconProps} />
+              ) : (
+                <IconChevronLeft {...iconProps} />
+              )}
+            </Button>
           </div>
 
-          {!isCollapsed && (
-            <div className="flex grow flex-col border-t">
-              <div className="flex grow flex-col p-2">
-                <SearchInput
-                  placeholder="Search chats"
-                  value={searchQueries.chats}
-                  onChange={value =>
-                    setSearchQueries(prev => ({ ...prev, chats: value }))
-                  }
-                />
-                <SidebarDataList
-                  contentType="chats"
-                  data={chats}
-                  folders={folders.filter(folder => folder.type === "chats")}
-                />
-              </div>
+          <div className="flex grow flex-col overflow-y-auto">
+            <div className="p-2">
+              <SidebarItem
+                icon={<IconPuzzle {...iconProps} />}
+                label="Prompts"
+                onClick={() => handleSubmenuOpen("prompts")}
+                hasSubmenu
+                isCollapsed={isCollapsed}
+              />
+              <SidebarItem
+                icon={<IconRobot {...iconProps} />}
+                label="Assistants"
+                onClick={() => handleSubmenuOpen("assistants")}
+                hasSubmenu
+                isCollapsed={isCollapsed}
+              />
+              <SidebarItem
+                icon={<IconFolder {...iconProps} />}
+                label="Files"
+                onClick={() => handleSubmenuOpen("files")}
+                hasSubmenu
+                isCollapsed={isCollapsed}
+              />
+              <SidebarItem
+                icon={<IconTool {...iconProps} />}
+                label="Tools"
+                onClick={() => handleSubmenuOpen("tools")}
+                hasSubmenu
+                isCollapsed={isCollapsed}
+              />
+              {/*<Link href="/applications" passHref>*/}
+              {/*  <SidebarItem*/}
+              {/*    icon={<IconApps {...iconProps} />}*/}
+              {/*    label="Applications"*/}
+              {/*    onClick={() => {}} // This onClick is now optional*/}
+              {/*    isCollapsed={isCollapsed}*/}
+              {/*  />*/}
+              {/*</Link>*/}
             </div>
-          )}
-        </div>
 
-        <div className="p-2">
-          <ProfileSettings isCollapsed={isCollapsed} />
-        </div>
-
-        {(["prompts", "assistants", "files", "tools"] as const).map(
-          contentType => (
-            <SlidingSubmenu
-              key={contentType}
-              isOpen={activeSubmenu === contentType}
-              contentType={contentType}
-              isCollapsed={isCollapsed}
-            >
-              <>
-                <div className="mb-2 flex items-center justify-between space-x-2">
+            {!isCollapsed && (
+              <div className="flex grow flex-col border-t">
+                <div className="flex grow flex-col p-2">
                   <SearchInput
-                    className="w-full"
-                    placeholder={`Search ${contentType}`}
-                    value={searchQueries[contentType]}
+                    placeholder="Search chats"
+                    value={searchQueries.chats}
                     onChange={value =>
-                      setSearchQueries(prev => ({
-                        ...prev,
-                        [contentType]: value
-                      }))
+                      setSearchQueries(prev => ({ ...prev, chats: value }))
                     }
                   />
-                  <SidebarCreateButtons
-                    contentType={contentType}
-                    hasData={getDataForContentType(contentType).length > 0}
+                  <SidebarDataList
+                    contentType="chats"
+                    data={chats}
+                    folders={foldersMap.chats}
                   />
                 </div>
-                <SidebarDataList
-                  contentType={contentType}
-                  data={getDataForContentType(contentType)}
-                  folders={folders.filter(
-                    folder => folder.type === contentType
-                  )}
-                />
-              </>
-            </SlidingSubmenu>
-          )
-        )}
-      </motion.div>
-    </>
+              </div>
+            )}
+          </div>
+
+          <div className="p-2">
+            <ProfileSettings isCollapsed={isCollapsed} />
+          </div>
+
+          {(["prompts", "assistants", "files", "tools"] as const).map(
+            contentType => (
+              <SlidingSubmenu
+                key={contentType}
+                isOpen={activeSubmenu === contentType}
+                contentType={contentType}
+                isCollapsed={isCollapsed}
+              >
+                <>
+                  <div className="mb-2 flex items-center justify-between space-x-2">
+                    <SearchInput
+                      className="w-full"
+                      placeholder={`Search ${contentType}`}
+                      value={searchQueries[contentType]}
+                      onChange={value =>
+                        setSearchQueries(prev => ({
+                          ...prev,
+                          [contentType]: value
+                        }))
+                      }
+                    />
+                    <SidebarCreateButtons
+                      contentType={contentType}
+                      hasData={getDataForContentType(contentType).length > 0}
+                    />
+                  </div>
+                  <SidebarDataList
+                    contentType={contentType}
+                    data={getDataForContentType(contentType)}
+                    folders={foldersMap[contentType]}
+                  />
+                </>
+              </SlidingSubmenu>
+            )
+          )}
+        </motion.div>
+      </>
+    ),
+    [
+      activeSubmenu,
+      chats,
+      prompts,
+      assistants,
+      files,
+      tools,
+      folders,
+      isCollapsed,
+      isLoaded,
+      showSidebar
+    ]
   )
 }
