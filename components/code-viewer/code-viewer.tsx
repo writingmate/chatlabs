@@ -20,6 +20,7 @@ import {
 } from "react"
 import CodeViewerSidebar from "./code-viewer-sidebar"
 import { DEFAULT_THEME, THEMES } from "./theme-config"
+import { updateMessage } from "@/db/messages" // Add this import
 
 interface CodeViewerProps {
   isGenerating?: boolean
@@ -28,22 +29,25 @@ interface CodeViewerProps {
   onClose?: () => void
   showCloseButton?: boolean
   autoScroll?: boolean
+  isEditable: boolean
+  onCodeChange: (updatedCode: string) => void
 }
 
 export const CodeViewer: FC<CodeViewerProps> = ({
-  codeBlock: { language, code: value, filename, messageId, sequenceNo },
+  codeBlock,
   className,
   onClose,
   isGenerating,
   showCloseButton = false,
-  autoScroll = false
+  autoScroll = false,
+  isEditable = false,
+  onCodeChange
 }) => {
   const { user } = useAuth()
   const router = useRouter()
   const { selectedWorkspace, chatSettings, profile } =
     useContext(ChatbotUIContext)
   const { setSelectedHtmlElements } = useContext(ChatbotUIChatContext)
-  const { handleSendMessage } = useChatHandler()
   const [sharing, setSharing] = useState(false)
   const [execute, setExecute] = useState(false)
   const [inspectMode, setInspectMode] = useState(false)
@@ -55,10 +59,10 @@ export const CodeViewer: FC<CodeViewerProps> = ({
 
   const downloadAsFile = useCallback(() => {
     if (typeof window === "undefined") return
-    const fileExtension = programmingLanguages[language] || ".file"
+    const fileExtension = programmingLanguages[codeBlock.language] || ".file"
     const suggestedFileName = `file-${generateRandomString(3, true)}${fileExtension}`
 
-    const blob = new Blob([value], { type: "text/plain" })
+    const blob = new Blob([codeBlock.code], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.download = suggestedFileName
@@ -68,20 +72,20 @@ export const CodeViewer: FC<CodeViewerProps> = ({
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
-  }, [language, value])
+  }, [codeBlock.language, codeBlock.code])
 
   const onFork = useCallback(() => {
     window.open(
-      `/chat?forkMessageId=${messageId}&forkSequenceNo=${sequenceNo}`,
+      `/chat?forkMessageId=${codeBlock.messageId}&forkSequenceNo=${codeBlock.sequenceNo}`,
       "_blank"
     )
-  }, [messageId, sequenceNo])
+  }, [codeBlock.messageId, codeBlock.sequenceNo])
 
   useEffect(() => {
-    if (language !== "html") {
+    if (codeBlock.language !== "html") {
       setExecute(false)
     }
-  }, [language])
+  }, [codeBlock.language])
 
   return useMemo(
     () => (
@@ -93,7 +97,7 @@ export const CodeViewer: FC<CodeViewerProps> = ({
       >
         <CodeViewerNavbar
           toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-          language={language}
+          language={codeBlock.language}
           isGenerating={isGenerating}
           execute={execute}
           setExecute={setExecute}
@@ -101,19 +105,19 @@ export const CodeViewer: FC<CodeViewerProps> = ({
           onClose={onClose}
           showCloseButton={showCloseButton}
           downloadAsFile={downloadAsFile}
-          copyValue={value}
+          copyValue={codeBlock.code}
           showShareButton={true}
           onThemeChange={() => {}}
           onFork={onFork}
           showSidebarButton={!!user?.email?.endsWith("@writingmate.ai")}
-          showForkButton={!!messageId && sequenceNo > -1}
+          showForkButton={!!codeBlock.messageId && codeBlock.sequenceNo > -1}
         />
         <div className="relative w-full flex-1 overflow-auto bg-zinc-950">
           {execute ? (
             <CodeViewerPreview2
               theme={theme}
-              value={value}
-              language={language}
+              value={codeBlock.code}
+              language={codeBlock.language}
               inspectMode={inspectMode}
               setInspectMode={setInspectMode}
               onElementClick={element => {
@@ -123,14 +127,10 @@ export const CodeViewer: FC<CodeViewerProps> = ({
             />
           ) : (
             <CodeViewerCode
-              codeBlock={{
-                language,
-                code: value,
-                filename,
-                messageId,
-                sequenceNo
-              }}
+              codeBlock={codeBlock}
               autoScroll={autoScroll}
+              onCodeChange={onCodeChange}
+              isEditable={isEditable}
             />
           )}
         </div>
@@ -146,21 +146,22 @@ export const CodeViewer: FC<CodeViewerProps> = ({
           user={user}
           selectedWorkspace={selectedWorkspace}
           chatSettings={chatSettings}
-          defaultFilename={filename || "Untitled"}
-          fileContent={value}
+          defaultFilename={codeBlock.filename || "Untitled"}
+          fileContent={codeBlock.code}
         />
       </div>
     ),
     [
-      language,
-      value,
+      codeBlock.language,
+      codeBlock.code,
       execute,
       inspectMode,
       error,
       sharing,
       isGenerating,
       isSidebarOpen,
-      theme
+      theme,
+      isEditable
     ]
   )
 }

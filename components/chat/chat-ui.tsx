@@ -30,14 +30,20 @@ import { IconMessagePlus } from "@tabler/icons-react"
 import { getPromptById } from "@/db/prompts"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getChatFilesByChatId } from "@/db/chat-files"
-import { getMessageById, getMessagesByChatId } from "@/db/messages"
+import {
+  getMessageById,
+  getMessagesByChatId,
+  updateMessage
+} from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
 import { getFileByHashId } from "@/db/files"
 import {
   parseChatMessageCodeBlocksAndContent,
-  parseDBMessageCodeBlocksAndContent
+  parseDBMessageCodeBlocksAndContent,
+  reconstructContentWithCodeBlocks,
+  reconstructContentWithCodeBlocksInChatMessage
 } from "@/lib/messages"
 import { CodeBlock } from "@/types/chat-message"
 
@@ -81,8 +87,12 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     isGenerating
   } = useContext(ChatbotUIChatContext)
 
-  const { handleNewChat, handleFocusChatInput, handleSendMessage } =
-    useChatHandler()
+  const {
+    handleNewChat,
+    handleFocusChatInput,
+    handleSendMessage,
+    handleSendEdit
+  } = useChatHandler()
 
   const { handleSelectPromptWithVariables } = usePromptAndCommand()
   const {
@@ -348,6 +358,41 @@ ${content}
     []
   )
 
+  const handleCodeChange = (updatedCode: string): void => {
+    if (selectedCodeBlock) {
+      const updatedMessage = chatMessages?.find(
+        message => message.message?.id === selectedCodeBlock.messageId
+      )
+      if (
+        updatedMessage &&
+        updatedMessage.codeBlocks &&
+        updatedMessage.codeBlocks.length > 0
+      ) {
+        updatedMessage.codeBlocks[updatedMessage.codeBlocks.length - 1].code =
+          updatedCode
+        setChatMessages(prev => {
+          const updatedMessages = [...prev]
+          const index = updatedMessages.findIndex(
+            message => message.message?.id === selectedCodeBlock.messageId
+          )
+          if (index !== -1) {
+            updatedMessages[index] = updatedMessage
+          }
+          return updatedMessages
+        })
+        setSelectedCodeBlock(
+          updatedMessage.codeBlocks[updatedMessage.codeBlocks.length - 1]
+        )
+        updateMessage(updatedMessage.message!.id, {
+          content: reconstructContentWithCodeBlocks(
+            updatedMessage.message?.content || "",
+            updatedMessage.codeBlocks
+          )
+        })
+      }
+    }
+  }
+
   return (
     <>
       <div
@@ -418,6 +463,12 @@ ${content}
         isGenerating={isGenerating}
         selectedCodeBlock={selectedCodeBlock}
         onSelectCodeBlock={handleSelectCodeBlock}
+        isEditable={
+          !isGenerating &&
+          selectedCodeBlock?.messageId ===
+            chatMessages?.[chatMessages.length - 1]?.message?.id
+        }
+        onCodeChange={handleCodeChange}
       />
     </>
   )
