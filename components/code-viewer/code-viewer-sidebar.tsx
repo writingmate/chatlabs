@@ -79,8 +79,6 @@ ${toolsInfo
   )
   .join("")}`
 
-    console.log(toolsPrompt, toolsInfo, selectedPlugins, plugins)
-
     setChatSettings(prevSettings => ({
       ...prevSettings,
       prompt: prevSettings.prompt + "\n\n" + toolsPrompt
