@@ -96,6 +96,8 @@ export const CodeViewer: FC<CodeViewerProps> = ({
         )}
       >
         <CodeViewerNavbar
+          filename={codeBlock.filename || ""}
+          isEditable={isEditable}
           toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           language={codeBlock.language}
           isGenerating={isGenerating}

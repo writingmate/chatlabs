@@ -61,14 +61,14 @@ export const ResizableSplitView: React.FC<ResizableSplitViewProps> = ({
       className={cn("grid h-full gap-3", getGridTemplate(), className)}
     >
       {children.map((child, index) => (
-        <div key={index} className={"h-full"}>
+        <div key={index} className="h-full overflow-hidden">
           <div className="relative h-full overflow-auto rounded-xl border">
             {child}
           </div>
           {index % 3 !== 2 && index !== numViews - 1 && (
             <div
-              className="bg-accent absolute -right-1 mx-[3px] my-[60px] w-[2px] cursor-col-resize"
-              onMouseDown={() => handleMouseDown(index)}
+              className="bg-accent absolute inset-y-0 -right-1 mx-[3px] w-[2px] cursor-col-resize"
+              onMouseDown={handleMouseDown(index)}
             />
           )}
         </div>

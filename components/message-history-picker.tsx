@@ -23,8 +23,6 @@ export const MessageHistoryPicker: FC<MessageHistoryPickerProps> = ({}) => {
     }
   }, [focusPrompt])
 
-  const [isTyping, setIsTyping] = useState(false)
-
   const filteredMessages = chatMessages.filter(
     message =>
       message.message.role === "user" &&

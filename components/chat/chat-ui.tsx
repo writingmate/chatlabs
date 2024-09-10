@@ -270,7 +270,7 @@ ${content}
   }
 
   useEffect(() => {
-    if (chatMessages?.length > 0 && isGenerating) {
+    if (chatMessages?.length > 0) {
       const lastMessage = chatMessages[chatMessages.length - 1]
       const codeBlocks = lastMessage?.codeBlocks
       if (
@@ -281,7 +281,7 @@ ${content}
         setSelectedCodeBlock(codeBlocks[codeBlocks.length - 1])
       }
     }
-  }, [chatMessages, isGenerating])
+  }, [chatMessages])
 
   const fetchMessageImages = async (
     messages: Tables<"messages">[]
@@ -393,6 +393,19 @@ ${content}
     }
   }
 
+  const isCodeBlockEditable = useCallback(
+    (codeBlock: CodeBlock | null): boolean => {
+      if (!codeBlock) return false
+      // only allow editing if the code block is the last one in the conversation
+      // we need to find the last message that has a code block
+      const lastMessage = chatMessages
+        ?.filter(message => message.codeBlocks && message.codeBlocks.length > 0)
+        .pop()
+      return lastMessage?.message?.id === codeBlock.messageId && !isGenerating
+    },
+    [chatMessages, isGenerating]
+  )
+
   return (
     <>
       <div
@@ -447,11 +460,7 @@ ${content}
         isGenerating={isGenerating}
         selectedCodeBlock={selectedCodeBlock}
         onSelectCodeBlock={handleSelectCodeBlock}
-        isEditable={
-          !isGenerating &&
-          selectedCodeBlock?.messageId ===
-            chatMessages?.[chatMessages.length - 1]?.message?.id
-        }
+        isEditable={isCodeBlockEditable(selectedCodeBlock)}
         onCodeChange={handleCodeChange}
       />
     </>

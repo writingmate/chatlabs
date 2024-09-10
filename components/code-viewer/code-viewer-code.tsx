@@ -7,7 +7,12 @@ import { oneDark } from "@codemirror/theme-one-dark"
 import { javascript } from "@codemirror/lang-javascript"
 import { html } from "@codemirror/lang-html"
 import { css } from "@codemirror/lang-css"
-import { useScroll } from "@/components/chat/chat-hooks/use-scroll"
+import { python } from "@codemirror/lang-python"
+import { java } from "@codemirror/lang-java"
+import { sql } from "@codemirror/lang-sql"
+import { cpp } from "@codemirror/lang-cpp"
+import { csharp } from "@replit/codemirror-lang-csharp"
+import { php } from "@codemirror/lang-php"
 import { CodeBlock } from "@/types"
 import { debounce } from "@/lib/debounce"
 
@@ -25,8 +30,6 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
   isEditable = false
 }) => {
   const [code, setCode] = useState(initialValue.trim())
-  const { messagesEndRef, handleScroll } = useScroll({ block: "end" })
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   const ref = useRef<ReactCodeMirrorRef>(null)
 
   useEffect(() => {
@@ -42,6 +45,18 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
         return html()
       case "css":
         return css()
+      case "c#":
+        return csharp()
+      case "c++":
+        return cpp()
+      case "php":
+        return php()
+      case "sql":
+        return sql()
+      case "python":
+        return python()
+      case "java":
+        return java()
       default:
         return javascript() // Default to JavaScript for unknown languages
     }
@@ -81,7 +96,6 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
       extensions={[getLanguageExtension(language)]}
       editable={isEditable}
       onChange={handleChange}
-      onScroll={handleScroll}
       style={{
         fontSize: "14px",
         fontFamily: "var(--font-mono)",

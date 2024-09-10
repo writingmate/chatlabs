@@ -35,7 +35,7 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
             className={"h-full rounded-none"}
             codeBlock={selectedCodeBlock}
             showCloseButton={true}
-            autoScroll={true}
+            autoScroll={isGenerating}
             isEditable={isEditable}
             onCodeChange={onCodeChange}
           />
