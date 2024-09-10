@@ -89,6 +89,8 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
         } else {
           return (
             <CodeViewer
+              isEditable={false}
+              onCodeChange={() => {}}
               key={`code-block-${index}`}
               codeBlock={block}
               isGenerating={isGenerating}

@@ -8,13 +8,17 @@ interface ChatPreviewContentProps {
   isGenerating: boolean
   selectedCodeBlock: CodeBlock | null
   onSelectCodeBlock?: (codeBlock: CodeBlock | null) => void
+  isEditable: boolean
+  onCodeChange: (updatedCode: string) => void
 }
 
 export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   open,
   isGenerating,
   selectedCodeBlock,
-  onSelectCodeBlock
+  onSelectCodeBlock,
+  isEditable,
+  onCodeChange
 }) => {
   return useMemo(
     () => (
@@ -31,11 +35,13 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
             className={"h-full rounded-none"}
             codeBlock={selectedCodeBlock}
             showCloseButton={true}
-            autoScroll={true}
+            autoScroll={isGenerating}
+            isEditable={isEditable}
+            onCodeChange={onCodeChange}
           />
         )}
       </div>
     ),
-    [open, isGenerating, selectedCodeBlock]
+    [open, isGenerating, selectedCodeBlock, isEditable, onCodeChange]
   )
 }

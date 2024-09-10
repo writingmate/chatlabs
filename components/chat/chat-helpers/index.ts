@@ -733,10 +733,8 @@ export const handleCreateMessages = async (
       return [...prevFileItems, ...newFileItems]
     })
 
-    if (updateState) {
-      setChatMessages(
-        finalChatMessages.map(parseChatMessageCodeBlocksAndContent)
-      )
-    }
+    // if (updateState) {
+    setChatMessages(finalChatMessages.map(parseChatMessageCodeBlocksAndContent))
+    // }
   }
 }

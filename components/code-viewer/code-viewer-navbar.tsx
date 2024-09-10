@@ -7,7 +7,9 @@ import {
   IconDownload,
   IconEye,
   IconArrowFork,
-  IconLayoutSidebar
+  IconLayoutSidebar,
+  IconLockAccess,
+  IconLock
 } from "@tabler/icons-react"
 
 import { CopyButton } from "@/components/ui/copy-button"
@@ -15,11 +17,14 @@ import Loading from "@/components/ui/loading"
 import { UITheme } from "@/components/code-viewer/theme-configurator"
 import NavbarButton from "@/components/code-viewer/code-navbar-button"
 import { Tables } from "@/supabase/types"
+import { Badge } from "../ui/badge"
+import { WithTooltip } from "../ui/with-tooltip"
 
 interface NavbarProps {
   showSidebarButton: boolean
   language: string
   isGenerating?: boolean
+  isEditable: boolean
   execute: boolean
   setExecute: (execute: boolean) => void
   setSharing: (sharing: boolean) => void
@@ -30,6 +35,7 @@ interface NavbarProps {
   downloadAsFile: () => void
   onFork: () => void
   showForkButton?: boolean
+  filename: string
   showShareButton?: any
   copyValue: string // Add prop for the value to be copied
 }
@@ -37,6 +43,7 @@ interface NavbarProps {
 export const CodeViewerNavbar: FC<NavbarProps> = ({
   language,
   isGenerating,
+  isEditable,
   execute,
   setExecute,
   setSharing,
@@ -46,6 +53,7 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
   showSidebarButton,
   showCloseButton,
   downloadAsFile,
+  filename,
   onThemeChange,
   copyValue, // Use the new prop
   showShareButton = true,
@@ -56,7 +64,19 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
   return (
     <div className="bg-accent text-foreground z-5 flex w-full items-center justify-between border-b px-4">
       <div className="flex items-center space-x-2">
-        <span className="text-xs lowercase">{language}</span>
+        {!isEditable && (
+          <WithTooltip
+            display={"This code is not editable"}
+            trigger={
+              <IconLock
+                size={16}
+                className="text-muted-foreground"
+                stroke={1.5}
+              />
+            }
+          />
+        )}
+        <span className="text-xs lowercase">{filename}</span>
         {isGenerating && (
           <div className={"size-4"}>
             <Loading />
