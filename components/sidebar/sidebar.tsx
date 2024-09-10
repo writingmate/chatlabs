@@ -16,7 +16,9 @@ import {
   IconX,
   IconMenu2,
   IconMessage2Plus,
-  IconLayoutColumns
+  IconLayoutColumns,
+  IconPuzzle2,
+  IconBulb
 } from "@tabler/icons-react"
 import { ChatbotUIContext } from "@/context/context"
 import { Button } from "../ui/button"
@@ -38,22 +40,14 @@ export const Sidebar: FC = () => {
     tools,
     assistants,
     folders,
-    setChats,
-    setPrompts,
-    setFiles,
-    setTools,
-    setAssistants,
     showSidebar,
     setShowSidebar
   } = useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
   const [activeSubmenu, setActiveSubmenu] = useState<ContentType | null>(null)
-  const [isCreating, setIsCreating] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const sidebarRef = useRef<HTMLDivElement>(null)
-  const params = useParams()
-  const router = useRouter()
 
   const [searchQueries, setSearchQueries] = useState({
     chats: "",
@@ -81,10 +75,6 @@ export const Sidebar: FC = () => {
     setActiveSubmenu(menuName === activeSubmenu ? null : menuName)
   }
 
-  const handleCreateItem = (contentType: ContentType) => {
-    setIsCreating(true)
-  }
-
   const toggleCollapseOrSubmenu = () => {
     if (activeSubmenu) {
       setActiveSubmenu(null)
@@ -107,15 +97,29 @@ export const Sidebar: FC = () => {
   const getDataForContentType = (contentType: ContentType) => {
     switch (contentType) {
       case "chats":
-        return chats
+        return chats.filter(chat =>
+          chat.name.toLowerCase().includes(searchQueries.chats.toLowerCase())
+        )
       case "prompts":
-        return prompts
+        return prompts.filter(prompt =>
+          prompt.name
+            .toLowerCase()
+            .includes(searchQueries.prompts.toLowerCase())
+        )
       case "assistants":
-        return assistants
+        return assistants.filter(assistant =>
+          assistant.name
+            .toLowerCase()
+            .includes(searchQueries.assistants.toLowerCase())
+        )
       case "files":
-        return files
+        return files.filter(file =>
+          file.name.toLowerCase().includes(searchQueries.files.toLowerCase())
+        )
       case "tools":
-        return tools
+        return tools.filter(tool =>
+          tool.name.toLowerCase().includes(searchQueries.tools.toLowerCase())
+        )
       default:
         return []
     }
@@ -129,17 +133,31 @@ export const Sidebar: FC = () => {
     tools: folders.filter(folder => folder.type === "tools")
   }
 
+  function getSubmenuTitle(contentType: ContentType) {
+    switch (contentType) {
+      case "prompts":
+        return "Prompts"
+      case "assistants":
+        return "Assistants"
+      case "files":
+        return "Files"
+      case "tools":
+        return "Plugins"
+      default:
+        return ""
+    }
+  }
+
   return useMemo(
     () => (
       <>
-        {/* Hamburger menu for mobile */}
         <Button
           variant="ghost"
           size="icon"
           className="fixed left-2 top-2 z-50 md:hidden"
           onClick={() => handleCreateChat()}
         >
-          <IconMessagePlus {...iconProps} className="text-foreground" />
+          <IconMessagePlus {...iconProps} />
         </Button>
 
         {/* Mobile overlay */}
@@ -181,8 +199,11 @@ export const Sidebar: FC = () => {
               onClick={handleCreateChat}
               title="New Chat"
             >
-              <IconMessagePlus {...iconProps} className="text-foreground" />
+              <IconMessagePlus {...iconProps} />
             </Button>
+            <div className="flex items-center justify-between">
+              {activeSubmenu && getSubmenuTitle(activeSubmenu)}
+            </div>
             <Button
               variant="ghost"
               size="icon"
@@ -200,7 +221,7 @@ export const Sidebar: FC = () => {
           <div className="flex grow flex-col overflow-y-auto">
             <div className="p-2">
               <SidebarItem
-                icon={<IconPuzzle {...iconProps} />}
+                icon={<IconBulb {...iconProps} />}
                 label="Prompts"
                 onClick={() => handleSubmenuOpen("prompts")}
                 hasSubmenu
@@ -221,13 +242,13 @@ export const Sidebar: FC = () => {
                 isCollapsed={isCollapsed}
               />
               <SidebarItem
-                icon={<IconTool {...iconProps} />}
-                label="Tools"
+                icon={<IconPuzzle {...iconProps} />}
+                label="Plugins"
                 onClick={() => handleSubmenuOpen("tools")}
                 hasSubmenu
                 isCollapsed={isCollapsed}
               />
-              <Link href="/splitview" passHref>
+              <Link href="/splitview" target="_blank" passHref>
                 <SidebarItem
                   icon={<IconLayoutColumns {...iconProps} />}
                   label="Split view"
@@ -247,7 +268,7 @@ export const Sidebar: FC = () => {
 
             {!isCollapsed && (
               <div className="flex grow flex-col border-t">
-                <div className="flex grow flex-col p-2">
+                <div className="flex grow flex-col p-2 pb-0">
                   <SearchInput
                     placeholder="Search chats"
                     value={searchQueries.chats}
@@ -257,7 +278,7 @@ export const Sidebar: FC = () => {
                   />
                   <SidebarDataList
                     contentType="chats"
-                    data={chats}
+                    data={getDataForContentType("chats")}
                     folders={foldersMap.chats}
                   />
                 </div>
@@ -265,7 +286,7 @@ export const Sidebar: FC = () => {
             )}
           </div>
 
-          <div className="p-2">
+          <div className="border-t p-2">
             <ProfileSettings isCollapsed={isCollapsed} />
           </div>
 
@@ -317,7 +338,8 @@ export const Sidebar: FC = () => {
       folders,
       isCollapsed,
       isLoaded,
-      showSidebar
+      showSidebar,
+      searchQueries
     ]
   )
 }

@@ -16,12 +16,12 @@ export function SearchInput({
 }: SearchInputProps) {
   return (
     <div className={`relative ${className}`}>
-      <IconSearch className="text-muted-foreground absolute left-2 top-1/2 size-4 -translate-y-1/2" />
+      <IconSearch className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2" />
       <Input
         placeholder={placeholder}
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="pl-8"
+        className="pl-9"
       />
     </div>
   )
