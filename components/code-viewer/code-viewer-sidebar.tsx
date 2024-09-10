@@ -49,9 +49,9 @@ const CodeViewerSidebar: FC<CodeViewerSidebarProps> = ({
   )
   const [selectedPlugins, setSelectedPlugins] = useState<Tables<"tools">[]>([])
 
-  useEffect(() => {
-    updateSystemPromptWithTools()
-  }, [selectedPlugins])
+  // useEffect(() => {
+  //   updateSystemPromptWithTools()
+  // }, [selectedPlugins])
 
   const updateSystemPromptWithTools = () => {
     const toolsInfo = selectedPlugins.map(tool => {
