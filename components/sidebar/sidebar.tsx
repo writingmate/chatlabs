@@ -102,39 +102,27 @@ export const Sidebar: FC = () => {
     className: "text-muted-foreground"
   }
 
-  const getDataForContentType = useCallback(
-    (contentType: ContentType) => {
-      switch (contentType) {
-        case "chats":
-          return chats.filter(chat =>
-            chat.name.toLowerCase().includes(searchQueries.chats.toLowerCase())
-          )
-        case "prompts":
-          return prompts.filter(prompt =>
-            prompt.name
-              .toLowerCase()
-              .includes(searchQueries.prompts.toLowerCase())
-          )
-        case "assistants":
-          return assistants.filter(assistant =>
-            assistant.name
-              .toLowerCase()
-              .includes(searchQueries.assistants.toLowerCase())
-          )
-        case "files":
-          return files.filter(file =>
-            file.name.toLowerCase().includes(searchQueries.files.toLowerCase())
-          )
-        case "tools":
-          return tools.filter(tool =>
-            tool.name.toLowerCase().includes(searchQueries.tools.toLowerCase())
-          )
-        default:
-          return []
-      }
-    },
-    [chats, prompts, assistants, files, tools, searchQueries]
-  )
+  const dataMap = useMemo(() => {
+    return {
+      chats: chats.filter(chat =>
+        chat.name.toLowerCase().includes(searchQueries.chats.toLowerCase())
+      ),
+      prompts: prompts.filter(prompt =>
+        prompt.name.toLowerCase().includes(searchQueries.prompts.toLowerCase())
+      ),
+      assistants: assistants.filter(assistant =>
+        assistant.name
+          .toLowerCase()
+          .includes(searchQueries.assistants.toLowerCase())
+      ),
+      files: files.filter(file =>
+        file.name.toLowerCase().includes(searchQueries.files.toLowerCase())
+      ),
+      tools: tools.filter(tool =>
+        tool.name.toLowerCase().includes(searchQueries.tools.toLowerCase())
+      )
+    }
+  }, [chats, prompts, assistants, files, tools, searchQueries])
 
   const foldersMap = useMemo(
     () => ({
@@ -146,10 +134,6 @@ export const Sidebar: FC = () => {
     }),
     [folders]
   )
-
-  useEffect(() => {
-    console.log("Data changed:", getDataForContentType("chats"))
-  }, [getDataForContentType])
 
   useEffect(() => {
     console.log("Folders changed:", foldersMap.chats)
@@ -304,7 +288,7 @@ export const Sidebar: FC = () => {
                 />
                 <SidebarDataList
                   contentType="chats"
-                  data={getDataForContentType("chats")}
+                  data={dataMap.chats}
                   folders={foldersMap.chats}
                 />
               </div>
@@ -338,12 +322,12 @@ export const Sidebar: FC = () => {
                     />
                     <SidebarCreateButtons
                       contentType={contentType}
-                      hasData={getDataForContentType(contentType).length > 0}
+                      hasData={dataMap[contentType].length > 0}
                     />
                   </div>
                   <SidebarDataList
                     contentType={contentType}
-                    data={getDataForContentType(contentType)}
+                    data={dataMap[contentType]}
                     folders={foldersMap[contentType]}
                   />
                 </>
