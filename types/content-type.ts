@@ -7,4 +7,4 @@ export type ContentType =
   | "assistants"
   | "tools"
   | "models"
-  | "applications"
+// | "applications"

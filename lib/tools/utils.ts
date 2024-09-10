@@ -52,7 +52,7 @@ export async function executeTool(
     if (applicationId) {
       // Fetch application-specific tools
       const applicationTools = await getApplicationTools(applicationId)
-      const applicationToolIds = applicationTools.map(tool => tool.id)
+      const applicationToolIds = applicationTools.map(tool => tool?.id)
 
       // Check if the called function is allowed for this application
       if (!applicationToolIds.includes(toolFunctionSpec.id)) {

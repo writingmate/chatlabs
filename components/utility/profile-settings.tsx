@@ -336,9 +336,12 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
         <Button
           variant="ghost"
           size="sm"
-          className="w-full items-center justify-start space-x-2 rounded-lg px-3 py-2 text-sm"
+          className={cn(
+            "flex w-full items-center justify-start space-x-2 rounded-lg p-2 pl-1 text-sm",
+            isCollapsed ? "justify-center pl-2" : ""
+          )}
         >
-          <Avatar className="size-6">
+          <Avatar className="size-8">
             <AvatarImage src={profile.image_url!} />
             <AvatarFallback>
               <IconUser size={SIDEBAR_ICON_SIZE} />

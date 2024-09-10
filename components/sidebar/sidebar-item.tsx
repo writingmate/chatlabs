@@ -1,6 +1,7 @@
 import { FC, ReactNode } from "react"
 import { IconChevronRight } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { Button } from "../ui/button"
 
 interface SidebarItemProps {
   icon: ReactNode
@@ -18,16 +19,16 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   isCollapsed = false
 }) => {
   return (
-    <div
+    <Button
+      variant="ghost"
+      size="icon"
       className={cn(
-        "hover:bg-accent flex cursor-pointer items-center rounded-lg p-2 text-sm",
+        "flex cursor-pointer items-center justify-start rounded-lg p-2 text-left text-sm font-normal",
         isCollapsed ? "w-12 justify-center" : "w-full"
       )}
       onClick={onClick}
     >
-      <div className="flex size-5 shrink-0 items-center justify-center">
-        {icon}
-      </div>
+      <div className="flex shrink-0 items-center justify-center">{icon}</div>
       {!isCollapsed && (
         <>
           <span className="ml-3 grow truncate">{label}</span>
@@ -36,6 +37,6 @@ export const SidebarItem: FC<SidebarItemProps> = ({
           )}
         </>
       )}
-    </div>
+    </Button>
   )
 }

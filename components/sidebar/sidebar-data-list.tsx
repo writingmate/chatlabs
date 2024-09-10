@@ -47,8 +47,6 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     setModels
   } = useContext(ChatbotUIContext)
 
-  console.log("data", data, contentType, folders)
-
   const divRef = useRef<HTMLDivElement>(null)
 
   const [isOverflowing, setIsOverflowing] = useState(false)

@@ -19,13 +19,21 @@ export const AssistantToolSelect: FC<AssistantToolSelectProps> = ({
 
   return (
     <MultiSelect
-      options={tools}
-      selectedOptions={selectedAssistantTools}
-      onChange={onAssistantToolsSelect}
+      options={tools.map(tool => ({ value: tool.id, label: tool.name }))}
+      selectedOptions={selectedAssistantTools.map(tool => ({
+        value: tool.id,
+        label: tool.name
+      }))}
+      onChange={selected => {
+        const selectedTools = selected
+          .map(tool => tools.find(t => t.id === tool.value))
+          .filter(Boolean) as Tables<"tools">[]
+        onAssistantToolsSelect(selectedTools)
+      }}
       renderOption={(tool, selected, onSelect) => (
         <AssistantToolItem
-          key={tool.id}
-          tool={tool}
+          key={tool.value}
+          tool={tools.find(t => t.id === tool.value)!}
           selected={selected}
           onSelect={onSelect}
         />
