@@ -1,4 +1,12 @@
-import { FC, useState, useContext, useRef, useEffect, useMemo } from "react"
+import {
+  FC,
+  useState,
+  useContext,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback
+} from "react"
 import { motion } from "framer-motion"
 import { SidebarItem } from "./sidebar-item"
 import { SlidingSubmenu } from "./sliding-submenu"
@@ -70,7 +78,7 @@ export const Sidebar: FC = () => {
       setTimeout(() => {
         setIsCollapsed(false)
         setExpandDelay(false)
-      }, 150)
+      }, 50)
     }
     setActiveSubmenu(menuName === activeSubmenu ? null : menuName)
   }
@@ -94,44 +102,58 @@ export const Sidebar: FC = () => {
     className: "text-muted-foreground"
   }
 
-  const getDataForContentType = (contentType: ContentType) => {
-    switch (contentType) {
-      case "chats":
-        return chats.filter(chat =>
-          chat.name.toLowerCase().includes(searchQueries.chats.toLowerCase())
-        )
-      case "prompts":
-        return prompts.filter(prompt =>
-          prompt.name
-            .toLowerCase()
-            .includes(searchQueries.prompts.toLowerCase())
-        )
-      case "assistants":
-        return assistants.filter(assistant =>
-          assistant.name
-            .toLowerCase()
-            .includes(searchQueries.assistants.toLowerCase())
-        )
-      case "files":
-        return files.filter(file =>
-          file.name.toLowerCase().includes(searchQueries.files.toLowerCase())
-        )
-      case "tools":
-        return tools.filter(tool =>
-          tool.name.toLowerCase().includes(searchQueries.tools.toLowerCase())
-        )
-      default:
-        return []
-    }
-  }
+  const getDataForContentType = useCallback(
+    (contentType: ContentType) => {
+      switch (contentType) {
+        case "chats":
+          return chats.filter(chat =>
+            chat.name.toLowerCase().includes(searchQueries.chats.toLowerCase())
+          )
+        case "prompts":
+          return prompts.filter(prompt =>
+            prompt.name
+              .toLowerCase()
+              .includes(searchQueries.prompts.toLowerCase())
+          )
+        case "assistants":
+          return assistants.filter(assistant =>
+            assistant.name
+              .toLowerCase()
+              .includes(searchQueries.assistants.toLowerCase())
+          )
+        case "files":
+          return files.filter(file =>
+            file.name.toLowerCase().includes(searchQueries.files.toLowerCase())
+          )
+        case "tools":
+          return tools.filter(tool =>
+            tool.name.toLowerCase().includes(searchQueries.tools.toLowerCase())
+          )
+        default:
+          return []
+      }
+    },
+    [chats, prompts, assistants, files, tools, searchQueries]
+  )
 
-  const foldersMap = {
-    chats: folders.filter(folder => folder.type === "chats"),
-    prompts: folders.filter(folder => folder.type === "prompts"),
-    assistants: folders.filter(folder => folder.type === "assistants"),
-    files: folders.filter(folder => folder.type === "files"),
-    tools: folders.filter(folder => folder.type === "tools")
-  }
+  const foldersMap = useMemo(
+    () => ({
+      chats: folders.filter(folder => folder.type === "chats"),
+      prompts: folders.filter(folder => folder.type === "prompts"),
+      assistants: folders.filter(folder => folder.type === "assistants"),
+      files: folders.filter(folder => folder.type === "files"),
+      tools: folders.filter(folder => folder.type === "tools")
+    }),
+    [folders]
+  )
+
+  useEffect(() => {
+    console.log("Data changed:", getDataForContentType("chats"))
+  }, [getDataForContentType])
+
+  useEffect(() => {
+    console.log("Folders changed:", foldersMap.chats)
+  }, [foldersMap])
 
   function getSubmenuTitle(contentType: ContentType) {
     switch (contentType) {
@@ -266,24 +288,27 @@ export const Sidebar: FC = () => {
               {/*</Link>*/}
             </div>
 
-            {!isCollapsed && (
-              <div className="flex grow flex-col border-t">
-                <div className="flex grow flex-col p-2 pb-0">
-                  <SearchInput
-                    placeholder="Search chats"
-                    value={searchQueries.chats}
-                    onChange={value =>
-                      setSearchQueries(prev => ({ ...prev, chats: value }))
-                    }
-                  />
-                  <SidebarDataList
-                    contentType="chats"
-                    data={getDataForContentType("chats")}
-                    folders={foldersMap.chats}
-                  />
-                </div>
+            <div
+              className={cn(
+                "flex grow flex-col border-t",
+                isCollapsed ? "hidden" : ""
+              )}
+            >
+              <div className="flex grow flex-col p-2 pb-0">
+                <SearchInput
+                  placeholder="Search chats"
+                  value={searchQueries.chats}
+                  onChange={value =>
+                    setSearchQueries(prev => ({ ...prev, chats: value }))
+                  }
+                />
+                <SidebarDataList
+                  contentType="chats"
+                  data={getDataForContentType("chats")}
+                  folders={foldersMap.chats}
+                />
               </div>
-            )}
+            </div>
           </div>
 
           <div className="border-t p-2">
