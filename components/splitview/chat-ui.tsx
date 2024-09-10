@@ -17,10 +17,24 @@ import { ChatbotUIChatContext, ChatbotUIChatProvider } from "@/context/chat"
 import { ChatMessage, LLMID, ModelProvider } from "@/types"
 import { ChatbotUIContext } from "@/context/context"
 import { cn } from "@/lib/utils"
-import { IconGauge } from "@tabler/icons-react"
+import {
+  IconApps,
+  IconDashboard,
+  IconGauge,
+  IconGrid4x4,
+  IconLayoutGrid
+} from "@tabler/icons-react"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ModelDetails } from "@/components/models/model-details"
 import { ResizableSplitView } from "./chat-resizable-split-view"
+import { Button } from "@/components/ui/button"
+import { IconPlus, IconMinus } from "@tabler/icons-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger
+} from "@/components/ui/select"
 
 interface ChatUIProps {}
 
@@ -229,17 +243,17 @@ export const ChatUI: FC<ChatUIProps> = () => {
     useContext(ChatbotUIContext)
 
   const [hasMessagesArray, setHasMessagesArray] = useState<boolean[]>(
-    new Array(chatsSize).fill(false)
+    new Array(6).fill(false)
   )
 
   const [isGeneratingArray, setIsGeneratingArray] = useState<boolean[]>(
-    new Array(chatsSize).fill(false)
+    new Array(6).fill(false)
   )
   const [toolsAllowedArray, setToolsAllowedArray] = useState<boolean[]>(
-    new Array(chatsSize).fill(false)
+    new Array(6).fill(false)
   )
   const [imagesAllowedArray, setImagesAllowedArray] = useState<boolean[]>(
-    new Array(chatsSize).fill(false)
+    new Array(6).fill(false)
   )
 
   const chatMessagesRef = useRef<ChatMessagesRef[]>([])
@@ -266,88 +280,72 @@ export const ChatUI: FC<ChatUIProps> = () => {
     })
   }
 
+  const handleAddChat = () => {
+    if (chatsSize < 6) {
+      setChatsSize(prevSize => prevSize + 1)
+    }
+  }
+
+  const handleRemoveChat = () => {
+    if (chatsSize > 2) {
+      setChatsSize(prevSize => prevSize - 1)
+    }
+  }
+
+  const renderChatWrappers = () => {
+    return range(chatsSize).map(index => (
+      <ChatbotUIChatProvider key={index} id={index.toString()}>
+        <ChatWrapper
+          ref={(ref: ChatMessagesRef) => {
+            chatMessagesRef.current[index] = ref
+          }}
+          onChatMessagesChange={(chatMessages: ChatMessage[]) => {
+            setHasMessagesArray(prevState => {
+              const newState = [...prevState]
+              newState[index] = chatMessages.length > 0
+              return newState
+            })
+          }}
+          onGeneratingChange={isGenerating => {
+            setIsGeneratingArray(prevState => {
+              const newState = [...prevState]
+              newState[index] = isGenerating
+              return newState
+            })
+          }}
+          onModelChange={model => {
+            setToolsAllowedArray(prevState => {
+              const newState = [...prevState]
+              newState[index] = !!model?.tools
+              return newState
+            })
+            setImagesAllowedArray(prevState => {
+              const newState = [...prevState]
+              newState[index] = !!model?.imageInput
+              return newState
+            })
+          }}
+        />
+      </ChatbotUIChatProvider>
+    ))
+  }
+
   return (
     <div className="flex size-full flex-col px-6 pt-4">
       <ResizableSplitView
         className={cn(
-          "max-h-[calc(100%-90px)]",
+          "max-h-[calc(100%-84px)]",
           newMessageImages.length > 0 || newMessageFiles.length > 0
-            ? "max-h-[calc(100%-164px)]"
+            ? "max-h-[calc(100%-134px)]"
             : ""
         )}
-        leftContent={
-          <ChatbotUIChatProvider id="0">
-            <ChatWrapper
-              ref={(ref: ChatMessagesRef) => {
-                chatMessagesRef.current[0] = ref
-              }}
-              onChatMessagesChange={(chatMessages: ChatMessage[]) => {
-                setHasMessagesArray(prevState => {
-                  const newState = [...prevState]
-                  newState[0] = chatMessages.length > 0
-                  return newState
-                })
-              }}
-              onGeneratingChange={isGenerating => {
-                setIsGeneratingArray(prevState => {
-                  const newState = [...prevState]
-                  newState[0] = isGenerating
-                  return newState
-                })
-              }}
-              onModelChange={model => {
-                setToolsAllowedArray(prevState => {
-                  const newState = [...prevState]
-                  newState[0] = !!model?.tools
-                  return newState
-                })
-                setImagesAllowedArray(prevState => {
-                  const newState = [...prevState]
-                  newState[0] = !!model?.imageInput
-                  return newState
-                })
-              }}
-            />
-          </ChatbotUIChatProvider>
-        }
-        rightContent={
-          <ChatbotUIChatProvider id="1">
-            <ChatWrapper
-              ref={(ref: ChatMessagesRef) => {
-                chatMessagesRef.current[1] = ref
-              }}
-              onChatMessagesChange={(chatMessages: ChatMessage[]) => {
-                setHasMessagesArray(prevState => {
-                  const newState = [...prevState]
-                  newState[1] = chatMessages.length > 0
-                  return newState
-                })
-              }}
-              onGeneratingChange={isGenerating => {
-                setIsGeneratingArray(prevState => {
-                  const newState = [...prevState]
-                  newState[1] = isGenerating
-                  return newState
-                })
-              }}
-              onModelChange={model => {
-                setToolsAllowedArray(prevState => {
-                  const newState = [...prevState]
-                  newState[1] = !!model?.tools
-                  return newState
-                })
-                setImagesAllowedArray(prevState => {
-                  const newState = [...prevState]
-                  newState[1] = !!model?.imageInput
-                  return newState
-                })
-              }}
-            />
-          </ChatbotUIChatProvider>
-        }
-      />
-      <div className="relative mx-auto w-full px-4 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[800px]">
+        numViews={chatsSize}
+      >
+        {renderChatWrappers()}
+      </ResizableSplitView>
+      <div className="relative mx-auto flex w-full items-center justify-between space-x-2 px-4 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[800px]">
         <ChatInput
+          className="grow"
           hasMessages={hasMessagesArray.some(x => x)}
           toolsAllowed={false}
           imagesAllowed={imagesAllowedArray.every(x => x)}
@@ -356,6 +354,22 @@ export const ChatUI: FC<ChatUIProps> = () => {
           handleStopMessage={handleStopMessage}
           handleReset={handleReset}
         />
+        <div className="w-18 h-full shrink-0 py-3">
+          <Select onValueChange={value => setChatsSize(parseInt(value))}>
+            <SelectTrigger
+              className={"flex h-full items-center justify-center rounded-xl"}
+            >
+              <IconLayoutGrid size={20} stroke={1.5} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="2">2</SelectItem>
+              <SelectItem value="3">3</SelectItem>
+              <SelectItem value="4">4</SelectItem>
+              <SelectItem value="5">5</SelectItem>
+              <SelectItem value="6">6</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   )

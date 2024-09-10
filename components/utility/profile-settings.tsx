@@ -20,6 +20,7 @@ import {
   IconInfoCircle,
   IconLoader2,
   IconLogout,
+  IconSettings,
   IconUser
 } from "@tabler/icons-react"
 import Image from "next/image"
@@ -53,9 +54,11 @@ import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { debounce } from "@/lib/debounce"
 
-interface ProfileSettingsProps {}
+interface ProfileSettingsProps {
+  isCollapsed: boolean
+}
 
-export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
+export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
   const {
     profile,
     setProfile,
@@ -330,12 +333,31 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Avatar>
-          <AvatarImage src={profile.image_url!} height={34} width={34} />
-          <AvatarFallback>
-            <IconUser size={SIDEBAR_ICON_SIZE} />
-          </AvatarFallback>
-        </Avatar>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "flex w-full items-center justify-start space-x-2 rounded-lg p-2 pl-1 text-sm",
+            isCollapsed ? "justify-center pl-2" : ""
+          )}
+        >
+          <Avatar className="size-8">
+            <AvatarImage src={profile.image_url!} />
+            <AvatarFallback>
+              <IconUser size={SIDEBAR_ICON_SIZE} />
+            </AvatarFallback>
+          </Avatar>
+          {!isCollapsed && (
+            <div className="flex w-full items-center justify-between">
+              <div>{profile.display_name}</div>
+              <IconSettings
+                size={18}
+                className="text-muted-foreground"
+                stroke={1.5}
+              />
+            </div>
+          )}
+        </Button>
       </SheetTrigger>
 
       <SheetContent

@@ -1,13 +1,8 @@
 "use client"
 
 import { Sidebar } from "@/components/sidebar/sidebar"
-import { SidebarSwitcher } from "@/components/sidebar/sidebar-switcher"
-import { Button } from "@/components/ui/button"
-import { Tabs } from "@/components/ui/tabs"
 import useHotkey from "@/lib/hooks/use-hotkey"
-import { cn } from "@/lib/utils"
 import { ContentType } from "@/types"
-import { IconChevronCompactRight } from "@tabler/icons-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useState, useContext, useMemo } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
@@ -77,7 +72,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         <CommandK />
         <PlanPicker />
 
-        <Button
+        {/* <Button
           className={cn(
             "absolute left-[4px] top-[50%] z-10 size-[32px] cursor-pointer"
           )}
@@ -90,29 +85,29 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
           onClick={handleToggleSidebar}
         >
           <IconChevronCompactRight size={24} />
-        </Button>
+        </Button> */}
 
-        <div
+        {/* <div
           className={cn(
             `bg-background absolute z-50 h-full shrink-0 overflow-hidden border-r transition-[width] duration-200 lg:relative`
           )}
           style={{
             width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"
           }}
-        >
-          <Tabs
+        > */}
+        {/* <Tabs
             className={"z-50 flex h-full"}
             value={contentType}
             onValueChange={tabValue => {
               setContentType(tabValue as ContentType)
               router.replace(`${pathname}?tab=${tabValue}`)
             }}
-          >
-            <SidebarSwitcher onContentTypeChange={setContentType} />
+          > */}
+        {/* <SidebarSwitcher onContentTypeChange={setContentType} /> */}
 
-            <Sidebar contentType={contentType} />
-          </Tabs>
-        </div>
+        <Sidebar />
+        {/* </Tabs> */}
+        {/* </div> */}
 
         <div
           className={"flex grow transition-[width]"}

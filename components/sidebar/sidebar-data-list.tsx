@@ -22,6 +22,7 @@ import { PresetItem } from "./items/presets/preset-item"
 import { PromptItem } from "./items/prompts/prompt-item"
 import { ToolItem } from "./items/tools/tool-item"
 import { VList } from "virtua"
+import { EmptyState } from "./empty-state"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -253,19 +254,44 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
   const getDescription = (contentType: ContentType) => {
     switch (contentType) {
       case "chats":
-        return "Your chat history will be displayed here."
+        return (
+          <EmptyState
+            message="No chats yet"
+            description="Chats are conversations with AI characters. You can create a chat by clicking the 'New chat' button."
+          />
+        )
 
       case "prompts":
-        return "Prompts are pre-saved text inputs designed to generate specific responses and communicate with AI quicker. Prompts you create will be displayed here."
+        return (
+          <EmptyState
+            message="No prompts yet"
+            description="Prompts are pre-saved text inputs designed to generate specific responses and communicate with AI quicker. Prompts you create will be displayed here."
+          />
+        )
 
       case "files":
-        return "Upload files to enrich conversations and assistants with context, data analysis, feedback, or customization. Uploaded files will be displayed here."
+        return (
+          <EmptyState
+            message="No files yet"
+            description="Upload files to enrich conversations and assistants with context, data analysis, feedback, or customization. Uploaded files will be displayed here."
+          />
+        )
 
       case "tools":
-        return "Plugins are special add-ons that allow you to do extra things beyond just chatting, such as using up-to-date information from the web or checking the weather by connecting to external services or databases."
+        return (
+          <EmptyState
+            message="No plugins yet"
+            description="Plugins are pre-built AI applications that can be used to enhance your conversations and assistants. Plugins you create will be displayed here."
+          />
+        )
 
       case "assistants":
-        return "Assistants are special AI characters instructed to provide information, solve specific problems, simulate conversations or offer creative content based on user queries."
+        return (
+          <EmptyState
+            message="No assistants yet"
+            description="Assistants are special AI characters instructed to provide information, solve specific problems, simulate conversations or offer creative content based on user queries."
+          />
+        )
 
       default:
         return null
@@ -277,10 +303,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
       <div className="flex w-full flex-1 grow flex-col" onDrop={handleDrop}>
         <VList className="mt-2 flex w-full flex-col overflow-auto">
           {data.length === 0 && (
-            <div className="flex grow flex-col items-center justify-center">
-              <div className="text-centertext-muted-foreground p-3 italic">
-                {getDescription(contentType)}
-              </div>
+            <div className="flex shrink-0 grow flex-col items-center justify-center">
+              {getDescription(contentType)}
             </div>
           )}
 
@@ -288,7 +312,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
             <div
               className={`h-full ${
                 isOverflowing ? "w-[calc(100%-8px)]" : "w-full"
-              } space-y-2 pt-2 ${isOverflowing ? "mr-2" : ""}`}
+              } space-y-2 ${isOverflowing ? "mr-2" : ""}`}
             >
               {folders.map(folder => (
                 <Folder

@@ -23,6 +23,7 @@ import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
+import { createApplication } from "@/db/applications"
 
 export const useChatHandler = () => {
   const router = useRouter()

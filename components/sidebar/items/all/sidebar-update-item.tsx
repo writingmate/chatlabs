@@ -226,17 +226,16 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     assistants: async (assistantId: string) => {
       const assistantFiles = await getAssistantFilesByAssistantId(assistantId)
       setStartingAssistantFiles(assistantFiles.files)
+      setSelectedAssistantFiles(assistantFiles.files)
 
       const assistantCollections =
         await getAssistantCollectionsByAssistantId(assistantId)
       setStartingAssistantCollections(assistantCollections.collections)
+      setSelectedAssistantCollections(assistantCollections.collections)
 
       const assistantTools = await getAssistantToolsByAssistantId(assistantId)
       setStartingAssistantTools(assistantTools.tools)
-
-      setSelectedAssistantFiles([])
-      setSelectedAssistantCollections([])
-      setSelectedAssistantTools([])
+      setSelectedAssistantTools(assistantTools.tools)
     },
     tools: null,
     models: null
@@ -397,10 +396,11 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
           )
       )
 
-      const filesToRemove = startingCollectionFiles.filter(startingFile =>
-        selectedCollectionFiles.some(
-          selectedFile => selectedFile.id === startingFile.id
-        )
+      const filesToRemove = startingCollectionFiles.filter(
+        startingFile =>
+          !selectedCollectionFiles.some(
+            selectedFile => selectedFile.id === startingFile.id
+          )
       )
 
       for (const file of filesToAdd) {
@@ -444,10 +444,11 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
           )
       )
 
-      const filesToRemove = startingAssistantFiles.filter(startingFile =>
-        selectedAssistantFiles.some(
-          selectedFile => selectedFile.id === startingFile.id
-        )
+      const filesToRemove = startingAssistantFiles.filter(
+        startingFile =>
+          !selectedAssistantFiles.some(
+            selectedFile => selectedFile.id === startingFile.id
+          )
       )
 
       for (const file of filesToAdd) {
@@ -472,7 +473,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
       const collectionsToRemove = startingAssistantCollections.filter(
         startingCollection =>
-          selectedAssistantCollections.some(
+          !selectedAssistantCollections.some(
             selectedCollection =>
               selectedCollection.id === startingCollection.id
           )
@@ -497,10 +498,11 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
           )
       )
 
-      const toolsToRemove = startingAssistantTools.filter(startingTool =>
-        selectedAssistantTools.some(
-          selectedTool => selectedTool.id === startingTool.id
-        )
+      const toolsToRemove = startingAssistantTools.filter(
+        startingTool =>
+          !selectedAssistantTools.some(
+            selectedTool => selectedTool.id === startingTool.id
+          )
       )
 
       for (const tool of toolsToAdd) {
@@ -676,6 +678,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
               <IconEdit
                 className={"hidden group-hover:flex group-[.active]:flex"}
                 size={18}
+                strokeWidth={1.5}
               />
             </SheetTrigger>
           }
@@ -691,6 +694,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
               trigger={
                 <IconTrash
                   size={18}
+                  strokeWidth={1.5}
                   className={"hidden group-hover:flex group-[.active]:flex"}
                 />
               }

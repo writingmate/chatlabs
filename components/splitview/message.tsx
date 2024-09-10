@@ -12,7 +12,7 @@ import {
   IconFileText,
   IconMoodSmile,
   IconPuzzle,
-  IconTerminal2
+  IconBulb
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
@@ -258,7 +258,7 @@ export const Message: FC<MessageProps> = ({
           <div className="space-y-3">
             {message.role === "system" ? (
               <div className="flex items-center space-x-4">
-                <IconTerminal2
+                <IconBulb
                   className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
                   size={ICON_SIZE}
                 />

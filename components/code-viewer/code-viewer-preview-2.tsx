@@ -3,8 +3,9 @@ import {
   IconChevronDown,
   IconChevronUp,
   IconClick,
-  IconTerminal2,
-  IconX
+  IconBulb,
+  IconX,
+  IconTerminal2
 } from "@tabler/icons-react"
 import { cn, generateRandomString } from "@/lib/utils"
 import { Button } from "@/components/ui/button"

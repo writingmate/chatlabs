@@ -196,7 +196,9 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       if (!selectedWorkspace) return
       if (isTyping) return // Prevent creation while typing
 
+      // @ts-ignore
       const createFunction = createFunctions[contentType]
+      // @ts-ignore
       const setStateFunction = stateUpdateFunctions[contentType]
 
       if (!createFunction || !setStateFunction) return

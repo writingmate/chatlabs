@@ -34,6 +34,185 @@ export interface Database {
   }
   public: {
     Tables: {
+      application_files: {
+        Row: {
+          application_id: string
+          created_at: string
+          file_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          file_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          file_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_files_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "application_files_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "application_files_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      application_models: {
+        Row: {
+          application_id: string | null
+          created_at: string | null
+          id: string
+          model_id: string
+        }
+        Insert: {
+          application_id?: string | null
+          created_at?: string | null
+          id?: string
+          model_id: string
+        }
+        Update: {
+          application_id?: string | null
+          created_at?: string | null
+          id?: string
+          model_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_models_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      application_tools: {
+        Row: {
+          application_id: string
+          created_at: string
+          tool_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          tool_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          tool_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_tools_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "application_tools_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "application_tools_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      applications: {
+        Row: {
+          created_at: string
+          description: string
+          folder_id: string | null
+          id: string
+          name: string
+          sharing: string
+          updated_at: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          folder_id?: string | null
+          id?: string
+          name: string
+          sharing?: string
+          updated_at?: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          folder_id?: string | null
+          id?: string
+          name?: string
+          sharing?: string
+          updated_at?: string | null
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       assistant_collections: {
         Row: {
           assistant_id: string
@@ -1634,6 +1813,7 @@ export interface Database {
       }
       tools: {
         Row: {
+          can_be_used_in_applications: boolean
           created_at: string
           custom_headers: Json
           description: string
@@ -1647,6 +1827,7 @@ export interface Database {
           user_id: string
         }
         Insert: {
+          can_be_used_in_applications?: boolean
           created_at?: string
           custom_headers?: Json
           description: string
@@ -1660,6 +1841,7 @@ export interface Database {
           user_id: string
         }
         Update: {
+          can_be_used_in_applications?: boolean
           created_at?: string
           custom_headers?: Json
           description?: string
@@ -1928,6 +2110,12 @@ export interface Database {
         Returns: boolean
       }
       non_private_file_exists: {
+        Args: {
+          p_name: string
+        }
+        Returns: boolean
+      }
+      non_private_generated_exists: {
         Args: {
           p_name: string
         }

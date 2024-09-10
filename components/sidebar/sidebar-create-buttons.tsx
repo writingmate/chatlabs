@@ -104,12 +104,14 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   }
 
   return (
-    <div className="flex w-full space-x-2">
-      <Button className="flex h-[36px] grow" onClick={getCreateFunction()}>
-        <IconPlus className="mr-1" size={20} />
-        New{" "}
-        {resolvedName.charAt(0).toUpperCase() +
-          resolvedName.slice(1, resolvedName.length - 1)}
+    <div className="flex">
+      <Button
+        variant="outline"
+        size={"icon"}
+        className="font-normal"
+        onClick={getCreateFunction()}
+      >
+        <IconPlus stroke={1.5} size={20} />
       </Button>
 
       {/*{hasData && (*/}

@@ -74,7 +74,6 @@ export const useSelectFileHandler = () => {
   }
 
   const handleSelectDeviceFile = async (file: File) => {
-    console.log("file", file)
     if (!profile || !selectedWorkspace || !chatSettings) return
     setIsUploading(true)
     setShowFilesDisplay(true)

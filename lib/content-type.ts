@@ -1,5 +1,4 @@
 export function guessFileExtensionByContentType(contentType: string) {
-  console.log("Guessing file extension for content type", contentType)
   switch (contentType) {
     case "text/csv":
       return "csv"
@@ -26,7 +25,6 @@ export function guessFileExtensionByContentType(contentType: string) {
     case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
       return "pptx"
     default:
-      console.log("Unknown content type", contentType)
       return contentType.split("/").pop() || contentType
   }
 }

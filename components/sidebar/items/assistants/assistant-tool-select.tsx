@@ -17,21 +17,33 @@ export const AssistantToolSelect: FC<AssistantToolSelectProps> = ({
 
   if (!tools) return null
 
+  const validTools = tools.filter(tool => tool && tool.id && tool.name)
+
   return (
     <MultiSelect
-      options={tools}
-      selectedOptions={selectedAssistantTools}
-      onChange={onAssistantToolsSelect}
-      renderOption={(tool, selected, onSelect) => (
+      options={validTools.map(tool => ({ value: tool.id, label: tool.name }))}
+      selectedOptions={selectedAssistantTools
+        .filter(tool => tool && tool.id && tool.name)
+        .map(tool => ({
+          value: tool.id,
+          label: tool.name
+        }))}
+      onChange={selected => {
+        const selectedTools = validTools.filter(tool =>
+          selected.some(s => s.value === tool.id)
+        )
+        onAssistantToolsSelect(selectedTools)
+      }}
+      renderOption={(option, selected, onSelect) => (
         <AssistantToolItem
-          key={tool.id}
-          tool={tool}
+          key={option.value}
+          tool={validTools.find(t => t.id === option.value)!}
           selected={selected}
           onSelect={onSelect}
         />
       )}
-      placeholder="Select tools"
-      searchPlaceholder="Search tools..."
+      placeholder="Select plugins"
+      searchPlaceholder="Search plugins..."
     />
   )
 }
@@ -47,6 +59,8 @@ const AssistantToolItem: FC<AssistantToolItemProps> = ({
   selected,
   onSelect
 }) => {
+  if (!tool) return null
+
   return (
     <div
       className="flex cursor-pointer items-center justify-between py-0.5 hover:opacity-50"
