@@ -40,7 +40,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
   return useMemo(
     () =>
       chatMessages
-        // .sort((a, b) => a.message.sequence_number - b.message.sequence_number)
+        .sort((a, b) => a.message.sequence_number - b.message.sequence_number)
         .map((chatMessage, index, array) => {
           const messageFileItems = chatFileItems.filter(
             (chatFileItem, _, self) =>
