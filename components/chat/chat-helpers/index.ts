@@ -33,7 +33,8 @@ import {
 import { encode } from "gpt-tokenizer"
 import {
   parseChatMessageCodeBlocksAndContent,
-  reconstructContentWithCodeBlocks
+  reconstructContentWithCodeBlocks,
+  reconstructContentWithCodeBlocksInChatMessage
 } from "@/lib/messages"
 
 export const validateChatSettings = (
@@ -617,6 +618,10 @@ export const handleCreateMessages = async (
   data: any,
   updateState = true
 ) => {
+  const notCreatedPriorMessages = chatMessages
+    .filter(message => message.message.id === "")
+    .map(reconstructContentWithCodeBlocksInChatMessage)
+
   const finalUserMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
     assistant_id: null,
@@ -665,9 +670,28 @@ export const handleCreateMessages = async (
 
     setChatMessages([...chatMessages])
   } else {
-    const createdMessages = cleanGeneratedText
-      ? await createMessages([finalUserMessage, finalAssistantMessage])
-      : await createMessages([finalUserMessage])
+    const createdMessages: Tables<"messages">[] = []
+    if (notCreatedPriorMessages.length > 0) {
+      const inserts = notCreatedPriorMessages.map((message, index) => {
+        return {
+          chat_id: currentChat.id,
+          assistant_id: selectedAssistant?.id || null,
+          user_id: profile.user_id,
+          content: message.message.content,
+          model: modelData.modelId,
+          role: "assistant",
+          sequence_number: index + 1,
+          image_paths: [],
+          annotation: data
+        } as TablesInsert<"messages">
+      })
+      createdMessages.push(...(await createMessages(inserts)))
+    }
+    cleanGeneratedText
+      ? createdMessages.push(
+          ...(await createMessages([finalUserMessage, finalAssistantMessage]))
+        )
+      : createdMessages.push(...(await createMessages([finalUserMessage])))
 
     const uploadPromises = newMessageImages
       .filter(obj => obj.file !== null)
@@ -733,8 +757,10 @@ export const handleCreateMessages = async (
       return [...prevFileItems, ...newFileItems]
     })
 
-    // if (updateState) {
-    setChatMessages(finalChatMessages.map(parseChatMessageCodeBlocksAndContent))
-    // }
+    if (updateState) {
+      setChatMessages(
+        finalChatMessages.map(parseChatMessageCodeBlocksAndContent)
+      )
+    }
   }
 }
