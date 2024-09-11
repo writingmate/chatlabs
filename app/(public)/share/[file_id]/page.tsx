@@ -55,9 +55,25 @@ const SharePage = async ({
     try {
       html = html.replace(REGEX_FILENAME, "")
       const parser = new DOMParser()
-      const dom = parser.parseFromString(html, "text/html")
+      const doc = parser.parseFromString(html, "text/html")
 
-      const links = dom.getElementsByTagName("a")
+      const tailwindScriptElement = doc.createElement("script")
+      tailwindScriptElement.setAttribute("src", "https://cdn.tailwindcss.com")
+
+      const head = doc.getElementsByTagName("head")[0]
+
+      head.insertBefore(tailwindScriptElement, head.firstChild)
+
+      const daisyuiLinkElement = doc.createElement("link")
+      daisyuiLinkElement.setAttribute(
+        "href",
+        "https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
+      )
+      daisyuiLinkElement.setAttribute("rel", "stylesheet")
+      daisyuiLinkElement.setAttribute("type", "text/css")
+      head.insertBefore(daisyuiLinkElement, head.firstChild)
+
+      const links = doc.getElementsByTagName("a")
 
       for (let i = 0; i < links.length; i++) {
         const link = links[i]
@@ -67,7 +83,9 @@ const SharePage = async ({
         }
       }
 
-      return dom.documentElement.toString()
+      const newHtml = doc.documentElement.toString()
+      console.log(newHtml)
+      return newHtml
     } catch (e) {
       console.error("Unable to parse dom, returning html as is", e)
       return html
