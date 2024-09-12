@@ -51,59 +51,65 @@ const SharePage = async ({
     return notFound()
   }
 
-  function fixSrcDocLinks(html: string) {
+  function updateHtml(html: string) {
     try {
       // known valid css files to ignore
-      const knownValidCssFiles = [
-        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
-        "https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
-      ]
+      const knownTailwind = "tailwindcss@2"
+      const upgradeToTailwind = "https://cdn.tailwindcss.com"
+      const knownDaisyui = "daisyui@4"
+      const upgradeToDaisyui =
+        "hhttps://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
 
       html = html.replace(REGEX_FILENAME, "")
       const parser = new DOMParser()
       const doc = parser.parseFromString(html, "text/html")
-
-      const tailwindScriptElement = doc.createElement("script")
-      tailwindScriptElement.setAttribute("src", "https://cdn.tailwindcss.com")
-
       const head = doc.getElementsByTagName("head")[0]
 
-      // find all stylesheets in the html and remove if they are in the knownValidCssFiles list
-      const stylesheets = doc.getElementsByTagName("link")
-      for (let i = 0; i < stylesheets.length; i++) {
-        const stylesheet = stylesheets[i]
-        if (stylesheet.getAttribute("rel") === "stylesheet") {
-          if (
-            knownValidCssFiles.includes(stylesheet.getAttribute("href") || "")
-          ) {
-            head.removeChild(stylesheet)
+      // replace daisyui with our own version if it in the document
+      function replaceDaisyui(dom: Document) {
+        const stylesheets = dom.getElementsByTagName("link")
+        for (let i = 0; i < stylesheets.length; i++) {
+          const stylesheet = stylesheets[i]
+          if (stylesheet.getAttribute("rel") === "stylesheet") {
+            if (stylesheet.getAttribute("href")?.includes(knownDaisyui)) {
+              stylesheet.setAttribute("href", upgradeToDaisyui)
+            }
           }
         }
       }
 
-      head.insertBefore(tailwindScriptElement, head.firstChild)
-
-      const daisyuiLinkElement = doc.createElement("link")
-      daisyuiLinkElement.setAttribute(
-        "href",
-        "https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
-      )
-      daisyuiLinkElement.setAttribute("rel", "stylesheet")
-      daisyuiLinkElement.setAttribute("type", "text/css")
-      head.insertBefore(daisyuiLinkElement, head.firstChild)
-
-      const links = doc.getElementsByTagName("a")
-
-      for (let i = 0; i < links.length; i++) {
-        const link = links[i]
-        link.setAttribute("rel", "nofollow")
-        if (link.getAttribute("href")?.startsWith("#")) {
-          link.setAttribute("href", `about:srcdoc${link.getAttribute("href")}`)
+      function replaceTailwind(dom: Document) {
+        const stylesheets = dom.getElementsByTagName("link")
+        for (let i = 0; i < stylesheets.length; i++) {
+          const stylesheet = stylesheets[i]
+          if (stylesheet.getAttribute("href")?.includes(knownTailwind)) {
+            const tailwindScriptElement = doc.createElement("script")
+            tailwindScriptElement.setAttribute("src", upgradeToTailwind)
+            dom.removeChild(stylesheet)
+            head.insertBefore(tailwindScriptElement, head.firstChild)
+          }
         }
       }
 
+      function replaceLinks(dom: Document) {
+        const links = dom.getElementsByTagName("link")
+        for (let i = 0; i < links.length; i++) {
+          const link = links[i]
+          link.setAttribute("rel", "nofollow")
+          if (link.getAttribute("href")?.startsWith("#")) {
+            link.setAttribute(
+              "href",
+              `about:srcdoc${link.getAttribute("href")}`
+            )
+          }
+        }
+      }
+
+      replaceDaisyui(doc)
+      replaceTailwind(doc)
+      replaceLinks(doc)
+
       const newHtml = doc.documentElement.toString()
-      console.log(newHtml)
       return newHtml
     } catch (e) {
       console.error("Unable to parse dom, returning html as is", e)
@@ -116,7 +122,7 @@ const SharePage = async ({
       <iframe
         allow="clipboard-write"
         className={"w-full flex-1 border-none"}
-        srcDoc={fixSrcDocLinks(file.file_items[0].content)}
+        srcDoc={updateHtml(file.file_items[0].content)}
       />
       {showBanner && (
         <div
