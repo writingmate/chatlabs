@@ -59,10 +59,6 @@ const SharePage = async ({
         "https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
       ]
 
-      if (knownValidCssFiles.find(cssFile => html.includes(cssFile))) {
-        return html
-      }
-
       html = html.replace(REGEX_FILENAME, "")
       const parser = new DOMParser()
       const doc = parser.parseFromString(html, "text/html")
@@ -71,6 +67,19 @@ const SharePage = async ({
       tailwindScriptElement.setAttribute("src", "https://cdn.tailwindcss.com")
 
       const head = doc.getElementsByTagName("head")[0]
+
+      // find all stylesheets in the html and remove if they are in the knownValidCssFiles list
+      const stylesheets = doc.getElementsByTagName("link")
+      for (let i = 0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i]
+        if (stylesheet.getAttribute("rel") === "stylesheet") {
+          if (
+            knownValidCssFiles.includes(stylesheet.getAttribute("href") || "")
+          ) {
+            head.removeChild(stylesheet)
+          }
+        }
+      }
 
       head.insertBefore(tailwindScriptElement, head.firstChild)
 
