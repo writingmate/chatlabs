@@ -359,64 +359,72 @@ export const fetchChatResponse = async (
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setPaywallOpen?: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const response = await fetch(url, {
-    method: "POST",
-    body: JSON.stringify(body),
-    signal: controller.signal
-  })
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(body),
+      signal: controller.signal
+    })
 
-  if (!response.ok) {
-    console.error("Error fetching chat response:", response)
+    if (!response.ok) {
+      console.error("Error fetching chat response:", response)
 
-    let errorMessage = null
-    let errorLogLevel = toast.error
+      let errorMessage = null
+      let errorLogLevel = toast.error
 
-    const statusToMessage = {
-      404: "Model not found.",
-      429: "You are sending too many messages. Please try again in a few minutes.",
-      402: "You have reached the limit of free messages. Please upgrade to a paid plan.",
-      413: "Message is too long or image is too large. Please shorten it."
-    }
-
-    const statusToErrorLogLevel = {
-      404: toast.error,
-      429: toast.warning,
-      402: toast.warning,
-      413: toast.error
-    }
-
-    if (response.status in statusToErrorLogLevel) {
-      errorLogLevel =
-        statusToErrorLogLevel[
-          response.status as keyof typeof statusToErrorLogLevel
-        ]
-    }
-
-    if (response.status in statusToMessage) {
-      errorMessage =
-        statusToMessage[response.status as keyof typeof statusToMessage]
-    }
-
-    if (!errorMessage) {
-      try {
-        const errorData = await response.json()
-        errorMessage = errorData.message
-      } catch (error) {
-        errorMessage = "Failed to send the message. Please try again."
+      const statusToMessage = {
+        404: "Model not found.",
+        429: "You are sending too many messages. Please try again in a few minutes.",
+        402: "You have reached the limit of free messages. Please upgrade to a paid plan.",
+        413: "Message is too long or image is too large. Please shorten it."
       }
+
+      const statusToErrorLogLevel = {
+        404: toast.error,
+        429: toast.warning,
+        402: toast.warning,
+        413: toast.error
+      }
+
+      if (response.status in statusToErrorLogLevel) {
+        errorLogLevel =
+          statusToErrorLogLevel[
+            response.status as keyof typeof statusToErrorLogLevel
+          ]
+      }
+
+      if (response.status in statusToMessage) {
+        errorMessage =
+          statusToMessage[response.status as keyof typeof statusToMessage]
+      }
+
+      if (!errorMessage) {
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message
+        } catch (error) {
+          errorMessage = "Failed to send the message. Please try again."
+        }
+      }
+
+      errorLogLevel(errorMessage)
+
+      if (response.status === 402) {
+        setPaywallOpen?.(true)
+      }
+
+      setIsGenerating(false)
+      setChatMessages(prevMessages => prevMessages.slice(0, -2))
     }
 
-    errorLogLevel(errorMessage)
-
-    if (response.status === 402) {
-      setPaywallOpen?.(true)
-    }
-
+    return response
+  } catch (error) {
+    console.error("Error fetching chat response:", error)
     setIsGenerating(false)
     setChatMessages(prevMessages => prevMessages.slice(0, -2))
+    toast.error("Error fetching chat response")
+    throw error
   }
-
-  return response
 }
 
 export const processResponse = async (
@@ -440,116 +448,123 @@ export const processResponse = async (
   let chunks: string[] = []
 
   if (response.body) {
-    await consumeReadableStream(
-      response.body,
-      chunk => {
-        setResponseTimeToFirstToken?.(prev => {
-          if (prev === 0) {
-            return (Date.now() - startTime) / 1000
-          }
-          return prev
-        })
-        setFirstTokenReceived(true)
-        setToolInUse("none")
+    try {
+      await consumeReadableStream(
+        response.body,
+        chunk => {
+          setResponseTimeToFirstToken?.(prev => {
+            if (prev === 0) {
+              return (Date.now() - startTime) / 1000
+            }
+            return prev
+          })
+          setFirstTokenReceived(true)
+          setToolInUse("none")
 
-        try {
-          contentToAdd = isHosted
-            ? chunk
-            : // Ollama's streaming endpoint returns new-line separated JSON
-              // objects. A chunk may have more than one of these objects, so we
-              // need to split the chunk by new-lines and handle each one
-              // separately.
-              chunk
-                .trimEnd()
-                .split("\n")
-                .reduce(
-                  (acc, line) => acc + JSON.parse(line).message.content,
-                  ""
-                )
+          try {
+            contentToAdd = isHosted
+              ? chunk
+              : // Ollama's streaming endpoint returns new-line separated JSON
+                // objects. A chunk may have more than one of these objects, so we
+                // need to split the chunk by new-lines and handle each one
+                // separately.
+                chunk
+                  .trimEnd()
+                  .split("\n")
+                  .reduce(
+                    (acc, line) => acc + JSON.parse(line).message.content,
+                    ""
+                  )
 
-          if (contentToAdd === "") {
-            return
-          }
-
-          if (selectedTools.length > 0) {
-            chunks.push(contentToAdd)
-            if (chunk[chunk.length - 1] !== "\n") {
+            if (contentToAdd === "") {
               return
             }
 
-            const streamParts = chunks
-              .join("")
-              .split("\n")
-              .filter(x => x !== "")
-              .map(parseDataStream)
-            chunks = []
-
-            for (const { text, data: newData } of streamParts) {
-              if (newData) {
-                data = newData
+            if (selectedTools.length > 0) {
+              chunks.push(contentToAdd)
+              if (chunk[chunk.length - 1] !== "\n") {
+                return
               }
-              contentToAdd = text
-              fullText += text
+
+              const streamParts = chunks
+                .join("")
+                .split("\n")
+                .filter(x => x !== "")
+                .map(parseDataStream)
+              chunks = []
+
+              for (const { text, data: newData } of streamParts) {
+                if (newData) {
+                  data = newData
+                }
+                contentToAdd = text
+                fullText += text
+              }
+            } else {
+              fullText += contentToAdd
             }
-          } else {
-            fullText += contentToAdd
+          } catch (error) {
+            console.error("Error parsing JSON:", error)
           }
-        } catch (error) {
-          console.error("Error parsing JSON:", error)
-        }
 
-        setResponseTimeTotal?.(prev => (Date.now() - startTime) / 1000)
+          setResponseTimeTotal?.(prev => (Date.now() - startTime) / 1000)
 
-        setChatMessages(prev =>
-          prev
-            .map(chatMessage => {
-              if (chatMessage.message.id === lastChatMessage.message.id) {
-                const updatedChatMessage: ChatMessage = {
-                  message: {
-                    ...chatMessage.message,
-                    content: fullText,
-                    annotation: data
-                  },
-                  fileItems: chatMessage.fileItems
+          setChatMessages(prev =>
+            prev
+              .map(chatMessage => {
+                if (chatMessage.message.id === lastChatMessage.message.id) {
+                  const updatedChatMessage: ChatMessage = {
+                    message: {
+                      ...chatMessage.message,
+                      content: fullText,
+                      annotation: data
+                    },
+                    fileItems: chatMessage.fileItems
+                  }
+
+                  return updatedChatMessage
                 }
 
-                return updatedChatMessage
-              }
+                return chatMessage
+              })
+              .map(parseChatMessageCodeBlocksAndContent)
+          )
+        },
+        controller.signal
+      )
 
-              return chatMessage
-            })
-            .map(parseChatMessageCodeBlocksAndContent)
-        )
-      },
-      controller.signal
-    )
+      function findSkipTokenCount(
+        data: { [key: string]: { skipTokenCount: boolean } }[]
+      ): boolean {
+        if (!data) return false
 
-    function findSkipTokenCount(
-      data: { [key: string]: { skipTokenCount: boolean } }[]
-    ): boolean {
-      if (!data) return false
-
-      return data.some(x => {
-        for (const key in x) {
-          if (x[key].skipTokenCount) {
-            return true
+        return data.some(x => {
+          for (const key in x) {
+            if (x[key].skipTokenCount) {
+              return true
+            }
           }
-        }
-      })
-    }
+        })
+      }
 
-    if (setResponseTokensTotal) {
-      setResponseTokensTotal(prev => {
-        if (!findSkipTokenCount(data)) {
-          return prev + encode(fullText).length
-        }
-        return prev
-      })
-    }
+      if (setResponseTokensTotal) {
+        setResponseTokensTotal(prev => {
+          if (!findSkipTokenCount(data)) {
+            return prev + encode(fullText).length
+          }
+          return prev
+        })
+      }
 
-    return {
-      generatedText: fullText,
-      data
+      return {
+        generatedText: fullText,
+        data
+      }
+    } catch (error) {
+      console.error("Error processing response:", error)
+      toast.error("Something went wrong. Please try again.")
+      setChatMessages(prevMessages => prevMessages.slice(0, -2))
+      throw error
     }
   } else {
     throw new Error("Response body is null")

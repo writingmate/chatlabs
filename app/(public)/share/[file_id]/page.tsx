@@ -53,6 +53,16 @@ const SharePage = async ({
 
   function fixSrcDocLinks(html: string) {
     try {
+      // known valid css files to ignore
+      const knownValidCssFiles = [
+        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
+        "https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
+      ]
+
+      if (knownValidCssFiles.find(cssFile => html.includes(cssFile))) {
+        return html
+      }
+
       html = html.replace(REGEX_FILENAME, "")
       const parser = new DOMParser()
       const doc = parser.parseFromString(html, "text/html")
