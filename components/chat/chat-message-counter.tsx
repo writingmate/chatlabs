@@ -1,6 +1,9 @@
 import { ChatbotUIContext } from "@/context/context"
 import { useContext, useEffect, useState } from "react"
-import { FREE_MESSAGE_DAILY_LIMIT, validateProPlan } from "@/lib/subscription"
+import {
+  FREE_MESSAGE_DAILY_LIMIT,
+  validatePlanForModel
+} from "@/lib/subscription"
 import { getMessageCount } from "@/db/messages"
 import { Button } from "@/components/ui/button"
 import { ChatbotUIChatContext } from "@/context/chat"
@@ -13,7 +16,7 @@ const LIMIT =
 
 const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
   const { profile, setIsPaywallOpen } = useContext(ChatbotUIContext)
-  const { isGenerating } = useContext(ChatbotUIChatContext)
+  const { isGenerating, chatSettings } = useContext(ChatbotUIChatContext)
   const [messageCount, setMessageCount] = useState(0)
 
   useEffect(() => {
@@ -31,7 +34,7 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
     return null
   }
 
-  if (validateProPlan(profile)) {
+  if (validatePlanForModel(profile, chatSettings?.model)) {
     return null // Do not display the counter for non-free plans
   }
 

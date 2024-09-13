@@ -29,62 +29,64 @@ export const ProfileStep: FC<ProfileStepProps> = ({
   return (
     <>
       <div className="space-y-4">
-        <div className="space-y-1">
-          <Label>Your Name</Label>
-          <Input
-            placeholder="Steve Jobs"
-            value={displayName}
-            onChange={e => onDisplayNameChange(e.target.value)}
-          />
-        </div>
-        <div className="space-y-1">
-          <Label>Job Role</Label>
-          <Input
-            placeholder="e.g. Marketing Manager, Software Engineer, or Student"
-            value={userQuestion.job_role || ""}
-            onChange={e =>
-              onUserQuestionChange({
-                ...userQuestion,
-                job_role: e.target.value
-              })
-            }
-          />
-        </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="space-y-1">
+            <Label>Your Name</Label>
+            <Input
+              placeholder="Steve Jobs"
+              value={displayName}
+              onChange={e => onDisplayNameChange(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label>Job Role</Label>
+            <Input
+              placeholder="e.g. Marketing Manager or Student"
+              value={userQuestion.job_role || ""}
+              onChange={e =>
+                onUserQuestionChange({
+                  ...userQuestion,
+                  job_role: e.target.value
+                })
+              }
+            />
+          </div>
 
-        <div className="space-y-1">
-          <Label>Company Name</Label>
-          <Input
-            placeholder="Your company or school name"
-            value={userQuestion.company_name || ""}
-            onChange={e =>
-              onUserQuestionChange({
-                ...userQuestion,
-                company_name: e.target.value
-              })
-            }
-          />
-        </div>
+          <div className="space-y-1">
+            <Label>Company Name</Label>
+            <Input
+              placeholder="Your company or school name"
+              value={userQuestion.company_name || ""}
+              onChange={e =>
+                onUserQuestionChange({
+                  ...userQuestion,
+                  company_name: e.target.value
+                })
+              }
+            />
+          </div>
 
-        <div className="space-y-1">
-          <Label>Company Size</Label>
-          <Select
-            value={userQuestion.company_size || ""}
-            onValueChange={e =>
-              onUserQuestionChange({ ...userQuestion, company_size: e })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select company size" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1-10">1-10 employees</SelectItem>
-              <SelectItem value="11-50">11-50 employees</SelectItem>
-              <SelectItem value="51-200">51-200 employees</SelectItem>
-              <SelectItem value="201-500">201-500 employees</SelectItem>
-              <SelectItem value="501-1000">501-1000 employees</SelectItem>
-              <SelectItem value="1001+">1001+ employees</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="space-y-1">
+            <Label>Company Size</Label>
+            <Select
+              value={userQuestion.company_size || ""}
+              onValueChange={e =>
+                onUserQuestionChange({ ...userQuestion, company_size: e })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select company size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1-10">1-10 employees</SelectItem>
+                <SelectItem value="11-50">11-50 employees</SelectItem>
+                <SelectItem value="51-200">51-200 employees</SelectItem>
+                <SelectItem value="201-500">201-500 employees</SelectItem>
+                <SelectItem value="501-1000">501-1000 employees</SelectItem>
+                <SelectItem value="1001+">1001+ employees</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="space-y-1">

@@ -15,6 +15,7 @@ import { WithTooltip } from "@/components/ui/with-tooltip"
 import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
 import { Badge } from "@/components/ui/badge"
+import { PLAN_FREE } from "@/lib/stripe/config"
 
 interface ModelOptionProps {
   model: LLM | OpenRouterLLM
@@ -70,9 +71,9 @@ export const ModelOption: FC<ModelOptionProps> = ({
           >
             {model.modelName}
           </div>
-          {model.paid && (
-            <Badge variant={"outline"} className={"h-5 text-xs"}>
-              Pro
+          {model.tier && model.tier !== PLAN_FREE && (
+            <Badge variant={"outline"} className={"h-5 text-xs capitalize"}>
+              {model.tier}
             </Badge>
           )}
           {model.new && (

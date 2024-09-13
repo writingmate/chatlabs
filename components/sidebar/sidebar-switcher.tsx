@@ -21,9 +21,9 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "../utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
 import { ChatbotUIContext } from "@/context/context"
-import { validateProPlan } from "@/lib/subscription"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import { PLAN_FREE } from "@/lib/stripe/config"
 
 export const SIDEBAR_ICON_SIZE = 28
 
@@ -114,7 +114,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 
         {/* TODO */}
         {/* <Alerts /> */}
-        {!validateProPlan(profile) && (
+        {profile?.plan === PLAN_FREE && (
           <WithTooltip
             display={
               <div>Upgrade to paid plans to get access to all features.</div>

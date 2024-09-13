@@ -15,6 +15,7 @@ import { csharp } from "@replit/codemirror-lang-csharp"
 import { php } from "@codemirror/lang-php"
 import { CodeBlock } from "@/types"
 import { debounce } from "@/lib/debounce"
+import { vscodeDark } from "@uiw/codemirror-theme-vscode"
 
 interface CodeViewerProps {
   codeBlock: CodeBlock
@@ -37,10 +38,11 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
   }, [initialValue])
 
   const getLanguageExtension = (lang: string) => {
+    console.log("lang", lang)
     switch (lang.toLowerCase()) {
       case "javascript":
       case "typescript":
-        return javascript()
+        return javascript({ jsx: true, typescript: true })
       case "html":
         return html()
       case "css":
@@ -58,7 +60,7 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
       case "java":
         return java()
       default:
-        return javascript() // Default to JavaScript for unknown languages
+        return javascript({ jsx: true, typescript: true }) // Default to JavaScript for unknown languages
     }
   }
 
@@ -89,10 +91,10 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
 
   return (
     <CodeMirror
+      theme={vscodeDark}
       ref={ref}
       value={code}
       height="100%"
-      theme={oneDark}
       extensions={[getLanguageExtension(language)]}
       editable={isEditable}
       onChange={handleChange}

@@ -11,10 +11,11 @@ import {
   CATCHALL_MESSAGE_DAILY_LIMIT,
   FREE_MESSAGE_DAILY_LIMIT,
   PRO_MESSAGE_DAILY_LIMIT,
-  validatePlanForModel,
-  validateProPlan
+  PRO_ULTIMATE_MESSAGE_DAILY_LIMIT,
+  ULTIMATE_MESSAGE_DAILY_LIMIT,
+  validatePlanForModel
 } from "@/lib/subscription"
-import { PLAN_FREE } from "@/lib/stripe/config"
+import { PLAN_FREE, PLAN_PRO, PLAN_ULTIMATE } from "@/lib/stripe/config"
 
 function createClient() {
   return createServerClient<Database>(
@@ -91,20 +92,47 @@ export function checkApiKey(apiKey: string | null, keyName: string) {
   }
 }
 
+const TIER_MODELS = {
+  [PLAN_ULTIMATE]: LLM_LIST.filter(x => x.tier === PLAN_ULTIMATE).map(
+    x => x.modelId
+  ),
+  [PLAN_PRO]: LLM_LIST.filter(x => x.tier === PLAN_PRO).map(x => x.modelId),
+  [PLAN_FREE]: LLM_LIST.filter(
+    x => x.tier === PLAN_FREE || x.tier === undefined
+  ).map(x => x.modelId)
+}
+
+function isTierModel(model: LLMID, tier: keyof typeof TIER_MODELS) {
+  if (tier == PLAN_FREE && TIER_MODELS[tier]) {
+    return TIER_MODELS[PLAN_FREE].includes(model)
+  }
+
+  if (tier == PLAN_PRO && TIER_MODELS[tier]) {
+    return TIER_MODELS[PLAN_PRO].includes(model)
+  }
+
+  if (tier == PLAN_ULTIMATE) {
+    return (
+      TIER_MODELS[PLAN_ULTIMATE].includes(model) ||
+      TIER_MODELS[PLAN_PRO].includes(model)
+    )
+  }
+
+  return false
+}
+
 function isPaidModel(model: LLMID) {
-  const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
+  const paidLLMS = LLM_LIST.filter(x => x.tier !== "free").map(x => x.modelId)
   return paidLLMS.includes(model)
 }
 
 export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
-  const { plan } = profile
-
-  if (validateProPlan(profile)) {
-    return
-  }
-
   if (!validatePlanForModel(profile, model)) {
-    throw new SubscriptionRequiredError("Pro plan required to use this model")
+    const modelData = LLM_LIST.find(x => x.modelId === model)
+    const requiredPlan = modelData?.tier === "ultimate" ? "Ultimate" : "Pro"
+    throw new SubscriptionRequiredError(
+      `${requiredPlan} plan required to use this model`
+    )
   }
 }
 
@@ -114,9 +142,9 @@ export async function validateMessageCount(
   date: Date,
   supabase: SupabaseClient
 ) {
-  const { plan } = profile
+  const userPlan = profile.plan.split("_")[0]
 
-  if (plan.startsWith("byok_")) {
+  if (userPlan.startsWith("byok")) {
     return
   }
 
@@ -138,25 +166,45 @@ export async function validateMessageCount(
   }
 
   if (
-    (plan === PLAN_FREE || plan.startsWith("premium_")) &&
-    count > FREE_MESSAGE_DAILY_LIMIT
+    (userPlan === PLAN_FREE || userPlan.startsWith("premium")) &&
+    count >= FREE_MESSAGE_DAILY_LIMIT
   ) {
     throw new SubscriptionRequiredError(
-      `You have reached daily message limit for ${model}. Upgrade to Pro plan to continue or come back tomorrow.`
+      `You have reached daily message limit for ${model}. Upgrade to Pro/Ultimate plan to continue or come back tomorrow.`
     )
   }
 
   if (
-    isPaidModel(model) &&
-    plan.startsWith("pro_") &&
-    count > PRO_MESSAGE_DAILY_LIMIT
+    isTierModel(model, PLAN_PRO) &&
+    userPlan === PLAN_PRO &&
+    count >= PRO_MESSAGE_DAILY_LIMIT
   ) {
     throw new SubscriptionRequiredError(
       `You have reached daily message limit for Pro plan for ${model}`
     )
   }
 
-  if (count > CATCHALL_MESSAGE_DAILY_LIMIT) {
+  if (
+    isTierModel(model, PLAN_ULTIMATE) &&
+    userPlan === PLAN_PRO &&
+    count >= PRO_ULTIMATE_MESSAGE_DAILY_LIMIT
+  ) {
+    throw new SubscriptionRequiredError(
+      `You have reached daily message limit for Pro plan for ${model}. Upgrade to Ultimate plan to continue or come back tomorrow.`
+    )
+  }
+
+  if (
+    isTierModel(model, PLAN_ULTIMATE) &&
+    userPlan === PLAN_ULTIMATE &&
+    count >= ULTIMATE_MESSAGE_DAILY_LIMIT
+  ) {
+    throw new SubscriptionRequiredError(
+      `You have reached hard daily message limit for model ${model}`
+    )
+  }
+
+  if (count >= CATCHALL_MESSAGE_DAILY_LIMIT) {
     throw new SubscriptionRequiredError(
       `You have reached hard daily message limit for model ${model}`
     )
