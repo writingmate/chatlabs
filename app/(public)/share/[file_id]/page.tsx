@@ -20,7 +20,7 @@ export async function generateMetadata({
   const file = await getFileByHashId(file_id)
 
   return {
-    title: `${file?.name} - Created with ChatLabs`,
+    title: `${file?.name} - Created with ImogenAI`,
     description: file?.description
   }
 }
@@ -135,9 +135,9 @@ const SharePage = async ({
             <a
               target={"_blank"}
               className={"font-semibold hover:underline"}
-              href={`https://labs.writingmate.ai/?utm_source=app_share&utm_medium=${file_id}`}
+              href={`https://imogenai.app/?utm_source=app_share&utm_medium=${file_id}`}
             >
-              ChatLabs
+              ImogenAI
             </a>
             <IconExternalLink stroke={1.5} size={16} />
           </div>

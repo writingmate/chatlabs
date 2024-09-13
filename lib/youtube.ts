@@ -17,7 +17,7 @@ export async function getSubtitles({
 }) {
   const data = await fetchData(`https://www.youtube.com/watch?v=${videoID}`)
 
-  const noCaptionsErrorMessage = `Could not find captions for video: ${videoID}. Some videos may not have captions. ChatLabs only supports videos with captions.`
+  const noCaptionsErrorMessage = `Could not find captions for video: ${videoID}. Some videos may not have captions. ImogenAI only supports videos with captions.`
 
   // * ensure we have access to captions data
   if (!data.includes("captionTracks")) throw new Error(noCaptionsErrorMessage)

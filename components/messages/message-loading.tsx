@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import { IconCircleFilled } from "@tabler/icons-react"
+import { useTranslation } from "react-i18next"
 
 const WAITING_MESSAGES = [
   "Hang tight! The AI is processing your request at the speed of thought...",
@@ -56,6 +57,8 @@ export const LoadingMessage: React.FC<LoadingMessageProps> = ({
 
   if (!isGenerating) return null
 
+  const { t } = useTranslation()
+
   return (
     <div className="flex items-start space-x-2">
       <div className="bg-foreground mt-1 flex size-3 items-center justify-center rounded-full">
@@ -63,7 +66,7 @@ export const LoadingMessage: React.FC<LoadingMessageProps> = ({
       </div>
       {showWaitingMessage && (
         <div className="relative h-[20px] w-full overflow-hidden">
-          {WAITING_MESSAGES.map((message, index) => (
+          {t("WAITING_MESSAGES").split("|").map((message, index) => (
             <div
               key={index}
               className={`

@@ -4,6 +4,7 @@ import { FREE_MESSAGE_DAILY_LIMIT, validateProPlan } from "@/lib/subscription"
 import { getMessageCount } from "@/db/messages"
 import { Button } from "@/components/ui/button"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { useTranslation } from "react-i18next"
 
 interface ChatMessageCounterProps {}
 
@@ -35,6 +36,8 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
     return null // Do not display the counter for non-free plans
   }
 
+  const { t } = useTranslation()
+
   return (
     <div className={"text-foreground/80 w-full p-2 text-center text-xs"}>
       {Math.max(LIMIT - messageCount, 0)}/{LIMIT} messages left. All generated
@@ -45,7 +48,7 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
         variant={"link"}
         onClick={() => setIsPaywallOpen(true)}
       >
-        Upgrade to Pro
+        {t("Upgrade NOW")}
       </Button>
       .
     </div>

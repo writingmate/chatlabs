@@ -10,11 +10,11 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 
 const font = DM_Sans({ subsets: ["latin"] })
-const APP_NAME = "ChatLabs"
-const APP_DEFAULT_TITLE = "ChatLabs"
-const APP_TITLE_TEMPLATE = "%s - ChatLabs"
+const APP_NAME = "ImogenAI"
+const APP_DEFAULT_TITLE = "ImogenAI"
+const APP_TITLE_TEMPLATE = "%s - ImogenAI"
 const APP_DESCRIPTION =
-  "ChatLabs is a platform for LLM and AI tinkerers. Experience more than 30 AI models in one place."
+  "ImogenAI is a platform for LLM and AI tinkerers. Experience more than 30 AI models in one place."
 
 interface RootLayoutProps {
   children: ReactNode
@@ -25,7 +25,7 @@ interface RootLayoutProps {
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,
-  metadataBase: new URL("https://labs.writingmate.ai/"),
+  metadataBase: new URL("https://imogenai.app/"),
   title: {
     default: APP_DEFAULT_TITLE,
     template: APP_TITLE_TEMPLATE

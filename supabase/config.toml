@@ -78,11 +78,11 @@ enable_confirmations = true
 
 # Uncomment to customize email template
 [auth.email.template.magic_link]
-subject = "ChatLabs: Confirm your email"
+subject = "ImogenAI: Confirm your email"
 content_path = "./supabase/templates/magic_link.html"
 
 [auth.email.template.confirmation]
-subject = "ChatLabs: Verify your email"
+subject = "ImogenAI: Verify your email"
 content_path = "./supabase/templates/confirmation.html"
 
 

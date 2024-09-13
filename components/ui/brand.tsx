@@ -20,7 +20,7 @@ export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
         />
       </div>
 
-      <h1 className="text-4xl font-semibold tracking-wide">ChatLabs</h1>
+      <h1 className="text-4xl font-semibold tracking-wide">ImogenAI</h1>
       <div className="flex flex-col items-center py-2">
         <h4 className="text-sm">{t("More than 30 AI models in one place.")}</h4>
         <h4 className="text-sm">

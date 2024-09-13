@@ -10,7 +10,7 @@ import { getChatById } from "@/db/chats"
 
 export function generateMetadata({ params }: { params: { share_id: string } }) {
   return {
-    title: "ChatLabs"
+    title: "ImogenAI"
   }
 }
 
@@ -85,7 +85,7 @@ export default async function SharedChatPage({
       <div className="mb-4 mt-8 flex justify-center">
         <Link href="/">
           <Button className="rounded-full bg-black px-6 py-3 text-white transition-colors hover:bg-gray-800">
-            Get started with ChatLabs
+            Get started with ImogenAI
           </Button>
         </Link>
       </div>

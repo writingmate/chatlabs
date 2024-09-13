@@ -46,14 +46,14 @@ export default function SubscriptionSuccessPage() {
   return (
     <div className="size-screen flex size-full flex-col items-center justify-center">
       <Image
-        src="https://media.licdn.com/dms/image/D5603AQF7L8gHvNGeNQ/profile-displayphoto-shrink_400_400/0/1699576720025?e=1728518400&v=beta&t=KsJYhiJqBFSn5vf0YERo4aDO8ZU1IJZgqljPtDkV3SQ"
-        alt="Artem"
+        src=" "
+        alt="Nam"
         width={100}
         height={100}
         className="mb-4 rounded-full"
       />
       <div className="mb-6 max-w-2xl text-center text-2xl">
-        Hi, my name is Artem and I am co-founder of ChatLabs. Thank you for
+        Thank you for
         subscribing to our product.
       </div>
       <div className="mb-6 max-w-2xl text-center">

@@ -290,7 +290,7 @@ export class OpenRouterFunctionCaller extends OpenAIFunctionCaller {
         baseURL: "https://openrouter.ai/api/v1",
         defaultHeaders: {
           "HTTP-Referer": "https://writingmate.ai/labs",
-          "X-Title": "ChatLabs",
+          "X-Title": "ImogenAI",
           "X-Description": "Chat with all best AI models in one place"
         }
       }),

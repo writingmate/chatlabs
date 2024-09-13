@@ -13,8 +13,6 @@ import { CreatePreset } from "./items/presets/create-preset"
 import { CreatePrompt } from "./items/prompts/create-prompt"
 import { CreateTool } from "./items/tools/create-tool"
 import { isMobileScreen } from "@/lib/mobile"
-import { useTranslation } from "react-i18next"
-import { Dialog, DialogContent } from "../ui/dialog"
 
 interface SidebarCreateButtonsProps {
   contentType: ContentType
@@ -27,8 +25,6 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   contentType,
   hasData
 }) => {
-  const { t } = useTranslation()
-
   const { setShowSidebar, profile, selectedWorkspace, folders, setFolders } =
     useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
@@ -108,15 +104,14 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   }
 
   return (
-    <div className="flex w-full space-x-2">
-      <Button className="flex h-[36px] grow" onClick={getCreateFunction()}>
-        <IconPlus className="mr-1" size={20} />
-        {t(
-          `New ${
-            resolvedName.charAt(0).toUpperCase() +
-            resolvedName.slice(1, resolvedName.length - 1)
-          }`
-        )}
+    <div className="flex">
+      <Button
+        variant="outline"
+        size={"icon"}
+        className="font-normal"
+        onClick={getCreateFunction()}
+      >
+        <IconPlus stroke={1.5} size={20} />
       </Button>
 
       {/*{hasData && (*/}

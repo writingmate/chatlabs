@@ -142,7 +142,7 @@ export async function validateMessageCount(
     count > FREE_MESSAGE_DAILY_LIMIT
   ) {
     throw new SubscriptionRequiredError(
-      `You have reached daily message limit for ${model}. Upgrade to Pro plan to continue or come back tomorrow.`
+      `You have reached daily message limit for ${model}. Upgrade NOW or come back tomorrow.`
     )
   }
 

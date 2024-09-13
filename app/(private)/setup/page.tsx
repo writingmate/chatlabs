@@ -23,8 +23,10 @@ import {
 import Plans from "@/components/upgrade/plans"
 import { useAuth } from "@/context/auth"
 import { upsertUserQuestion } from "@/db/user_questions"
+import { useTranslation } from "react-i18next"  
 
 export default function SetupPage() {
+  const { t } = useTranslation()
   const {
     profile,
     setProfile,
@@ -165,9 +167,9 @@ export default function SetupPage() {
       case 1:
         return (
           <StepContainer
-            stepDescription="Let's create your profile."
+            stepDescription={t("Let's create your profile.")}
             stepNum={currentStep}
-            stepTitle="Welcome to ChatLabs"
+            stepTitle={t("Welcome to ImogenAI")}
             onShouldProceed={handleShouldProceed}
             showNextButton={!!(username && usernameAvailable)}
             showBackButton={false}
@@ -184,9 +186,9 @@ export default function SetupPage() {
       case 2:
         return (
           <StepContainer
-            stepDescription="Pro plan gives unlimited access to over 20 AI models."
+            stepDescription={t("Pro plan gives unlimited access to over 20 AI models.")}
             stepNum={currentStep}
-            stepTitle="Choose your plan"
+            stepTitle={t("Choose your plan")}
             onShouldProceed={handleShouldProceed}
             showNextButton={true}
             showBackButton={true}
@@ -246,9 +248,9 @@ export default function SetupPage() {
       case 3:
         return (
           <StepContainer
-            stepDescription="You are all set up!"
+            stepDescription={t("You are all set up!")}
             stepNum={currentStep}
-            stepTitle="Setup Complete"
+            stepTitle={t("Setup Complete")}
             onShouldProceed={handleShouldProceed}
             showNextButton={true}
             showBackButton={true}

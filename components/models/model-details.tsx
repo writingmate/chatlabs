@@ -5,6 +5,7 @@ import { IconCheck, IconX } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { Badge } from "@/components/ui/badge"
+import { useTranslation } from "react-i18next"
 
 export function ModelDetails({
   className,
@@ -41,6 +42,8 @@ export function ModelDetails({
     )
   }
 
+  const { t } = useTranslation()
+
   return (
     <div className={cn("flex w-[320px] flex-col", className)}>
       <div className={"flex items-center space-x-2"}>
@@ -55,21 +58,21 @@ export function ModelDetails({
         <span className={"font-semibold"}>{model.modelName}</span>
       </div>
       <div className="grid grid-cols-1 divide-y pt-4 text-xs">
-        <Row label={"Context"} value={formattedContextLength + " tokens"} />
+        <Row label={t("Context")} value={formattedContextLength + " tokens"} />
         {model.pricing && (
           <>
             <Row
-              label={"Input pricing"}
+              label={t("Input pricing")}
               value={"$" + inputCost + " / million tokens"}
             />
             <Row
-              label={"Output pricing"}
+              label={t("Output pricing")}
               value={"$" + outputCost + " / million tokens"}
             />
           </>
         )}
         <Row
-          label={"Supports vision"}
+          label={t("Supports vision")}
           value={
             model.imageInput ? (
               <IconCheck size={18} stroke={1.5} />
@@ -80,7 +83,7 @@ export function ModelDetails({
         />
         {!model.tools || !selectedTools || selectedTools?.length === 0 ? (
           <Row
-            label={"Supports plugins"}
+            label={t("Supports plugins")}
             value={
               model.tools ? (
                 <IconCheck size={18} stroke={1.5} />
@@ -91,7 +94,7 @@ export function ModelDetails({
           />
         ) : (
           <Row
-            label={"Plugins selected"}
+            label={t("Plugins selected")}
             value={
               <div
                 className={

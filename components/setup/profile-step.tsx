@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/select"
 import { FC, useState } from "react"
 import { TablesInsert } from "@/supabase/types"
+import { useTranslation } from "react-i18next"
+import LanguageSwitcher from "@/components/languageswitcher/LanguageSwitcher"
 
 interface ProfileStepProps {
   displayName: string
@@ -25,22 +27,27 @@ export const ProfileStep: FC<ProfileStepProps> = ({
   onUserQuestionChange
 }) => {
   const [showOtherSource, setShowOtherSource] = useState(false)
+  const { t } = useTranslation()
 
   return (
     <>
       <div className="space-y-4">
         <div className="space-y-1">
-          <Label>Your Name</Label>
+          <Label>{t("Language")}</Label>
+          <LanguageSwitcher />
+        </div>
+        <div className="space-y-1">
+          <Label>{t("Your Name")}</Label>
           <Input
-            placeholder="Steve Jobs"
+            placeholder={t("John Cena")}
             value={displayName}
             onChange={e => onDisplayNameChange(e.target.value)}
           />
         </div>
         <div className="space-y-1">
-          <Label>Job Role</Label>
+          <Label>{t("Job Role")}</Label>
           <Input
-            placeholder="e.g. Marketing Manager, Software Engineer, or Student"
+            placeholder={t("e.g. Marketing Manager, Software Engineer, or Student")}
             value={userQuestion.job_role || ""}
             onChange={e =>
               onUserQuestionChange({
@@ -51,44 +58,10 @@ export const ProfileStep: FC<ProfileStepProps> = ({
           />
         </div>
 
-        <div className="space-y-1">
-          <Label>Company Name</Label>
-          <Input
-            placeholder="Your company or school name"
-            value={userQuestion.company_name || ""}
-            onChange={e =>
-              onUserQuestionChange({
-                ...userQuestion,
-                company_name: e.target.value
-              })
-            }
-          />
-        </div>
+        {/* Company Name and Company Size fields hidden */}
 
         <div className="space-y-1">
-          <Label>Company Size</Label>
-          <Select
-            value={userQuestion.company_size || ""}
-            onValueChange={e =>
-              onUserQuestionChange({ ...userQuestion, company_size: e })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select company size" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1-10">1-10 employees</SelectItem>
-              <SelectItem value="11-50">11-50 employees</SelectItem>
-              <SelectItem value="51-200">51-200 employees</SelectItem>
-              <SelectItem value="201-500">201-500 employees</SelectItem>
-              <SelectItem value="501-1000">501-1000 employees</SelectItem>
-              <SelectItem value="1001+">1001+ employees</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-1">
-          <Label>How did you hear about us?</Label>
+          <Label>{t("How did you hear about us?")}</Label>
           <Select
             value={userQuestion.source || ""}
             onValueChange={value => {
@@ -97,7 +70,7 @@ export const ProfileStep: FC<ProfileStepProps> = ({
             }}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select an option" />
+              <SelectValue placeholder={t("Select an option")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Google">Google</SelectItem>
@@ -107,46 +80,15 @@ export const ProfileStep: FC<ProfileStepProps> = ({
               <SelectItem value="Instagram/Facebook">
                 Instagram/Facebook
               </SelectItem>
-              <SelectItem value="Friends">Friend told me</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
+              <SelectItem value="Friends">{t("Friend told me")}</SelectItem>
+              <SelectItem value="Other">{t("Other")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {showOtherSource && (
-          <div className="space-y-1">
-            <Label>Please specify:</Label>
-            <Input
-              placeholder="How did you hear about us?"
-              value={userQuestion.other_source || ""}
-              onChange={e =>
-                onUserQuestionChange({
-                  ...userQuestion,
-                  other_source: e.target.value
-                })
-              }
-            />
-          </div>
-        )}
+        {/* "Please specify" field hidden */}
 
-        <div className="space-y-1">
-          <Label>What do you want to use ChatLabs for?</Label>
-          <Textarea
-            placeholder="Describe how you plan to use ChatLabs"
-            value={(userQuestion.use_cases as string) || ""}
-            onChange={e =>
-              onUserQuestionChange({
-                ...userQuestion,
-                use_cases: e.target.value
-              })
-            }
-            rows={4}
-          />
-          <div className="text-xs text-gray-500">
-            e.g. customer support, lead generation, etc. Founders read every
-            response!
-          </div>
-        </div>
+        {/* "What do you want to use ImogenAI for?" field and description hidden */}
       </div>
     </>
   )

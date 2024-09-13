@@ -8,7 +8,7 @@ export const stripe = new Stripe(
     // Register this as an official Stripe plugin.
     // https://stripe.com/docs/building-plugins#setappinfo
     appInfo: {
-      name: "ChatLabs"
+      name: "ImogenAI"
     }
   }
 )

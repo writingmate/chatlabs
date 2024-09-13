@@ -24,6 +24,7 @@ import {
 } from "@/lib/build-prompt"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { updateWorkspace } from "@/db/workspaces"
+import { useTranslation } from "react-i18next"
 
 export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "gpt-3.5-turbo-0125": false,
@@ -88,11 +89,11 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
 
 const SYSTEM_PROMPT_DESCRIPTION = `
 The system prompt is a message that the AI will use to start the conversation. 
-It should contain the following dynamic variables for ChatLabs functioning properly: {profile_context}, {local_date}, and {assistant}. {profile_context} is the user's profile context, {local_date} is the current date, and {assistant} is the name of the assistant and it's instructions.
+It should contain the following dynamic variables for ImogenAI functioning properly: {profile_context}, {local_date}, and {assistant}. {profile_context} is the user's profile context, {local_date} is the current date, and {assistant} is the name of the assistant and it's instructions.
 `
 
 const SYSTEM_PROMPT_WARNING = `
-The system prompt should contain the following dynamic variables for ChatLabs functioning properly: {profile_context}, {local_date}, and {assistant}. {profile_context} is the user's profile context, {local_date} is the current date, and {assistant} is the name of the assistant and it's instructions.`
+The system prompt should contain the following dynamic variables for ImogenAI functioning properly: {profile_context}, {local_date}, and {assistant}. {profile_context} is the user's profile context, {local_date} is the current date, and {assistant} is the name of the assistant and it's instructions.`
 
 function ModelSettings({ models }: { models?: LLM[] }) {
   const {
@@ -140,6 +141,8 @@ function ModelSettings({ models }: { models?: LLM[] }) {
     setDialogOpen(false)
   }
 
+  const { t } = useTranslation()
+
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
@@ -155,29 +158,29 @@ function ModelSettings({ models }: { models?: LLM[] }) {
           />{" "}
           <div className={"flex flex-col"}>
             <div className={"flex items-center space-x-3"}>
-              Discover and manage models
+              {t("Discover and manage models")}
             </div>
             <div className={"text-foreground/60 text-xs"}>
-              Configure and discover all LLM models here.
+              {t("Configure and discover all LLM models here.")}
             </div>
           </div>
         </div>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle>Manage models</DialogTitle>
+        <DialogTitle>{t("Manage models")}</DialogTitle>
         <Tabs className={"flex w-full flex-col justify-center"}>
           <TabsList className={"mx-auto"}>
             <TabsTrigger value={"basic"} title={"Basic settings"}>
-              Model parameters
+              {t("Model parameters")}
             </TabsTrigger>
             <TabsTrigger value={"visibility"} title={"Model visibility"}>
-              Discover models
+              {t("Discover models")}
             </TabsTrigger>
           </TabsList>
           <TabsContent value={"basic"}>
             <div className="mb-4 mt-2 flex items-center space-x-2">
-              <Label>System Prompt</Label>
-              <InfoIconTooltip label={SYSTEM_PROMPT_DESCRIPTION} />
+              <Label>{t("System Prompt")}</Label>
+              <InfoIconTooltip label={t("SYSTEM_PROMPT_DESCRIPTION")} />
             </div>
             <TextareaAutosize
               minRows={3}
@@ -195,13 +198,13 @@ function ModelSettings({ models }: { models?: LLM[] }) {
                 className={"text-xs"}
                 variant={"link"}
               >
-                Reset to default
+                {t("Reset to default")}
               </Button>
               {!validSystemPrompt && (
                 <WithTooltip
                   trigger={
                     <div className="text-xs text-yellow-500">
-                      Missing dynamic variables
+                      {t("Missing dynamic variables")}
                     </div>
                   }
                   display={SYSTEM_PROMPT_WARNING}
@@ -232,12 +235,12 @@ function ModelSettings({ models }: { models?: LLM[] }) {
                   />
                 ))
               ) : (
-                <p>No models available</p>
+                <p>{t("No models available")}</p>
               )}
             </div>
           </TabsContent>
         </Tabs>
-        <Button onClick={handleSave}>Save for all future chats</Button>
+        <Button onClick={handleSave}>{t("Save for all future chats")}</Button>
       </DialogContent>
     </Dialog>
   )

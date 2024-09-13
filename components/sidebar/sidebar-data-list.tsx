@@ -259,7 +259,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         return (
           <EmptyState
             message="No chats yet"
-            description="Chats are conversations with AI characters. You can create a chat by clicking the 'New chat' button."
+            description={t("Chats are conversations with AI characters. You can create a chat by clicking the 'New chat' button.")}
           />
         )
 
@@ -267,7 +267,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         return (
           <EmptyState
             message="No prompts yet"
-            description="Prompts are pre-saved text inputs designed to generate specific responses and communicate with AI quicker. Prompts you create will be displayed here."
+            description={t("Prompts are pre-saved text inputs designed to generate specific responses and communicate with AI quicker. Prompts you create will be displayed here.")}
           />
         )
 
@@ -275,7 +275,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         return (
           <EmptyState
             message="No files yet"
-            description="Upload files to enrich conversations and assistants with context, data analysis, feedback, or customization. Uploaded files will be displayed here."
+            description={t("Upload files to enrich conversations and assistants with context, data analysis, feedback, or customization. Uploaded files will be displayed here.")}
           />
         )
 
@@ -283,7 +283,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         return (
           <EmptyState
             message="No plugins yet"
-            description="Plugins are pre-built AI applications that can be used to enhance your conversations and assistants. Plugins you create will be displayed here."
+            description={t("Plugins are pre-built AI applications that can be used to enhance your conversations and assistants. Plugins you create will be displayed here.")}
           />
         )
 
@@ -291,7 +291,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
         return (
           <EmptyState
             message="No assistants yet"
-            description="Assistants are special AI characters instructed to provide information, solve specific problems, simulate conversations or offer creative content based on user queries."
+            description={t("Assistants are special AI characters instructed to provide information, solve specific problems, simulate conversations or offer creative content based on user queries.")}
           />
         )
 
