@@ -70,7 +70,10 @@ export function updateHtml(doc: Document) {
     }
 
     function addCustomStyles(doc: Document) {
-      const DOMParser = require("@xmldom/xmldom").DOMParser
+      const DOMParser =
+        typeof window !== "undefined"
+          ? window.DOMParser
+          : require("@xmldom/xmldom").DOMParser
       const parser = new DOMParser()
       const styleElement = parser.parseFromString(
         `
