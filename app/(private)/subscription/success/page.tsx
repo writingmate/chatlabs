@@ -45,13 +45,7 @@ export default function SubscriptionSuccessPage() {
   const router = useRouter()
   return (
     <div className="size-screen flex size-full flex-col items-center justify-center">
-      <Image
-        src=" "
-        alt="Nam"
-        width={100}
-        height={100}
-        className="mb-4 rounded-full"
-      />
+      
       <div className="mb-6 max-w-2xl text-center text-2xl">
         Thank you for
         subscribing to our product.

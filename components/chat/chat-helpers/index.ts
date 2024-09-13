@@ -704,18 +704,18 @@ export const handleCreateMessages = async (
           annotation: data
         } as TablesInsert<"messages">
       })
-      createdMessages.push(...(await createMessages(inserts)))
+      createdMessages.push(...(await createMessages(inserts) || []))
     }
     cleanGeneratedText
       ? createdMessages.push(
-          ...(await createMessages([finalUserMessage, finalAssistantMessage]))
+          ...(await createMessages([finalUserMessage, finalAssistantMessage]) || [])
         )
-      : createdMessages.push(...(await createMessages([finalUserMessage])))
+      : createdMessages.push(...(await createMessages([finalUserMessage]) || []))
 
     const uploadPromises = newMessageImages
       .filter(obj => obj.file !== null)
       .map(obj => {
-        const filePath = `${profile.user_id}/${currentChat.id}/${createdMessages && createdMessages[0].id}/${uuidv4()}`
+        const filePath = `${profile.user_id}/${currentChat.id}/${createdMessages[0].id}/${uuidv4()}`
         return uploadMessageImage(filePath, obj.file as File).catch(error => {
           console.error(`Failed to upload image at ${filePath}:`, error)
           return null
@@ -726,20 +726,17 @@ export const handleCreateMessages = async (
       Boolean
     ) as string[]
 
-    let createdMessagesId =
-      createdMessages !== null ? createdMessages[0].id : ""
-
     setChatImages(prevImages => [
       ...prevImages,
       ...newMessageImages.map((obj, index) => ({
         ...obj,
-        messageId: createdMessagesId,
+        messageId: createdMessages[0].id,
         path: paths[index]
       }))
     ])
 
-    const updatedMessage = await updateMessage(createdMessagesId, {
-      ...finalUserMessage,
+    const updatedMessage = await updateMessage(createdMessages[0].id, {
+      ...createdMessages[0],
       image_paths: paths
     })
 
@@ -748,7 +745,7 @@ export const handleCreateMessages = async (
         retrievedFileItems.map(fileItem => {
           return {
             user_id: profile.user_id,
-            message_id: createdMessagesId,
+            message_id: createdMessages[1].id,
             file_item_id: fileItem.id
           }
         })
@@ -764,7 +761,7 @@ export const handleCreateMessages = async (
       ...(cleanGeneratedText
         ? [
             {
-              message: finalAssistantMessage,
+              message: createdMessages[1],
               fileItems: retrievedFileItems.map(fileItem => fileItem.id)
             }
           ]

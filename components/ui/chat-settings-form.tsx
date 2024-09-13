@@ -14,6 +14,7 @@ import { WithTooltip } from "./with-tooltip"
 import { buildBasePrompt, DEFAULT_SYSTEM_PROMPT } from "@/lib/build-prompt"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useTranslation } from "react-i18next"
 
 const TEMPERATURE_DESCRIPTION = `
 Temperature affects the randomness of the AI model's responses. A higher temperature increases the randomness, while a lower temperature makes the responses more deterministic.
@@ -38,15 +39,16 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
 }) => {
   const { profile, models } = useContext(ChatbotUIContext)
 
+  const { t } = useTranslation()
   if (!profile) return null
 
   const PromptSettings = (
     <div className="space-y-1">
-      <Label>Prompt</Label>
+      <Label>{t("Prompt")}</Label>
 
       <TextareaAutosize
         className="bg-background border-input border"
-        placeholder="You are a helpful AI assistant."
+        placeholder={t("You are a helpful AI assistant.")}
         onValueChange={prompt => {
           onChangeChatSettings({ ...chatSettings, prompt })
         }}
@@ -151,13 +153,15 @@ export const AdvancedContent: FC<AdvancedContentProps> = ({
         ?.context_length
     : MODEL_LIMITS.MAX_CONTEXT_LENGTH
 
+  const { t } = useTranslation()
+
   return (
     <div className="mt-2 w-full">
       <div className="space-y-1">
         <Label className="flex items-center justify-between space-x-1">
           <div className={"flex items-center space-x-2 text-nowrap"}>
-            <div>Temperature</div>
-            <InfoIconTooltip label={TEMPERATURE_DESCRIPTION} />
+            <div>{t("Temperature")}</div>
+            <InfoIconTooltip label={t("TEMPERATURE_DESCRIPTION")} />
           </div>
 
           <Input
@@ -202,8 +206,8 @@ export const AdvancedContent: FC<AdvancedContentProps> = ({
       <div className="mt-6 space-y-3">
         <Label className="flex items-center justify-between space-x-1">
           <div className={"flex items-center space-x-2 text-nowrap"}>
-            <div>Context Length</div>
-            <InfoIconTooltip label={CONTEXT_LENGTH_DESCRIPTION} />
+            <div>{t("Context Length")}</div>
+            <InfoIconTooltip label={t("CONTEXT_LENGTH_DESCRIPTION")} />
           </div>
           <Input
             className={

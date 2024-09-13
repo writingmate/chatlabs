@@ -53,6 +53,7 @@ import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { debounce } from "@/lib/debounce"
+import { useTranslation } from "react-i18next"
 
 interface ProfileSettingsProps {
   isCollapsed: boolean
@@ -328,6 +329,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     }
   }
 
+  const { t } = useTranslation()
   if (!profile) return null
 
   return (
@@ -368,7 +370,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
         <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center justify-between space-x-2">
-              <div>User Settings</div>
+              <div>{t("User Settings")}</div>
 
               <Button
                 tabIndex={-1}
@@ -377,7 +379,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 onClick={handleSignOut}
               >
                 <IconLogout className="mr-1" size={20} />
-                Logout
+                {t("Logout")}
               </Button>
             </SheetTitle>
           </SheetHeader>
@@ -385,14 +387,14 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
           <Tabs defaultValue="profile">
             <TabsList className="mt-4 flex w-full space-x-1">
               <TabsTrigger className={"flex-1"} value="profile">
-                Profile
+                {t("Profile")}
               </TabsTrigger>
               <TabsTrigger className={"flex-1"} value="shortcuts">
-                Shortcuts
+                {t("Shortcuts")}
               </TabsTrigger>
               {profile?.plan.startsWith("byok_") && (
                 <TabsTrigger className={"flex-1"} value="keys">
-                  API Keys
+                  {t("API Keys")}
                 </TabsTrigger>
               )}
             </TabsList>
@@ -447,7 +449,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 {/*</div>*/}
 
                 <div className="space-y-1">
-                  <Label>Profile Image</Label>
+                  <Label>{t("Profile Image")}</Label>
 
                   <ImagePicker
                     src={profileImageSrc}
@@ -460,10 +462,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label>Chat Display Name</Label>
+                  <Label>{t("Chat Display Name")}</Label>
 
                   <Input
-                    placeholder="Chat display name..."
+                    placeholder={t("Chat display name...")}
                     value={displayName}
                     onChange={e => setDisplayName(e.target.value)}
                     maxLength={PROFILE_DISPLAY_NAME_MAX}
@@ -472,8 +474,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
 
                 <div className="space-y-1">
                   <Label className="text-sm">
-                    What would you like the AI to know about you to provide
-                    better responses?
+                    {t("What would you like the AI to know about you to provide better responses?")}
                   </Label>
 
                   <TextareaAutosize
@@ -491,7 +492,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 </div>
                 <div className="flex items-center justify-between space-y-1">
                   <div className="flex items-center space-x-2">
-                    <Label>Side-by-Side Code Viewer</Label>
+                    <Label>{t("Side-by-Side Code Viewer")}</Label>
                     <WithTooltip
                       trigger={
                         <IconInfoCircle
@@ -502,9 +503,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       }
                       display={
                         <div className={"text-xs"}>
-                          If enabled, code will be displayed in a side-by-side
-                          editor on the right from the message thread. This
-                          feature is currently in beta.
+                          {t("If enabled, code will be displayed in a side-by-side editor on the right from the message thread. This feature is currently in beta.")}
                         </div>
                       }
                     />
@@ -520,7 +519,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       className={"w-full"}
                       formAction={redirectToBillingPortal}
                     >
-                      Manage subscription
+                      {t("Manage subscription")}
                     </Button>
                   ) : (
                     <Button
@@ -531,7 +530,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                         setIsPaywallOpen(true)
                       }}
                     >
-                      Upgrade
+                      {t("Upgrade")}
                     </Button>
                   )}
                 </div>
@@ -886,7 +885,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                   variant={"secondary"}
                   onClick={resetToDefaults}
                 >
-                  Reset to defaults
+                  {t("Reset to defaults")}
                 </Button>
               </div>
             </TabsContent>
@@ -900,7 +899,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
             <WithTooltip
               display={
                 <div>
-                  Download ChatLabs 1.0 data as JSON. Import coming soon!
+                  Download ImogenAI 1.0 data as JSON. Import coming soon!
                 </div>
               }
               trigger={
