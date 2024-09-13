@@ -32,7 +32,8 @@ function addTailwindTheme(doc: Document, theme: UITheme) {
   doc.head.appendChild(daisyuiLinkElement)
 
   const tailwindScriptElement = doc.createElement("script")
-  tailwindScriptElement.src = "https://cdn.tailwindcss.com"
+  tailwindScriptElement.src =
+    "https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp,container-queries"
   doc.head.appendChild(tailwindScriptElement)
 
   //   const scriptElement = doc.createElement("script")
@@ -45,8 +46,8 @@ function addTailwindTheme(doc: Document, theme: UITheme) {
   const styleElement = doc.createElement("style")
   styleElement.textContent = `
     body, html {
-      width: 100%;
-      height: 100%;
+      min-width: 100%;
+      min-height: 100%;
     }
     `
   // styleElement.textContent = `

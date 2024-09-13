@@ -55,7 +55,8 @@ const SharePage = async ({
     try {
       // known valid css files to ignore
       const knownTailwind = "tailwindcss@2"
-      const upgradeToTailwind = "https://cdn.tailwindcss.com"
+      const upgradeToTailwind =
+        "https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp,container-queries"
       const knownDaisyui = "daisyui@4"
       const upgradeToDaisyui =
         "hhttps://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
