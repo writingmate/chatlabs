@@ -13,14 +13,12 @@ const imageGenerator = async (
         prompt: string
         format: ImageFormat
       }
-): Promise<Omit<ImageGeneratorResult, "responseTime">> => {
+): Promise<string> => {
   if ("parameters" in params) {
     params = params.parameters
   }
 
   let { prompt, format } = params
-
-  console.log("Generating image", prompt, format)
 
   if (prompt === undefined) {
     throw new Error("prompt is required")
@@ -68,11 +66,9 @@ const imageGenerator = async (
     throw new Error("Failed to generate image", error)
   }
 
-  return {
-    prompt: prompt,
-    url: result,
-    size: size
-  }
+  return `
+![${prompt}](${result})
+${prompt}`
 }
 
 // This is the definition of the webscrapping tool.
@@ -86,6 +82,7 @@ export const imageGeneratorTool: PlatformTool = {
     "This tool allows you to generate images from a using OpenAI DALL-E 3 model.",
   toolsFunctions: [
     {
+      resultProcessingMode: "render_markdown",
       id: "generateImage", // This is the unique identifier of the tool function.
       toolFunction: imageGenerator, // This is the function that will be called when the tool function is executed.
       description: `Generate an image from a prompt. Returns the URL of the image. 

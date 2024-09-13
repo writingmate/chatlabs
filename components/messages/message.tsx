@@ -3,18 +3,19 @@ import { ChatbotUIContext } from "@/context/context"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
-import { LLM, LLMID, MessageImage, ModelProvider } from "@/types"
+import { CodeBlock, LLM, LLMID, MessageImage, ModelProvider } from "@/types"
 import {
+  IconApi,
   IconCaretDownFilled,
   IconCaretRightFilled,
   IconCircleFilled,
   IconFileText,
   IconMoodSmile,
   IconPuzzle,
-  IconTerminal2
+  IconBulb
 } from "@tabler/icons-react"
 import Image from "next/image"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
 import { FileIcon } from "../ui/file-icon"
@@ -29,11 +30,18 @@ import AnnotationImage from "@/components/messages/annotations/image"
 import { Annotation, Annotation2 } from "@/types/annotation"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { toast } from "sonner"
+import { LoadingMessage } from "@/components/messages/message-loading"
+import { CodeBlock as ChatMessageCodeBlock } from "@/types/chat-message"
+import {
+  ResponseTime,
+  ToolCalls
+} from "@/components/messages/annotations/toolCalls"
 
 const ICON_SIZE = 32
 
 interface MessageProps {
   showActions?: boolean
+  codeBlocks?: ChatMessageCodeBlock[]
   message: Tables<"messages">
   fileItems: Tables<"file_items">[]
   isEditing: boolean
@@ -45,11 +53,8 @@ interface MessageProps {
   isGenerating: boolean
   firstTokenReceived: boolean
   setIsGenerating?: (value: boolean) => void
-  onPreviewContent?: (content: {
-    content: string
-    filename?: string
-    update: boolean
-  }) => void
+  onSelectCodeBlock?: (codeBlock: ChatMessageCodeBlock | null) => void
+  isExperimentalCodeEditor?: boolean
 }
 
 export const Message: FC<MessageProps> = ({
@@ -64,24 +69,22 @@ export const Message: FC<MessageProps> = ({
   onCancelEdit,
   onRegenerate,
   onSubmitEdit,
-  onPreviewContent,
-  showActions = true
+  onSelectCodeBlock,
+  showActions = true,
+  codeBlocks,
+  isExperimentalCodeEditor
 }) => {
   const {
     assistants,
     profile,
-    availableLocalModels,
-    availableOpenRouterModels,
+    allModels,
     selectedAssistant,
     chatImages,
-    toolInUse,
-    files,
-    models
+    files
   } = useContext(ChatbotUIContext)
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
 
-  const [isHovering, setIsHovering] = useState(false)
   const [editedMessage, setEditedMessage] = useState(message.content)
 
   const [showImagePreview, setShowImagePreview] = useState(false)
@@ -278,19 +281,7 @@ export const Message: FC<MessageProps> = ({
     }
   }, [isEditing])
 
-  const MODEL_DATA = [
-    ...models.map(model => ({
-      modelId: model.model_id as LLMID,
-      modelName: model.name,
-      provider: "custom" as ModelProvider,
-      hostedId: model.id,
-      platformLink: "",
-      imageInput: false
-    })),
-    ...LLM_LIST,
-    ...availableLocalModels,
-    ...availableOpenRouterModels
-  ].find(llm => llm.modelId === message.model) as LLM
+  const MODEL_DATA = allModels.find(llm => llm.modelId === message.model) as LLM
 
   const fileAccumulator: Record<
     string,
@@ -342,15 +333,39 @@ export const Message: FC<MessageProps> = ({
     } = {
       imageGenerator__generateImage: AnnotationImage,
       webScraper__youtubeCaptions: YouTube,
-      webScraper__googleSearch: WebSearch
+      webScraper__googleSearch: WebSearch,
+      toolCalls: ToolCalls
+    }
+
+    const annotationResponseTimeLabelMap: {
+      [key: string]: string
+    } = {
+      imageGenerator__generateImage: "Image",
+      webScraper__youtubeCaptions: "YouTube",
+      webScraper__googleSearch: "Google Search"
     }
 
     return Object.keys(annotation).map(key => {
       if (!annotationMap[key]) {
         return null
       }
+      const responseTimeLabel = annotationResponseTimeLabelMap[key]
       const AnnotationComponent = annotationMap[key]!
-      return <AnnotationComponent key={key} annotation={annotation} />
+      // @ts-ignore
+      const responseTime = responseTimeLabel ? annotation[key]?.responseTime : 0
+      return (
+        <div key={key} className={"flex flex-col space-y-3"}>
+          <AnnotationComponent annotation={annotation} />
+          {responseTime && (
+            <ResponseTime
+              icon={<IconApi stroke={1.5} size={18} />}
+              label={responseTimeLabel}
+              // @ts-ignore
+              value={responseTime}
+            />
+          )}
+        </div>
+      )
     })
   }
 
@@ -377,8 +392,8 @@ export const Message: FC<MessageProps> = ({
         <div className="space-y-3">
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
-              <IconTerminal2
-                className="border-primary bg-primary text-secondary rounded border p-1"
+              <IconBulb
+                className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
                 size={ICON_SIZE}
               />
 
@@ -457,38 +472,7 @@ export const Message: FC<MessageProps> = ({
           isGenerating &&
           isLast &&
           message.role === "assistant" ? (
-            <>
-              {(() => {
-                switch (toolInUse) {
-                  case "none":
-                    return (
-                      <div
-                        className={
-                          "bg-foreground flex size-3 items-center justify-center rounded-full"
-                        }
-                      >
-                        <IconCircleFilled className="animate-ping" size={20} />
-                      </div>
-                    )
-                  // case "retrieval":
-                  //   return (
-                  //     <div className="flex animate-ping items-center space-x-2">
-                  //       <IconFileText stroke={1.5} size={20} />
-                  //
-                  //       <div>Searching files...</div>
-                  //     </div>
-                  //   )
-                  default:
-                    return (
-                      <div className="flex items-center space-x-2">
-                        <IconPuzzle stroke={1.5} size={20} />
-
-                        <div>Using {toolInUse}...</div>
-                      </div>
-                    )
-                }
-              })()}
-            </>
+            <LoadingMessage isGenerating={isGenerating} />
           ) : isEditing ? (
             <TextareaAutosize
               textareaRef={editInputRef}
@@ -500,9 +484,10 @@ export const Message: FC<MessageProps> = ({
           ) : (
             <MessageMarkdown
               isGenerating={isGenerating && isLast}
-              experimentalCodeEditor={!!profile?.experimental_code_editor}
+              codeBlocks={codeBlocks}
               content={message.content}
-              onPreviewContent={onPreviewContent}
+              onSelectCodeBlock={onSelectCodeBlock}
+              experimental_code_editor={isExperimentalCodeEditor}
             />
           )}
         </div>

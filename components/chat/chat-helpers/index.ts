@@ -32,6 +32,11 @@ import {
   validateProPlan
 } from "@/lib/subscription"
 import { encode } from "gpt-tokenizer"
+import {
+  parseChatMessageCodeBlocksAndContent,
+  reconstructContentWithCodeBlocks,
+  reconstructContentWithCodeBlocksInChatMessage
+} from "@/lib/messages"
 
 export const validateChatSettings = (
   chatSettings: ChatSettings | null,
@@ -156,7 +161,9 @@ export const createTempMessages = (
     ]
   }
 
-  setChatMessages(newMessages)
+  console.log("newMessages", newMessages)
+
+  setChatMessages(newMessages.map(parseChatMessageCodeBlocksAndContent))
 
   return {
     tempUserChatMessage,
@@ -308,7 +315,10 @@ export const handleHostedChat = async (
     provider === "custom" ? "/api/chat/custom" : `/api/chat/${provider}`
 
   const requestBody = {
-    chatSettings: payload.chatSettings,
+    chatSettings: {
+      ...payload.chatSettings,
+      model: modelData.hostedId || modelData.modelId
+    },
     messages: formattedMessages,
     customModelId: provider === "custom" ? modelData.hostedId : ""
   }
@@ -353,64 +363,72 @@ export const fetchChatResponse = async (
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setPaywallOpen?: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const response = await fetch(url, {
-    method: "POST",
-    body: JSON.stringify(body),
-    signal: controller.signal
-  })
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(body),
+      signal: controller.signal
+    })
 
-  if (!response.ok) {
-    console.error("Error fetching chat response:", response)
+    if (!response.ok) {
+      console.error("Error fetching chat response:", response)
 
-    let errorMessage = null
-    let errorLogLevel = toast.error
+      let errorMessage = null
+      let errorLogLevel = toast.error
 
-    const statusToMessage = {
-      404: "Model not found. Make sure you have it downloaded via Ollama.",
-      429: "You are sending too many messages. Please try again in a few minutes.",
-      402: "You have reached the limit of free messages. Please upgrade to a paid plan.",
-      413: "Message is too long or image is too large. Please shorten it."
-    }
-
-    const statusToErrorLogLevel = {
-      404: toast.error,
-      429: toast.warning,
-      402: toast.warning,
-      413: toast.error
-    }
-
-    if (response.status in statusToErrorLogLevel) {
-      errorLogLevel =
-        statusToErrorLogLevel[
-          response.status as keyof typeof statusToErrorLogLevel
-        ]
-    }
-
-    if (response.status in statusToMessage) {
-      errorMessage =
-        statusToMessage[response.status as keyof typeof statusToMessage]
-    }
-
-    if (!errorMessage) {
-      try {
-        const errorData = await response.json()
-        errorMessage = errorData.message
-      } catch (error) {
-        errorMessage = "Failed to send the message. Please try again."
+      const statusToMessage = {
+        404: "Model not found.",
+        429: "You are sending too many messages. Please try again in a few minutes.",
+        402: "You have reached the limit of free messages. Please upgrade to a paid plan.",
+        413: "Message is too long or image is too large. Please shorten it."
       }
+
+      const statusToErrorLogLevel = {
+        404: toast.error,
+        429: toast.warning,
+        402: toast.warning,
+        413: toast.error
+      }
+
+      if (response.status in statusToErrorLogLevel) {
+        errorLogLevel =
+          statusToErrorLogLevel[
+            response.status as keyof typeof statusToErrorLogLevel
+          ]
+      }
+
+      if (response.status in statusToMessage) {
+        errorMessage =
+          statusToMessage[response.status as keyof typeof statusToMessage]
+      }
+
+      if (!errorMessage) {
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message
+        } catch (error) {
+          errorMessage = "Failed to send the message. Please try again."
+        }
+      }
+
+      errorLogLevel(errorMessage)
+
+      if (response.status === 402) {
+        setPaywallOpen?.(true)
+      }
+
+      setIsGenerating(false)
+      setChatMessages(prevMessages => prevMessages.slice(0, -2))
     }
 
-    errorLogLevel(errorMessage)
-
-    if (response.status === 402) {
-      setPaywallOpen?.(true)
-    }
-
+    return response
+  } catch (error) {
+    console.error("Error fetching chat response:", error)
     setIsGenerating(false)
     setChatMessages(prevMessages => prevMessages.slice(0, -2))
+    toast.error("Error fetching chat response")
+    throw error
   }
-
-  return response
 }
 
 export const processResponse = async (
@@ -434,114 +452,123 @@ export const processResponse = async (
   let chunks: string[] = []
 
   if (response.body) {
-    await consumeReadableStream(
-      response.body,
-      chunk => {
-        setResponseTimeToFirstToken?.(prev => {
-          if (prev === 0) {
-            return (Date.now() - startTime) / 1000
-          }
-          return prev
-        })
-        setFirstTokenReceived(true)
-        setToolInUse("none")
+    try {
+      await consumeReadableStream(
+        response.body,
+        chunk => {
+          setResponseTimeToFirstToken?.(prev => {
+            if (prev === 0) {
+              return (Date.now() - startTime) / 1000
+            }
+            return prev
+          })
+          setFirstTokenReceived(true)
+          setToolInUse("none")
 
-        try {
-          contentToAdd = isHosted
-            ? chunk
-            : // Ollama's streaming endpoint returns new-line separated JSON
-              // objects. A chunk may have more than one of these objects, so we
-              // need to split the chunk by new-lines and handle each one
-              // separately.
-              chunk
-                .trimEnd()
-                .split("\n")
-                .reduce(
-                  (acc, line) => acc + JSON.parse(line).message.content,
-                  ""
-                )
+          try {
+            contentToAdd = isHosted
+              ? chunk
+              : // Ollama's streaming endpoint returns new-line separated JSON
+                // objects. A chunk may have more than one of these objects, so we
+                // need to split the chunk by new-lines and handle each one
+                // separately.
+                chunk
+                  .trimEnd()
+                  .split("\n")
+                  .reduce(
+                    (acc, line) => acc + JSON.parse(line).message.content,
+                    ""
+                  )
 
-          if (contentToAdd === "") {
-            return
-          }
-
-          if (selectedTools.length > 0) {
-            chunks.push(contentToAdd)
-            if (chunk[chunk.length - 1] !== "\n") {
+            if (contentToAdd === "") {
               return
             }
 
-            const streamParts = chunks
-              .join("")
-              .split("\n")
-              .filter(x => x !== "")
-              .map(parseDataStream)
-            chunks = []
-
-            for (const { text, data: newData } of streamParts) {
-              if (newData) {
-                data = newData
-              }
-              contentToAdd = text
-              fullText += text
-            }
-          } else {
-            fullText += contentToAdd
-          }
-        } catch (error) {
-          console.error("Error parsing JSON:", error)
-        }
-
-        setResponseTimeTotal?.(prev => (Date.now() - startTime) / 1000)
-
-        setChatMessages(prev =>
-          prev.map(chatMessage => {
-            if (chatMessage.message.id === lastChatMessage.message.id) {
-              const updatedChatMessage: ChatMessage = {
-                message: {
-                  ...chatMessage.message,
-                  content: fullText,
-                  annotation: data
-                },
-                fileItems: chatMessage.fileItems
+            if (selectedTools.length > 0) {
+              chunks.push(contentToAdd)
+              if (chunk[chunk.length - 1] !== "\n") {
+                return
               }
 
-              return updatedChatMessage
+              const streamParts = chunks
+                .join("")
+                .split("\n")
+                .filter(x => x !== "")
+                .map(parseDataStream)
+              chunks = []
+
+              for (const { text, data: newData } of streamParts) {
+                if (newData) {
+                  data = newData
+                }
+                contentToAdd = text
+                fullText += text
+              }
+            } else {
+              fullText += contentToAdd
             }
-
-            return chatMessage
-          })
-        )
-      },
-      controller.signal
-    )
-
-    function findSkipTokenCount(
-      data: { [key: string]: { skipTokenCount: boolean } }[]
-    ): boolean {
-      if (!data) return false
-
-      return data.some(x => {
-        for (const key in x) {
-          if (x[key].skipTokenCount) {
-            return true
+          } catch (error) {
+            console.error("Error parsing JSON:", error)
           }
-        }
-      })
-    }
 
-    if (setResponseTokensTotal) {
-      setResponseTokensTotal(prev => {
-        if (!findSkipTokenCount(data)) {
-          return prev + encode(fullText).length
-        }
-        return prev
-      })
-    }
+          setResponseTimeTotal?.(prev => (Date.now() - startTime) / 1000)
 
-    return {
-      generatedText: fullText,
-      data
+          setChatMessages(prev =>
+            prev
+              .map(chatMessage => {
+                if (chatMessage.message.id === lastChatMessage.message.id) {
+                  const updatedChatMessage: ChatMessage = {
+                    message: {
+                      ...chatMessage.message,
+                      content: fullText,
+                      annotation: data
+                    },
+                    fileItems: chatMessage.fileItems
+                  }
+
+                  return updatedChatMessage
+                }
+
+                return chatMessage
+              })
+              .map(parseChatMessageCodeBlocksAndContent)
+          )
+        },
+        controller.signal
+      )
+
+      function findSkipTokenCount(
+        data: { [key: string]: { skipTokenCount: boolean } }[]
+      ): boolean {
+        if (!data) return false
+
+        return data.some(x => {
+          for (const key in x) {
+            if (x[key].skipTokenCount) {
+              return true
+            }
+          }
+        })
+      }
+
+      if (setResponseTokensTotal) {
+        setResponseTokensTotal(prev => {
+          if (!findSkipTokenCount(data)) {
+            return prev + encode(fullText).length
+          }
+          return prev
+        })
+      }
+
+      return {
+        generatedText: fullText,
+        data
+      }
+    } catch (error) {
+      console.error("Error processing response:", error)
+      toast.error("Something went wrong. Please try again.")
+      setChatMessages(prevMessages => prevMessages.slice(0, -2))
+      throw error
     }
   } else {
     throw new Error("Response body is null")
@@ -610,11 +637,15 @@ export const handleCreateMessages = async (
   data: any,
   updateState = true
 ) => {
+  const notCreatedPriorMessages = chatMessages
+    .filter(message => message.message.id === "")
+    .map(reconstructContentWithCodeBlocksInChatMessage)
+
   const finalUserMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
     assistant_id: null,
     user_id: profile.user_id,
-    content: messageContent,
+    content: messageContent, // This doesn't need reconstruction as it's the original user input
     model: modelData.modelId,
     role: "user",
     sequence_number: chatMessages.length,
@@ -622,11 +653,19 @@ export const handleCreateMessages = async (
     annotation: {}
   }
 
+  const reconstructedAssistantContent =
+    chatMessages.length > 0
+      ? reconstructContentWithCodeBlocks(
+          generatedText,
+          chatMessages[chatMessages.length - 1].codeBlocks || []
+        )
+      : generatedText
+
   const finalAssistantMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
     assistant_id: selectedAssistant?.id || null,
     user_id: profile.user_id,
-    content: generatedText,
+    content: reconstructedAssistantContent, // Use the reconstructed content here
     model: modelData.modelId,
     role: "assistant",
     sequence_number: chatMessages.length + 1,
@@ -641,6 +680,8 @@ export const handleCreateMessages = async (
 
     const updatedMessage = await updateMessage(lastStartingMessage.id, {
       ...lastStartingMessage,
+      // @ts-ignore
+      file_items: undefined,
       content: cleanGeneratedText
     })
 
@@ -648,9 +689,28 @@ export const handleCreateMessages = async (
 
     setChatMessages([...chatMessages])
   } else {
-    let createdMessages = cleanGeneratedText
-      ? await createMessages([finalUserMessage, finalAssistantMessage])
-      : await createMessages([finalUserMessage])
+    const createdMessages: Tables<"messages">[] = []
+    if (notCreatedPriorMessages.length > 0) {
+      const inserts = notCreatedPriorMessages.map((message, index) => {
+        return {
+          chat_id: currentChat.id,
+          assistant_id: selectedAssistant?.id || null,
+          user_id: profile.user_id,
+          content: message.message.content,
+          model: modelData.modelId,
+          role: "assistant",
+          sequence_number: index + 1,
+          image_paths: [],
+          annotation: data
+        } as TablesInsert<"messages">
+      })
+      createdMessages.push(...(await createMessages(inserts)))
+    }
+    cleanGeneratedText
+      ? createdMessages.push(
+          ...(await createMessages([finalUserMessage, finalAssistantMessage]))
+        )
+      : createdMessages.push(...(await createMessages([finalUserMessage])))
 
     const uploadPromises = newMessageImages
       .filter(obj => obj.file !== null)
@@ -720,7 +780,9 @@ export const handleCreateMessages = async (
     })
 
     if (updateState) {
-      setChatMessages(finalChatMessages as ChatMessage[])
+      setChatMessages(
+        finalChatMessages.map(parseChatMessageCodeBlocksAndContent)
+      )
     }
   }
 }

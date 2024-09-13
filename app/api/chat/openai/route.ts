@@ -9,6 +9,7 @@ import { ServerRuntime } from "next"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 import { OPENAI_LLM_LIST } from "@/lib/models/llm/openai-llm-list"
+import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 
 export const runtime: ServerRuntime = "edge"
 
@@ -33,14 +34,17 @@ export async function POST(request: Request) {
     })
 
     const supportsVision =
-      OPENAI_LLM_LIST.find(x => x.modelId === chatSettings.model)?.imageInput ||
-      false
+      OPENAI_LLM_LIST.find(x =>
+        [x.modelId, x.hostedId].includes(chatSettings.model)
+      )?.imageInput || false
 
     const response = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens: supportsVision ? 4096 : null,
+      max_tokens: supportsVision
+        ? CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH
+        : null,
       stream: true
     })
 

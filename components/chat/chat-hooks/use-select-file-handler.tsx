@@ -13,7 +13,29 @@ export const ACCEPTED_FILE_TYPES = [
   "application/json",
   "text/markdown",
   "application/pdf",
-  "text/plain"
+  "text/plain",
+  // programming files
+  ".js",
+  ".py",
+  ".go",
+  ".scala",
+  ".c",
+  ".cpp",
+  ".cs",
+  ".html",
+  ".css",
+  ".php",
+  ".ts",
+  ".java",
+  ".rb",
+  ".lua",
+  ".sh",
+  ".sql",
+  ".yaml",
+  ".yml",
+  ".md",
+  ".json",
+  ".txt"
 ].join(",")
 
 export const useSelectFileHandler = () => {
@@ -38,7 +60,9 @@ export const useSelectFileHandler = () => {
 
   const handleFilesToAccept = () => {
     const model = chatSettings?.model
-    const FULL_MODEL = LLM_LIST.find(llm => llm.modelId === model)
+    const FULL_MODEL = LLM_LIST.find(
+      llm => llm.modelId === model || llm.hostedId === model
+    )
 
     if (!FULL_MODEL) return
 
@@ -62,7 +86,10 @@ export const useSelectFileHandler = () => {
 
       if (file.type.includes("image")) {
         reader.readAsDataURL(file)
-      } else if (ACCEPTED_FILE_TYPES.split(",").includes(file.type)) {
+      } else if (
+        ACCEPTED_FILE_TYPES.split(",").includes(file.type) ||
+        ACCEPTED_FILE_TYPES.includes("." + file.name.split(".").pop())
+      ) {
         if (simplifiedFileType.includes("vnd.adobe.pdf")) {
           simplifiedFileType = "pdf"
         } else if (
@@ -137,7 +164,9 @@ export const useSelectFileHandler = () => {
             : reader.readAsText(file)
         }
       } else {
-        throw new Error("Unsupported file type")
+        toast.error("Unsupported file type " + file.type)
+        console.error("Unsupported file type " + file.type)
+        return
       }
 
       reader.onloadend = async function () {

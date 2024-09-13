@@ -166,6 +166,8 @@ interface ChatbotUIContext {
   // SIDEBAR
   showSidebar: boolean
   setShowSidebar: Dispatch<SetStateAction<boolean>>
+
+  // SYSTEM PROMPTS
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({

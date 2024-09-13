@@ -22,6 +22,8 @@ import {
 import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
+import { createApplication } from "@/db/applications"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -87,11 +89,14 @@ export const useChatHandler = () => {
     }
   }, [isPromptPickerOpen, isFilePickerOpen, isToolPickerOpen])
 
-  const handleNewChat = async (redirectTo = "") => {
+  const handleNewChat = async (
+    redirectTo = "",
+    chatMessages: ChatMessage[] = []
+  ) => {
     if (!selectedWorkspace) return
 
     setUserInput("")
-    setChatMessages([])
+    setChatMessages(chatMessages)
     setSelectedChat(null)
     setChatFileItems([])
 
@@ -205,7 +210,9 @@ export const useChatHandler = () => {
       setAbortController(newAbortController)
 
       const modelData = allModels.find(
-        llm => llm.modelId === chatSettings?.model
+        llm =>
+          llm.modelId === chatSettings?.model ||
+          llm.hostedId === chatSettings?.model
       )
 
       validateChatSettings(
@@ -252,10 +259,10 @@ export const useChatHandler = () => {
 
       let payload: ChatPayload = {
         chatSettings: chatSettings!,
-        // workspaceInstructions: selectedWorkspace?.instructions || "",
-        chatMessages: isRegeneration
+        chatMessages: (isRegeneration
           ? [...chatMessages]
-          : [...chatMessages, tempUserChatMessage],
+          : [...chatMessages, tempUserChatMessage]
+        ).map(reconstructContentWithCodeBlocksInChatMessage),
         assistant: selectedAssistant,
         messageFileItems: retrievedFileItems,
         chatFileItems: chatFileItems,
@@ -326,6 +333,8 @@ export const useChatHandler = () => {
           setChatFiles,
           setSelectedTools
         )
+
+        window.history.pushState({}, "", `/chat/${currentChat.id}`)
       } else {
         const updatedChat = await updateChat(currentChat.id, {
           updated_at: new Date().toISOString()

@@ -144,7 +144,7 @@ export async function POST(request: Request) {
       for (const toolCall of toolCalls) {
         const functionCallStartTime = new Date().getTime()
         // Reroute to local executor for local tools
-        const { result: data } = await executeTool(
+        const { result: data, resultProcessingMode } = await executeTool(
           schemaDetails,
           toolCall.function as any
         )
@@ -162,6 +162,17 @@ export async function POST(request: Request) {
           name: toolCall.function.name,
           content: JSON.stringify(data)
         })
+
+        if (
+          toolCalls.length == 1 &&
+          resultProcessingMode === "render_markdown"
+        ) {
+          return new Response(`0:${JSON.stringify(data)}\n`, {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
+        }
       }
     }
 

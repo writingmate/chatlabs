@@ -1,135 +1,57 @@
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
-import {
-  IconBolt,
-  IconChevronDown,
-  IconCircleCheckFilled,
-  IconPuzzle
-} from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { IconPuzzle, IconCircleCheckFilled } from "@tabler/icons-react"
+import { FC, useContext } from "react"
+import { MultiSelect } from "@/components/ui/multi-select"
 
 interface AssistantToolSelectProps {
   selectedAssistantTools: Tables<"tools">[]
-  onAssistantToolsSelect: (tool: Tables<"tools">) => void
+  onAssistantToolsSelect: (tools: Tables<"tools">[]) => void
 }
 
 export const AssistantToolSelect: FC<AssistantToolSelectProps> = ({
   selectedAssistantTools,
   onAssistantToolsSelect
 }) => {
-  const { tools, platformTools } = useContext(ChatbotUIContext)
-
-  const inputRef = useRef<HTMLInputElement>(null)
-  const triggerRef = useRef<HTMLButtonElement>(null)
-
-  const [isOpen, setIsOpen] = useState(false)
-  const [search, setSearch] = useState("")
-
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        inputRef.current?.focus()
-      }, 100) // FIX: hacky
-    }
-  }, [isOpen])
-
-  const handleToolSelect = (tool: Tables<"tools">) => {
-    onAssistantToolsSelect(tool)
-  }
+  const { tools } = useContext(ChatbotUIContext)
 
   if (!tools) return null
 
+  const validTools = tools.filter(tool => tool && tool.id && tool.name)
+
   return (
-    <DropdownMenu
-      open={isOpen}
-      onOpenChange={isOpen => {
-        setIsOpen(isOpen)
-        setSearch("")
+    <MultiSelect
+      options={validTools.map(tool => ({ value: tool.id, label: tool.name }))}
+      selectedOptions={selectedAssistantTools
+        .filter(tool => tool && tool.id && tool.name)
+        .map(tool => ({
+          value: tool.id,
+          label: tool.name
+        }))}
+      onChange={selected => {
+        const selectedTools = validTools.filter(tool =>
+          selected.some(s => s.value === tool.id)
+        )
+        onAssistantToolsSelect(selectedTools)
       }}
-    >
-      <DropdownMenuTrigger
-        className="bg-background w-full justify-start border px-3 py-5"
-        asChild
-      >
-        <Button
-          ref={triggerRef}
-          className="flex items-center justify-between"
-          variant="ghost"
-        >
-          <div className="flex items-center">
-            <div className="ml-2 flex items-center">
-              {selectedAssistantTools.length} tools selected
-            </div>
-          </div>
-
-          <IconChevronDown />
-        </Button>
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent
-        style={{ width: triggerRef.current?.offsetWidth }}
-        className="space-y-2 overflow-auto p-2"
-        align="start"
-      >
-        <Input
-          ref={inputRef}
-          placeholder="Search tools..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          onKeyDown={e => e.stopPropagation()}
+      renderOption={(option, selected, onSelect) => (
+        <AssistantToolItem
+          key={option.value}
+          tool={validTools.find(t => t.id === option.value)!}
+          selected={selected}
+          onSelect={onSelect}
         />
-
-        {selectedAssistantTools
-          .filter(item =>
-            item.name.toLowerCase().includes(search.toLowerCase())
-          )
-          .map(tool => (
-            <AssistantToolItem
-              key={tool.id}
-              tool={tool}
-              selected={selectedAssistantTools.some(
-                selectedAssistantRetrieval =>
-                  selectedAssistantRetrieval.id === tool.id
-              )}
-              onSelect={handleToolSelect}
-            />
-          ))}
-
-        {tools
-          .filter(
-            tool =>
-              !selectedAssistantTools.some(
-                selectedAssistantRetrieval =>
-                  selectedAssistantRetrieval.id === tool.id
-              ) && tool.name.toLowerCase().includes(search.toLowerCase())
-          )
-          .map(tool => (
-            <AssistantToolItem
-              key={tool.id}
-              tool={tool}
-              selected={selectedAssistantTools.some(
-                selectedAssistantRetrieval =>
-                  selectedAssistantRetrieval.id === tool.id
-              )}
-              onSelect={handleToolSelect}
-            />
-          ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      )}
+      placeholder="Select plugins"
+      searchPlaceholder="Search plugins..."
+    />
   )
 }
 
 interface AssistantToolItemProps {
   tool: Tables<"tools">
   selected: boolean
-  onSelect: (tool: Tables<"tools">) => void
+  onSelect: () => void
 }
 
 const AssistantToolItem: FC<AssistantToolItemProps> = ({
@@ -137,23 +59,19 @@ const AssistantToolItem: FC<AssistantToolItemProps> = ({
   selected,
   onSelect
 }) => {
-  const handleSelect = () => {
-    onSelect(tool)
-  }
+  if (!tool) return null
 
   return (
     <div
       className="flex cursor-pointer items-center justify-between py-0.5 hover:opacity-50"
-      onClick={handleSelect}
+      onClick={onSelect}
     >
       <div className="flex grow items-center truncate">
         <div className="mr-2 min-w-[24px]">
           <IconPuzzle size={24} />
         </div>
-
         <div className="truncate">{tool.name}</div>
       </div>
-
       {selected && (
         <IconCircleCheckFilled size={20} className="min-w-[30px] flex-none" />
       )}

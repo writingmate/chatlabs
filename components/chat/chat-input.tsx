@@ -11,7 +11,7 @@ import {
   IconArrowUp,
   IconPrompt,
   IconPlus,
-  IconTerminal2
+  IconBulb
 } from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Input } from "../ui/input"
@@ -181,6 +181,8 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
     if (!isTyping && isSendShortcut(event) && !isUploading) {
       event.preventDefault()
       setIsPromptPickerOpen(false)
+      setTranscript("")
+      setUserInputBeforeRecording("")
       handleSendMessage(userInput, chatMessages, false)
     }
 
@@ -226,7 +228,9 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
 
   const handlePaste = (event: React.ClipboardEvent) => {
     const imagesAllowed = LLM_LIST.find(
-      llm => llm.modelId === chatSettings?.model
+      llm =>
+        llm.modelId === chatSettings?.model ||
+        llm.hostedId === chatSettings?.model
     )?.imageInput
 
     const items = event.clipboardData.items
@@ -373,6 +377,8 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
                   onClick={() => {
                     if (!userInput || isUploading) return
                     handleSendMessage(userInput, chatMessages, false)
+                    setTranscript("")
+                    setUserInputBeforeRecording("")
                   }}
                   stroke={1.5}
                   size={24}

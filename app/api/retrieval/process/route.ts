@@ -59,6 +59,18 @@ export async function POST(req: Request) {
       case "pdf":
         chunks = await processPdf(blob)
         break
+      case "php":
+      case "js":
+      case "py":
+      case "java":
+      case "go":
+      case "c":
+      case "cpp":
+      case "scala":
+      case "ts":
+      case "octet-stream":
+      // programming files
+
       case "txt":
         chunks = await processTxt(blob)
         break
@@ -66,7 +78,10 @@ export async function POST(req: Request) {
         chunks = await processTxt(blob, 0)
         break
       default:
-        return createErrorResponse("Unsupported file type", 400)
+        return createErrorResponse(
+          "Unsupported file type " + fileExtension,
+          400
+        )
     }
 
     if (chunks.length === 0) {

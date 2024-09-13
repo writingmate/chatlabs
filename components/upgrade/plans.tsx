@@ -9,7 +9,8 @@ import {
   IconBooks,
   IconFileDescription,
   IconGlobe,
-  IconPhoto
+  IconPhoto,
+  IconShield
 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { PlanFeature } from "@/components/upgrade/plan-picker"
@@ -177,11 +178,11 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                     <PlanFeature title="Connect keys for GPT-4o, Mistral, Claude 3, Gemini Pro, LLama 3, Perplexity, Groq, and other models" />
                   </FeatureGroup>
                   <FeatureGroup
-                    icon={<IconRobot size={20} />}
-                    title="Free Models"
+                    icon={<IconShield size={20} />}
+                    title="Privacy and Security"
                   >
-                    <PlanFeature title="Access to all free models without API keys" />
-                    <PlanFeature title="Including GPT-3.5 Turbo, Claude Haiku, DBRX Instruct, Mistral Tiny" />
+                    <PlanFeature title="Conversations and search results are private" />
+                    <PlanFeature title="Generated images are private" />
                   </FeatureGroup>
                 </div>
               </div>
@@ -235,6 +236,13 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                   >
                     <PlanFeature title="Access to all 30+ AI models" />
                     <PlanFeature title="Including GPT-4o, Mistral, Claude 3.5, Gemini Pro, LLama 3, Perplexity, Groq" />
+                  </FeatureGroup>
+                  <FeatureGroup
+                    icon={<IconShield size={20} />}
+                    title="Privacy and Security"
+                  >
+                    <PlanFeature title="Conversations and search results are private" />
+                    <PlanFeature title="Generated images are private" />
                   </FeatureGroup>
                   <FeatureGroup
                     icon={<IconPhoto size={20} />}

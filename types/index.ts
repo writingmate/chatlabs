@@ -13,3 +13,15 @@ export * from "./llms"
 export * from "./models"
 export * from "./sharing"
 export * from "./sidebar-data"
+
+export interface Application {
+  id: string
+  user_id: string
+  workspace_id: string
+  folder_id: string | null
+  name: string
+  description: string
+  sharing: string
+  created_at: string
+  updated_at: string | null
+}

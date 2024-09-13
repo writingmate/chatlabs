@@ -4,17 +4,14 @@ import { Tables } from "@/supabase/types"
 import { FC, useContext, useMemo, useState } from "react"
 import { Message } from "../messages/message"
 import { ChatbotUIChatContext } from "@/context/chat"
-import { as } from "@upstash/redis/zmscore-10fd3773"
+import { CodeBlock } from "@/types/chat-message"
+import { isMobileScreen } from "@/lib/mobile"
 
 interface ChatMessagesProps {
-  onPreviewContent?: (content: {
-    content: string
-    filename?: string
-    update: boolean
-  }) => void
+  onSelectCodeBlock: (codeBlock: CodeBlock | null) => void
 }
 
-export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {
+export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
   const {
     chatMessages,
     chatFileItems,
@@ -24,6 +21,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {
   } = useContext(ChatbotUIChatContext)
 
   const { handleSendEdit, handleSendMessage } = useChatHandler()
+  const { profile } = useContext(ChatbotUIContext)
 
   async function handleRegenerate(editedMessage?: string) {
     setIsGenerating(true)
@@ -36,6 +34,8 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {
   }
 
   const [editingMessage, setEditingMessage] = useState<Tables<"messages">>()
+
+  const isMobile = isMobileScreen()
 
   return useMemo(
     () =>
@@ -53,7 +53,8 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {
               isGenerating={isGenerating}
               setIsGenerating={setIsGenerating}
               firstTokenReceived={firstTokenReceived}
-              key={chatMessage.message.sequence_number}
+              key={index}
+              codeBlocks={chatMessage.codeBlocks}
               message={chatMessage.message}
               fileItems={messageFileItems}
               isEditing={editingMessage?.id === chatMessage.message.id}
@@ -61,8 +62,11 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {
               onStartEdit={setEditingMessage}
               onCancelEdit={() => setEditingMessage(undefined)}
               onSubmitEdit={handleSendEdit}
-              onPreviewContent={onPreviewContent}
+              onSelectCodeBlock={onSelectCodeBlock}
               onRegenerate={handleRegenerate}
+              isExperimentalCodeEditor={
+                !!profile?.experimental_code_editor && !isMobile
+              }
             />
           )
         }),
@@ -71,7 +75,9 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onPreviewContent }) => {
       chatFileItems,
       editingMessage,
       isGenerating,
-      firstTokenReceived
+      firstTokenReceived,
+      onSelectCodeBlock,
+      isMobile
     ]
   )
 }

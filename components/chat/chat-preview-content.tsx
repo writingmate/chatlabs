@@ -1,57 +1,47 @@
-import { FC } from "react"
-import { MessageCodeBlock } from "@/components/messages/message-codeblock"
+import { FC, useMemo } from "react"
 import { cn } from "@/lib/utils"
+import { CodeViewer } from "@/components/code-viewer/code-viewer"
+import { CodeBlock } from "@/types/chat-message"
 
 interface ChatPreviewContentProps {
   open: boolean
   isGenerating: boolean
-  content: {
-    content: string
-    filename?: string
-  } | null
-  onPreviewContent?: (
-    content: {
-      content: string
-      filename?: string
-      update: boolean
-    } | null
-  ) => void
+  selectedCodeBlock: CodeBlock | null
+  onSelectCodeBlock?: (codeBlock: CodeBlock | null) => void
+  isEditable: boolean
+  onCodeChange: (updatedCode: string) => void
 }
+
 export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   open,
   isGenerating,
-  content,
-  onPreviewContent
+  selectedCodeBlock,
+  onSelectCodeBlock,
+  isEditable,
+  onCodeChange
 }) => {
-  // language is the first line of the content
-  // the rest is the code
-
-  let language = "",
-    code: string[] = []
-
-  if (content) {
-    ;[language, ...code] = content.content.split("\n")
-  }
-
-  return (
-    <div
-      className={cn(
-        "fixed bottom-2 right-4 top-14 transition-[width]",
-        open ? "w-[calc(100%-30px)] lg:w-[calc(50%-30px)]" : "w-0"
-      )}
-    >
-      {open && content && (
-        <MessageCodeBlock
-          isGenerating={isGenerating}
-          onClose={() => onPreviewContent?.(null)}
-          className={"h-full"}
-          language={language}
-          filename={content.filename}
-          value={code.join("\n")}
-          showCloseButton={true}
-          autoScroll={true}
-        />
-      )}
-    </div>
+  return useMemo(
+    () => (
+      <div
+        className={cn(
+          "max-w-[50%] shrink-0 overflow-hidden transition-[width] duration-200",
+          open ? "w-[100%]" : "w-[0%]"
+        )}
+      >
+        {open && selectedCodeBlock && (
+          <CodeViewer
+            isGenerating={isGenerating}
+            onClose={() => onSelectCodeBlock?.(null)}
+            className={"h-full rounded-none"}
+            codeBlock={selectedCodeBlock}
+            showCloseButton={true}
+            autoScroll={isGenerating}
+            isEditable={isEditable}
+            onCodeChange={onCodeChange}
+          />
+        )}
+      </div>
+    ),
+    [open, isGenerating, selectedCodeBlock, isEditable, onCodeChange]
   )
 }

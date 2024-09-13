@@ -13,6 +13,47 @@ export const runtime = "edge"
 
 export const maxDuration = 300
 
+function addCacheControlToUserMessages(messages: any[], limit = 2) {
+  // adds cache_control to the last `limit` user messages content
+  return messages.map((message, index) => {
+    if (message.role === "user" && index >= messages.length - limit - 1) {
+      if (typeof message.content === "string") {
+        return {
+          ...message,
+          content: [
+            {
+              type: "text",
+              text: message.content,
+              cache_control: {
+                type: "ephemeral"
+              }
+            }
+          ]
+        }
+      }
+
+      if (Array.isArray(message.content)) {
+        return {
+          ...message,
+          content: message.content.map((y: any) => {
+            if (y.type === "text") {
+              return {
+                type: "text",
+                text: y.text,
+                cache_control: {
+                  type: "ephemeral"
+                }
+              }
+            }
+            return y
+          })
+        }
+      }
+    }
+    return message
+  })
+}
+
 export async function POST(request: NextRequest) {
   const json = await request.json()
   const { chatSettings, messages } = json as {
@@ -25,7 +66,9 @@ export async function POST(request: NextRequest) {
     checkApiKey(profile.anthropic_api_key, "Anthropic")
     await validateModelAndMessageCount(chatSettings.model, new Date())
 
-    let ANTHROPIC_FORMATTED_MESSAGES: any = messages.slice(1)
+    let ANTHROPIC_FORMATTED_MESSAGES: any = addCacheControlToUserMessages(
+      messages.slice(1)
+    )
 
     const anthropic = new Anthropic({
       apiKey: profile.anthropic_api_key || "",
@@ -37,14 +80,25 @@ export async function POST(request: NextRequest) {
         model: chatSettings.model,
         messages: ANTHROPIC_FORMATTED_MESSAGES,
         temperature: chatSettings.temperature,
-        system: messages[0].content,
+        system: [
+          {
+            type: "text",
+            text: messages[0].content,
+            // @ts-ignore
+            cache_control: {
+              type: "ephemeral"
+            }
+          }
+        ],
         max_tokens:
           CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH,
         stream: true
       },
       {
         headers: {
-          "anthropic-beta": "max-tokens-3-5-sonnet-2024-07-15"
+          "anthropic-version": "2023-06-01",
+          "anthropic-beta":
+            "prompt-caching-2024-07-31,max-tokens-3-5-sonnet-2024-07-15"
         }
       }
     )

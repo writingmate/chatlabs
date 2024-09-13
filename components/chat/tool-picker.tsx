@@ -84,7 +84,9 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
     }
 
   const toolsSupported = LLM_LIST.find(
-    llm => llm.modelId === chatSettings?.model
+    llm =>
+      llm.modelId === chatSettings?.model ||
+      llm.hostedId === chatSettings?.model
   )?.tools
 
   return (

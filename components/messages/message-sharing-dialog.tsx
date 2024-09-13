@@ -6,13 +6,14 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { CopyButton } from "@/components/messages/message-codeblock"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { createFile } from "@/db/files"
 import { IconExternalLink, IconShare3, IconWorld } from "@tabler/icons-react"
 import Link from "next/link"
+
+import { CopyButton } from "@/components/ui/copy-button"
 
 interface MessageSharingDialogProps {
   user: any
@@ -73,6 +74,7 @@ export function MessageSharingDialog({
         setUrl(window.location.origin + `/share/${result.hashid}`)
       })
       .catch(error => {
+        console.error(error)
         toast.error("Failed to upload.")
       })
       .finally(() => {

@@ -17,8 +17,10 @@ import {
   IconCircleCheckFilled,
   IconCircleXFilled,
   IconFileDownload,
+  IconInfoCircle,
   IconLoader2,
   IconLogout,
+  IconSettings,
   IconUser
 } from "@tabler/icons-react"
 import Image from "next/image"
@@ -50,10 +52,13 @@ import { PLAN_FREE } from "@/lib/stripe/config"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { debounce } from "@/lib/debounce"
 
-interface ProfileSettingsProps {}
+interface ProfileSettingsProps {
+  isCollapsed: boolean
+}
 
-export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
+export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
   const {
     profile,
     setProfile,
@@ -265,20 +270,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     setIsOpen(false)
   }
 
-  const debounce = (func: (...args: any[]) => void, wait: number) => {
-    let timeout: NodeJS.Timeout | null
-
-    return (...args: any[]) => {
-      const later = () => {
-        if (timeout) clearTimeout(timeout)
-        func(...args)
-      }
-
-      if (timeout) clearTimeout(timeout)
-      timeout = setTimeout(later, wait)
-    }
-  }
-
   const checkUsernameAvailability = useCallback(
     debounce(async (username: string) => {
       if (!username) return
@@ -342,12 +333,31 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Avatar>
-          <AvatarImage src={profile.image_url!} height={34} width={34} />
-          <AvatarFallback>
-            <IconUser size={SIDEBAR_ICON_SIZE} />
-          </AvatarFallback>
-        </Avatar>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "flex w-full items-center justify-start space-x-2 rounded-lg p-2 pl-1 text-sm",
+            isCollapsed ? "justify-center pl-2" : ""
+          )}
+        >
+          <Avatar className="size-8">
+            <AvatarImage src={profile.image_url!} />
+            <AvatarFallback>
+              <IconUser size={SIDEBAR_ICON_SIZE} />
+            </AvatarFallback>
+          </Avatar>
+          {!isCollapsed && (
+            <div className="flex w-full items-center justify-between">
+              <div>{profile.display_name}</div>
+              <IconSettings
+                size={18}
+                className="text-muted-foreground"
+                stroke={1.5}
+              />
+            </div>
+          )}
+        </Button>
       </SheetTrigger>
 
       <SheetContent
@@ -387,7 +397,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               )}
             </TabsList>
 
-            <TabsContent className="mt-4" value="profile">
+            <TabsContent className="mt-2" value="profile">
               <form className={"space-y-2"}>
                 {/*<div className="space-y-1">*/}
                 {/*  <div className="flex items-center space-x-2">*/}
@@ -480,11 +490,24 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   />
                 </div>
                 <div className="flex items-center justify-between space-y-1">
-                  <div>
-                    <Label>Enable Experimental Code Editor</Label>
-                    <div className={"text-foreground/60 text-xs"}>
-                      Try experimental side-by-side code editor.
-                    </div>
+                  <div className="flex items-center space-x-2">
+                    <Label>Side-by-Side Code Viewer</Label>
+                    <WithTooltip
+                      trigger={
+                        <IconInfoCircle
+                          size={18}
+                          stroke={1.5}
+                          className="text-foreground/60"
+                        />
+                      }
+                      display={
+                        <div className={"text-xs"}>
+                          If enabled, code will be displayed in a side-by-side
+                          editor on the right from the message thread. This
+                          feature is currently in beta.
+                        </div>
+                      }
+                    />
                   </div>
                   <Switch
                     checked={experimentalCodeEditor}
@@ -515,7 +538,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </form>
             </TabsContent>
 
-            <TabsContent className="mt-4 space-y-4" value="keys">
+            <TabsContent className="mt-2 space-y-4" value="keys">
               <div className="mt-5 space-y-2">
                 <Label className="flex items-center">
                   {useAzureOpenai
@@ -807,7 +830,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 )}
               </div>
             </TabsContent>
-            <TabsContent className="mt-4 space-y-4 py-2" value="shortcuts">
+            <TabsContent className="mt-2 space-y-4 py-2" value="shortcuts">
               <div className="space-y-5">
                 <div className={"flex items-center justify-between"}>
                   <Label>
@@ -870,7 +893,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </Tabs>
         </div>
 
-        <div className="mt-2 flex items-center">
+        <div className="flex items-center">
           <div className="flex items-center space-x-1">
             <ThemeSwitcher />
 

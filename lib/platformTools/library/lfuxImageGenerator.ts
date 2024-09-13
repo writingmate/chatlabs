@@ -87,7 +87,6 @@ export const flux1ProTools: PlatformTool = {
       description: `Generate images using FLUX.1 Pro based on a text description. 
 Returns the URL of the image.
 Do not use semi-colons when describing the image. Never use html, always use Markdown.
-You should only return the function call in tools call sections.
         `, // This is the description of the tool function.
       parameters: [
         // These are the parameters of the tool function.

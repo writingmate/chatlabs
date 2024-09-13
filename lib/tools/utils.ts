@@ -3,6 +3,7 @@ import { platformToolFunctionSpec } from "@/lib/platformTools/utils/platformTool
 import { Tables } from "@/supabase/types"
 import OpenAI from "openai"
 import { openapiToFunctions } from "@/lib/openapi-conversion"
+import { getApplicationTools } from "@/db/applications"
 
 export const TOOLS_SYSTEM_PROMPT = `
 Today is ${new Date().toLocaleDateString()}.
@@ -21,7 +22,8 @@ export function prependSystemPrompt(messages: any[]) {
 
 export async function executeTool(
   schemaDetails: any,
-  functionCall: FunctionCallPayload
+  functionCall: FunctionCallPayload,
+  applicationId?: string
 ) {
   const functionName = functionCall.name
   const resultProcessingMode = "send_to_llm"
@@ -47,6 +49,19 @@ export async function executeTool(
 
     if (!toolFunctionSpec) {
       throw new Error(`Function ${functionName} not found`)
+    }
+
+    if (applicationId) {
+      // Fetch application-specific tools
+      const applicationTools = await getApplicationTools(applicationId)
+      const applicationToolIds = applicationTools.map(tool => tool?.id)
+
+      // Check if the called function is allowed for this application
+      if (!applicationToolIds.includes(toolFunctionSpec.id)) {
+        throw new Error(
+          `Function ${functionName} is not allowed for this application`
+        )
+      }
     }
 
     return {

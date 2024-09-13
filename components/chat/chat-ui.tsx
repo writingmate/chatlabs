@@ -1,12 +1,7 @@
 "use client"
 
-import React, { useContext, useEffect, useState } from "react"
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams
-} from "next/navigation"
+import React, { useCallback, useContext, useEffect, useState } from "react"
+import { useParams, useSearchParams } from "next/navigation"
 import { ChatbotUIContext } from "@/context/context"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { useAuth } from "@/context/auth"
@@ -15,10 +10,9 @@ import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and
 import { useScroll } from "./chat-hooks/use-scroll"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { useTheme } from "next-themes"
-import { LLMID, MessageImage } from "@/types"
+import { ChatMessage, LLMID, MessageImage } from "@/types"
 import { Tables } from "@/supabase/types"
 import { parseIdFromSlug } from "@/lib/slugify"
-import { cn } from "@/lib/utils"
 
 import Loading from "@/components/ui/loading"
 import { ChatInput } from "./chat-input"
@@ -36,13 +30,22 @@ import { IconMessagePlus } from "@tabler/icons-react"
 import { getPromptById } from "@/db/prompts"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getChatFilesByChatId } from "@/db/chat-files"
-import { getMessagesByChatId } from "@/db/messages"
+import {
+  getMessageById,
+  getMessagesByChatId,
+  updateMessage
+} from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
-import { Virtualizer } from "virtua"
-import { bo } from "@upstash/redis/zmscore-10fd3773"
-import { ShareChatButton } from "@/components/chat/chat-share-button"
+import { getFileByHashId } from "@/db/files"
+import {
+  parseChatMessageCodeBlocksAndContent,
+  parseDBMessageCodeBlocksAndContent,
+  reconstructContentWithCodeBlocks,
+  reconstructContentWithCodeBlocksInChatMessage
+} from "@/lib/messages"
+import { CodeBlock } from "@/types/chat-message"
 
 interface ChatUIProps {
   showModelSelector?: boolean
@@ -55,8 +58,6 @@ export const ChatUI: React.FC<ChatUIProps> = ({
 }) => {
   const params = useParams()
   const chatId = params.chatid as string
-  const router = useRouter()
-  const pathname = usePathname()
   const searchParams = useSearchParams()
   const { theme } = useTheme()
 
@@ -76,6 +77,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
   } = useContext(ChatbotUIContext)
 
   const {
+    chatSettings,
     setSelectedChat,
     setChatSettings,
     setChatFileItems,
@@ -85,8 +87,13 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     isGenerating
   } = useContext(ChatbotUIChatContext)
 
-  const { handleNewChat, handleFocusChatInput, handleSendMessage } =
-    useChatHandler()
+  const {
+    handleNewChat,
+    handleFocusChatInput,
+    handleSendMessage,
+    handleSendEdit
+  } = useChatHandler()
+
   const { handleSelectPromptWithVariables } = usePromptAndCommand()
   const {
     scrollRef,
@@ -99,11 +106,9 @@ export const ChatUI: React.FC<ChatUIProps> = ({
 
   const [editorOpen, setEditorOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(true)
-  const [previewContent, setPreviewContent] = useState<{
-    content: string
-    filename?: string
-    update: boolean
-  } | null>(null)
+  const [selectedCodeBlock, setSelectedCodeBlock] = useState<CodeBlock | null>(
+    null
+  )
 
   useHotkey("o", handleNewChat)
   useHotkey("l", handleFocusChatInput)
@@ -111,6 +116,16 @@ export const ChatUI: React.FC<ChatUIProps> = ({
   useEffect(() => {
     if (assistant) {
       setSelectedAssistant(assistant)
+      setChatSettings({
+        ...chatSettings,
+        model: assistant.model as LLMID,
+        prompt: assistant.prompt,
+        temperature: assistant.temperature,
+        contextLength: assistant.context_length,
+        includeProfileContext: assistant.include_profile_context,
+        includeWorkspaceInstructions: assistant.include_workspace_instructions,
+        embeddingsProvider: assistant.embeddings_provider as "openai" | "local"
+      })
     }
     if (!chatId) {
       setLoading(false)
@@ -123,12 +138,6 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     handleSearchParams()
   }, [searchParams])
 
-  useEffect(() => {
-    if (showSidebar) {
-      setPreviewContent(null)
-    }
-  }, [showSidebar])
-
   const fetchChatData = async (): Promise<void> => {
     await Promise.all([fetchMessages(), fetchChat()])
     scrollToBottom()
@@ -137,9 +146,82 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setLoading(false)
   }
 
+  const createRemixMessages = (
+    filename: string,
+    content: string
+  ): ChatMessage[] =>
+    [
+      {
+        fileItems: [],
+        message: {
+          content: `Remixing ${filename}`,
+          annotation: {},
+          assistant_id: null,
+          created_at: new Date().toISOString(),
+          role: "user",
+          chat_id: chatId,
+          id: "",
+          image_paths: [],
+          model: chatSettings?.model!,
+          sequence_number: 0,
+          updated_at: null,
+          user_id: user?.id!,
+          word_count: 0
+        }
+      },
+      {
+        fileItems: [],
+        message: {
+          content: `\`\`\`html
+#filename=${filename}#
+${content}
+\`\`\``,
+          annotation: {},
+          assistant_id: null,
+          created_at: new Date().toISOString(),
+          role: "assistant",
+          chat_id: chatId,
+          id: "",
+          image_paths: [],
+          model: chatSettings?.model!,
+          sequence_number: 1,
+          updated_at: null,
+          user_id: user?.id!,
+          word_count: 0
+        }
+      }
+    ].map(parseChatMessageCodeBlocksAndContent)
+
+  async function handleForkMessage(messageId: string, sequenceNo: number) {
+    const message = await getMessageById(messageId)
+    if (message) {
+      const codeBlock =
+        parseDBMessageCodeBlocksAndContent(message)?.codeBlocks?.[sequenceNo]
+      if (codeBlock && codeBlock.language === "html" && codeBlock.filename) {
+        await handleNewChat(
+          "",
+          createRemixMessages(codeBlock.filename, codeBlock.code)
+        )
+      }
+    }
+  }
+
+  function handleRemixFile(fileId: string) {
+    getFileByHashId(fileId).then(file => {
+      if (chatMessages?.length === 0 && file && file.type === "html") {
+        setChatMessages(
+          createRemixMessages(file.name, file.file_items[0].content)
+        )
+      }
+    })
+  }
+
   const handleSearchParams = (): void => {
     const promptId = searchParams.get("prompt_id")
     const modelId = searchParams.get("model") as LLMID
+    const remixFileId = searchParams.get("remix")
+    const forkMessageId = searchParams.get("forkMessageId")
+    const forkSequenceNo = parseInt(searchParams.get("forkSequenceNo") || "-1")
 
     if (promptId) {
       getPromptById(parseIdFromSlug(promptId))
@@ -153,7 +235,13 @@ export const ChatUI: React.FC<ChatUIProps> = ({
       setChatSettings(prev => ({ ...prev, model: modelId as LLMID }))
     }
 
-    // router.replace(pathname)
+    if (chatMessages?.length === 0 && remixFileId) {
+      handleRemixFile(remixFileId)
+    }
+
+    if (chatMessages?.length === 0 && forkMessageId && forkSequenceNo > -1) {
+      handleForkMessage(forkMessageId, forkSequenceNo)
+    }
   }
 
   const fetchMessages = async (): Promise<void> => {
@@ -178,13 +266,22 @@ export const ChatUI: React.FC<ChatUIProps> = ({
         file: null
       }))
     )
-    setChatMessages(
-      fetchedMessages.map(message => ({
-        message,
-        fileItems: message.file_items.map(fileItem => fileItem.id)
-      }))
-    )
+    setChatMessages(fetchedMessages.map(parseDBMessageCodeBlocksAndContent))
   }
+
+  useEffect(() => {
+    if (chatMessages?.length > 0) {
+      const lastMessage = chatMessages[chatMessages.length - 1]
+      const codeBlocks = lastMessage?.codeBlocks
+      if (
+        codeBlocks &&
+        codeBlocks.length > 0 &&
+        !!codeBlocks[codeBlocks.length - 1].filename
+      ) {
+        setSelectedCodeBlock(codeBlocks[codeBlocks.length - 1])
+      }
+    }
+  }, [chatMessages])
 
   const fetchMessageImages = async (
     messages: Tables<"messages">[]
@@ -247,105 +344,126 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     })
   }
 
-  const handlePreviewContent = (
-    content: {
-      content: string
-      filename?: string
-      update: boolean
-    } | null
-  ): void => {
-    setPreviewContent(prev => {
-      if (content && !content.update) {
-        setEditorOpen(true)
+  const handleSelectCodeBlock = useCallback(
+    (codeBlock: CodeBlock | null): void => {
+      setSelectedCodeBlock(prev => {
+        if (codeBlock) {
+          setEditorOpen(true)
+        } else {
+          setEditorOpen(false)
+        }
+        return codeBlock
+      })
+    },
+    []
+  )
+
+  const handleCodeChange = (updatedCode: string): void => {
+    if (selectedCodeBlock) {
+      const updatedMessage = chatMessages?.find(
+        message => message.message?.id === selectedCodeBlock.messageId
+      )
+      if (
+        updatedMessage &&
+        updatedMessage.codeBlocks &&
+        updatedMessage.codeBlocks.length > 0
+      ) {
+        updatedMessage.codeBlocks[updatedMessage.codeBlocks.length - 1].code =
+          updatedCode
+        setChatMessages(prev => {
+          const updatedMessages = [...prev]
+          const index = updatedMessages.findIndex(
+            message => message.message?.id === selectedCodeBlock.messageId
+          )
+          if (index !== -1) {
+            updatedMessages[index] = updatedMessage
+          }
+          return updatedMessages
+        })
+        setSelectedCodeBlock(
+          updatedMessage.codeBlocks[updatedMessage.codeBlocks.length - 1]
+        )
+        updateMessage(updatedMessage.message!.id, {
+          content: reconstructContentWithCodeBlocks(
+            updatedMessage.message?.content || "",
+            updatedMessage.codeBlocks
+          )
+        })
       }
-      if (!content) {
-        setEditorOpen(false)
-      }
-      return content
-    })
-    if (editorOpen) {
-      setShowSidebar(false)
     }
   }
 
+  const isCodeBlockEditable = useCallback(
+    (codeBlock: CodeBlock | null): boolean => {
+      if (!codeBlock) return false
+      // only allow editing if the code block is the last one in the conversation
+      // we need to find the last message that has a code block
+      const lastMessage = chatMessages
+        ?.filter(message => message.codeBlocks && message.codeBlocks.length > 0)
+        .pop()
+      return lastMessage?.message?.id === codeBlock.messageId && !isGenerating
+    },
+    [chatMessages, isGenerating]
+  )
+
   return (
-    <div
-      ref={scrollRef}
-      onScroll={handleScroll}
-      className="relative flex size-full flex-1 flex-col overflow-hidden overflow-y-auto"
-    >
-      {/* Header */}
-      <div className="bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 justify-between p-2">
-        <div className="flex items-center">
-          {(!showSidebar || assistant) && (
-            <WithTooltip
-              delayDuration={200}
-              display={<div>Start a new chat</div>}
-              trigger={
-                <IconMessagePlus
-                  className="ml-2 cursor-pointer hover:opacity-50"
-                  size={24}
-                  stroke={1.5}
-                  onClick={() =>
-                    handleNewChat(assistant ? "/a/" + assistant.hashid : "")
-                  }
-                />
-              }
-            />
-          )}
-          {!assistant && <QuickSettings />}
-        </div>
-        {showModelSelector && <ChatSettings />}
-      </div>
-
-      {/* Chat Content */}
-      <div className="flex size-full">
-        {loading ? (
-          <Loading />
-        ) : (
-          <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col">
-            {chatMessages?.length === 0 ? (
-              <EmptyChatView
-                selectedAssistant={selectedAssistant}
-                theme={theme}
-              />
-            ) : (
-              <>
-                <div ref={messagesStartRef} />
-                <ChatMessages onPreviewContent={handlePreviewContent} />
-                <div ref={messagesEndRef} className="min-h-20 flex-1" />
-              </>
-            )}
-            <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
-              {chatMessages?.length === 0 && (
-                <ConversationStarters
-                  values={selectedAssistant?.conversation_starters}
-                  onSelect={(value: string) =>
-                    handleSendMessage(value, chatMessages, false)
-                  }
-                />
-              )}
-              <ChatInput showAssistant={!selectedAssistant} />
-              <ChatMessageCounter />
-            </div>
+    <>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="relative flex h-full flex-1 shrink-0 flex-col overflow-hidden overflow-y-auto"
+      >
+        {/* Header */}
+        <div className="bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 justify-between p-2">
+          <div className="flex items-center">
+            {!assistant && <QuickSettings />}
           </div>
-        )}
+          {showModelSelector && <ChatSettings />}
+        </div>
 
-        <div
-          className={cn(
-            "w-0 transition-[width] duration-100",
-            editorOpen && "w-full lg:w-[calc(50%-2rem)]"
+        {/* Chat Content */}
+        <div className="flex size-full">
+          {loading ? (
+            <Loading />
+          ) : (
+            <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col">
+              {chatMessages?.length === 0 ? (
+                <EmptyChatView
+                  selectedAssistant={selectedAssistant}
+                  theme={theme}
+                />
+              ) : (
+                <>
+                  <div ref={messagesStartRef} />
+                  <ChatMessages onSelectCodeBlock={handleSelectCodeBlock} />
+                  <div ref={messagesEndRef} className="min-h-20 flex-1" />
+                </>
+              )}
+              <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
+                {chatMessages?.length === 0 && (
+                  <ConversationStarters
+                    values={selectedAssistant?.conversation_starters}
+                    onSelect={(value: string) =>
+                      handleSendMessage(value, chatMessages, false)
+                    }
+                  />
+                )}
+                <ChatInput showAssistant={!selectedAssistant} />
+                <ChatMessageCounter />
+              </div>
+            </div>
           )}
-        />
-
-        <ChatPreviewContent
-          open={editorOpen}
-          isGenerating={isGenerating}
-          content={previewContent}
-          onPreviewContent={handlePreviewContent}
-        />
+        </div>
       </div>
-    </div>
+      <ChatPreviewContent
+        open={editorOpen}
+        isGenerating={isGenerating}
+        selectedCodeBlock={selectedCodeBlock}
+        onSelectCodeBlock={handleSelectCodeBlock}
+        isEditable={isCodeBlockEditable(selectedCodeBlock)}
+        onCodeChange={handleCodeChange}
+      />
+    </>
   )
 }
 

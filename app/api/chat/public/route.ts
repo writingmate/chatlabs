@@ -8,9 +8,10 @@ export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, messages } = json as {
+  const { chatSettings, messages, response_format } = json as {
     chatSettings: ChatSettings
     messages: any[]
+    response_format: any
   }
 
   try {
@@ -23,7 +24,8 @@ export async function POST(request: Request) {
       model: "gpt-4o-mini",
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens: 16384, // 16k tokens
+      max_tokens: 16384, // 16k tokens,
+      response_format: response_format as any,
       stream: true
     })
 

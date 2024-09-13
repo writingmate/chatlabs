@@ -108,7 +108,7 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
     }
 
     return {
-      model: "gpt-3.5-turbo-0125",
+      model: "gpt-4o-mini",
       prompt: "You are a helpful AI assistant.",
       temperature: 0.5,
       contextLength: 4000,

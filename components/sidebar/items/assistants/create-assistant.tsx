@@ -15,7 +15,6 @@ import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { LLMID } from "@/types"
 import { SharingField } from "@/components/sidebar/items/all/sharing-field"
 import { AssistantConversationStarters } from "@/components/sidebar/items/assistants/assistant-conversation-starters"
-import { set } from "date-fns"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { CenterCreateItem } from "@/components/sidebar/items/all/center-create-item"
 
@@ -47,7 +46,8 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [imageLink, setImageLink] = useState("")
   const [selectedAssistantRetrievalItems, setSelectedAssistantRetrievalItems] =
-    useState<Tables<"files">[] | Tables<"collections">[]>([])
+    useState<(Tables<"files"> | Tables<"collections">)[]>([])
+
   const [selectedAssistantToolItems, setSelectedAssistantToolItems] = useState<
     Tables<"tools">[]
   >([])
@@ -66,34 +66,19 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
     })
   }, [name])
 
-  const handleRetrievalItemSelect = (
-    item: Tables<"files"> | Tables<"collections">
+  const handleRetrievalItemsSelect = (
+    items: (Tables<"files"> | Tables<"collections">)[]
   ) => {
-    setSelectedAssistantRetrievalItems(prevState => {
-      const isItemAlreadySelected = prevState.find(
-        selectedItem => selectedItem.id === item.id
-      )
+    // Use a Set to remove duplicates based on id
+    const uniqueItems = Array.from(new Set(items.map(item => item.id))).map(
+      id => items.find(item => item.id === id)!
+    )
 
-      if (isItemAlreadySelected) {
-        return prevState.filter(selectedItem => selectedItem.id !== item.id)
-      } else {
-        return [...prevState, item]
-      }
-    })
+    setSelectedAssistantRetrievalItems(uniqueItems)
   }
 
-  const handleToolSelect = (item: Tables<"tools">) => {
-    setSelectedAssistantToolItems(prevState => {
-      const isItemAlreadySelected = prevState.find(
-        selectedItem => selectedItem.id === item.id
-      )
-
-      if (isItemAlreadySelected) {
-        return prevState.filter(selectedItem => selectedItem.id !== item.id)
-      } else {
-        return [...prevState, item]
-      }
-    })
+  const handleToolSelect = (tools: Tables<"tools">[]) => {
+    setSelectedAssistantToolItems(tools)
   }
 
   const checkIfModelIsToolCompatible = () => {
@@ -130,11 +115,11 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
           prompt: assistantChatSettings.prompt,
           temperature: assistantChatSettings.temperature,
           embeddings_provider: assistantChatSettings.embeddingsProvider,
-          files: selectedAssistantRetrievalItems.filter(item =>
-            item.hasOwnProperty("type")
+          files: selectedAssistantRetrievalItems.filter(
+            item => "type" in item
           ) as Tables<"files">[],
           collections: selectedAssistantRetrievalItems.filter(
-            item => !item.hasOwnProperty("type")
+            item => !("type" in item)
           ) as Tables<"collections">[],
           tools: selectedAssistantToolItems,
           sharing,
@@ -198,7 +183,7 @@ export const CreateAssistant: FC<CreateAssistantProps> = ({
 
             <AssistantRetrievalSelect
               selectedAssistantRetrievalItems={selectedAssistantRetrievalItems}
-              onAssistantRetrievalItemsSelect={handleRetrievalItemSelect}
+              onAssistantRetrievalItemsSelect={handleRetrievalItemsSelect}
             />
           </div>
 

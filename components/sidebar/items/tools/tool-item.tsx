@@ -37,6 +37,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
         <IconPuzzle
           size={SIDEBAR_ITEM_ICON_SIZE}
           stroke={SIDEBAR_ITEM_ICON_STROKE}
+          className="text-muted-foreground size-5"
         />
       }
       updateState={{

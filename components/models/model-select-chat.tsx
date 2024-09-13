@@ -76,11 +76,11 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
     setIsOpen(false)
   }
 
-  useEffect(() => {
-    getMostRecentModels().then(result => {
-      setMostRecentModels(result)
-    })
-  }, [])
+  // useEffect(() => {
+  //   getMostRecentModels().then(result => {
+  //     setMostRecentModels(result)
+  //   })
+  // }, [])
 
   const selectedModel = allModels.find(
     model => model.modelId === selectedModelId

@@ -31,6 +31,7 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "gpt-4-turbo-preview": false,
   "gpt-4-turbo": false,
   "gpt-4o-mini": true,
+  "gpt-4o-2024-08-06": true,
   "claude-3-haiku-20240307": true,
   "claude-3-sonnet-20240229": false,
   "claude-3-5-sonnet-20240620": true,

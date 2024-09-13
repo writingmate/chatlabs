@@ -23,9 +23,11 @@ import { useSelectFileHandler } from "@/components/splitview/splitview-hooks/use
 import { ToolSelect } from "@/components/tools/tool-select"
 import { ChatFilesDisplay } from "@/components/chat/chat-files-display"
 import { PromptCatalog } from "@/components/splitview/prompt-catalog"
+import { reconstructContentWithCodeBlocks } from "@/lib/messages"
 
 interface ChatInputProps {
   isGenerating: boolean
+  className?: string
   // userInput: string
   // setUserInput: (input: string) => void,
   handleSendMessage: (input: string, isRegeneration: boolean) => void
@@ -38,6 +40,7 @@ interface ChatInputProps {
 }
 
 export const ChatInput: FC<ChatInputProps> = ({
+  className,
   isGenerating,
   hasMessages,
   handleSendMessage,
@@ -106,7 +109,11 @@ export const ChatInput: FC<ChatInputProps> = ({
     if (!isTyping && isSendShortcut(event)) {
       event.preventDefault()
       setIsPromptPickerOpen(false)
-      handleSendMessage(userInput, false)
+      const reconstructedContent = reconstructContentWithCodeBlocks(
+        userInput,
+        []
+      )
+      handleSendMessage(reconstructedContent, false)
     }
     //
     // // Consolidate conditions to avoid TypeScript error
@@ -178,7 +185,7 @@ export const ChatInput: FC<ChatInputProps> = ({
   return (
     <>
       <ChatFilesDisplay />
-      <div className={"relative"}>
+      <div className={cn("relative", className)}>
         {/*<ChatCommandInput/>*/}
         <div className="border-input my-3 flex min-h-[60px] w-full flex-col justify-end overflow-hidden rounded-xl border backdrop-blur-xl">
           {/*{selectedAssistant && (*/}
