@@ -70,10 +70,11 @@ export function updateHtml(doc: Document) {
     }
 
     function addCustomStyles(doc: Document) {
-      const DOMParser = require("@xmldom/xmldom").DOMParser
-      const parser = new DOMParser()
-      const styleElement = parser.parseFromString(
-        `
+      if (typeof window === "undefined") {
+        const DOMParser = require("@xmldom/xmldom").DOMParser
+        const parser = new DOMParser()
+        const styleElement = parser.parseFromString(
+          `
             <style>
 body, html {
   min-width: 100vw;
@@ -81,9 +82,20 @@ body, html {
 }
   </style>
     `,
-        "text/html"
-      )
-      head.appendChild(styleElement)
+          "text/html"
+        )
+
+        head.appendChild(styleElement)
+      } else {
+        const styleElement = doc.createElement("style")
+        styleElement.textContent = `
+                body, html {
+                  min-width: 100vw;
+                  min-height: 100vh;
+                }
+                `
+        head.appendChild(styleElement)
+      }
     }
 
     replaceDaisyui(doc)
