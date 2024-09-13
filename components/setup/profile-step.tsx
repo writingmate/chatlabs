@@ -47,7 +47,9 @@ export const ProfileStep: FC<ProfileStepProps> = ({
         <div className="space-y-1">
           <Label>{t("Job Role")}</Label>
           <Input
-            placeholder={t("e.g. Marketing Manager, Software Engineer, or Student")}
+            placeholder={t(
+              "e.g. Marketing Manager, Software Engineer, or Student"
+            )}
             value={userQuestion.job_role || ""}
             onChange={e =>
               onUserQuestionChange({

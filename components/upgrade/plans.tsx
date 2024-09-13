@@ -133,18 +133,20 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
-            <div className="flex justify-center"> {/* Add this wrapper div */}
+            <div className="flex justify-center">
+              {" "}
+              {/* Add this wrapper div */}
               <div
                 className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t p-4 text-sm last:border-r-0 md:max-w-md md:border-r md:border-t-0"
                 data-testid="BYOK-pricing-modal-column"
               >
                 <div className="bg-token-main-surface-primary relative flex flex-col">
                   <div className="flex flex-col gap-1">
-                    <p className="text-xl font-semibold">
-                      One for all
-                    </p>
+                    <p className="text-xl font-semibold">One for all</p>
                     <p className="text-foreground/60 mb-4 text-sm">
-                      {t("Connect your API keys to access AI models and all features")}
+                      {t(
+                        "Connect your API keys to access AI models and all features"
+                      )}
                     </p>
                     <div className="flex items-baseline gap-2">
                       <p className="text-xl font-semibold">
@@ -177,53 +179,90 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                     icon={<IconKey size={20} />}
                     title={t("API Key Access")}
                   >
-                    <PlanFeature title={t("Use all AI models and features with your own API keys in one powerful platform")} />
-                    <PlanFeature title={t("Connect keys for OpenAI, Anthropic, Perplexity, Groq, and other providers")} />
-
+                    <PlanFeature
+                      title={t(
+                        "Use all AI models and features with your own API keys in one powerful platform"
+                      )}
+                    />
+                    <PlanFeature
+                      title={t(
+                        "Connect keys for OpenAI, Anthropic, Perplexity, Groq, and other providers"
+                      )}
+                    />
                   </FeatureGroup>
                   <FeatureGroup
-                  icon={<IconRobot size={20} />}
-                  title={t("AI Models")}
+                    icon={<IconRobot size={20} />}
+                    title={t("AI Models")}
                   >
-                    <PlanFeature title={t("Access to the most powerful AI models")} />
-                    <PlanFeature title={t("Including Newest Openai:o1, o1mini, GPT-4o, Groq, Claude 3.5, Gemini Pro, LLama 3, Perplexity, Mistral")} />
+                    <PlanFeature
+                      title={t("Access to the most powerful AI models")}
+                    />
+                    <PlanFeature
+                      title={t(
+                        "Including Newest Openai:o1, o1mini, GPT-4o, Groq, Claude 3.5, Gemini Pro, LLama 3, Perplexity, Mistral"
+                      )}
+                    />
                   </FeatureGroup>
-                  
+
                   <FeatureGroup
                     icon={<IconPhoto size={20} />}
                     title={t("Image Generation")}
                   >
-                    <PlanFeature title={t("Generate detailed visuals for work, study, and presentations with newest Flux1.pro and Stable Diffusion 3")} />
+                    <PlanFeature
+                      title={t(
+                        "Generate detailed visuals for work, study, and presentations with newest Flux1.pro and Stable Diffusion 3"
+                      )}
+                    />
                   </FeatureGroup>
                   <FeatureGroup
                     icon={<IconGlobe size={20} />}
                     title={t("Web Access")}
                   >
-                    <PlanFeature title={t("Quickly access the latest research and online data")} />
+                    <PlanFeature
+                      title={t(
+                        "Quickly access the latest research and online data"
+                      )}
+                    />
                   </FeatureGroup>
                   <FeatureGroup
                     icon={<IconFileDescription size={20} />}
                     title={t("File Chat")}
                   >
-                    <PlanFeature title={t("Upload documents to extract or summarize key information directly")} />
+                    <PlanFeature
+                      title={t(
+                        "Upload documents to extract or summarize key information directly"
+                      )}
+                    />
                   </FeatureGroup>
                   <FeatureGroup
                     icon={<IconSparkles size={20} />}
                     title={t("AI Assistants")}
                   >
-                    <PlanFeature title={t("Get personalized help with pre-built and custom GPT assistants and create yours")} />
+                    <PlanFeature
+                      title={t(
+                        "Get personalized help with pre-built and custom GPT assistants and create yours"
+                      )}
+                    />
                   </FeatureGroup>
                   <FeatureGroup
                     icon={<IconLayout2 size={20} />}
                     title={t("Model Comparison")}
                   >
-                    <PlanFeature title={t("Compare models based on quality, speed, cost, and the number of tokens used")} />
+                    <PlanFeature
+                      title={t(
+                        "Compare models based on quality, speed, cost, and the number of tokens used"
+                      )}
+                    />
                   </FeatureGroup>
                   <FeatureGroup
                     icon={<IconBooks size={20} />}
                     title={t("Prompt Library")}
                   >
-                    <PlanFeature title={t("A wide range of prompts to enhance interactions with AI and save your time")} />
+                    <PlanFeature
+                      title={t(
+                        "A wide range of prompts to enhance interactions with AI and save your time"
+                      )}
+                    />
                   </FeatureGroup>
                 </div>
               </div>

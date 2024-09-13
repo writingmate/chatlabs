@@ -23,7 +23,7 @@ import {
 import Plans from "@/components/upgrade/plans"
 import { useAuth } from "@/context/auth"
 import { upsertUserQuestion } from "@/db/user_questions"
-import { useTranslation } from "react-i18next"  
+import { useTranslation } from "react-i18next"
 
 export default function SetupPage() {
   const { t } = useTranslation()
@@ -186,7 +186,9 @@ export default function SetupPage() {
       case 2:
         return (
           <StepContainer
-            stepDescription={t("Pro plan gives unlimited access to over 20 AI models.")}
+            stepDescription={t(
+              "Pro plan gives unlimited access to over 20 AI models."
+            )}
             stepNum={currentStep}
             stepTitle={t("Choose your plan")}
             onShouldProceed={handleShouldProceed}

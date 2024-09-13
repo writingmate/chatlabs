@@ -45,10 +45,8 @@ export default function SubscriptionSuccessPage() {
   const router = useRouter()
   return (
     <div className="size-screen flex size-full flex-col items-center justify-center">
-      
       <div className="mb-6 max-w-2xl text-center text-2xl">
-        Thank you for
-        subscribing to our product.
+        Thank you for subscribing to our product.
       </div>
       <div className="mb-6 max-w-2xl text-center">
         We are dedicated to making this the best possible experience you can

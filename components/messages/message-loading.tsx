@@ -23,6 +23,7 @@ export const LoadingMessage: React.FC<LoadingMessageProps> = ({
   const [showWaitingMessage, setShowWaitingMessage] = useState(false)
   const waitingTimerRef = useRef<NodeJS.Timeout | null>(null)
   const rotationTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (isGenerating) {
@@ -57,8 +58,6 @@ export const LoadingMessage: React.FC<LoadingMessageProps> = ({
 
   if (!isGenerating) return null
 
-  const { t } = useTranslation()
-
   return (
     <div className="flex items-start space-x-2">
       <div className="bg-foreground mt-1 flex size-3 items-center justify-center rounded-full">
@@ -66,18 +65,20 @@ export const LoadingMessage: React.FC<LoadingMessageProps> = ({
       </div>
       {showWaitingMessage && (
         <div className="relative h-[20px] w-full overflow-hidden">
-          {t("WAITING_MESSAGES").split("|").map((message, index) => (
-            <div
-              key={index}
-              className={`
+          {t("WAITING_MESSAGES")
+            .split("|")
+            .map((message, index) => (
+              <div
+                key={index}
+                className={`
                 text-foreground/60 absolute inset-0 text-sm
                 transition-opacity duration-500 ease-in-out
                 ${index === currentMessageIndex ? "opacity-100" : "opacity-0"}
               `}
-            >
-              {message}
-            </div>
-          ))}
+              >
+                {message}
+              </div>
+            ))}
         </div>
       )}
     </div>

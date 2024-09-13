@@ -16,6 +16,7 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
   const { profile, setIsPaywallOpen } = useContext(ChatbotUIContext)
   const { isGenerating } = useContext(ChatbotUIChatContext)
   const [messageCount, setMessageCount] = useState(0)
+  const { t } = useTranslation() // Moved this to the top level
 
   useEffect(() => {
     if (!profile) {
@@ -35,8 +36,6 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
   if (validateProPlan(profile)) {
     return null // Do not display the counter for non-free plans
   }
-
-  const { t } = useTranslation()
 
   return (
     <div className={"text-foreground/80 w-full p-2 text-center text-xs"}>

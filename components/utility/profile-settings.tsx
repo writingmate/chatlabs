@@ -474,7 +474,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
 
                 <div className="space-y-1">
                   <Label className="text-sm">
-                    {t("What would you like the AI to know about you to provide better responses?")}
+                    {t(
+                      "What would you like the AI to know about you to provide better responses?"
+                    )}
                   </Label>
 
                   <TextareaAutosize
@@ -503,7 +505,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       }
                       display={
                         <div className={"text-xs"}>
-                          {t("If enabled, code will be displayed in a side-by-side editor on the right from the message thread. This feature is currently in beta.")}
+                          {t(
+                            "If enabled, code will be displayed in a side-by-side editor on the right from the message thread. This feature is currently in beta."
+                          )}
                         </div>
                       }
                     />

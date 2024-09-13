@@ -704,13 +704,18 @@ export const handleCreateMessages = async (
           annotation: data
         } as TablesInsert<"messages">
       })
-      createdMessages.push(...(await createMessages(inserts) || []))
+      createdMessages.push(...((await createMessages(inserts)) || []))
     }
     cleanGeneratedText
       ? createdMessages.push(
-          ...(await createMessages([finalUserMessage, finalAssistantMessage]) || [])
+          ...((await createMessages([
+            finalUserMessage,
+            finalAssistantMessage
+          ])) || [])
         )
-      : createdMessages.push(...(await createMessages([finalUserMessage]) || []))
+      : createdMessages.push(
+          ...((await createMessages([finalUserMessage])) || [])
+        )
 
     const uploadPromises = newMessageImages
       .filter(obj => obj.file !== null)
