@@ -86,6 +86,9 @@ export type OpenRouterLLMID =
   | "anthropic/claude-3.5-sonnet"
   | "perplexity/llama-3.1-sonar-huge-128k-online"
   | "mattshumer/reflection-70b"
+  | "deepseek/deepseek-chat"
+  | "openai/o1-mini"
+  | "openai/o1-preview"
 
 export interface LLM {
   modelId: LLMID

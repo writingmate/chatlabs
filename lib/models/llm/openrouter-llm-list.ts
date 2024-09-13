@@ -10,7 +10,7 @@ const GPT4O: LLM = {
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
   tools: true,
-
+  paid: false,
   supportsStreaming: true,
   pricing: {
     currency: "USD",
@@ -26,11 +26,11 @@ const GPT4O_MINI: LLM = {
   provider: "openrouter",
   hostedId: "gpt-4o-mini",
   platformLink: OPENROUTER_PLATFORM_LINK,
-  imageInput: true,
+  imageInput: false,
   tools: true,
   paid: false,
   supportsStreaming: true,
-  new: true,
+  new: false,
   pricing: {
     currency: "USD",
     unit: "1M tokens",
@@ -77,7 +77,7 @@ const CLAUDE_3_HAIKU: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  paid: true
+  paid: false
 }
 
 const CLAUDE_35_SONNET: LLM = {
@@ -88,7 +88,8 @@ const CLAUDE_35_SONNET: LLM = {
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
   tools: true,
-  supportsStreaming: true
+  supportsStreaming: true,
+  paid: true
 }
 
 const LLAVA_YI_34b: LLM = {
@@ -100,7 +101,7 @@ const LLAVA_YI_34b: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  paid: true
+  paid: false
 }
 
 const FIRELLAVA_13b: LLM = {
@@ -112,7 +113,7 @@ const FIRELLAVA_13b: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  paid: true
+  paid: false
 }
 
 const LLAMA_3_1_SONAR_HUGE_128K_ONLINE: LLM = {
@@ -124,7 +125,7 @@ const LLAMA_3_1_SONAR_HUGE_128K_ONLINE: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  paid: true
+  paid: false
 }
 
 const REFLECTION_70B: LLM = {
@@ -140,6 +141,43 @@ const REFLECTION_70B: LLM = {
   new: true
 }
 
+const DEEPSEEK_CHAT: LLM = {
+  modelId: "deepseek/deepseek-chat",
+  modelName: "DeepSeek v2.5",
+  provider: "openrouter",
+  hostedId: "deepseek-chat",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  paid: true
+}
+
+const O1_MINI: LLM = {
+  modelId: "openai/o1-mini",
+  modelName: "O1 Mini",
+  provider: "openrouter",
+  hostedId: "o1-mini",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: true,
+  tools: true,
+  supportsStreaming: true,
+  paid: true,
+  new: true
+}
+
+const O1_PREVIEW: LLM = {
+  modelId: "openai/o1-preview",
+  modelName: "O1 Preview",
+  provider: "openrouter",
+  hostedId: "o1-preview",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  paid: true,
+  new: true
+}
 export const OPENROUTER_LLM_LIST: LLM[] = [
   GPT4O,
   GPT4O_MINI,
@@ -150,7 +188,10 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
   LLAVA_YI_34b,
   FIRELLAVA_13b,
   LLAMA_3_1_SONAR_HUGE_128K_ONLINE,
-  REFLECTION_70B
+  REFLECTION_70B,
+  DEEPSEEK_CHAT,
+  O1_MINI,
+  O1_PREVIEW
 ]
 //- openai/gpt-4o-2024-08-06
 //- openai/gpt-4o-mini
@@ -162,3 +203,6 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
 //- anthropic/claude-3-haiku
 //- anthropic/claude-3.5-sonnet
 //- meta-llama/llama-3.1-405b
+//- deepseek/deepseek-chat
+//- openai/o1-mini
+//- openai/o1-preview

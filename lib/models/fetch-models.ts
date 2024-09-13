@@ -40,14 +40,15 @@ const KNOWN_MODEL_NAMES: {
     paid: true,
     supportsStreaming: true
   },
-  "openai/gpt-4o-2024-08-06": {
-    provider: "openai",
-    modelName: "GPT-4o 2024-08-06",
-    imageInput: true,
-    tools: false,
-    new: true,
-    supportsStreaming: true
-  },
+  //"openai/gpt-4o-2024-08-06": {
+  //  provider: "openai",
+  //  modelName: "GPT-4o 2024-08-06",
+  //  imageInput: true,
+  //  tools: false,
+  //  new: true,
+  //  supportsStreaming: true,
+  //  paid: true
+  //},
   "openai/gpt-4o-mini": {
     provider: "openai",
     modelName: "GPT-4o mini",
@@ -105,7 +106,10 @@ function parseSupportedModelsFromEnv() {
     "openai/gpt-4o-2024-08-06",
     "openai/gpt-4o-mini",
     "perplexity/llama-3.1-sonar-huge-128k-online",
-    "mattshumer/reflection-70b"
+    "mattshumer/reflection-70b",
+    "deepseek/deepseek-chat",
+    "openai/o1-mini",
+    "openai/o1-preview"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {
@@ -246,7 +250,8 @@ export const fetchOpenRouterModels = async () => {
           },
           tools: knownModel?.tools ?? false,
           supportsStreaming: true,
-          new: knownModel?.new ?? false
+          new: knownModel?.new ?? false,
+          paid: knownModel?.paid ?? true
         }
       })
 

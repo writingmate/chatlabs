@@ -84,7 +84,10 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "anthropic/claude-3-haiku": false,
   "anthropic/claude-3.5-sonnet": false,
   "perplexity/llama-3.1-sonar-huge-128k-online": false,
-  "mattshumer/reflection-70b": false
+  "mattshumer/reflection-70b": false,
+  "deepseek/deepseek-chat": false,
+  "openai/o1-mini": false,
+  "openai/o1-preview": false
 }
 
 const SYSTEM_PROMPT_DESCRIPTION = `
