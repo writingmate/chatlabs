@@ -4,7 +4,7 @@ import { IconExternalLink } from "@tabler/icons-react"
 import { DOMParser } from "xmldom"
 import RemixButton from "@/components/remix/remix-button"
 import { REGEX_FILENAME } from "@/lib/preview"
-import { updateHtml } from "@/components/code-viewer/code-viewer-preview-2"
+import { updateHtml } from "@/lib/code-viewer"
 
 interface SharePageProps {
   params: {
@@ -53,8 +53,9 @@ const SharePage = async ({
   }
 
   const updateHtmlFromString = (html: string) => {
+    const cleanHtml = html.replace(REGEX_FILENAME, "")
     const parser = new DOMParser()
-    const doc = parser.parseFromString(html, "text/html")
+    const doc = parser.parseFromString(cleanHtml, "text/html")
     return updateHtml(doc).toString()
   }
 

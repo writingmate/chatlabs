@@ -11,7 +11,7 @@ import { cn, generateRandomString } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { MessageHtmlElement } from "@/types/html"
 import { UITheme } from "./theme-configurator"
-import { daisyui } from "@/lib/daisyui"
+import { updateHtml } from "@/lib/code-viewer"
 
 interface PreviewProps2 {
   value: string
@@ -21,78 +21,6 @@ interface PreviewProps2 {
   setInspectMode: (inspectMode: boolean) => void
   onElementClick: (element: MessageHtmlElement) => void
   handleFixError: (error: string) => void // New prop for handling error fixes
-}
-
-export function updateHtml(doc: Document) {
-  try {
-    // known valid css files to ignore
-    const knownTailwind = "tailwindcss@2"
-    const upgradeToTailwind =
-      "https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp,container-queries"
-    const knownDaisyui = "daisyui@4"
-    const upgradeToDaisyui =
-      "hhttps://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
-
-    const head = doc.getElementsByTagName("head")[0]
-
-    // replace daisyui with our own version if it in the document
-    function replaceDaisyui(dom: Document) {
-      const stylesheets = dom.getElementsByTagName("link")
-      for (let i = 0; i < stylesheets.length; i++) {
-        const stylesheet = stylesheets[i]
-        if (stylesheet.getAttribute("rel") === "stylesheet") {
-          if (stylesheet.getAttribute("href")?.includes(knownDaisyui)) {
-            stylesheet.setAttribute("href", upgradeToDaisyui)
-          }
-        }
-      }
-    }
-
-    function replaceTailwind(dom: Document) {
-      const stylesheets = dom.getElementsByTagName("link")
-      for (let i = 0; i < stylesheets.length; i++) {
-        const stylesheet = stylesheets[i]
-        if (stylesheet.getAttribute("href")?.includes(knownTailwind)) {
-          const tailwindScriptElement = doc.createElement("script")
-          tailwindScriptElement.setAttribute("src", upgradeToTailwind)
-          dom.removeChild(stylesheet)
-          head.insertBefore(tailwindScriptElement, head.firstChild)
-        }
-      }
-    }
-
-    function replaceLinks(dom: Document) {
-      const links = dom.getElementsByTagName("link")
-      for (let i = 0; i < links.length; i++) {
-        const link = links[i]
-        link.setAttribute("rel", "nofollow")
-        if (link.getAttribute("href")?.startsWith("#")) {
-          link.setAttribute("href", `about:srcdoc${link.getAttribute("href")}`)
-        }
-      }
-    }
-
-    function addCustomStyles(doc: Document) {
-      const styleElement = doc.createElement("style")
-      styleElement.textContent = `
-body, html {
-  min-width: 100%;
-  min-height: 100%;
-}
-    `
-      doc.head.appendChild(styleElement)
-    }
-
-    replaceDaisyui(doc)
-    replaceTailwind(doc)
-    replaceLinks(doc)
-    addCustomStyles(doc)
-
-    return doc
-  } catch (e) {
-    console.error("Unable to parse dom, returning html as is", e)
-    return doc
-  }
 }
 
 const CodeViewerPreview2: React.FC<PreviewProps2> = ({
@@ -187,7 +115,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
         }
       })
     }
-  }, [fullHtmlContent, inspectMode, theme])
+  }, [fullHtmlContent, inspectMode])
 
   useEffect(() => {
     const iframe = iframeRef.current
