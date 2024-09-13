@@ -1,7 +1,7 @@
 export function updateHtml(doc: Document) {
   try {
     // known valid css files to ignore
-    const knownTailwind = "tailwindcss.com"
+    const knownTailwind = "tailwindcss"
     const upgradeToTailwind =
       "https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,container-queries"
     const knownDaisyui = "daisyui"
