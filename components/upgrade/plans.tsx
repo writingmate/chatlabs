@@ -150,7 +150,7 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                     </p>
                     <div className="flex items-baseline gap-2">
                       <p className="text-xl font-semibold">
-                        ${billingCycle === "yearly" ? "10" : "10"}
+                        ${billingCycle === "yearly" ? "8" : "10"}
                       </p>
                       {billingCycle === "yearly" && (
                         <p className="text-foreground/50 line-through">$10</p>
