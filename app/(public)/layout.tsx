@@ -20,7 +20,7 @@ export default function RootLayout({
         <>
           <Analytics />
           <SpeedInsights />
-          <GoogleAnalytics gaId="G-Y14R2TP0QH" />
+          <GoogleAnalytics gaId="G-DY8D1FRVKT" />
           <GoogleTagManager gtmId={"GTM-5SBXJ23Q"} />
         </>
       )}
