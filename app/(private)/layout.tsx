@@ -80,8 +80,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           <>
             <Analytics />
             <SpeedInsights />
-            <GoogleAnalytics gaId="G-Y14R2TP0QH" />
-            <GoogleTagManager gtmId={"GTM-5SBXJ23Q"} />
+            <GoogleAnalytics gaId="G-DY8D1FRVKT" />
+            <GoogleTagManager gtmId={"GTM-5W2BH5K5"} />
           </>
         )}
       </body>
