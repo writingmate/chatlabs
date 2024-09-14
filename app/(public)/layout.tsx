@@ -21,7 +21,7 @@ export default function RootLayout({
           <Analytics />
           <SpeedInsights />
           <GoogleAnalytics gaId="G-DY8D1FRVKT" />
-          <GoogleTagManager gtmId={"GTM-5SBXJ23Q"} />
+          <GoogleTagManager gtmId={"GTM-5W2BH5K5"} />
         </>
       )}
     </html>
