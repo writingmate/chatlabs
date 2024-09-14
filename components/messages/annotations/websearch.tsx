@@ -42,8 +42,8 @@ export function WebSearch({
                       hostname
                     }
                     alt={hostname}
-                    width={16}
-                    height={16}
+                    width={32}
+                    height={32}
                   />
                 </div>
                 <div className="text-xs font-semibold">{displayHostname}</div>

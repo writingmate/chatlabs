@@ -128,7 +128,7 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                 <ToggleGroupItem value={BILLING_CYCLE_YEARLY}>
                   {t("Yearly")}
                   <span className="ml-2 line-clamp-1 text-nowrap rounded bg-green-500 px-2 py-1 text-xs text-white">
-                    {t("4 months free")}
+                    {t("2 months free")}
                   </span>
                 </ToggleGroupItem>
               </ToggleGroup>
@@ -150,7 +150,7 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                     </p>
                     <div className="flex items-baseline gap-2">
                       <p className="text-xl font-semibold">
-                        ${billingCycle === "yearly" ? "6.99" : "10"}
+                        ${billingCycle === "yearly" ? "10" : "10"}
                       </p>
                       {billingCycle === "yearly" && (
                         <p className="text-foreground/50 line-through">$10</p>
@@ -158,7 +158,7 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                     </div>
                     <p className="text-foreground/50 text-sm">
                       {billingCycle === "yearly"
-                        ? "per month, billed annually ($83.88/year)"
+                        ? "per month, billed annually ($100/year)"
                         : "per month"}
                     </p>
                   </div>

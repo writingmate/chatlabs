@@ -1,7 +1,7 @@
 {
   "Ask anything. Type \"/\" for prompts, \"@\" for files, and \"#\" for tools.": "무엇이든 물어보세요. \"/\"는 프롬프트, \"@\"는 파일, \"#\"는 도구를 입력합니다.",
   "Quick Settings": "빠른 설정",
-  "More than 30 AI models in one place.": "30개 이상의 AI 모델을 한 곳에서.",
+  "World's best AI models in one place.": "세계 최고의 AI 모델을 한 곳에서 사용할 수 있습니다.",
   "You have messages": "메시지가 있습니다",
   "New Chat": "새 채팅",
   "New Prompt": "새 프롬프트",
@@ -87,7 +87,7 @@
   "API Key Access": "API 키 접근",
   "Use all AI models and features with your own API keys in one powerful platform": "하나의 강력한 플랫폼에서 자신의 API 키로 모든 AI 모델과 기능 사용",
   "Connect keys for OpenAI, Anthropic, Perplexity, Groq, and other providers": "OpenAI, Anthropic, Perplexity, Groq 및 기타 제공업체의 키 연결",
-  "4 months free": "4개월 무료",
+  "2 months free": "2개월 무료",
   "Yearly": "연간",
   "Monthly": "월간",
   "Upgrade": "업그레이드",
