@@ -69,28 +69,32 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "llama3-groq-70b-8192-tool-use-preview": true,
   "gpt-4o": false,
   "gemini-1.5-flash-latest": false,
+
   //openrouter models
-  "databricks/dbrx-instruct": false,
-  "cohere/command-r-plus-08-2024": false,
-  "mistralai/mixtral-8x22b-instruct": false,
-  "microsoft/wizardlm-2-8x22b": false,
-  "meta-llama/llama-3-70b-instruct": false,
+  "openai/o1-mini": false,
+  "openai/o1-preview": false,
   "openai/gpt-4o-2024-08-06": false,
-  "openai/gpt-4-vision-preview": false,
   "openai/gpt-4o-mini": true,
+  "openai/gpt-4-vision-preview": false,
+
+  "anthropic/claude-3-haiku": false,
+  "anthropic/claude-3.5-sonnet": false,
+
   "google/gemini-pro-1.5": false,
   "google/gemini-pro-vision": false,
   "google/gemini-flash-1.5-exp": true,
   "google/gemini-pro-1.5-exp": false,
+
+  "databricks/dbrx-instruct": false,
+  "cohere/command-r-plus-08-2024": false,
+  "mistralai/mixtral-8x22b-instruct": false,
+  "microsoft/wizardlm-2-8x22b": false,
+  "meta-llama/llama-3-1-405b-instruct": false,
   "liuhaotian/llava-yi-34b": false,
   "fireworks/firellava-13b": false,
-  "anthropic/claude-3-haiku": false,
-  "anthropic/claude-3.5-sonnet": false,
   "perplexity/llama-3.1-sonar-huge-128k-online": false,
   "mattshumer/reflection-70b": false,
-  "deepseek/deepseek-chat": true,
-  "openai/o1-mini": false,
-  "openai/o1-preview": false
+  "deepseek/deepseek-chat": true
 }
 
 const SYSTEM_PROMPT_DESCRIPTION = `

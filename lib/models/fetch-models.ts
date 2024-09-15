@@ -106,7 +106,7 @@ function parseSupportedModelsFromEnv() {
     "databricks/dbrx-instruct",
     "mistralai/mixtral-8x22b-instruct",
     "microsoft/wizardlm-2-8x22b",
-    "meta-llama/llama-3-70b-instruct",
+    "meta-llama/llama-3-405b-instruct",
 
     "perplexity/llama-3.1-sonar-huge-128k-online",
     "mattshumer/reflection-70b",

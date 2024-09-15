@@ -169,6 +169,18 @@ const FIRELLAVA_13b: LLM = {
   paid: false
 }
 
+const LLAMA_3_1_405B: LLM = {
+  modelId: "meta-llama/llama-3-1-405b-instruct",
+  modelName: "Llama 3.1 405B",
+  provider: "openrouter",
+  hostedId: "llama-3-1-405b-instruct",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  paid: false
+}
+
 const LLAMA_3_1_SONAR_HUGE_128K_ONLINE: LLM = {
   modelId: "perplexity/llama-3.1-sonar-huge-128k-online",
   modelName: "Llama 3.1 Sonar 405B Online",
@@ -232,6 +244,7 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
   LLAVA_YI_34b,
   FIRELLAVA_13b,
   LLAMA_3_1_SONAR_HUGE_128K_ONLINE,
+  LLAMA_3_1_405B,
   REFLECTION_70B,
   DEEPSEEK_CHAT,
   COMMAND_R_PLUS_08_2024
@@ -241,12 +254,14 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
 //- openai/gpt-4o-mini
 //- openai/gpt-4-vision-preview
 //- google/gemini-pro-1.5
+//- google/gemini-pro-1.5-exp
+//- google/gemini-flash-1.5-exp
 //- google/gemini-pro-vision
 //- liuhaotian/llava-yi-34b
 //- fireworks/firellava-13b
 //- anthropic/claude-3-haiku
 //- anthropic/claude-3.5-sonnet
-//- meta-llama/llama-3.1-405b
+//- meta-llama/llama-3-1-405b-instruct
 //- deepseek/deepseek-chat
 //- openai/o1-mini
 //- openai/o1-preview
