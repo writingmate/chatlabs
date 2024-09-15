@@ -64,6 +64,7 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "codellama-34b-instruct": false,
   "codellama-70b-instruct": false,
   "llama3-70b-8192": false,
+  "llama-3.1-70b-versatile": false,
   "llama3-8b-8192": false,
   "llama3-groq-70b-8192-tool-use-preview": true,
   "gpt-4o": false,
