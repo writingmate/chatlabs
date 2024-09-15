@@ -66,6 +66,23 @@ const META_LLAMA_3_70B_8192: LLM = {
   }
 }
 
+const LLAMA3_GROQ_70B_VERSATILE: LLM = {
+  modelId: "llama-3.1-70b-versatile",
+  modelName: "Llama 3.1 70B (Preview)",
+  provider: "groq",
+  hostedId: "llama-3.1-70b-versatile",
+  platformLink: GROQ_PLATORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  pricing: {
+    currency: "USD",
+    unit: "1M tokens",
+    inputCost: 0.59,
+    outputCost: 0.79
+  }
+}
+
 const LLAMA3_GROQ_70B_8192_TOOL_USE_PREVIEW: LLM = {
   modelId: "llama3-groq-70b-8192-tool-use-preview",
   modelName: "Meta LLama 3 70B Tool Use Preview",
@@ -88,5 +105,6 @@ export const GROQ_LLM_LIST: LLM[] = [
   MIXTRAL_8X7B,
   META_LLAMA_3_8B_8192,
   META_LLAMA_3_70B_8192,
+  LLAMA3_GROQ_70B_VERSATILE,
   LLAMA3_GROQ_70B_8192_TOOL_USE_PREVIEW
 ]

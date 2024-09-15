@@ -7,9 +7,10 @@ import {
   IconLink,
   IconBrandLinkedin,
   IconBrandFacebook,
-  IconBrandReddit,
+  IconBrandThreads,
   IconBrandX,
-  IconShare2
+  IconShare2,
+  IconShare3
 } from "@tabler/icons-react"
 import { supabase } from "@/lib/supabase/browser-client"
 import { ChatbotUIContext } from "@/context/context"
@@ -105,8 +106,8 @@ export const ShareChatButton: React.FC = () => {
       case "facebook":
         url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
         break
-      case "reddit":
-        url = `https://reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(text)}`
+      case "threads":
+        url = `https://threads.net/intent/post?text=${encodeURIComponent(shareUrl)}`
         break
       case "twitter":
         url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`
@@ -133,7 +134,7 @@ export const ShareChatButton: React.FC = () => {
             onClick={handleOpenDialog}
             title={shareUrl ? "Manage shared chat" : "Share chat"}
           >
-            <IconShare2 stroke={1.5} />
+            <IconShare3 stroke={1.5} />
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
@@ -193,9 +194,9 @@ export const ShareChatButton: React.FC = () => {
                 <Button
                   size="icon"
                   variant="outline"
-                  onClick={() => handleSocialShare("reddit")}
+                  onClick={() => handleSocialShare("threads")}
                 >
-                  <IconBrandReddit className="size-4" />
+                  <IconBrandThreads className="size-4" />
                 </Button>
                 <Button
                   size="icon"

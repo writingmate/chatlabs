@@ -27,15 +27,15 @@ const KNOWN_MODEL_NAMES: {
     provider: "deepseek",
     modelName: "DeepSeek Coder V2",
     new: true
-  },
-  "google/gemini-pro-1.5": {
-    provider: "google",
-    modelName: "Gemini Pro 1.5",
-    imageInput: true,
-    tools: false,
-    paid: true,
-    supportsStreaming: true
-  },
+  }
+  ///"google/gemini-pro-1.5": {
+  //provider: "google",
+  //modelName: "Gemini Pro 1.5",
+  //imageInput: true,
+  //tools: false,
+  //paid: true,
+  //supportsStreaming: true
+  //},
   //"openai/gpt-4o-2024-08-06": {
   //  provider: "openai",
   //  modelName: "GPT-4o 2024-08-06",
@@ -45,31 +45,31 @@ const KNOWN_MODEL_NAMES: {
   //  supportsStreaming: true,
   //  paid: true
   //},
-  "openai/gpt-4o-mini": {
-    provider: "openai",
-    modelName: "GPT-4o mini",
-    imageInput: true,
-    tools: true,
-    paid: false,
-    new: true,
-    supportsStreaming: true
-  },
-  "anthropic/claude-3.5-sonnet": {
-    provider: "anthropic",
-    modelName: "Claude 3.5 Sonnet",
-    new: true,
-    imageInput: true,
-    supportsStreaming: true
-  },
-  "perplexity/llama-3.1-sonar-huge-128k-online": {
-    provider: "perplexity",
-    modelName: "Llama 3.1 Sonar 405B Online",
-    new: true,
-    imageInput: false,
-    tools: false,
-    supportsStreaming: true,
-    paid: true
-  }
+  ///"openai/gpt-4o-mini": {
+  ///  provider: "openai",
+  ///  modelName: "GPT-4o mini",
+  //imageInput: true,
+  //tools: true,
+  //paid: false,
+  //new: true,
+  //supportsStreaming: true
+  /// },
+  ///"anthropic/claude-3.5-sonnet": {
+  //provider: "anthropic",
+  //modelName: "Claude 3.5 Sonnet",
+  //new: true,
+  //imageInput: true,
+  //supportsStreaming: true
+  //  },
+  ///"perplexity/llama-3.1-sonar-huge-128k-online": {
+  //provider: "perplexity",
+  //modelName: "Llama 3.1 Sonar 405B Online",
+  //new: true,
+  //imageInput: false,
+  //tools: false,
+  //supportsStreaming: true,
+  //paid: true
+  //}
 }
 //add things to KNOWN_MODEL_NAMES casuse crash at this moment. Reason unknow
 
