@@ -206,7 +206,21 @@ const DEEPSEEK_CHAT: LLM = {
   paid: false
 }
 
+const COMMAND_R_PLUS_08_2024: LLM = {
+  modelId: "cohere/command-r-plus-08-2024",
+  modelName: "Command R Plus 08 2024",
+  provider: "openrouter",
+  hostedId: "command-r-plus-08-2024",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  paid: false
+}
+
 export const OPENROUTER_LLM_LIST: LLM[] = [
+  O1_MINI,
+  O1_PREVIEW,
   GPT4O,
   GPT4O_MINI,
   GPT4Vision,
@@ -220,9 +234,9 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
   LLAMA_3_1_SONAR_HUGE_128K_ONLINE,
   REFLECTION_70B,
   DEEPSEEK_CHAT,
-  O1_MINI,
-  O1_PREVIEW
+  COMMAND_R_PLUS_08_2024
 ]
+
 //- openai/gpt-4o-2024-08-06
 //- openai/gpt-4o-mini
 //- openai/gpt-4-vision-preview
@@ -238,3 +252,4 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
 //- openai/o1-preview
 //- google/gemini-pro-1.5-exp
 //- google/gemini-flash-1.5-exp
+//- cohere/command-r-plus-08-2024

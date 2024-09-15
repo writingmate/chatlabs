@@ -268,17 +268,90 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
   },
 
   //openrouter models
+
+  // OPENAI MODELS
+  "openai/o1-mini": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 65536,
+    MAX_CONTEXT_LENGTH: 128000
+  },
+  "openai/o1-preview": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 32768,
+    MAX_CONTEXT_LENGTH: 128000
+  },
+  "openai/gpt-4o-2024-08-06": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 16384,
+    MAX_CONTEXT_LENGTH: 128000
+  },
+  "openai/gpt-4-vision-preview": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+  "openai/gpt-4o-mini": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 16384,
+    MAX_CONTEXT_LENGTH: 128000
+  },
+
+  // ANTHROPIC MODELS
+  "anthropic/claude-3.5-sonnet": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 8192,
+    MAX_CONTEXT_LENGTH: 200000
+  },
+  "anthropic/claude-3-haiku": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 4096,
+    MAX_CONTEXT_LENGTH: 200000
+  },
+
+  // GOOGLE MODELS
+  "google/gemini-pro-1.5-exp": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 32768,
+    MAX_CONTEXT_LENGTH: 4000000
+  },
+  "google/gemini-flash-1.5-exp": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 32768,
+    MAX_CONTEXT_LENGTH: 4000000
+  },
+  "google/gemini-pro-1.5": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 32768,
+    MAX_CONTEXT_LENGTH: 4000000
+  },
+  "google/gemini-pro-vision": {
+    MIN_TEMPERATURE: 0,
+    MAX_TEMPERATURE: 0,
+    MAX_TOKEN_OUTPUT_LENGTH: 0,
+    MAX_CONTEXT_LENGTH: 0
+  },
+
   "databricks/dbrx-instruct": {
     MIN_TEMPERATURE: 0,
     MAX_TEMPERATURE: 0,
     MAX_TOKEN_OUTPUT_LENGTH: 0,
     MAX_CONTEXT_LENGTH: 0
   },
-  "cohere/command-r-plus": {
+  "cohere/command-r-plus-08-2024": {
     MIN_TEMPERATURE: 0,
     MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 0,
-    MAX_CONTEXT_LENGTH: 0
+    MAX_TOKEN_OUTPUT_LENGTH: 4000,
+    MAX_CONTEXT_LENGTH: 128000
   },
   "mistralai/mixtral-8x22b-instruct": {
     MIN_TEMPERATURE: 0,
@@ -298,42 +371,7 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TOKEN_OUTPUT_LENGTH: 0,
     MAX_CONTEXT_LENGTH: 0
   },
-  "anthropic/claude-3.5-sonnet": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 0,
-    MAX_CONTEXT_LENGTH: 0
-  },
-  "openai/gpt-4o-2024-08-06": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 0,
-    MAX_CONTEXT_LENGTH: 0
-  },
-  "openai/gpt-4-vision-preview": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 0,
-    MAX_CONTEXT_LENGTH: 0
-  },
-  "openai/gpt-4o-mini": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 0,
-    MAX_CONTEXT_LENGTH: 0
-  },
-  "google/gemini-pro-1.5": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 0,
-    MAX_CONTEXT_LENGTH: 0
-  },
-  "google/gemini-pro-vision": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 0,
-    MAX_CONTEXT_LENGTH: 0
-  },
+
   "liuhaotian/llava-yi-34b": {
     MIN_TEMPERATURE: 0,
     MAX_TEMPERATURE: 0,
@@ -346,12 +384,7 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TOKEN_OUTPUT_LENGTH: 0,
     MAX_CONTEXT_LENGTH: 0
   },
-  "anthropic/claude-3-haiku": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 0,
-    MAX_CONTEXT_LENGTH: 0
-  },
+
   "perplexity/llama-3.1-sonar-huge-128k-online": {
     MIN_TEMPERATURE: 0,
     MAX_TEMPERATURE: 0,
@@ -369,29 +402,5 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TEMPERATURE: 0,
     MAX_TOKEN_OUTPUT_LENGTH: 4096,
     MAX_CONTEXT_LENGTH: 128000
-  },
-  "openai/o1-mini": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 65536,
-    MAX_CONTEXT_LENGTH: 128000
-  },
-  "openai/o1-preview": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 32768,
-    MAX_CONTEXT_LENGTH: 128000
-  },
-  "google/gemini-pro-1.5-exp": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 0,
-    MAX_CONTEXT_LENGTH: 0
-  },
-  "google/gemini-flash-1.5-exp": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 0,
-    MAX_TOKEN_OUTPUT_LENGTH: 0,
-    MAX_CONTEXT_LENGTH: 0
   }
 }

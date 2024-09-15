@@ -11,10 +11,6 @@ const KNOWN_MODEL_NAMES: {
     provider: "databricks",
     modelName: "DBRX Instruct"
   },
-  "cohere/command-r-plus": {
-    provider: "cohere",
-    modelName: "Command R Plus"
-  },
   "mistralai/mixtral-8x22b-instruct": {
     provider: "mistral",
     modelName: "Mixtral 8x22B"
@@ -108,14 +104,14 @@ function parseSupportedModelsFromEnv() {
     "google/gemini-flash-1.5-exp",
 
     "databricks/dbrx-instruct",
-    "cohere/command-r-plus",
     "mistralai/mixtral-8x22b-instruct",
     "microsoft/wizardlm-2-8x22b",
     "meta-llama/llama-3-70b-instruct",
 
     "perplexity/llama-3.1-sonar-huge-128k-online",
     "mattshumer/reflection-70b",
-    "deepseek/deepseek-chat"
+    "deepseek/deepseek-chat",
+    "cohere/command-r-plus-08-2024"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {

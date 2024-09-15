@@ -70,11 +70,8 @@ export type PerplexityLLMID =
   | "llama-3-sonar-large-32k-online" // Sonar Medium Online
 
 export type OpenRouterLLMID =
-  | "databricks/dbrx-instruct"
-  | "cohere/command-r-plus"
-  | "mistralai/mixtral-8x22b-instruct"
-  | "microsoft/wizardlm-2-8x22b"
-  | "meta-llama/llama-3-70b-instruct"
+  | "openai/o1-mini"
+  | "openai/o1-preview"
   | "openai/gpt-4o-2024-08-06"
   | "openai/gpt-4-vision-preview"
   | "openai/gpt-4o-mini"
@@ -82,15 +79,18 @@ export type OpenRouterLLMID =
   | "google/gemini-pro-vision"
   | "google/gemini-flash-1.5-exp"
   | "google/gemini-pro-1.5-exp"
-  | "liuhaotian/llava-yi-34b"
-  | "fireworks/firellava-13b"
   | "anthropic/claude-3-haiku"
   | "anthropic/claude-3.5-sonnet"
+  | "databricks/dbrx-instruct"
+  | "mistralai/mixtral-8x22b-instruct"
+  | "microsoft/wizardlm-2-8x22b"
+  | "meta-llama/llama-3-70b-instruct"
+  | "liuhaotian/llava-yi-34b"
+  | "fireworks/firellava-13b"
   | "perplexity/llama-3.1-sonar-huge-128k-online"
   | "mattshumer/reflection-70b"
   | "deepseek/deepseek-chat"
-  | "openai/o1-mini"
-  | "openai/o1-preview"
+  | "cohere/command-r-plus-08-2024"
 
 export interface LLM {
   modelId: LLMID
