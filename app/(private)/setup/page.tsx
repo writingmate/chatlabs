@@ -167,7 +167,7 @@ export default function SetupPage() {
           <StepContainer
             stepDescription="Let's create your profile."
             stepNum={currentStep}
-            stepTitle="Welcome to ChatLabs"
+            stepTitle="Welcome to The Texas Law Advisor"
             onShouldProceed={handleShouldProceed}
             showNextButton={!!(username && usernameAvailable)}
             showBackButton={false}
@@ -184,16 +184,16 @@ export default function SetupPage() {
       case 2:
         return (
           <StepContainer
-            stepDescription="Pro plan gives unlimited access to over 20 AI models."
+            stepDescription="Receive instant and reliable legal guidance on any area of Texas law, without limitations."
             stepNum={currentStep}
-            stepTitle="Choose your plan"
+            stepTitle="Subscribe Now"
             onShouldProceed={handleShouldProceed}
             showNextButton={true}
             showBackButton={true}
           >
             <Plans
-              onClose={() => setIsPaywallOpen(false)}
-              showCloseIcon={false}
+              onClose={() => setIsPaywallOpen(true)}
+              showCloseIcon={true}
             />
           </StepContainer>
         )
