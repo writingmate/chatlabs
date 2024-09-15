@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       apiKey: profile.openrouter_api_key || "",
       baseURL: "https://openrouter.ai/api/v1",
       defaultHeaders: {
-        "HTTP-Referer": `https://writingmate.ai/labs`,
+        "HTTP-Referer": `https://imogenai.app`,
         "X-Title": `ImogenAI`,
         "X-Description": `Chat with all best AI models in one place`
       }

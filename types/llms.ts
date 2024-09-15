@@ -80,6 +80,8 @@ export type OpenRouterLLMID =
   | "openai/gpt-4o-mini"
   | "google/gemini-pro-1.5"
   | "google/gemini-pro-vision"
+  | "google/gemini-flash-1.5-exp"
+  | "google/gemini-pro-1.5-exp"
   | "liuhaotian/llava-yi-34b"
   | "fireworks/firellava-13b"
   | "anthropic/claude-3-haiku"

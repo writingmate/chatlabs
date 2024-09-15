@@ -2,6 +2,32 @@ import { LLM } from "@/types"
 
 const OPENROUTER_PLATFORM_LINK = "https://openrouter.ai/api/v1"
 
+const O1_MINI: LLM = {
+  modelId: "openai/o1-mini",
+  modelName: "O1 Mini",
+  provider: "openrouter",
+  hostedId: "o1-mini",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: true,
+  tools: true,
+  supportsStreaming: true,
+  paid: true,
+  new: true
+}
+
+const O1_PREVIEW: LLM = {
+  modelId: "openai/o1-preview",
+  modelName: "O1 Preview",
+  provider: "openrouter",
+  hostedId: "o1-preview",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  paid: true,
+  new: true
+}
+
 const GPT4O: LLM = {
   modelId: "openai/gpt-4o-2024-08-06",
   modelName: "GPT-4o 2024-08-06",
@@ -56,6 +82,7 @@ const GPT4Vision: LLM = {
   }
 }
 
+///google
 const GEMINI_PRO_15: LLM = {
   modelId: "google/gemini-pro-1.5",
   modelName: "Gemini 1.5 Pro",
@@ -68,6 +95,31 @@ const GEMINI_PRO_15: LLM = {
   paid: true
 }
 
+const GEMINI_PRO_15_EXP: LLM = {
+  modelId: "google/gemini-pro-1.5-exp",
+  modelName: "Gemini 1.5 Pro Exp",
+  provider: "openrouter",
+  hostedId: "gemini-1.5-pro-exp",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: true,
+  tools: false,
+  supportsStreaming: true,
+  paid: true
+}
+
+const GEMINI_FLASH_15_EXP: LLM = {
+  modelId: "google/gemini-flash-1.5-exp",
+  modelName: "Gemini Flash 1.5 Exp",
+  provider: "openrouter",
+  hostedId: "gemini-flash-1.5-exp",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: true,
+  tools: false,
+  supportsStreaming: true,
+  paid: false
+}
+
+///anthropic
 const CLAUDE_3_HAIKU: LLM = {
   modelId: "anthropic/claude-3-haiku",
   modelName: "Claude 3 Haiku",
@@ -92,6 +144,7 @@ const CLAUDE_35_SONNET: LLM = {
   paid: true
 }
 
+///other
 const LLAVA_YI_34b: LLM = {
   modelId: "liuhaotian/llava-yi-34b",
   modelName: "Llava-yi-34b",
@@ -145,44 +198,21 @@ const DEEPSEEK_CHAT: LLM = {
   modelId: "deepseek/deepseek-chat",
   modelName: "DeepSeek v2.5",
   provider: "openrouter",
-  hostedId: "deepseek-chat",
+  hostedId: "DeepSeek V2.5",
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  paid: true
+  paid: false
 }
 
-const O1_MINI: LLM = {
-  modelId: "openai/o1-mini",
-  modelName: "O1 Mini",
-  provider: "openrouter",
-  hostedId: "o1-mini",
-  platformLink: OPENROUTER_PLATFORM_LINK,
-  imageInput: true,
-  tools: true,
-  supportsStreaming: true,
-  paid: true,
-  new: true
-}
-
-const O1_PREVIEW: LLM = {
-  modelId: "openai/o1-preview",
-  modelName: "O1 Preview",
-  provider: "openrouter",
-  hostedId: "o1-preview",
-  platformLink: OPENROUTER_PLATFORM_LINK,
-  imageInput: false,
-  tools: false,
-  supportsStreaming: true,
-  paid: true,
-  new: true
-}
 export const OPENROUTER_LLM_LIST: LLM[] = [
   GPT4O,
   GPT4O_MINI,
   GPT4Vision,
   GEMINI_PRO_15,
+  GEMINI_PRO_15_EXP,
+  GEMINI_FLASH_15_EXP,
   CLAUDE_3_HAIKU,
   CLAUDE_35_SONNET,
   LLAVA_YI_34b,
@@ -206,3 +236,5 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
 //- deepseek/deepseek-chat
 //- openai/o1-mini
 //- openai/o1-preview
+//- google/gemini-pro-1.5-exp
+//- google/gemini-flash-1.5-exp

@@ -95,21 +95,27 @@ export function parseOpenRouterModelName(modelId: string): Partial<LLM> {
 
 function parseSupportedModelsFromEnv() {
   let SUPPORTED_OPENROUTER_MODELS = [
+    "openai/o1-mini",
+    "openai/o1-preview",
+    "openai/gpt-4o-2024-08-06",
+    "openai/gpt-4o-mini",
+
+    "anthropic/claude-3.5-sonnet",
+    "anthropic/claude-3-haiku",
+
+    "google/gemini-pro-1.5",
+    "google/gemini-pro-1.5-exp",
+    "google/gemini-flash-1.5-exp",
+
     "databricks/dbrx-instruct",
     "cohere/command-r-plus",
     "mistralai/mixtral-8x22b-instruct",
     "microsoft/wizardlm-2-8x22b",
     "meta-llama/llama-3-70b-instruct",
-    "deepseek/deepseek-coder",
-    "google/gemini-pro-1.5",
-    "anthropic/claude-3.5-sonnet",
-    "openai/gpt-4o-2024-08-06",
-    "openai/gpt-4o-mini",
+
     "perplexity/llama-3.1-sonar-huge-128k-online",
     "mattshumer/reflection-70b",
-    "deepseek/deepseek-chat",
-    "openai/o1-mini",
-    "openai/o1-preview"
+    "deepseek/deepseek-chat"
   ]
 
   if (process.env.NEXT_PUBLIC_OPENROUTER_MODELS) {
