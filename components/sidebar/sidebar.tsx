@@ -154,6 +154,10 @@ export const Sidebar: FC = () => {
     }
   }
 
+  const toggleSidebar = () => {
+    setShowSidebar(!showSidebar)
+  }
+
   return useMemo(
     () => (
       <>
@@ -298,6 +302,16 @@ export const Sidebar: FC = () => {
           <div className="border-t p-2">
             <ProfileSettings isCollapsed={isCollapsed} />
           </div>
+
+          {/* Updated button positioning */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute -right-10 top-1/2 -translate-y-1/2 md:hidden"
+            onClick={toggleSidebar}
+          >
+            <IconMenu2 {...iconProps} />
+          </Button>
 
           {(["prompts", "assistants", "files", "tools"] as const).map(
             contentType => (

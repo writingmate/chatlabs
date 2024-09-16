@@ -28,7 +28,7 @@ const O1_PREVIEW: LLM = {
   new: true
 }
 
-const GPT4O: LLM = {
+const GPT_4O: LLM = {
   modelId: "openai/gpt-4o-2024-08-06",
   modelName: "GPT-4o 2024-08-06",
   provider: "openrouter",
@@ -46,7 +46,7 @@ const GPT4O: LLM = {
   }
 }
 
-const GPT4O_MINI: LLM = {
+const GPT_4O_MINI: LLM = {
   modelId: "openai/gpt-4o-mini",
   modelName: "GPT-4o mini",
   provider: "openrouter",
@@ -65,7 +65,7 @@ const GPT4O_MINI: LLM = {
   }
 }
 
-const GPT4Vision: LLM = {
+const GPT_4_VISION: LLM = {
   modelId: "openai/gpt-4-vision-preview",
   modelName: "GPT-4 Vision",
   provider: "openrouter",
@@ -169,11 +169,11 @@ const FIRELLAVA_13b: LLM = {
   paid: false
 }
 
-const LLAMA_3_1_405B: LLM = {
-  modelId: "meta-llama/llama-3-1-405b-instruct",
-  modelName: "Llama 3.1 405B",
+const META_LLAMA_3_1_405B: LLM = {
+  modelId: "meta-llama/llama-3.1-405b-instruct",
+  modelName: "Meta Llama 3.1 405B",
   provider: "openrouter",
-  hostedId: "llama-3-1-405b-instruct",
+  hostedId: "llama-3.1-405b-instruct",
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: false,
   tools: false,
@@ -233,9 +233,9 @@ const COMMAND_R_PLUS_08_2024: LLM = {
 export const OPENROUTER_LLM_LIST: LLM[] = [
   O1_MINI,
   O1_PREVIEW,
-  GPT4O,
-  GPT4O_MINI,
-  GPT4Vision,
+  GPT_4O,
+  GPT_4O_MINI,
+  GPT_4_VISION,
   GEMINI_PRO_15,
   GEMINI_PRO_15_EXP,
   GEMINI_FLASH_15_EXP,
@@ -244,7 +244,7 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
   LLAVA_YI_34b,
   FIRELLAVA_13b,
   LLAMA_3_1_SONAR_HUGE_128K_ONLINE,
-  LLAMA_3_1_405B,
+  META_LLAMA_3_1_405B,
   REFLECTION_70B,
   DEEPSEEK_CHAT,
   COMMAND_R_PLUS_08_2024
@@ -261,7 +261,7 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
 //- fireworks/firellava-13b
 //- anthropic/claude-3-haiku
 //- anthropic/claude-3.5-sonnet
-//- meta-llama/llama-3-1-405b-instruct
+//- meta-llama/llama-3.1-405b-instruct
 //- deepseek/deepseek-chat
 //- openai/o1-mini
 //- openai/o1-preview
