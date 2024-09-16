@@ -11,7 +11,7 @@ import { cn, generateRandomString } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { MessageHtmlElement } from "@/types/html"
 import { UITheme } from "./theme-configurator"
-import { daisyui } from "@/lib/daisyui"
+import { updateHtml } from "@/lib/code-viewer"
 
 interface PreviewProps2 {
   value: string
@@ -21,48 +21,6 @@ interface PreviewProps2 {
   setInspectMode: (inspectMode: boolean) => void
   onElementClick: (element: MessageHtmlElement) => void
   handleFixError: (error: string) => void // New prop for handling error fixes
-}
-
-function addTailwindTheme(doc: Document, theme: UITheme) {
-  const daisyuiLinkElement = doc.createElement("link")
-  daisyuiLinkElement.href =
-    "https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
-  daisyuiLinkElement.rel = "stylesheet"
-  daisyuiLinkElement.type = "text/css"
-  doc.head.appendChild(daisyuiLinkElement)
-
-  const tailwindScriptElement = doc.createElement("script")
-  tailwindScriptElement.src = "https://cdn.tailwindcss.com"
-  doc.head.appendChild(tailwindScriptElement)
-
-  //   const scriptElement = doc.createElement("script")
-  //   scriptElement.textContent = `
-  // document.addEventListener("DOMContentLoaded", function() {
-  //   document.body.setAttribute("data-theme", "custom");
-  // });
-  // `
-
-  const styleElement = doc.createElement("style")
-  styleElement.textContent = `
-    body, html {
-      width: 100%;
-      height: 100%;
-    }
-    `
-  // styleElement.textContent = `
-  //   [data-theme="custom"] {
-  //     --webkit-font-smoothing: antialiased;
-  //     --moz-osx-font-smoothing: grayscale;
-  //     ${daisyui.convertThemeToCSS(theme)}
-  //   }
-  //   body {
-  //     width: 100%;
-  //     height: 100%;
-  //   }
-  //   ${theme.fontSize ? `html { font-size: ${theme.fontSize}; }` : ""}
-
-  doc.head.appendChild(styleElement)
-  // doc.head.appendChild(scriptElement)
 }
 
 const CodeViewerPreview2: React.FC<PreviewProps2> = ({
@@ -106,9 +64,8 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
 
     renderRef.current = fullHtmlContent
 
-    if (theme) {
-      addTailwindTheme(doc, theme.theme)
-    }
+    updateHtml(doc)
+
     const captureConsole = (methodName: keyof Console, messageType: string) => {
       const originalMethod = iframeWindow.console[methodName]
       iframeWindow.console[methodName] = (...args: any[]) => {
@@ -158,7 +115,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
         }
       })
     }
-  }, [fullHtmlContent, inspectMode, theme])
+  }, [fullHtmlContent, inspectMode])
 
   useEffect(() => {
     const iframe = iframeRef.current
