@@ -7,7 +7,6 @@ import { LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import {
-  ALLOWED_MODELS,
   CATCHALL_MESSAGE_DAILY_LIMIT,
   FREE_MESSAGE_DAILY_LIMIT,
   PRO_MESSAGE_DAILY_LIMIT,
@@ -121,11 +120,6 @@ function isTierModel(model: LLMID, tier: keyof typeof TIER_MODELS) {
   return false
 }
 
-function isPaidModel(model: LLMID) {
-  const paidLLMS = LLM_LIST.filter(x => x.tier !== "free").map(x => x.modelId)
-  return paidLLMS.includes(model)
-}
-
 export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
   if (!validatePlanForModel(profile, model)) {
     const modelData = LLM_LIST.find(x => x.modelId === model)
@@ -184,10 +178,14 @@ export async function validateMessageCount(
     )
   }
 
+  const ULTIMATE_GRANDFATHERED_DATE =
+    process.env.ULTIMATE_GRANDFATHERED_DATE || "2024-09-16"
+
   if (
     isTierModel(model, PLAN_ULTIMATE) &&
     userPlan === PLAN_PRO &&
-    count >= PRO_ULTIMATE_MESSAGE_DAILY_LIMIT
+    count >= PRO_ULTIMATE_MESSAGE_DAILY_LIMIT &&
+    profile.created_at > ULTIMATE_GRANDFATHERED_DATE
   ) {
     throw new SubscriptionRequiredError(
       `You have reached daily message limit for Pro plan for ${model}. Upgrade to Ultimate plan to continue or come back tomorrow.`
@@ -197,7 +195,8 @@ export async function validateMessageCount(
   if (
     isTierModel(model, PLAN_ULTIMATE) &&
     userPlan === PLAN_ULTIMATE &&
-    count >= ULTIMATE_MESSAGE_DAILY_LIMIT
+    count >= ULTIMATE_MESSAGE_DAILY_LIMIT &&
+    profile.created_at > ULTIMATE_GRANDFATHERED_DATE
   ) {
     throw new SubscriptionRequiredError(
       `You have reached hard daily message limit for model ${model}`

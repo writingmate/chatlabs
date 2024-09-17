@@ -2,17 +2,15 @@ import { ChatbotUIContext } from "@/context/context"
 import { useContext, useEffect, useState } from "react"
 import {
   FREE_MESSAGE_DAILY_LIMIT,
-  validatePlanForModel
+  PRO_ULTIMATE_MESSAGE_DAILY_LIMIT,
+  ULTIMATE_MESSAGE_DAILY_LIMIT
 } from "@/lib/subscription"
-import { getMessageCount } from "@/db/messages"
+import { getMessageCountForModel } from "@/db/messages"
 import { Button } from "@/components/ui/button"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 
 interface ChatMessageCounterProps {}
-
-const LIMIT =
-  parseInt(process.env.NEXT_PUBLIC_FREE_MESSAGE_DAILY_LIMIT + "") ||
-  FREE_MESSAGE_DAILY_LIMIT
 
 const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
   const { profile, setIsPaywallOpen } = useContext(ChatbotUIContext)
@@ -24,33 +22,80 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
       return
     }
     const fetchMessageCount = async () => {
-      const count = await getMessageCount()
+      if (!chatSettings?.model) {
+        return
+      }
+      const count = await getMessageCountForModel(chatSettings?.model)
       setMessageCount(count || 0)
     }
     fetchMessageCount()
-  }, [profile, isGenerating])
+  }, [profile, isGenerating, chatSettings])
 
-  if (!profile) {
+  if (!profile || !chatSettings?.model) {
     return null
   }
 
-  if (validatePlanForModel(profile, chatSettings?.model)) {
-    return null // Do not display the counter for non-free plans
+  const userPlan = profile.plan.split("_")[0]
+  const modelData = LLM_LIST.find(x => x.modelId === chatSettings.model)
+  const modelTier = modelData?.tier
+
+  let limit = FREE_MESSAGE_DAILY_LIMIT
+  let showCounter = true
+
+  if (userPlan === "ultimate") {
+    if (modelTier === "ultimate" && profile.created_at > "2024-09-16") {
+      limit = ULTIMATE_MESSAGE_DAILY_LIMIT
+    } else {
+      showCounter = false
+    }
+  } else if (userPlan === "pro") {
+    if (modelTier === "ultimate" && profile.created_at > "2024-09-16") {
+      limit = PRO_ULTIMATE_MESSAGE_DAILY_LIMIT
+    } else {
+      showCounter = false
+    }
+  }
+
+  if (userPlan === "byok") {
+    showCounter = false
+  }
+
+  if (!showCounter) {
+    return null
   }
 
   return (
     <div className={"text-foreground/80 w-full p-2 text-center text-xs"}>
-      {Math.max(LIMIT - messageCount, 0)}/{LIMIT} messages left. All generated
-      images and web search results are public.{" "}
-      <Button
-        size={"xs"}
-        className={"px-0 text-xs"}
-        variant={"link"}
-        onClick={() => setIsPaywallOpen(true)}
-      >
-        Upgrade to Pro
-      </Button>
-      .
+      {limit - messageCount}/{limit} messages left today.
+      {userPlan === "free" && (
+        <>
+          {" "}
+          All generated images and web search results are public.{" "}
+          <Button
+            size={"xs"}
+            className={"px-0 text-xs"}
+            variant={"link"}
+            onClick={() => setIsPaywallOpen(true)}
+          >
+            Upgrade to Pro
+          </Button>
+        </>
+      )}
+      {userPlan === "pro" && (
+        <>
+          {" "}
+          To increase your message limit,{" "}
+          <Button
+            size={"xs"}
+            className={"px-0 text-xs"}
+            variant={"link"}
+            onClick={() => setIsPaywallOpen(true)}
+          >
+            upgrade to Ultimate
+          </Button>
+          .
+        </>
+      )}
     </div>
   )
 }
