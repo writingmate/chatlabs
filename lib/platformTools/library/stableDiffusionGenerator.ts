@@ -92,20 +92,22 @@ async function generateImageFromStabilityAPI(
   return data.image // Return the base64 image data
 }
 
+function convertToBuffer(dataOrUrl: string) {
+  if (dataOrUrl.startsWith("http")) {
+    return fetch(dataOrUrl).then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch image")
+      }
+      return res.arrayBuffer()
+    })
+  } else {
+    return Buffer.from(dataOrUrl, "base64")
+  }
+}
+
 export async function uploadImageToSupabase(prompt: string, imageData: string) {
   // if it's a url, fetch the image
-  let imageBuffer: Buffer
-  if (imageData.startsWith("http")) {
-    const response = await fetch(imageData)
-
-    if (!response.ok) {
-      throw new Error("Error fetching image: " + response.statusText)
-    }
-
-    const arrayBuffer = await response.arrayBuffer()
-    imageBuffer = Buffer.from(arrayBuffer)
-  }
-  imageBuffer = Buffer.from(imageData, "base64")
+  let imageBuffer = await convertToBuffer(imageData)
   // add random string to filename to avoid conflicts
   const randomString = Date.now().toString(36)
   const fileName = `${randomString}.png`
