@@ -181,11 +181,16 @@ export async function validateMessageCount(
   const ULTIMATE_GRANDFATHERED_DATE =
     process.env.ULTIMATE_GRANDFATHERED_DATE || "2024-09-16"
 
+  const isGrandfathered =
+    profile.created_at < ULTIMATE_GRANDFATHERED_DATE &&
+    userPlan === PLAN_PRO &&
+    model.includes("opus")
+
   if (
     isTierModel(model, PLAN_ULTIMATE) &&
     userPlan === PLAN_PRO &&
     count >= PRO_ULTIMATE_MESSAGE_DAILY_LIMIT &&
-    profile.created_at > ULTIMATE_GRANDFATHERED_DATE
+    !isGrandfathered
   ) {
     throw new SubscriptionRequiredError(
       `You have reached daily message limit for Pro plan for ${model}. Upgrade to Ultimate plan to continue or come back tomorrow.`
@@ -195,8 +200,7 @@ export async function validateMessageCount(
   if (
     isTierModel(model, PLAN_ULTIMATE) &&
     userPlan === PLAN_ULTIMATE &&
-    count >= ULTIMATE_MESSAGE_DAILY_LIMIT &&
-    profile.created_at > ULTIMATE_GRANDFATHERED_DATE
+    count >= ULTIMATE_MESSAGE_DAILY_LIMIT
   ) {
     throw new SubscriptionRequiredError(
       `You have reached hard daily message limit for model ${model}`
