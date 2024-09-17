@@ -181,6 +181,7 @@ export async function validateMessageCount(
   const ULTIMATE_GRANDFATHERED_DATE =
     process.env.ULTIMATE_GRANDFATHERED_DATE || "2024-09-16"
 
+  // grandfathered pro users created before 2024-09-16 and using opus models
   const isGrandfathered =
     profile.created_at < ULTIMATE_GRANDFATHERED_DATE &&
     userPlan === PLAN_PRO &&
