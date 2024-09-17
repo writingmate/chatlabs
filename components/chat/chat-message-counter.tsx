@@ -42,20 +42,27 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
   let limit = FREE_MESSAGE_DAILY_LIMIT
   let showCounter = true
 
+  // we should not show the counter for pro users created before 2024-09-16 and using opus models
+  const isProGrandfathered =
+    userPlan === "pro" &&
+    profile.created_at < "2024-09-16" &&
+    modelData?.modelId.includes("opus")
+
   if (userPlan === "ultimate") {
-    if (modelTier === "ultimate" && profile.created_at > "2024-09-16") {
+    if (modelTier === "ultimate") {
       limit = ULTIMATE_MESSAGE_DAILY_LIMIT
     } else {
       showCounter = false
     }
   } else if (userPlan === "pro") {
-    if (modelTier === "ultimate" && profile.created_at > "2024-09-16") {
+    if (modelTier === "ultimate" && !isProGrandfathered) {
       limit = PRO_ULTIMATE_MESSAGE_DAILY_LIMIT
     } else {
       showCounter = false
     }
   }
 
+  // BYOK users have unlimited messages
   if (userPlan === "byok") {
     showCounter = false
   }
