@@ -37,6 +37,10 @@ export function validatePlanForModel(
     return false
   }
 
+  if (profile?.plan.startsWith("byok")) {
+    return true
+  }
+
   const modelData = LLM_LIST.find(x => x.modelId === model)
   if (!modelData) {
     return false

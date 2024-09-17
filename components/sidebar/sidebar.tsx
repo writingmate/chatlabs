@@ -39,6 +39,7 @@ import { useChatHandler } from "../chat/chat-hooks/use-chat-handler"
 import { SidebarDataList } from "./sidebar-data-list"
 import { ContentType } from "@/types"
 import Link from "next/link"
+import { WithTooltip } from "../ui/with-tooltip"
 
 export const Sidebar: FC = () => {
   const {
@@ -199,29 +200,41 @@ export const Sidebar: FC = () => {
                 : "items-center justify-between p-2"
             )}
           >
-            <Button
-              variant="ghost"
-              size={"icon"}
-              onClick={handleCreateChat}
-              title="New Chat"
-            >
-              <IconMessagePlus {...iconProps} />
-            </Button>
+            <WithTooltip
+              display={<div>New Chat</div>}
+              trigger={
+                <Button
+                  variant="ghost"
+                  size={"icon"}
+                  onClick={handleCreateChat}
+                  title="New Chat"
+                >
+                  <IconMessagePlus {...iconProps} />
+                </Button>
+              }
+              side="right"
+            />
             <div className="flex items-center justify-between">
               {activeSubmenu && getSubmenuTitle(activeSubmenu)}
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleCollapseOrSubmenu}
-              className="hidden md:flex"
-            >
-              {isCollapsed ? (
-                <IconChevronRight {...iconProps} />
-              ) : (
-                <IconChevronLeft {...iconProps} />
-              )}
-            </Button>
+            <WithTooltip
+              display={<div>{isCollapsed ? "Expand" : "Collapse"}</div>}
+              trigger={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleCollapseOrSubmenu}
+                  className="hidden md:flex"
+                >
+                  {isCollapsed ? (
+                    <IconChevronRight {...iconProps} />
+                  ) : (
+                    <IconChevronLeft {...iconProps} />
+                  )}
+                </Button>
+              }
+              side="right"
+            />
           </div>
 
           <div className="flex grow flex-col overflow-y-auto">

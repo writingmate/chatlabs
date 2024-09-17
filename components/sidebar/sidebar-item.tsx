@@ -2,6 +2,7 @@ import { FC, ReactNode } from "react"
 import { IconChevronRight } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { Button } from "../ui/button"
+import { WithTooltip } from "../ui/with-tooltip"
 
 interface SidebarItemProps {
   icon: ReactNode
@@ -18,7 +19,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   hasSubmenu = false,
   isCollapsed = false
 }) => {
-  return (
+  const buttonContent = (
     <Button
       variant="ghost"
       size="icon"
@@ -39,4 +40,16 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       )}
     </Button>
   )
+
+  if (isCollapsed) {
+    return (
+      <WithTooltip
+        display={<div>{label}</div>}
+        trigger={buttonContent}
+        side="right"
+      />
+    )
+  }
+
+  return buttonContent
 }
