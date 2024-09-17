@@ -45,7 +45,8 @@ async function stableDiffusion3(
 
     const imageUrl = await uploadImageToSupabase(prompt, imageData)
 
-    return imageUrl
+    // return markdown to display the image
+    return `![${prompt}](${imageUrl})\n${prompt}`
   } catch (error: any) {
     console.error("Error generating image:", error)
     throw new Error("Error: " + error.message)
