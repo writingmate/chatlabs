@@ -94,7 +94,9 @@ async function generateImageFromStabilityAPI(
 
 async function uploadImageToSupabase(prompt: string, imageData: string) {
   const imageBuffer = Buffer.from(imageData, "base64")
-  const fileName = `${prompt.replace(/\s+/g, "_")}.png`
+  // add random string to filename to avoid conflicts
+  const randomString = Date.now().toString(36)
+  const fileName = `${randomString}_${prompt.replace(/\s+/g, "_")}.png`
   const supabase = createClient(cookies())
 
   const { data, error } = await supabase.storage
