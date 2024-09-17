@@ -99,7 +99,10 @@ const ChatWrapper = forwardRef(
       chatMessages[chatMessages.length - 1]?.message.annotation
     )
 
-    const selectedModel = allModels.find(x => x.modelId === chatSettings?.model)
+    const selectedModel = allModels.find(
+      x =>
+        x.modelId === chatSettings?.model || x.hostedId === chatSettings?.model
+    )
 
     useImperativeHandle(
       ref,
