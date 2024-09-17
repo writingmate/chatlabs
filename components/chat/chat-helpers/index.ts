@@ -24,12 +24,7 @@ import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { SubscriptionRequiredError } from "@/lib/errors"
-import {
-  validatePlanForAssistant,
-  validatePlanForModel,
-  validatePlanForTools,
-  validateProPlan
-} from "@/lib/subscription"
+import { validatePlanForModel, validatePlanForTools } from "@/lib/subscription"
 import { encode } from "gpt-tokenizer"
 import {
   parseChatMessageCodeBlocksAndContent,
@@ -59,8 +54,9 @@ export const validateChatSettings = (
   }
 
   if (!validatePlanForModel(profile, modelData.modelId)) {
+    const requiredPlan = modelData.tier === "ultimate" ? "Ultimate" : "Pro"
     throw new SubscriptionRequiredError(
-      "Subscription required to use this model"
+      `${requiredPlan} plan required to use this model`
     )
   }
 

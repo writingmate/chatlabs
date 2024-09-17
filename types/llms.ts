@@ -20,6 +20,8 @@ export type OpenAILLMID =
   | "gpt-4o" // GPT-4o
   | "gpt-4o-mini" // GPT-4 Vision
   | "gpt-4o-2024-08-06" // GPT-4o (updated 8/6/24)
+  | "o1-mini" // O1 Mini
+  | "o1-preview" // O1 Mini Latest
 
 // Google Models
 export type GoogleLLMID =
@@ -74,7 +76,6 @@ export interface LLM {
   hostedId: string
   platformLink: string
   imageInput: boolean
-  paid?: boolean
   tools?: boolean
   supportsStreaming?: boolean
   description?: string
@@ -85,6 +86,7 @@ export interface LLM {
     outputCost?: number
   }
   new?: boolean
+  tier?: "free" | "pro" | "ultimate" | undefined
 }
 
 export interface OpenRouterLLM extends LLM {

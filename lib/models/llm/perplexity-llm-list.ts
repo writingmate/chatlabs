@@ -10,7 +10,7 @@ const MIXTRAL_8X7B_INSTRUCT: LLM = {
   hostedId: "mixtral-8x7b-instruct",
   platformLink: PERPLEXITY_PLATORM_LINK,
   imageInput: false,
-  paid: true
+  tier: "pro"
 }
 
 const MISTRAL_7B_INSTRUCT: LLM = {
@@ -47,7 +47,7 @@ const PERPLEXITY_SONAR_LARGE_CHAT_8x7B: LLM = {
   hostedId: "llama-3-sonar-large-32k-chat",
   platformLink: PERPLEXITY_PLATORM_LINK,
   imageInput: false,
-  paid: true
+  tier: "pro"
 }
 
 const PERPLEXITY_SONAR_LARGE_ONLINE_8x7B: LLM = {
@@ -57,7 +57,7 @@ const PERPLEXITY_SONAR_LARGE_ONLINE_8x7B: LLM = {
   hostedId: "llama-3-sonar-large-32k-online",
   platformLink: PERPLEXITY_PLATORM_LINK,
   imageInput: false,
-  paid: true
+  tier: "pro"
 }
 
 export const PERPLEXITY_LLM_LIST: LLM[] = [

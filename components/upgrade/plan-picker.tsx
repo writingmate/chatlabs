@@ -1,19 +1,23 @@
 "use client"
 import { ChatbotUIContext } from "@/context/context"
-import { IconCheck } from "@tabler/icons-react"
+import { IconCheck, IconCircleCheck } from "@tabler/icons-react"
 import { FC, ReactNode, useContext } from "react"
 import { Dialog, DialogContent } from "../ui/dialog"
 import Plans from "@/components/upgrade/plans"
 
 interface PlanPickerProps {}
 
-export function PlanFeature({ title }: { title: string | ReactNode }) {
+export function PlanFeature({
+  title,
+  icon = <IconCircleCheck size={18} />
+}: {
+  title: string | ReactNode
+  icon?: ReactNode
+}) {
   return (
     <div className="bg-token-main-surface-primary relative">
       <div className="text-l flex justify-start gap-2">
-        <div className="w-5 shrink-0">
-          <IconCheck size={18} />
-        </div>
+        <div className="w-5 shrink-0">{icon}</div>
         <span>{title}</span>
       </div>
     </div>

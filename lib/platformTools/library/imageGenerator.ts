@@ -1,6 +1,7 @@
 import { ImageGeneratorResult, PlatformTool } from "@/types/platformTools"
 import OpenAI from "openai"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import { uploadImageToSupabase } from "@/lib/platformTools/library/stableDiffusionGenerator"
 
 type ImageFormat = "portrait" | "landscape" | "square"
 // This function fetches data from a URL and returns it in markdown format.
@@ -60,7 +61,12 @@ const imageGenerator = async (
       size: size as any
     })
 
-    result = response.data[0].url as string
+    const imageUrl = await uploadImageToSupabase(
+      prompt,
+      response.data[0].url as string
+    )
+
+    result = imageUrl as string
   } catch (error: any) {
     console.error("Failed to generate image", error, prompt, size)
     throw new Error("Failed to generate image", error)

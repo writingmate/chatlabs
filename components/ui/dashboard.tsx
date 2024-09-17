@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/sidebar/sidebar"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { ContentType } from "@/types"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { FC, useState, useContext, useMemo } from "react"
+import { FC, useState, useContext, useMemo, useEffect } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
 import { PlanPicker } from "@/components/upgrade/plan-picker"
@@ -61,56 +61,16 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
     event.preventDefault()
   }
 
-  const handleToggleSidebar = () => {
-    setShowSidebar(prevState => !prevState)
-    localStorage.setItem("showSidebar", String(!showSidebar))
-  }
-
   return useMemo(
     () => (
       <div className="flex size-full overflow-x-hidden">
         <CommandK />
         <PlanPicker />
 
-        {/* <Button
-          className={cn(
-            "absolute left-[4px] top-[50%] z-10 size-[32px] cursor-pointer"
-          )}
-          style={{
-            marginLeft: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
-            transform: showSidebar ? "rotate(180deg)" : "rotate(0deg)"
-          }}
-          variant="ghost"
-          size="icon"
-          onClick={handleToggleSidebar}
-        >
-          <IconChevronCompactRight size={24} />
-        </Button> */}
-
-        {/* <div
-          className={cn(
-            `bg-background absolute z-50 h-full shrink-0 overflow-hidden border-r transition-[width] duration-200 lg:relative`
-          )}
-          style={{
-            width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"
-          }}
-        > */}
-        {/* <Tabs
-            className={"z-50 flex h-full"}
-            value={contentType}
-            onValueChange={tabValue => {
-              setContentType(tabValue as ContentType)
-              router.replace(`${pathname}?tab=${tabValue}`)
-            }}
-          > */}
-        {/* <SidebarSwitcher onContentTypeChange={setContentType} /> */}
-
         <Sidebar />
-        {/* </Tabs> */}
-        {/* </div> */}
 
         <div
-          className={"flex grow transition-[width]"}
+          className="flex grow overflow-hidden transition-[width]"
           style={{
             width: showSidebar ? `calc(100% - ${SIDEBAR_WIDTH}px)` : "100%"
           }}
@@ -129,6 +89,6 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         </div>
       </div>
     ),
-    [showSidebar, contentType]
+    [showSidebar, contentType, isDragging, children]
   )
 }

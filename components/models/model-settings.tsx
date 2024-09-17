@@ -65,7 +65,9 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "llama3-70b-8192": false,
   "llama3-8b-8192": false,
   "gpt-4o": true,
-  "gemini-1.5-flash-latest": true
+  "gemini-1.5-flash-latest": true,
+  "o1-mini": true,
+  "o1-preview": true
 }
 
 const SYSTEM_PROMPT_DESCRIPTION = `

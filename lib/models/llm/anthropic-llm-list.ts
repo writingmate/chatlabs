@@ -5,40 +5,6 @@ const ANTHROPIC_PLATFORM_LINK =
 
 // Anthropic Models (UPDATED 03/13/24) -----------------------------
 
-// Claude 2 (UPDATED 12/21/23)
-const CLAUDE_2: LLM = {
-  modelId: "claude-2.1",
-  modelName: "Claude 2",
-  provider: "anthropic",
-  hostedId: "claude-2.1",
-  platformLink: ANTHROPIC_PLATFORM_LINK,
-  imageInput: false,
-  paid: true,
-  pricing: {
-    currency: "USD",
-    unit: "1M tokens",
-    inputCost: 8,
-    outputCost: 24
-  }
-}
-
-// Claude Instant (UPDATED 12/21/23)
-const CLAUDE_INSTANT: LLM = {
-  modelId: "claude-instant-1.2",
-  modelName: "Claude Instant",
-  provider: "anthropic",
-  hostedId: "claude-instant-1.2",
-  platformLink: ANTHROPIC_PLATFORM_LINK,
-  imageInput: false,
-  paid: true,
-  pricing: {
-    currency: "USD",
-    unit: "1M tokens",
-    inputCost: 0.8,
-    outputCost: 2.4
-  }
-}
-
 // Claude 3 Haiku (UPDATED 03/13/24)
 const CLAUDE_3_HAIKU: LLM = {
   modelId: "claude-3-haiku-20240307",
@@ -63,7 +29,7 @@ const CLAUDE_3_SONNET: LLM = {
   hostedId: "claude-3-sonnet-20240229",
   platformLink: ANTHROPIC_PLATFORM_LINK,
   imageInput: true,
-  paid: true,
+  tier: "pro",
   pricing: {
     currency: "USD",
     unit: "1M tokens",
@@ -80,8 +46,7 @@ const CLAUDE_3_5_SONNET: LLM = {
   platformLink: ANTHROPIC_PLATFORM_LINK,
   imageInput: true,
   tools: true,
-  paid: true,
-  new: true,
+  tier: "pro",
   pricing: {
     currency: "USD",
     unit: "1M tokens",
@@ -98,7 +63,7 @@ const CLAUDE_3_OPUS: LLM = {
   hostedId: "claude-3-opus-20240229",
   platformLink: ANTHROPIC_PLATFORM_LINK,
   imageInput: true,
-  paid: true,
+  tier: "ultimate",
   tools: true,
   pricing: {
     currency: "USD",
@@ -109,8 +74,6 @@ const CLAUDE_3_OPUS: LLM = {
 }
 
 export const ANTHROPIC_LLM_LIST: LLM[] = [
-  CLAUDE_2,
-  CLAUDE_INSTANT,
   CLAUDE_3_HAIKU,
   CLAUDE_3_SONNET,
   CLAUDE_3_OPUS,

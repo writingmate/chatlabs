@@ -23,6 +23,7 @@ import {
 import Plans from "@/components/upgrade/plans"
 import { useAuth } from "@/context/auth"
 import { upsertUserQuestion } from "@/db/user_questions"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function SetupPage() {
   const {
@@ -160,105 +161,119 @@ export default function SetupPage() {
   }
 
   const renderStep = (stepNum: number) => {
-    switch (stepNum) {
-      // Profile Step
-      case 1:
-        return (
-          <StepContainer
-            stepDescription="Let's create your profile."
-            stepNum={currentStep}
-            stepTitle="Welcome to ChatLabs"
-            onShouldProceed={handleShouldProceed}
-            showNextButton={!!(username && usernameAvailable)}
-            showBackButton={false}
-          >
-            <ProfileStep
-              displayName={displayName}
-              onDisplayNameChange={setDisplayName}
-              onUserQuestionChange={setQuestion}
-              userQuestion={question}
-            />
-          </StepContainer>
-        )
+    return (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={stepNum}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          {(() => {
+            switch (stepNum) {
+              // Profile Step
+              case 1:
+                return (
+                  <StepContainer
+                    stepDescription="Let's create your profile."
+                    stepNum={currentStep}
+                    stepTitle="Welcome to ChatLabs"
+                    onShouldProceed={handleShouldProceed}
+                    showNextButton={!!(username && usernameAvailable)}
+                    showBackButton={false}
+                  >
+                    <ProfileStep
+                      displayName={displayName}
+                      onDisplayNameChange={setDisplayName}
+                      onUserQuestionChange={setQuestion}
+                      userQuestion={question}
+                    />
+                  </StepContainer>
+                )
 
-      case 2:
-        return (
-          <StepContainer
-            stepDescription="Pro plan gives unlimited access to over 20 AI models."
-            stepNum={currentStep}
-            stepTitle="Choose your plan"
-            onShouldProceed={handleShouldProceed}
-            showNextButton={true}
-            showBackButton={true}
-          >
-            <Plans
-              onClose={() => setIsPaywallOpen(false)}
-              showCloseIcon={false}
-            />
-          </StepContainer>
-        )
+              case 2:
+                return (
+                  <StepContainer
+                    stepDescription="Pro plan gives unlimited access to over 20 AI models."
+                    stepNum={currentStep}
+                    stepTitle="Choose your plan"
+                    onShouldProceed={handleShouldProceed}
+                    showNextButton={true}
+                    showBackButton={true}
+                  >
+                    <Plans
+                      onClose={() => setIsPaywallOpen(false)}
+                      showCloseIcon={false}
+                    />
+                  </StepContainer>
+                )
 
-      // API Step
-      // case 2:
-      //   return (
-      //     <StepContainer
-      //       stepDescription="Enter API keys for each service you'd like to use."
-      //       stepNum={currentStep}
-      //       stepTitle="Set API Keys (optional)"
-      //       onShouldProceed={handleShouldProceed}
-      //       showNextButton={true}
-      //       showBackButton={true}
-      //     >
-      //       <APIStep
-      //         openaiAPIKey={openaiAPIKey}
-      //         openaiOrgID={openaiOrgID}
-      //         azureOpenaiAPIKey={azureOpenaiAPIKey}
-      //         azureOpenaiEndpoint={azureOpenaiEndpoint}
-      //         azureOpenai35TurboID={azureOpenai35TurboID}
-      //         azureOpenai45TurboID={azureOpenai45TurboID}
-      //         azureOpenai45VisionID={azureOpenai45VisionID}
-      //         azureOpenaiEmbeddingsID={azureOpenaiEmbeddingsID}
-      //         anthropicAPIKey={anthropicAPIKey}
-      //         googleGeminiAPIKey={googleGeminiAPIKey}
-      //         mistralAPIKey={mistralAPIKey}
-      //         perplexityAPIKey={perplexityAPIKey}
-      //         useAzureOpenai={useAzureOpenai}
-      //         onOpenaiAPIKeyChange={setOpenaiAPIKey}
-      //         onOpenaiOrgIDChange={setOpenaiOrgID}
-      //         onAzureOpenaiAPIKeyChange={setAzureOpenaiAPIKey}
-      //         onAzureOpenaiEndpointChange={setAzureOpenaiEndpoint}
-      //         onAzureOpenai35TurboIDChange={setAzureOpenai35TurboID}
-      //         onAzureOpenai45TurboIDChange={setAzureOpenai45TurboID}
-      //         onAzureOpenai45VisionIDChange={setAzureOpenai45VisionID}
-      //         onAzureOpenaiEmbeddingsIDChange={setAzureOpenaiEmbeddingsID}
-      //         onAnthropicAPIKeyChange={setAnthropicAPIKey}
-      //         onGoogleGeminiAPIKeyChange={setGoogleGeminiAPIKey}
-      //         onMistralAPIKeyChange={setMistralAPIKey}
-      //         onPerplexityAPIKeyChange={setPerplexityAPIKey}
-      //         onUseAzureOpenaiChange={setUseAzureOpenai}
-      //         openrouterAPIKey={openrouterAPIKey}
-      //         onOpenrouterAPIKeyChange={setOpenrouterAPIKey}
-      //       />
-      //     </StepContainer>
-      //   )
+              // API Step
+              // case 2:
+              //   return (
+              //     <StepContainer
+              //       stepDescription="Enter API keys for each service you'd like to use."
+              //       stepNum={currentStep}
+              //       stepTitle="Set API Keys (optional)"
+              //       onShouldProceed={handleShouldProceed}
+              //       showNextButton={true}
+              //       showBackButton={true}
+              //     >
+              //       <APIStep
+              //         openaiAPIKey={openaiAPIKey}
+              //         openaiOrgID={openaiOrgID}
+              //         azureOpenaiAPIKey={azureOpenaiAPIKey}
+              //         azureOpenaiEndpoint={azureOpenaiEndpoint}
+              //         azureOpenai35TurboID={azureOpenai35TurboID}
+              //         azureOpenai45TurboID={azureOpenai45TurboID}
+              //         azureOpenai45VisionID={azureOpenai45VisionID}
+              //         azureOpenaiEmbeddingsID={azureOpenaiEmbeddingsID}
+              //         anthropicAPIKey={anthropicAPIKey}
+              //         googleGeminiAPIKey={googleGeminiAPIKey}
+              //         mistralAPIKey={mistralAPIKey}
+              //         perplexityAPIKey={perplexityAPIKey}
+              //         useAzureOpenai={useAzureOpenai}
+              //         onOpenaiAPIKeyChange={setOpenaiAPIKey}
+              //         onOpenaiOrgIDChange={setOpenaiOrgID}
+              //         onAzureOpenaiAPIKeyChange={setAzureOpenaiAPIKey}
+              //         onAzureOpenaiEndpointChange={setAzureOpenaiEndpoint}
+              //         onAzureOpenai35TurboIDChange={setAzureOpenai35TurboID}
+              //         onAzureOpenai45TurboIDChange={setAzureOpenai45TurboID}
+              //         onAzureOpenai45VisionIDChange={setAzureOpenai45VisionID}
+              //         onAzureOpenaiEmbeddingsIDChange={setAzureOpenaiEmbeddingsID}
+              //         onAnthropicAPIKeyChange={setAnthropicAPIKey}
+              //         onGoogleGeminiAPIKeyChange={setGoogleGeminiAPIKey}
+              //         onMistralAPIKeyChange={setMistralAPIKey}
+              //         onPerplexityAPIKeyChange={setPerplexityAPIKey}
+              //         onUseAzureOpenaiChange={setUseAzureOpenai}
+              //         openrouterAPIKey={openrouterAPIKey}
+              //         onOpenrouterAPIKeyChange={setOpenrouterAPIKey}
+              //       />
+              //     </StepContainer>
+              //   )
 
-      // Finish Step
-      case 3:
-        return (
-          <StepContainer
-            stepDescription="You are all set up!"
-            stepNum={currentStep}
-            stepTitle="Setup Complete"
-            onShouldProceed={handleShouldProceed}
-            showNextButton={true}
-            showBackButton={true}
-          >
-            <FinishStep displayName={displayName} />
-          </StepContainer>
-        )
-      default:
-        return null
-    }
+              // Finish Step
+              case 3:
+                return (
+                  <StepContainer
+                    stepDescription="You are all set up!"
+                    stepNum={currentStep}
+                    stepTitle="Setup Complete"
+                    onShouldProceed={handleShouldProceed}
+                    showNextButton={true}
+                    showBackButton={true}
+                  >
+                    <FinishStep displayName={displayName} />
+                  </StepContainer>
+                )
+              default:
+                return null
+            }
+          })()}
+        </motion.div>
+      </AnimatePresence>
+    )
   }
 
   if (loading) {
@@ -266,7 +281,7 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="flex size-full items-center justify-center sm:w-auto">
+    <div className="flex w-full grow items-center justify-center sm:my-6 sm:w-auto">
       {renderStep(currentStep)}
     </div>
   )

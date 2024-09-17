@@ -32,9 +32,9 @@ export const ModelVisibilityOption: FC<ModelVisibilityOption> = ({
             className={"text-sm" + (selected ? "font-semibold" : "font-normal")}
           >
             {model.modelName}
-            {model.paid && (
-              <Badge variant={"outline"} className="ml-2">
-                Pro
+            {model.tier !== "free" && model.tier !== undefined && (
+              <Badge variant={"outline"} className="ml-2 capitalize">
+                {model.tier}
               </Badge>
             )}
           </div>

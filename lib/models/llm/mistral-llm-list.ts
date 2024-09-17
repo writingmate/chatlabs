@@ -22,7 +22,7 @@ const MIXTRAL: LLM = {
   hostedId: "mistral-small",
   platformLink: MISTRAL_PLATORM_LINK,
   imageInput: false,
-  paid: true,
+  tier: "pro",
   pricing: {
     currency: "USD",
     unit: "1M tokens",
@@ -39,7 +39,7 @@ const MISTRAL_MEDIUM: LLM = {
   hostedId: "mistral-medium",
   platformLink: MISTRAL_PLATORM_LINK,
   imageInput: false,
-  paid: true,
+  tier: "pro",
   pricing: {
     currency: "USD",
     unit: "1M tokens",
@@ -56,7 +56,7 @@ const MISTRAL_LARGE: LLM = {
   hostedId: "mistral-large-latest",
   platformLink: MISTRAL_PLATORM_LINK,
   imageInput: false,
-  paid: true,
+  tier: "pro",
   tools: true,
   pricing: {
     currency: "USD",

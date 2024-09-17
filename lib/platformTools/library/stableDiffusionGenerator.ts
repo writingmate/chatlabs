@@ -45,7 +45,8 @@ async function stableDiffusion3(
 
     const imageUrl = await uploadImageToSupabase(prompt, imageData)
 
-    return imageUrl
+    // return markdown to display the image
+    return `![${prompt}](${imageUrl})\n${prompt}`
   } catch (error: any) {
     console.error("Error generating image:", error)
     throw new Error("Error: " + error.message)
@@ -91,9 +92,25 @@ async function generateImageFromStabilityAPI(
   return data.image // Return the base64 image data
 }
 
-async function uploadImageToSupabase(prompt: string, imageData: string) {
-  const imageBuffer = Buffer.from(imageData, "base64")
-  const fileName = `${prompt.replace(/\s+/g, "_")}.png`
+function convertToBuffer(dataOrUrl: string) {
+  if (dataOrUrl.startsWith("http")) {
+    return fetch(dataOrUrl).then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch image")
+      }
+      return res.arrayBuffer()
+    })
+  } else {
+    return Buffer.from(dataOrUrl, "base64")
+  }
+}
+
+export async function uploadImageToSupabase(prompt: string, imageData: string) {
+  // if it's a url, fetch the image
+  let imageBuffer = await convertToBuffer(imageData)
+  // add random string to filename to avoid conflicts
+  const randomString = Date.now().toString(36)
+  const fileName = `${randomString}.png`
   const supabase = createClient(cookies())
 
   const { data, error } = await supabase.storage

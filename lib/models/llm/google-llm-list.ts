@@ -12,7 +12,7 @@ const GEMINI_PRO: LLM = {
   hostedId: "gemini-pro",
   platformLink: GOOGLE_PLATORM_LINK,
   imageInput: false,
-  paid: true
+  tier: "pro"
 }
 
 // Gemini Pro Vision (UPDATED 12/22/23)
@@ -23,7 +23,7 @@ const GEMINI_PRO_VISION: LLM = {
   hostedId: "gemini-pro-vision",
   platformLink: GOOGLE_PLATORM_LINK,
   imageInput: true,
-  paid: true
+  tier: "pro"
 }
 
 const GEMINI_PRO_15: LLM = {
@@ -33,7 +33,7 @@ const GEMINI_PRO_15: LLM = {
   hostedId: "gemini-1.5-pro-latest",
   platformLink: GOOGLE_PLATORM_LINK,
   imageInput: true,
-  paid: true
+  tier: "pro"
 }
 
 const GEMINI_15_FLASH: LLM = {
@@ -42,8 +42,7 @@ const GEMINI_15_FLASH: LLM = {
   provider: "google",
   hostedId: "gemini-1.5-flash-latest",
   platformLink: GOOGLE_PLATORM_LINK,
-  imageInput: true,
-  paid: false
+  imageInput: true
 }
 
 export const GOOGLE_LLM_LIST: LLM[] = [
