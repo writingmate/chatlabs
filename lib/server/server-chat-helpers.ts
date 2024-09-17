@@ -122,7 +122,9 @@ function isTierModel(model: LLMID, tier: keyof typeof TIER_MODELS) {
 
 export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
   if (!validatePlanForModel(profile, model)) {
-    const modelData = LLM_LIST.find(x => x.modelId === model)
+    const modelData = LLM_LIST.find(
+      x => x.modelId === model || x.hostedId === model
+    )
     const requiredPlan = modelData?.tier === "ultimate" ? "Ultimate" : "Pro"
     throw new SubscriptionRequiredError(
       `${requiredPlan} plan required to use this model`

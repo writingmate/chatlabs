@@ -41,7 +41,9 @@ export function validatePlanForModel(
     return true
   }
 
-  const modelData = LLM_LIST.find(x => x.modelId === model)
+  const modelData = LLM_LIST.find(
+    x => x.modelId === model || x.hostedId === model
+  )
   if (!modelData) {
     return false
   }

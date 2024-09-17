@@ -36,7 +36,9 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
   }
 
   const userPlan = profile.plan.split("_")[0]
-  const modelData = LLM_LIST.find(x => x.modelId === chatSettings.model)
+  const modelData = LLM_LIST.find(
+    x => x.modelId === chatSettings.model || x.hostedId === chatSettings.model
+  )
   const modelTier = modelData?.tier
 
   let limit = FREE_MESSAGE_DAILY_LIMIT

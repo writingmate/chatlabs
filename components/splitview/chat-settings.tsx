@@ -34,7 +34,9 @@ export const ChatSettings: FC<ChatSettingsProps> = ({
     }
   }
 
-  const selectedModel = allModels.find(x => x.modelId === chatSettings?.model)
+  const selectedModel = allModels.find(
+    x => x.modelId === chatSettings?.model || x.hostedId === chatSettings?.model
+  )
 
   useEffect(() => {
     if (!chatSettings) return
