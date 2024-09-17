@@ -1,5 +1,6 @@
 import { PlatformTool } from "@/types/platformTools"
 import Replicate from "replicate"
+import { uploadImageToSupabase } from "@/lib/platformTools/library/stableDiffusionGenerator"
 
 interface ImageGenerationViaFlux3ProParams {
   prompt: string
@@ -66,8 +67,10 @@ async function generateImageFromReplicateAPI(
     input
   })
 
+  const imageUrl = await uploadImageToSupabase(prompt, result as any)
+
   return `
-![${prompt}](${result})
+![${prompt}](${imageUrl})
 ${prompt}
   `
 }
