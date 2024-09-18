@@ -37,6 +37,11 @@ export function validatePlanForModel(
     return false
   }
 
+  // openrouter models are always allowed
+  if (model.includes("/")) {
+    return true
+  }
+
   if (profile?.plan.startsWith("byok")) {
     return true
   }
@@ -44,6 +49,7 @@ export function validatePlanForModel(
   const modelData = LLM_LIST.find(
     x => x.modelId === model || x.hostedId === model
   )
+
   if (!modelData) {
     return false
   }
