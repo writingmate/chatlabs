@@ -46,6 +46,7 @@ import {
   reconstructContentWithCodeBlocksInChatMessage
 } from "@/lib/messages"
 import { CodeBlock } from "@/types/chat-message"
+import { as } from "@upstash/redis/zmscore-10fd3773"
 
 interface ChatUIProps {
   showModelSelector?: boolean
@@ -94,7 +95,8 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     handleSendEdit
   } = useChatHandler()
 
-  const { handleSelectPromptWithVariables } = usePromptAndCommand()
+  const { handleSelectPromptWithVariables, handleSelectAssistant } =
+    usePromptAndCommand()
   const {
     scrollRef,
     messagesStartRef,
@@ -115,17 +117,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
 
   useEffect(() => {
     if (assistant) {
-      setSelectedAssistant(assistant)
-      setChatSettings({
-        ...chatSettings,
-        model: assistant.model as LLMID,
-        prompt: assistant.prompt,
-        temperature: assistant.temperature,
-        contextLength: assistant.context_length,
-        includeProfileContext: assistant.include_profile_context,
-        includeWorkspaceInstructions: assistant.include_workspace_instructions,
-        embeddingsProvider: assistant.embeddings_provider as "openai" | "local"
-      })
+      handleSelectAssistant(assistant).catch(console.error)
     }
     if (!chatId) {
       setLoading(false)
@@ -148,7 +140,9 @@ export const ChatUI: React.FC<ChatUIProps> = ({
 
   const createRemixMessages = (
     filename: string,
-    content: string
+    content: string,
+    model: LLMID | null,
+    assistantId: string | null
   ): ChatMessage[] =>
     [
       {
@@ -156,13 +150,13 @@ export const ChatUI: React.FC<ChatUIProps> = ({
         message: {
           content: `Remixing ${filename}`,
           annotation: {},
-          assistant_id: null,
+          assistant_id: assistantId || null,
           created_at: new Date().toISOString(),
           role: "user",
           chat_id: chatId,
           id: "",
           image_paths: [],
-          model: chatSettings?.model!,
+          model: model || chatSettings?.model!,
           sequence_number: 0,
           updated_at: null,
           user_id: user?.id!,
@@ -177,13 +171,13 @@ export const ChatUI: React.FC<ChatUIProps> = ({
 ${content}
 \`\`\``,
           annotation: {},
-          assistant_id: null,
+          assistant_id: assistantId || null,
           created_at: new Date().toISOString(),
           role: "assistant",
           chat_id: chatId,
           id: "",
           image_paths: [],
-          model: chatSettings?.model!,
+          model: model || chatSettings?.model!,
           sequence_number: 1,
           updated_at: null,
           user_id: user?.id!,
@@ -192,7 +186,12 @@ ${content}
       }
     ].map(parseChatMessageCodeBlocksAndContent)
 
-  async function handleForkMessage(messageId: string, sequenceNo: number) {
+  async function handleForkMessage(
+    messageId: string,
+    sequenceNo: number,
+    assistantId: string | null,
+    modelId: LLMID | null
+  ) {
     const message = await getMessageById(messageId)
     if (message) {
       const codeBlock =
@@ -200,17 +199,31 @@ ${content}
       if (codeBlock && codeBlock.language === "html" && codeBlock.filename) {
         await handleNewChat(
           "",
-          createRemixMessages(codeBlock.filename, codeBlock.code)
+          createRemixMessages(
+            codeBlock.filename,
+            codeBlock.code,
+            modelId,
+            assistantId
+          )
         )
       }
     }
   }
 
-  function handleRemixFile(fileId: string) {
+  function handleRemixFile(
+    fileId: string,
+    assistantId: string | null,
+    modelId: LLMID | null
+  ) {
     getFileByHashId(fileId).then(file => {
       if (chatMessages?.length === 0 && file && file.type === "html") {
         setChatMessages(
-          createRemixMessages(file.name, file.file_items[0].content)
+          createRemixMessages(
+            file.name,
+            file.file_items[0].content,
+            modelId,
+            assistantId
+          )
         )
       }
     })
@@ -218,9 +231,10 @@ ${content}
 
   const handleSearchParams = (): void => {
     const promptId = searchParams.get("prompt_id")
-    const modelId = searchParams.get("model")
+    let modelId = searchParams.get("model") as LLMID
     const remixFileId = searchParams.get("remix")
     const forkMessageId = searchParams.get("forkMessageId")
+    const assistantId = searchParams.get("assistant")
     const forkSequenceNo = parseInt(searchParams.get("forkSequenceNo") || "-1")
 
     if (promptId) {
@@ -231,16 +245,31 @@ ${content}
         .catch(console.error)
     }
 
+    if (assistantId) {
+      const assistant = assistants.find(
+        assistant => assistant.id === assistantId
+      )
+
+      if (assistant) {
+        handleSelectAssistant(assistant).catch(console.error)
+      }
+    }
+
     if (modelId) {
       setChatSettings(prev => ({ ...prev, model: modelId as LLMID }))
     }
 
     if (chatMessages?.length === 0 && remixFileId) {
-      handleRemixFile(remixFileId)
+      handleRemixFile(remixFileId, assistantId, modelId)
     }
 
     if (chatMessages?.length === 0 && forkMessageId && forkSequenceNo > -1) {
-      handleForkMessage(forkMessageId, forkSequenceNo)
+      handleForkMessage(
+        forkMessageId,
+        forkSequenceNo,
+        assistantId,
+        modelId
+      ).catch(console.error)
     }
   }
 

@@ -45,9 +45,10 @@ export const CodeViewer: FC<CodeViewerProps> = ({
 }) => {
   const { user } = useAuth()
   const router = useRouter()
-  const { selectedWorkspace, chatSettings, profile } =
+  const { selectedWorkspace, profile, selectedAssistant } =
     useContext(ChatbotUIContext)
-  const { setSelectedHtmlElements } = useContext(ChatbotUIChatContext)
+  const { setSelectedHtmlElements, chatSettings } =
+    useContext(ChatbotUIChatContext)
   const [sharing, setSharing] = useState(false)
   const [execute, setExecute] = useState(false)
   const [inspectMode, setInspectMode] = useState(false)
@@ -75,11 +76,21 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   }, [codeBlock.language, codeBlock.code])
 
   const onFork = useCallback(() => {
-    window.open(
-      `/chat?forkMessageId=${codeBlock.messageId}&forkSequenceNo=${codeBlock.sequenceNo}`,
-      "_blank"
-    )
-  }, [codeBlock.messageId, codeBlock.sequenceNo])
+    const queryParams = new URLSearchParams()
+    queryParams.append("forkMessageId", codeBlock.messageId)
+    queryParams.append("forkSequenceNo", codeBlock.sequenceNo.toString())
+    queryParams.append("model", chatSettings?.model || "")
+    if (selectedAssistant) {
+      queryParams.append("assistant", selectedAssistant?.id)
+    }
+
+    window.open(`/chat?${queryParams.toString()}`, "_blank")
+  }, [
+    codeBlock.messageId,
+    codeBlock.sequenceNo,
+    chatSettings?.model,
+    selectedAssistant
+  ])
 
   useEffect(() => {
     if (codeBlock.language !== "html") {
@@ -163,7 +174,9 @@ export const CodeViewer: FC<CodeViewerProps> = ({
       isGenerating,
       isSidebarOpen,
       theme,
-      isEditable
+      isEditable,
+      chatSettings?.model,
+      selectedAssistant
     ]
   )
 }
