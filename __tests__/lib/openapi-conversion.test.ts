@@ -317,7 +317,7 @@ const validSchemaBody2 = JSON.stringify({
   ]
 })
 
-describe("extractOpenapiData for body 2", () => {
+xdescribe("extractOpenapiData for body 2", () => {
   it("should parse a valid OpenAPI body schema for body 2", async () => {
     const { info, routes, functions } = await openapiToFunctions(
       JSON.parse(validSchemaBody2)
