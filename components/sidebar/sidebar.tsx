@@ -26,7 +26,8 @@ import {
   IconMessage2Plus,
   IconLayoutColumns,
   IconPuzzle2,
-  IconBulb
+  IconBulb,
+  IconLayoutSidebar
 } from "@tabler/icons-react"
 import { ChatbotUIContext } from "@/context/context"
 import { Button } from "../ui/button"
@@ -40,6 +41,7 @@ import { SidebarDataList } from "./sidebar-data-list"
 import { ContentType } from "@/types"
 import Link from "next/link"
 import { WithTooltip } from "../ui/with-tooltip"
+import { ChevronLeftIcon } from "lucide-react"
 
 export const Sidebar: FC = () => {
   const {
@@ -162,6 +164,17 @@ export const Sidebar: FC = () => {
           variant="ghost"
           size="icon"
           className="fixed left-2 top-2 z-50 md:hidden"
+          onClick={() => {
+            setShowSidebar(true)
+            setIsCollapsed(false)
+          }}
+        >
+          <IconLayoutSidebar {...iconProps} />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="fixed left-12 top-2 z-50 md:hidden"
           onClick={() => handleCreateChat()}
         >
           <IconMessagePlus {...iconProps} />
