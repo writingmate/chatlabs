@@ -88,7 +88,10 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
           <>
             <ToggleGroup
               disabled={isGenerating}
-              onValueChange={value => setExecute(value === "execute")}
+              onValueChange={value => {
+                if (!value) return
+                setExecute(value === "execute")
+              }}
               size={"xs"}
               variant={"default"}
               className={"gap-0 overflow-hidden rounded-md"}
