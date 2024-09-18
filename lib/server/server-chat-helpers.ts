@@ -14,7 +14,12 @@ import {
   ULTIMATE_MESSAGE_DAILY_LIMIT,
   validatePlanForModel
 } from "@/lib/subscription"
-import { PLAN_FREE, PLAN_PRO, PLAN_ULTIMATE } from "@/lib/stripe/config"
+import {
+  PLAN_FREE,
+  PLAN_PREMIUM,
+  PLAN_PRO,
+  PLAN_ULTIMATE
+} from "@/lib/stripe/config"
 
 function createClient() {
   return createServerClient<Database>(
@@ -97,7 +102,7 @@ const TIER_MODELS = {
   ),
   [PLAN_PRO]: LLM_LIST.filter(x => x.tier === PLAN_PRO).map(x => x.modelId),
   [PLAN_FREE]: LLM_LIST.filter(
-    x => x.tier === PLAN_FREE || x.tier === undefined
+    x => x.tier === PLAN_FREE || typeof x.tier === "undefined"
   ).map(x => x.modelId)
 }
 
@@ -111,10 +116,7 @@ function isTierModel(model: LLMID, tier: keyof typeof TIER_MODELS) {
   }
 
   if (tier == PLAN_ULTIMATE) {
-    return (
-      TIER_MODELS[PLAN_ULTIMATE].includes(model) ||
-      TIER_MODELS[PLAN_PRO].includes(model)
-    )
+    return TIER_MODELS[PLAN_ULTIMATE].includes(model)
   }
 
   return false
@@ -144,11 +146,20 @@ export async function validateMessageCount(
     return
   }
 
-  // subtract 24 hours
+  // Check if free or premium user is trying to use a non-free model
+  if (
+    (userPlan === PLAN_FREE || userPlan === PLAN_PREMIUM) &&
+    !isTierModel(model, PLAN_FREE)
+  ) {
+    throw new SubscriptionRequiredError(
+      `${isTierModel(model, PLAN_PRO) ? "Pro" : "Ultimate"} plan required to use this model`
+    )
+  }
 
+  // subtract 24 hours
   let previousDate = new Date(date.getTime() - 24 * 60 * 60 * 1000)
 
-  const { count, data, error } = await supabase
+  const { count } = await supabase
     .from("messages")
     .select("*", {
       count: "exact"
@@ -159,6 +170,13 @@ export async function validateMessageCount(
 
   if (count === null) {
     throw new Error("Could not fetch message count")
+  }
+
+  // Check catch-all limit first
+  if (count >= CATCHALL_MESSAGE_DAILY_LIMIT) {
+    throw new SubscriptionRequiredError(
+      `You have reached hard daily message limit for model ${model}`
+    )
   }
 
   if (
@@ -192,12 +210,23 @@ export async function validateMessageCount(
   if (
     isTierModel(model, PLAN_ULTIMATE) &&
     userPlan === PLAN_PRO &&
-    count >= PRO_ULTIMATE_MESSAGE_DAILY_LIMIT &&
     !isGrandfathered
   ) {
-    throw new SubscriptionRequiredError(
-      `You have reached daily message limit for Pro plan for ${model}. Upgrade to Ultimate plan to continue or come back tomorrow.`
-    )
+    if (count >= PRO_ULTIMATE_MESSAGE_DAILY_LIMIT) {
+      throw new SubscriptionRequiredError(
+        `You have reached daily message limit for Pro plan for ${model}. Upgrade to Ultimate plan to continue or come back tomorrow.`
+      )
+    }
+  } else if (
+    isTierModel(model, PLAN_ULTIMATE) &&
+    userPlan === PLAN_PRO &&
+    isGrandfathered
+  ) {
+    if (count >= ULTIMATE_MESSAGE_DAILY_LIMIT) {
+      throw new SubscriptionRequiredError(
+        `You have reached daily message limit for Ultimate plan for ${model}`
+      )
+    }
   }
 
   if (
@@ -206,13 +235,7 @@ export async function validateMessageCount(
     count >= ULTIMATE_MESSAGE_DAILY_LIMIT
   ) {
     throw new SubscriptionRequiredError(
-      `You have reached hard daily message limit for model ${model}`
-    )
-  }
-
-  if (count >= CATCHALL_MESSAGE_DAILY_LIMIT) {
-    throw new SubscriptionRequiredError(
-      `You have reached hard daily message limit for model ${model}`
+      `You have reached daily message limit for Ultimate plan for ${model}`
     )
   }
 }

@@ -5,6 +5,7 @@ export const STRIPE_TRIAL_PERIOD_DAYS = process.env
 export const PLAN_FREE = "free"
 export const PLAN_PRO = "pro"
 export const PLAN_ULTIMATE = "ultimate"
+export const PLAN_PREMIUM = "premium"
 
 export const PLAN_PRO_MONTHLY = "pro_monthly"
 export const PLAN_PRO_YEARLY = "pro_yearly"
