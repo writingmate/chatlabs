@@ -167,6 +167,7 @@ export const Sidebar: FC = () => {
           onClick={() => {
             setShowSidebar(true)
             setIsCollapsed(false)
+            setActiveSubmenu(null)
           }}
         >
           <IconLayoutSidebar {...iconProps} />
