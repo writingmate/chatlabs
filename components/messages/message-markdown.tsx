@@ -27,7 +27,7 @@ const CodeBlockButton: FC<
     variant={"outline"}
     size={"lg"}
     className={
-      "text-foreground flex h-auto w-[260px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:shadow"
+      "text-foreground flex h-auto max-w-[300px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:shadow"
     }
     onClick={onClick}
   >
@@ -39,7 +39,9 @@ const CodeBlockButton: FC<
       )}
     </div>
     <div className={"flex flex-col overflow-hidden"}>
-      <div>{filename}</div>
+      <div title={filename} className={"truncate"}>
+        {filename}
+      </div>
       <span className="text-foreground/60 line-clamp-1 text-ellipsis whitespace-pre-wrap text-xs font-normal">
         Click to view file
       </span>
