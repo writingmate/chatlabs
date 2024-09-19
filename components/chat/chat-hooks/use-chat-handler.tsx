@@ -245,6 +245,12 @@ export const useChatHandler = () => {
         )
       }
 
+      const userAnnotations =
+        selectedHtmlElements?.length > 0
+          ? [{ selected_html_elements: selectedHtmlElements }]
+          : []
+      let assistantAnnotations = {}
+
       const { tempUserChatMessage, tempAssistantChatMessage } =
         createTempMessages(
           messageContent,
@@ -253,7 +259,8 @@ export const useChatHandler = () => {
           b64Images,
           isRegeneration,
           setChatMessages,
-          selectedAssistant
+          selectedAssistant,
+          userAnnotations
         )
 
       let payload: ChatPayload = {
@@ -269,10 +276,9 @@ export const useChatHandler = () => {
       }
 
       let generatedText = ""
-      let data = null
 
       if (selectedTools.length > 0 && modelData!.tools) {
-        ;({ generatedText, data } = await handleToolsChat(
+        ;({ generatedText, data: assistantAnnotations } = await handleToolsChat(
           payload,
           profile!,
           tempAssistantChatMessage,
@@ -288,18 +294,19 @@ export const useChatHandler = () => {
         ))
       } else {
         if (modelData!.provider === "ollama") {
-          ;({ generatedText, data } = await handleLocalChat(
-            payload,
-            profile!,
-            chatSettings!,
-            tempAssistantChatMessage,
-            isRegeneration,
-            newAbortController,
-            setIsGenerating,
-            setFirstTokenReceived,
-            setChatMessages,
-            setToolInUse
-          ))
+          ;({ generatedText, data: assistantAnnotations } =
+            await handleLocalChat(
+              payload,
+              profile!,
+              chatSettings!,
+              tempAssistantChatMessage,
+              isRegeneration,
+              newAbortController,
+              setIsGenerating,
+              setFirstTokenReceived,
+              setChatMessages,
+              setToolInUse
+            ))
         } else {
           ;({ generatedText } = await handleHostedChat(
             payload,
@@ -362,8 +369,8 @@ export const useChatHandler = () => {
         setChatFileItems,
         setChatImages,
         selectedAssistant,
-        data,
-        isGenerating
+        userAnnotations,
+        assistantAnnotations
       )
 
       setIsGenerating(false)

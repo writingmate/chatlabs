@@ -100,7 +100,7 @@ export const createTempMessages = (
   isRegeneration: boolean,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   selectedAssistant: Tables<"assistants"> | null,
-  data = {}
+  userAnnotation: any = {}
 ) => {
   let tempUserChatMessage: ChatMessage = {
     message: {
@@ -115,7 +115,7 @@ export const createTempMessages = (
       sequence_number: chatMessages.length,
       updated_at: "",
       user_id: "",
-      annotation: {},
+      annotation: userAnnotation,
       word_count: 0
     },
     fileItems: []
@@ -664,8 +664,8 @@ export const handleCreateMessages = async (
   >,
   setChatImages: React.Dispatch<React.SetStateAction<MessageImage[]>>,
   selectedAssistant: Tables<"assistants"> | null,
-  data: any,
-  updateState = true
+  userAnnotations: any = {},
+  assistantAnnotations: any = {}
 ): Promise<void> => {
   try {
     if (isRegeneration && generatedText.trim()) {
@@ -687,7 +687,7 @@ export const handleCreateMessages = async (
       modelData.modelId,
       "user",
       chatMessages.length,
-      {},
+      userAnnotations,
       selectedAssistant
     )
 
@@ -703,7 +703,7 @@ export const handleCreateMessages = async (
       modelData.modelId,
       "assistant",
       chatMessages.length + 1,
-      data,
+      assistantAnnotations,
       selectedAssistant
     )
 

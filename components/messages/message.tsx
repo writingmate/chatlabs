@@ -36,6 +36,7 @@ import {
   ResponseTime,
   ToolCalls
 } from "@/components/messages/annotations/toolCalls"
+import { SelectedHtmlElements } from "@/components/messages/annotations/selectedHtmlElements"
 
 const ICON_SIZE = 32
 
@@ -334,7 +335,8 @@ export const Message: FC<MessageProps> = ({
       imageGenerator__generateImage: AnnotationImage,
       webScraper__youtubeCaptions: YouTube,
       webScraper__googleSearch: WebSearch,
-      toolCalls: ToolCalls
+      toolCalls: ToolCalls,
+      selected_html_elements: SelectedHtmlElements
     }
 
     const annotationResponseTimeLabelMap: {
@@ -356,7 +358,7 @@ export const Message: FC<MessageProps> = ({
       return (
         <div key={key} className={"flex flex-col space-y-3"}>
           <AnnotationComponent annotation={annotation} />
-          {responseTime && (
+          {responseTime > 0 && (
             <ResponseTime
               icon={<IconApi stroke={1.5} size={18} />}
               label={responseTimeLabel}
