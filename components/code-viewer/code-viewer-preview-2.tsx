@@ -201,11 +201,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
 
   return (
     <div className="flex h-full min-h-[400px] flex-col">
-      <iframe
-        ref={iframeRef}
-        title="Full HTML Renderer"
-        className="flex-1 bg-white"
-      />
+      <iframe ref={iframeRef} className="flex-1 bg-white" />
       <div
         className={`bg-accent text-foreground overflow-auto border-t font-mono text-xs transition-all duration-300 ${
           isConsoleExpanded ? "h-48 p-4" : "h-0 p-0"

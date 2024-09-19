@@ -2,6 +2,8 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true"
 })
 
+const nrExternals = require('newrelic/load-externals')
+
 const withPWA = require("next-pwa")({
   dest: "public"
 })
@@ -26,7 +28,11 @@ const nextConfig = {
     ]
   },
   experimental: {
-    serverComponentsExternalPackages: ["sharp", "onnxruntime-node"]
+    serverComponentsExternalPackages: ["sharp", "onnxruntime-node", "newrelic"]
+  },
+  webpack: (config) => {
+    nrExternals(config)
+    return config
   }
 }
 
