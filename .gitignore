@@ -6,6 +6,7 @@
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+newrelic*.log
 
 # testing
 /coverage
