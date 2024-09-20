@@ -10,5 +10,8 @@
   "Toggle Retrieval": "Toggle Retrieval",
   "Open Settings": "Open Settings",
   "Open Quick Settings": "Open Quick Settings",
-  "Toggle Sidebar": "Toggle Sidebar"
+  "Toggle Sidebar": "Toggle Sidebar",
+  "SYSTEM_PROMPT_DESCRIPTION": "The system prompt is a message that the AI will use to start the conversation. It should contain the following dynamic variables for ImogenAI functioning properly: {profile_context}, {local_date}, and {assistant}. {profile_context} is the user's profile context, {local_date} is the current date, and {assistant} is the name of the assistant and it's instructions.",
+  "TEMPERATURE_DESCRIPTION": "Temperature is a value that affects the randomness of AI model responses. Higher temperatures make responses more random, while lower temperatures make responses more deterministic.",
+  "CONTEXT_LENGTH_DESCRIPTION": "The context length impacts the AI's grasp of chat history; longer contexts slow response but provide more history, while shorter ones increase speed and cut costs, as charges depend on the processed information volume."
 }

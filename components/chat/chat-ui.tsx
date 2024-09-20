@@ -124,7 +124,10 @@ export const ChatUI: React.FC<ChatUIProps> = ({
         contextLength: assistant.context_length,
         includeProfileContext: assistant.include_profile_context,
         includeWorkspaceInstructions: assistant.include_workspace_instructions,
-        embeddingsProvider: assistant.embeddings_provider as "openai" | "local"
+        embeddingsProvider: assistant.embeddings_provider as
+          | "cohere"
+          | "openai"
+          | "local"
       })
     }
     if (!chatId) {
@@ -340,7 +343,10 @@ ${content}
       contextLength: chat.context_length,
       includeProfileContext: chat.include_profile_context,
       includeWorkspaceInstructions: chat.include_workspace_instructions,
-      embeddingsProvider: chat.embeddings_provider as "openai" | "local"
+      embeddingsProvider: chat.embeddings_provider as
+        | "cohere"
+        | "openai"
+        | "local"
     })
   }
 
@@ -439,7 +445,7 @@ ${content}
                   <div ref={messagesEndRef} className="min-h-20 flex-1" />
                 </>
               )}
-              <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
+              <div className="sticky bottom-0 mx-2 items-end bg-transparent pb-2 backdrop-blur-sm">
                 {chatMessages?.length === 0 && (
                   <ConversationStarters
                     values={selectedAssistant?.conversation_starters}

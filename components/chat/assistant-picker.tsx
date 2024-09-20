@@ -6,9 +6,21 @@ import { useClickOutside } from "@/components/chat/picker-hooks/use-click-outsid
 import { validatePlanForAssistant } from "@/lib/subscription"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 
-interface AssistantPickerProps {}
+interface AssistantPickerProps {
+  isOpen: boolean
+  onOpenChange: (isOpen: boolean) => void
+  searchQuery: string
+  onSelectAssistant: (assistant: Tables<"assistants">) => void
+  isFocused: boolean
+}
 
-export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
+export const AssistantPicker: FC<AssistantPickerProps> = ({
+  isOpen,
+  onOpenChange,
+  searchQuery,
+  onSelectAssistant,
+  isFocused
+}) => {
   const {
     profile,
     assistants,
@@ -29,14 +41,16 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
     }
   }, [focusAssistant])
 
+  // Update filtering to use searchQuery prop
   const filteredAssistants = assistants.filter(assistant =>
-    assistant.name.toLowerCase().includes(atCommand.toLowerCase())
+    assistant.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  useClickOutside(itemsRef, () => setIsAssistantPickerOpen(false))
+  // Use onOpenChange prop
+  useClickOutside(itemsRef, () => onOpenChange(false))
 
   const handleOpenChange = (isOpen: boolean) => {
-    setIsAssistantPickerOpen(isOpen)
+    onOpenChange(isOpen)
   }
 
   const callSelectAssistant = (assistant: Tables<"assistants">) => {
@@ -44,7 +58,7 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
       setIsPaywallOpen(true)
       return
     }
-    handleSelectAssistant(assistant)
+    onSelectAssistant(assistant)
     handleOpenChange(false)
   }
 

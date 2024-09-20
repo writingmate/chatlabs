@@ -24,7 +24,9 @@ export async function GET() {
     azure_gpt_35_turbo_name: VALID_ENV_KEYS.AZURE_GPT_35_TURBO_NAME,
     azure_gpt_45_vision_name: VALID_ENV_KEYS.AZURE_GPT_45_VISION_NAME,
     azure_gpt_45_turbo_name: VALID_ENV_KEYS.AZURE_GPT_45_TURBO_NAME,
-    azure_embeddings_name: VALID_ENV_KEYS.AZURE_EMBEDDINGS_NAME
+    azure_embeddings_name: VALID_ENV_KEYS.AZURE_EMBEDDINGS_NAME,
+    cohere_api_key: VALID_ENV_KEYS.COHERE_API_KEY,
+    cohere_embeddings_name: VALID_ENV_KEYS.COHERE_EMBEDDINGS_NAME
   }
 
   let profile: Tables<"profiles"> | null = null

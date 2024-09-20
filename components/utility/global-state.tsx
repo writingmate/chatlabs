@@ -104,7 +104,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       contextLength: 4000,
       includeProfileContext: true,
       includeWorkspaceInstructions: true,
-      embeddingsProvider: "openai"
+      embeddingsProvider: "cohere"
     }
   })
   const [selectedChat, setSelectedChat] = useState<Tables<"chats"> | null>(null)
@@ -374,7 +374,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
           workspace?.include_workspace_instructions || true,
         embeddingsProvider:
           // chatSettings?.embeddingsProvider ||
-          (workspace?.embeddings_provider as "openai" | "local") || "openai"
+          (workspace?.embeddings_provider as "cohere" | "openai" | "local") ||
+          "cohere"
       })
 
       setLoading(false)

@@ -125,6 +125,7 @@ export const useChatHandler = () => {
         includeWorkspaceInstructions:
           selectedAssistant.include_workspace_instructions,
         embeddingsProvider: selectedAssistant.embeddings_provider as
+          | "cohere"
           | "openai"
           | "local"
       })
@@ -169,6 +170,7 @@ export const useChatHandler = () => {
         includeWorkspaceInstructions:
           selectedPreset.include_workspace_instructions,
         embeddingsProvider: selectedPreset.embeddings_provider as
+          | "cohere"
           | "openai"
           | "local"
       })

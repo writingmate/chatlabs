@@ -21,6 +21,7 @@ import { createCheckoutSession } from "@/actions/stripe"
 import { router } from "next/client"
 import { Badge } from "@/components/ui/badge"
 import { useTranslation } from "react-i18next"
+import Link from "next/link"
 
 const BYOK_PLAN_PREFIX = "byok"
 const PRO_PLAN_PREFIX = "pro"
@@ -133,32 +134,38 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
-            <div className="flex justify-center">
-              {" "}
-              {/* Add this wrapper div */}
+            <div className="flex flex-col-reverse md:flex-row">
               <div
-                className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t p-4 text-sm last:border-r-0 md:max-w-md md:border-r md:border-t-0"
+                className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t p-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
                 data-testid="BYOK-pricing-modal-column"
               >
                 <div className="bg-token-main-surface-primary relative flex flex-col">
                   <div className="flex flex-col gap-1">
-                    <p className="text-xl font-semibold">One for all</p>
+                    <p className="text-xl font-semibold">One for All Plan</p>
                     <p className="text-foreground/60 mb-4 text-sm">
                       {t(
-                        "Connect your API keys to access AI models and all features"
+                        "Connect your API keys to access AI models and all platform features"
                       )}
                     </p>
+                    <a
+                      href="/tutorial" // Replace with the actual tutorial URL
+                      className="mb-4 text-sm font-medium text-blue-500 underline transition-colors duration-200 hover:text-blue-600"
+                    >
+                      {t(
+                        "One key for all AI models. Click here to see the tutorial"
+                      )}
+                    </a>
                     <div className="flex items-baseline gap-2">
                       <p className="text-xl font-semibold">
-                        ${billingCycle === "yearly" ? "8" : "10"}
+                        ${billingCycle === "yearly" ? "6.99" : "9.99"}
                       </p>
                       {billingCycle === "yearly" && (
-                        <p className="text-foreground/50 line-through">$10</p>
+                        <p className="text-foreground/50 line-through">$9.99</p>
                       )}
                     </div>
                     <p className="text-foreground/50 text-sm">
                       {billingCycle === "yearly"
-                        ? "per month, billed annually ($100/year)"
+                        ? "per month, billed annually ($83.88/year)"
                         : "per month"}
                     </p>
                   </div>
@@ -177,8 +184,13 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                 <div className="flex grow flex-col gap-2">
                   <FeatureGroup
                     icon={<IconKey size={20} />}
-                    title={t("API Key Access")}
+                    title={t("API Key Hub")}
                   >
+                    <PlanFeature
+                      title={t(
+                        "Fully optimized for openrouter API. No VPN and overseas credit card required"
+                      )}
+                    />
                     <PlanFeature
                       title={t(
                         "Use all AI models and features with your own API keys in one powerful platform"
@@ -192,18 +204,79 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                   </FeatureGroup>
                   <FeatureGroup
                     icon={<IconRobot size={20} />}
-                    title={t("AI Models")}
+                    title={t("PRO Models")}
                   >
                     <PlanFeature
-                      title={t("Access to the most powerful AI models")}
+                      title={t("Access to PRO models at the first moment")}
                     />
                     <PlanFeature
                       title={t(
-                        "Including Newest Openai:o1, o1mini, GPT-4o, Groq, Claude 3.5, Gemini Pro, LLama 3, Perplexity, Mistral"
+                        "Including Newest OpenAI: o1, o1mini, GPT-4o, Claude 3.5, Gemini Pro and other opensource models"
                       )}
                     />
                   </FeatureGroup>
-
+                </div>
+              </div>
+              <div
+                className="border-token-border-light relative flex flex-1 flex-col gap-5 border-t p-4 text-sm last:border-r-0 md:max-w-xs md:border-r md:border-t-0"
+                data-testid="Pro-pricing-modal-column"
+              >
+                <div className="bg-token-main-surface-primary relative flex flex-col">
+                  <div className="flex flex-col gap-1">
+                    <p className="flex items-center space-x-2 text-xl font-semibold">
+                      <span>{t("Professional Plan")}</span>{" "}
+                      <Badge variant={"outline"}>{t("Popular")}</Badge>
+                    </p>
+                    <p className="text-foreground/60 mb-4 text-sm">
+                      {t("We take care of the rest")}
+                    </p>
+                    <p className="text-foreground/60 mb-4 text-sm">
+                      {t("Unlimited access")}
+                    </p>
+                    <p className="text-foreground/60 mb-4 text-sm">
+                      {t("No API keys required")}
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-xl font-semibold">
+                        ${billingCycle === "yearly" ? "19.99" : "29.99"}
+                      </p>
+                      {billingCycle === "yearly" && (
+                        <p className="text-foreground/50 line-through">
+                          $29.99
+                        </p>
+                      )}
+                    </div>
+                    <p className="text-foreground/50 text-sm">
+                      {billingCycle === "yearly"
+                        ? "per month, billed annually ($239.88/year)"
+                        : "per month"}
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-token-main-surface-primary relative flex flex-col">
+                  <Button
+                    disabled={loading !== "" && loading !== PRO_PLAN_PREFIX}
+                    loading={loading === PRO_PLAN_PREFIX}
+                    formAction={createFormAction(PRO_PLAN_PREFIX)}
+                    onClick={() => handleClick(PRO_PLAN_PREFIX)}
+                    data-testid="select-plan-button-Pro-create"
+                    className={"bg-violet-700 text-white"}
+                  >
+                    {t("Upgrade NOW")}
+                  </Button>
+                </div>
+                <div className="flex grow flex-col gap-2">
+                  <FeatureGroup
+                    icon={<IconRobot size={20} />}
+                    title={t("AI Models")}
+                  >
+                    <PlanFeature title={t("Access to all 30+ AI models")} />
+                    <PlanFeature
+                      title={t(
+                        "Now supporting OpenAI: o1mini, GPT-4o, Claude 3.5 and more"
+                      )}
+                    />
+                  </FeatureGroup>
                   <FeatureGroup
                     icon={<IconPhoto size={20} />}
                     title={t("Image Generation")}
@@ -220,7 +293,7 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                   >
                     <PlanFeature
                       title={t(
-                        "Quickly access the latest research and online data"
+                        "Quickly access online data and form research report（Beta）"
                       )}
                     />
                   </FeatureGroup>

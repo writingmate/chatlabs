@@ -85,7 +85,7 @@ export type OpenRouterLLMID =
   | "databricks/dbrx-instruct"
   | "mistralai/mixtral-8x22b-instruct"
   | "microsoft/wizardlm-2-8x22b"
-  | "meta-llama/llama-3-1-405b-instruct"
+  | "meta-llama/llama-3.1-405b-instruct"
   | "liuhaotian/llava-yi-34b"
   | "fireworks/firellava-13b"
   | "perplexity/llama-3.1-sonar-huge-128k-online"
@@ -114,6 +114,8 @@ export interface LLM {
 }
 
 export interface OpenRouterLLM extends LLM {
+  modelId: LLMID
+  modelName: string
   maxContext: number
   tools: boolean
   supportsStreaming: boolean

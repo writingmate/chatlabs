@@ -15,17 +15,17 @@ const KNOWN_MODEL_NAMES: {
     provider: "mistral",
     modelName: "Mixtral 8x22B"
   },
-  "meta-llama/llama-3-70b-instruct": {
+  "meta-llama/llama-3.1-405b-instruct": {
     provider: "meta",
-    modelName: "Meta Llama 3 70B"
+    modelName: "Meta Llama 3 405B"
   },
   "microsoft/wizardlm-2-8x22b": {
     provider: "microsoft",
     modelName: "WizardLM 2 8x22B"
   },
-  "deepseek/deepseek-coder": {
+  "deepseek/deepseek-chat": {
     provider: "deepseek",
-    modelName: "DeepSeek Coder V2",
+    modelName: "DeepSeek Chat V2.5",
     new: true
   }
   ///"google/gemini-pro-1.5": {
@@ -106,8 +106,7 @@ function parseSupportedModelsFromEnv() {
     "databricks/dbrx-instruct",
     "mistralai/mixtral-8x22b-instruct",
     "microsoft/wizardlm-2-8x22b",
-    "meta-llama/llama-3-405b-instruct",
-
+    "meta-llama/llama-3.1-405b-instruct",
     "perplexity/llama-3.1-sonar-huge-128k-online",
     "mattshumer/reflection-70b",
     "deepseek/deepseek-chat",

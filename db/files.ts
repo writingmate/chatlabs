@@ -93,7 +93,7 @@ export const createFileBasedOnExtension = async (
   file: File,
   fileRecord: TablesInsert<"files">,
   workspace_id: string,
-  embeddingsProvider: "openai" | "local"
+  embeddingsProvider: "cohere" | "openai" | "local"
 ) => {
   const fileExtension = file.name.split(".").pop()
 
@@ -120,7 +120,7 @@ export const createFile = async (
   file: File,
   fileRecord: TablesInsert<"files">,
   workspace_id: string,
-  embeddingsProvider: "openai" | "local"
+  embeddingsProvider: "cohere" | "openai" | "local"
 ) => {
   const { data: createdFile, error } = await supabase
     .from("files")
@@ -174,7 +174,7 @@ export const createDocXFile = async (
   file: File,
   fileRecord: TablesInsert<"files">,
   workspace_id: string,
-  embeddingsProvider: "openai" | "local"
+  embeddingsProvider: "cohere" | "openai" | "local"
 ) => {
   const { data: createdFile, error } = await supabase
     .from("files")

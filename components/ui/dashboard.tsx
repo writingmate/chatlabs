@@ -65,14 +65,16 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
     setShowSidebar(prevState => !prevState)
     localStorage.setItem("showSidebar", String(!showSidebar))
   }
-
+  ////below is the code for the background of the dashboard and the sidebar
   return useMemo(
     () => (
-      <div className="flex size-full overflow-x-hidden">
-        <CommandK />
-        <PlanPicker />
+      <div className="relative flex size-full overflow-x-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-pink-200 to-orange-600 opacity-15"></div>
+        <div className="relative z-10 flex size-full">
+          <CommandK />
+          <PlanPicker />
 
-        {/* <Button
+          {/* <Button
           className={cn(
             "absolute left-[4px] top-[50%] z-10 size-[32px] cursor-pointer"
           )}
@@ -87,7 +89,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
           <IconChevronCompactRight size={24} />
         </Button> */}
 
-        {/* <div
+          {/* <div
           className={cn(
             `bg-background absolute z-50 h-full shrink-0 overflow-hidden border-r transition-[width] duration-200 lg:relative`
           )}
@@ -95,7 +97,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
             width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"
           }}
         > */}
-        {/* <Tabs
+          {/* <Tabs
             className={"z-50 flex h-full"}
             value={contentType}
             onValueChange={tabValue => {
@@ -103,29 +105,30 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
               router.replace(`${pathname}?tab=${tabValue}`)
             }}
           > */}
-        {/* <SidebarSwitcher onContentTypeChange={setContentType} /> */}
+          {/* <SidebarSwitcher onContentTypeChange={setContentType} /> */}
 
-        <Sidebar />
-        {/* </Tabs> */}
-        {/* </div> */}
+          <Sidebar />
+          {/* </Tabs> */}
+          {/* </div> */}
 
-        <div
-          className={"flex grow transition-[width]"}
-          style={{
-            width: showSidebar ? `calc(100% - ${SIDEBAR_WIDTH}px)` : "100%"
-          }}
-          onDrop={onFileDrop}
-          onDragOver={onDragOver}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-        >
-          {isDragging ? (
-            <div className="flex h-full items-center justify-center bg-black/50 text-2xl text-white">
-              drop file here
-            </div>
-          ) : (
-            children
-          )}
+          <div
+            className={"flex grow transition-[width]"}
+            style={{
+              width: showSidebar ? `calc(100% - ${SIDEBAR_WIDTH}px)` : "100%"
+            }}
+            onDrop={onFileDrop}
+            onDragOver={onDragOver}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+          >
+            {isDragging ? (
+              <div className="flex h-full items-center justify-center bg-black/50 text-2xl text-white">
+                drop file here
+              </div>
+            ) : (
+              children
+            )}
+          </div>
         </div>
       </div>
     ),

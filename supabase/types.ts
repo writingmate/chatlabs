@@ -2075,6 +2075,20 @@ export interface Database {
             }
             Returns: string
           }
+      match_file_items_cohere: {
+        Args: {
+          query_embedding: string
+          match_count?: number
+          file_ids?: string[]
+        }
+        Returns: {
+          id: string
+          file_id: string
+          content: string
+          tokens: number
+          similarity: number
+        }[]
+      }
       match_file_items_local: {
         Args: {
           query_embedding: string
