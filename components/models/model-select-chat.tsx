@@ -108,6 +108,8 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
     )
     .sort((a, b) => a.provider.localeCompare(b.provider))
 
+  const modelForDetails = hoveredModel || filteredModels?.[0]
+
   return (
     <DropdownMenu
       open={isOpen}
@@ -165,7 +167,9 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
             "relative mr-2 hidden h-auto flex-col justify-between border-r p-4 lg:flex"
           }
         >
-          <ModelDetails model={hoveredModel || filteredModels[0]} />
+          {modelForDetails && (
+            <ModelDetails model={hoveredModel || filteredModels[0]} />
+          )}
         </DropdownMenuSubContent2>
         <DropdownMenuSubContent2 className="relative mr-2 flex w-[340px] flex-col space-y-2 overflow-auto p-2">
           {availableLocalModels.length > 0 && (
