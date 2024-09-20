@@ -1,8 +1,13 @@
 import { supabase } from "@/lib/supabase/browser-client"
-import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
+import { Database, Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
+import { LLM } from "@/types"
+import { SupabaseClient } from "@supabase/supabase-js"
 
-export const getApplicationById = async (applicationId: string) => {
-  const { data: application, error } = await supabase
+export const getApplicationById = async (
+  applicationId: string,
+  client: SupabaseClient<Database> = supabase
+) => {
+  const { data: application, error } = await client
     .from("applications")
     .select("*")
     .eq("id", applicationId)
@@ -32,7 +37,8 @@ export const getApplicationsByWorkspaceId = async (workspaceId: string) => {
 export const createApplication = async (
   application: TablesInsert<"applications">,
   files: string[],
-  tools: string[]
+  tools: string[],
+  platformTools: string[]
 ) => {
   const { data: createdApplication, error } = await supabase
     .from("applications")
@@ -64,12 +70,24 @@ export const createApplication = async (
     )
   }
 
+  if (platformTools.length > 0) {
+    await createApplicationPlatformTools(
+      platformTools.map(toolId => ({
+        user_id: application.user_id,
+        application_id: createdApplication.id,
+        platform_tool_id: toolId
+      }))
+    )
+  }
   return createdApplication
 }
 
 export const updateApplication = async (
   applicationId: string,
-  application: TablesUpdate<"applications">
+  application: TablesUpdate<"applications">,
+  tools: string[],
+  platformTools: string[],
+  models: LLM[]
 ) => {
   const { data: updatedApplication, error } = await supabase
     .from("applications")
@@ -82,7 +100,98 @@ export const updateApplication = async (
     throw new Error(error.message)
   }
 
+  // Update tools
+  if (tools.length > 0 || platformTools.length > 0) {
+    await updateApplicationTools(
+      tools.map(toolId => ({
+        user_id: application.user_id!,
+        application_id: applicationId,
+        tool_id: toolId
+      })),
+      platformTools.map(toolId => ({
+        user_id: application.user_id!,
+        application_id: applicationId,
+        platform_tool_id: toolId
+      }))
+    )
+  }
+
+  // Update models
+  await updateApplicationModels(applicationId, models)
+
   return updatedApplication
+}
+
+const updateApplicationTools = async (
+  tools: TablesInsert<"application_tools">[],
+  platformTools: TablesInsert<"application_platform_tools">[]
+) => {
+  console.log("tools", tools, "platformTools", platformTools)
+
+  const applicationId =
+    tools?.[0]?.application_id || platformTools?.[0]?.application_id
+
+  if (!applicationId) {
+    throw new Error("Application ID is required")
+  }
+
+  // Remove existing tools
+  await supabase
+    .from("application_tools")
+    .delete()
+    .eq("application_id", applicationId)
+
+  await supabase
+    .from("application_platform_tools")
+    .delete()
+    .eq("application_id", applicationId)
+
+  // Add new tools
+  if (tools.length > 0) {
+    const { error: toolsError } = await supabase
+      .from("application_tools")
+      .insert(tools)
+
+    if (toolsError) {
+      throw new Error(toolsError.message)
+    }
+  }
+
+  // Add new platform tools
+  if (platformTools.length > 0) {
+    const { error: platformToolsError } = await supabase
+      .from("application_platform_tools")
+      .insert(platformTools)
+
+    if (platformToolsError) {
+      throw new Error(platformToolsError.message)
+    }
+  }
+}
+
+const updateApplicationModels = async (
+  applicationId: string,
+  models: LLM[]
+) => {
+  // Remove existing models
+  await supabase
+    .from("application_models")
+    .delete()
+    .eq("application_id", applicationId)
+
+  // Add new models
+  const modelsToInsert = models.map(model => ({
+    application_id: applicationId,
+    model_id: model.modelId
+  }))
+
+  const { error } = await supabase
+    .from("application_models")
+    .insert(modelsToInsert)
+
+  if (error) {
+    throw new Error(error.message)
+  }
 }
 
 export const deleteApplication = async (applicationId: string) => {
@@ -99,7 +208,7 @@ export const deleteApplication = async (applicationId: string) => {
 }
 
 export const createApplicationFiles = async (
-  items: { user_id: string; application_id: string; file_id: string }[]
+  items: TablesInsert<"application_files">[]
 ) => {
   const { data: createdApplicationFiles, error } = await supabase
     .from("application_files")
@@ -111,8 +220,21 @@ export const createApplicationFiles = async (
   return createdApplicationFiles
 }
 
+export const createApplicationPlatformTools = async (
+  items: TablesInsert<"application_platform_tools">[]
+) => {
+  const { data: createdApplicationPlatformTools, error } = await supabase
+    .from("application_platform_tools")
+    .insert(items)
+    .select("*")
+
+  if (error) throw new Error(error.message)
+
+  return createdApplicationPlatformTools
+}
+
 export const createApplicationTools = async (
-  items: { user_id: string; application_id: string; tool_id: string }[]
+  items: TablesInsert<"application_tools">[]
 ) => {
   const { data: createdApplicationTools, error } = await supabase
     .from("application_tools")
@@ -143,5 +265,5 @@ export const getApplicationTools = async (applicationId: string) => {
 
   if (error) throw new Error(error.message)
 
-  return applicationTools.map(item => item.tools)
+  return applicationTools.map(item => item.tools).filter(tool => tool !== null)
 }

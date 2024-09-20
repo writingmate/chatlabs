@@ -20,12 +20,8 @@ import { ChatMessages } from "./chat-messages"
 import { QuickSettings } from "@/components/chat/quick-settings"
 import { ChatSettings } from "@/components/chat/chat-settings"
 import { Brand } from "@/components/ui/brand"
-import { WithTooltip } from "@/components/ui/with-tooltip"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { ConversationStarters } from "@/components/chat/conversation-starters"
-import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
-
-import { IconMessagePlus } from "@tabler/icons-react"
 
 import { getPromptById } from "@/db/prompts"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
@@ -41,21 +37,26 @@ import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
 import { getFileByHashId } from "@/db/files"
 import {
   parseChatMessageCodeBlocksAndContent,
-  parseDBMessageCodeBlocksAndContent,
-  reconstructContentWithCodeBlocks,
-  reconstructContentWithCodeBlocksInChatMessage
+  parseDBMessageCodeBlocksAndContent
 } from "@/lib/messages"
 import { CodeBlock } from "@/types/chat-message"
-import { as } from "@upstash/redis/zmscore-10fd3773"
 
 interface ChatUIProps {
   showModelSelector?: boolean
+  showChatSettings?: boolean
+  showAssistantSelector?: boolean
   assistant?: Tables<"assistants">
+  application?: Tables<"applications">
+  onSelectCodeBlock?: (codeBlock: CodeBlock | null) => void
 }
 
 export const ChatUI: React.FC<ChatUIProps> = ({
+  showModelSelector = true,
+  showChatSettings = true,
+  showAssistantSelector = true,
   assistant,
-  showModelSelector = true
+  application,
+  onSelectCodeBlock
 }) => {
   const params = useParams()
   const chatId = params.chatid as string
@@ -129,6 +130,16 @@ export const ChatUI: React.FC<ChatUIProps> = ({
   useEffect(() => {
     handleSearchParams()
   }, [searchParams])
+
+  useEffect(() => {
+    if (application) {
+      const applicationPrompt = `This is an application named "${application.name}". Description: ${application.description}. Application type: ${application.application_type}.`
+      setChatSettings(prevSettings => ({
+        ...prevSettings,
+        prompt: `${applicationPrompt}\n\n${prevSettings.prompt}`
+      }))
+    }
+  }, [application])
 
   const fetchChatData = async (): Promise<void> => {
     await Promise.all([fetchMessages(), fetchChat()])
@@ -373,153 +384,95 @@ ${content}
     })
   }
 
-  const handleSelectCodeBlock = useCallback(
-    (codeBlock: CodeBlock | null): void => {
-      setSelectedCodeBlock(prev => {
-        if (codeBlock) {
-          setEditorOpen(true)
-        } else {
-          setEditorOpen(false)
-        }
-        return codeBlock
-      })
-    },
-    []
-  )
-
-  const handleCodeChange = (updatedCode: string): void => {
-    if (selectedCodeBlock) {
-      const updatedMessage = chatMessages?.find(
-        message => message.message?.id === selectedCodeBlock.messageId
-      )
-      if (
-        updatedMessage &&
-        updatedMessage.codeBlocks &&
-        updatedMessage.codeBlocks.length > 0
-      ) {
-        updatedMessage.codeBlocks[updatedMessage.codeBlocks.length - 1].code =
-          updatedCode
-        setChatMessages(prev => {
-          const updatedMessages = [...prev]
-          const index = updatedMessages.findIndex(
-            message => message.message?.id === selectedCodeBlock.messageId
-          )
-          if (index !== -1) {
-            updatedMessages[index] = updatedMessage
-          }
-          return updatedMessages
-        })
-        setSelectedCodeBlock(
-          updatedMessage.codeBlocks[updatedMessage.codeBlocks.length - 1]
-        )
-        updateMessage(updatedMessage.message!.id, {
-          content: reconstructContentWithCodeBlocks(
-            updatedMessage.message?.content || "",
-            updatedMessage.codeBlocks
-          )
-        })
-      }
-    }
-  }
-
-  const isCodeBlockEditable = useCallback(
-    (codeBlock: CodeBlock | null): boolean => {
-      if (!codeBlock) return false
-      // only allow editing if the code block is the last one in the conversation
-      // we need to find the last message that has a code block
-      const lastMessage = chatMessages
-        ?.filter(message => message.codeBlocks && message.codeBlocks.length > 0)
-        .pop()
-      return lastMessage?.message?.id === codeBlock.messageId && !isGenerating
-    },
-    [chatMessages, isGenerating]
-  )
-
   return (
-    <>
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="relative flex h-full flex-1 shrink-0 flex-col overflow-hidden overflow-y-auto"
-      >
-        {/* Header */}
-        <div className="bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 justify-between p-2">
-          <div className="flex items-center">
-            {!assistant && <QuickSettings />}
-          </div>
-          {showModelSelector && <ChatSettings />}
+    <div
+      ref={scrollRef}
+      onScroll={handleScroll}
+      className="relative flex h-full flex-1 shrink-0 flex-col overflow-hidden overflow-y-auto"
+    >
+      {/* Header */}
+      <div className="bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 justify-between p-2">
+        <div className="flex items-center">
+          {!assistant && showChatSettings && <QuickSettings />}
         </div>
-
-        {/* Chat Content */}
-        <div className="flex size-full">
-          {loading ? (
-            <Loading />
-          ) : (
-            <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col">
-              {chatMessages?.length === 0 ? (
-                <EmptyChatView
-                  selectedAssistant={selectedAssistant}
-                  theme={theme}
-                />
-              ) : (
-                <>
-                  <div ref={messagesStartRef} />
-                  <ChatMessages onSelectCodeBlock={handleSelectCodeBlock} />
-                  <div ref={messagesEndRef} className="min-h-20 flex-1" />
-                </>
-              )}
-              <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
-                {chatMessages?.length === 0 && (
-                  <ConversationStarters
-                    values={selectedAssistant?.conversation_starters}
-                    onSelect={(value: string) =>
-                      handleSendMessage(value, chatMessages, false)
-                    }
-                  />
-                )}
-                <ChatInput showAssistant={!selectedAssistant} />
-                <ChatMessageCounter />
-              </div>
-            </div>
-          )}
-        </div>
+        {showModelSelector && showChatSettings && <ChatSettings />}
       </div>
-      <ChatPreviewContent
-        open={editorOpen}
-        isGenerating={isGenerating}
-        selectedCodeBlock={selectedCodeBlock}
-        onSelectCodeBlock={handleSelectCodeBlock}
-        isEditable={isCodeBlockEditable(selectedCodeBlock)}
-        onCodeChange={handleCodeChange}
-      />
-    </>
+
+      {/* Chat Content */}
+      <div className="flex size-full">
+        {loading ? (
+          <Loading />
+        ) : (
+          <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col">
+            {chatMessages?.length === 0 ? (
+              <EmptyChatView
+                selectedAssistant={selectedAssistant}
+                theme={theme}
+                application={application}
+              />
+            ) : (
+              <>
+                <div ref={messagesStartRef} />
+                <ChatMessages onSelectCodeBlock={onSelectCodeBlock} />
+                <div ref={messagesEndRef} className="min-h-20 flex-1" />
+              </>
+            )}
+            <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
+              {chatMessages?.length === 0 && (
+                <ConversationStarters
+                  values={selectedAssistant?.conversation_starters}
+                  onSelect={(value: string) =>
+                    handleSendMessage(value, chatMessages, false)
+                  }
+                />
+              )}
+              <ChatInput
+                showAssistant={showAssistantSelector && !selectedAssistant}
+              />
+              <ChatMessageCounter />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 
 interface EmptyChatViewProps {
   selectedAssistant: Tables<"assistants"> | null
   theme: string | undefined
+  application?: Tables<"applications">
 }
 
 const EmptyChatView: React.FC<EmptyChatViewProps> = ({
   selectedAssistant,
-  theme
+  theme,
+  application
 }) => (
   <div className="center flex w-full flex-1 flex-col items-center justify-center transition-[height]">
-    {!selectedAssistant ? (
+    {!selectedAssistant && !application ? (
       <Brand theme={theme === "dark" ? "dark" : "light"} />
+    ) : application ? (
+      <>
+        <div className="text-foreground mt-4 text-center text-2xl font-bold">
+          {application.name}
+        </div>
+        <div className="text-foreground mt-2 text-center text-sm">
+          {application.description}
+        </div>
+      </>
     ) : (
       <>
         <AssistantIcon
           className="size-[100px] rounded-xl"
-          assistant={selectedAssistant}
+          assistant={selectedAssistant!}
           size={100}
         />
         <div className="text-foreground mt-4 text-center text-2xl font-bold">
-          {selectedAssistant.name}
+          {selectedAssistant!.name}
         </div>
         <div className="text-foreground mt-2 text-center text-sm">
-          {selectedAssistant.description}
+          {selectedAssistant!.description}
         </div>
       </>
     )}

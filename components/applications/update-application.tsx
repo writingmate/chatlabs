@@ -1,6 +1,6 @@
 "use client"
 
-import { FC, useState, useContext } from "react"
+import { FC, useState, useContext, useEffect } from "react"
 import { Button } from "../ui/button"
 import {
   Select,
@@ -12,7 +12,7 @@ import {
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import { ChatbotUIContext } from "@/context/context"
-import { createApplication } from "@/db/applications"
+import { updateApplication } from "@/db/applications"
 import { Application, LLM } from "@/types"
 import { toast } from "sonner"
 import { Tables } from "@/supabase/types"
@@ -58,40 +58,57 @@ const themes = [
   "sunset"
 ]
 
-interface CreateApplicationProps {
-  onApplicationCreated: (application: Application) => void
+interface UpdateApplicationProps {
+  application: Tables<"applications">
+  onUpdateApplication: (application: Tables<"applications">) => void
   onCancel: () => void
 }
 
-export const CreateApplication: FC<CreateApplicationProps> = ({
-  onApplicationCreated,
+export const UpdateApplication: FC<UpdateApplicationProps> = ({
+  application,
+  onUpdateApplication,
   onCancel
 }) => {
   const { profile, selectedWorkspace, tools, allModels } =
     useContext(ChatbotUIContext)
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [sharing, setSharing] = useState<Application["sharing"]>("private")
+  const [name, setName] = useState(application.name)
+  const [description, setDescription] = useState(application.description)
+  const [sharing, setSharing] = useState<Application["sharing"]>(
+    application.sharing
+  )
   const [selectedTools, setSelectedTools] = useState<string[]>([])
   const [selectedModels, setSelectedModels] = useState<LLM[]>([])
-  const [theme, setTheme] = useState<string>("light")
-  const [applicationType, setApplicationType] = useState<string>("web_app")
+  const [theme, setTheme] = useState(application.theme || "light")
+  const [applicationType, setApplicationType] = useState(
+    application.application_type || "web_app"
+  )
 
-  const handleCreate = async () => {
+  useEffect(() => {
+    // Fetch current tools and models for this application
+    const fetchApplicationDetails = async () => {
+      // Fetch tools
+      // const appTools = await getApplicationTools(application.id)
+      // setSelectedTools(appTools.map(tool => tool.id))
+      // Fetch models
+      // const appModels = await getApplicationModels(application.id)
+      // setSelectedModels(appModels)
+    }
+
+    fetchApplicationDetails()
+  }, [application.id])
+
+  const handleUpdate = async () => {
     if (!profile || !selectedWorkspace) return
 
     try {
-      const newApplication: Partial<Tables<"applications">> = {
-        user_id: profile.user_id,
-        workspace_id: selectedWorkspace.id,
+      const updatedApplication: Partial<Tables<"applications">> = {
         name,
         description,
         sharing,
-        folder_id: null,
-        created_at: new Date().toISOString(),
-        updated_at: null,
+        updated_at: new Date().toISOString(),
         application_type: applicationType,
-        theme: applicationType === "web_app" ? theme : undefined // Add theme only for web apps
+        theme: applicationType === "web_app" ? theme : undefined,
+        user_id: profile.user_id // Make sure to include the user_id
       }
 
       const platformTools = tools.filter(tool => tool.sharing === "platform")
@@ -103,25 +120,19 @@ export const CreateApplication: FC<CreateApplicationProps> = ({
           !selectedPlatformTools.find(platformTool => platformTool === tool)
       )
 
-      const createdApplication = await createApplication(
-        newApplication as Tables<"applications">,
-        [], // files
+      const result = await updateApplication(
+        application.id,
+        updatedApplication as Tables<"applications">,
         filteredSelectedTools,
-        selectedPlatformTools
+        selectedPlatformTools,
+        selectedModels
       )
 
-      onApplicationCreated(createdApplication)
-      toast.success("Application created successfully")
-      // Reset form
-      setName("")
-      setDescription("")
-      setSharing("private")
-      setSelectedTools([])
-      setSelectedModels([])
-      setTheme("light")
+      onUpdateApplication(result)
+      toast.success("Application updated successfully")
     } catch (error) {
-      console.error("Error creating application:", error)
-      toast.error("Failed to create application")
+      console.error("Error updating application:", error)
+      toast.error("Failed to update application")
     }
   }
 
@@ -179,7 +190,7 @@ export const CreateApplication: FC<CreateApplicationProps> = ({
       <div>
         <Label htmlFor="description">Description</Label>
         <Description>
-          Provide a brief overview of your application:{"'"}s purpose and
+          Provide a brief overview of your application{"'"}s purpose and
           functionality.
         </Description>
         <Textarea
@@ -269,8 +280,8 @@ export const CreateApplication: FC<CreateApplicationProps> = ({
         </div>
       )}
       <div className="space-x-2">
-        <Button onClick={handleCreate} disabled={!name}>
-          Create Application
+        <Button onClick={handleUpdate} disabled={!name}>
+          Update Application
         </Button>
         <Button onClick={onCancel} variant="outline">
           Cancel
