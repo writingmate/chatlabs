@@ -3,6 +3,7 @@ import React from "react"
 export const AnimatedChatbotUISVG = ({ size = 200 }) => {
   return (
     <svg
+      className="animated-chatbot-ui" // Added unique class
       width={size}
       height={size}
       viewBox="0 0 200 200"
@@ -20,17 +21,17 @@ export const AnimatedChatbotUISVG = ({ size = 200 }) => {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
           }
-          path {
+          .animated-chatbot-ui path {
             animation: pulse 2s infinite;
             transform-origin: center;
             animation-timing-function: ease-in-out;
           }
-          path:nth-child(1) { animation-delay: 0s; }
-          path:nth-child(2) { animation-delay: 0.3s; }
-          path:nth-child(3) { animation-delay: 0.6s; }
-          path:nth-child(4) { animation-delay: 0.9s; }
-          path:nth-child(5) { animation-delay: 1.2s; }
-          path:nth-child(6) { animation-delay: 1.5s; }
+          .animated-chatbot-ui path:nth-child(1) { animation-delay: 0s; }
+          .animated-chatbot-ui path:nth-child(2) { animation-delay: 0.3s; }
+          .animated-chatbot-ui path:nth-child(3) { animation-delay: 0.6s; }
+          .animated-chatbot-ui path:nth-child(4) { animation-delay: 0.9s; }
+          .animated-chatbot-ui path:nth-child(5) { animation-delay: 1.2s; }
+          .animated-chatbot-ui path:nth-child(6) { animation-delay: 1.5s; }
         `}
       </style>
       <g stroke="#595959" strokeLinecap="butt" strokeWidth="3.24">

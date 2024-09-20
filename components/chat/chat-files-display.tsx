@@ -24,6 +24,7 @@ import { ChatRetrievalSettings } from "./chat-retrieval-settings"
 import { XIcon } from "@/components/ui/x-icon"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { guessFileExtensionByContentType } from "@/lib/content-type"
+import { LoadingSVG } from "@/components/icons/loading-svg"
 
 interface ChatFilesDisplayProps {}
 
@@ -163,7 +164,7 @@ export const ChatFilesDisplay: FC<ChatFilesDisplayProps> = ({}) => {
                   className="relative flex h-[64px] max-w-[260px] items-center space-x-4 rounded-xl border px-4 py-3"
                 >
                   <div className="rounded bg-violet-500 p-2">
-                    <IconLoader2 className="animate-spin" />
+                    <LoadingSVG className="size-6" />
                   </div>
 
                   <div className="truncate text-sm">

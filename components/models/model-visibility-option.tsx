@@ -36,18 +36,11 @@ export const ModelVisibilityOption: FC<ModelVisibilityOption> = ({
           </span>
           <div className="flex items-center space-x-1">
             {model.paid && (
-              <Badge
-                variant="outline"
-                className="flex size-5 items-center justify-center rounded-full bg-gradient-to-r from-purple-400 to-pink-600 p-0 text-xs text-white"
-                style={{
-                  backgroundClip: "text",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  border: "1px solid transparent",
-                  borderImage: "linear-gradient(to right, #9333ea, #db2777) 1"
-                }}
-              >
-                P
+              <Badge variant="outline" className="relative overflow-hidden">
+                <span className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-600 opacity-10"></span>
+                <span className="relative bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                  Pro
+                </span>
               </Badge>
             )}
             {model.imageInput && (

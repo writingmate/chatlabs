@@ -17,6 +17,7 @@ create table file_items (
 
   -- REQUIRED
   content TEXT NOT NULL,
+  cohere_embedding vector(384), -- 384 works for local w/ Xenova/all-MiniLM-L6-v2
   local_embedding vector(384), -- 384 works for local w/ Xenova/all-MiniLM-L6-v2
   openai_embedding vector(1536), -- 1536 for OpenAI
   tokens INT NOT NULL
@@ -25,6 +26,9 @@ create table file_items (
 -- INDEXES --
 
 CREATE INDEX file_items_file_id_idx ON file_items(file_id);
+
+CREATE INDEX file_items_cohere_embedding_idx ON file_items
+  USING hnsw (cohere_embedding vector_cosine_ops);
 
 CREATE INDEX file_items_embedding_idx ON file_items
   USING hnsw (openai_embedding vector_cosine_ops);
@@ -56,6 +60,36 @@ FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 
 -- FUNCTIONS --
+
+create function match_file_items_cohere (
+  query_embedding vector(384),
+  match_count int DEFAULT null,
+  file_ids UUID[] DEFAULT null
+) returns table (
+  id UUID,
+  file_id UUID,
+  content TEXT,
+  tokens INT,
+  similarity float
+)
+language plpgsql
+as $$
+#variable_conflict use_column
+begin
+  return query
+  select
+    id,
+    file_id,
+    content,
+    tokens,
+    1 - (file_items.cohere_embedding <=> query_embedding) as similarity
+  from file_items
+  where (file_id = ANY(file_ids))
+  order by file_items.cohere_embedding <=> query_embedding
+  limit match_count;
+end;
+$$;
+
 
 create function match_file_items_local (
   query_embedding vector(384),

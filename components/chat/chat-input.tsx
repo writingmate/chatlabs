@@ -8,11 +8,13 @@ import {
   IconX,
   IconMicrophone,
   IconPlayerRecordFilled,
+  IconSend,
   IconArrowUp,
   IconPrompt,
   IconPlus,
   IconBulb
 } from "@tabler/icons-react"
+import { IconAiSVG } from "@/components/icons/AI-icon-svg"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
@@ -43,9 +45,11 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
   const [recognition, setRecognition] = useState<any>(null)
   const [listening, setListening] = useState(false)
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | undefined>()
+  const [rowCount, setRowCount] = useState(1)
 
   const {
     isAssistantPickerOpen,
+    setIsAssistantPickerOpen,
     focusAssistant,
     setFocusAssistant,
     selectedPreset,
@@ -78,7 +82,8 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
     handleFocusChatInput
   } = useChatHandler()
 
-  const { handleInputChange } = usePromptAndCommand()
+  const { handleInputChange: promptHandleInputChange, handleSelectAssistant } =
+    usePromptAndCommand()
 
   const { filesToAccept, handleSelectDeviceFile, isUploading } =
     useSelectFileHandler()
@@ -283,12 +288,25 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
 
   const { t } = useTranslation()
 
+  const handleAiIconClick = () => {
+    setIsAssistantPickerOpen(true)
+  }
+
+  // Renamed Custom Input Change Handler
+  const handleCustomInputChange = (value: string) => {
+    setUserInput(value)
+    const lines = value.split("\n").length
+    setRowCount(lines)
+    // Integrate with the existing prompt handler if needed
+    promptHandleInputChange(value)
+  }
+
   return (
     <div className={"relative"}>
       <ChatFilesDisplay />
       <ChatCommandInput />
       <ChatSelectedHtmlElements />
-      <div className="border-input bg-background flex w-full flex-col justify-end overflow-hidden rounded-xl border">
+      <div className="border-input bg-background flex w-full flex-col justify-end overflow-hidden rounded-xl border px-4 py-2">
         {showAssistant && selectedAssistant && (
           <div className="bg-accent border-input flex items-center justify-between space-x-2 border-b p-2 pl-4 pr-3">
             <div className={"flex items-center space-x-2"}>
@@ -309,30 +327,40 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
         )}
         <div className="flex items-end justify-between p-2">
           <div className={"flex"}>
-            <div title={"Upload/attach files"}>
+            <span className="flex items-end" title="Upload/attach files">
               <IconPaperclip
                 onClick={() => fileInputRef.current?.click()}
                 stroke={1.5}
                 className="m-1 cursor-pointer p-0.5 hover:opacity-50"
                 size={24}
               />
-              <Input
-                ref={fileInputRef}
-                className="hidden"
-                type="file"
-                onChange={e => {
-                  if (!e.target.files) return
-                  handleSelectDeviceFile(e.target.files[0])
-                }}
-                accept={filesToAccept}
+            </span>
+            <span className="flex items-end" title="AI Assistant">
+              <IconAiSVG
+                onClick={handleAiIconClick}
+                stroke={1.5}
+                className="m-1 cursor-pointer p-0.5 hover:opacity-50"
+                size={24}
               />
-            </div>
+            </span>
+            <Input
+              ref={fileInputRef}
+              className="hidden"
+              type="file"
+              onChange={e => {
+                if (!e.target.files) return
+                handleSelectDeviceFile(e.target.files[0])
+              }}
+              accept={filesToAccept}
+            />
           </div>
           <TextareaAutosize
             textareaRef={chatInputRef}
-            className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex w-full resize-none rounded-md border-none bg-transparent p-1.5 px-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            className={`ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring grow resize-none rounded-full border-none bg-transparent p-1.5 px-2 transition-all duration-200 ease-in-out focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
+              rowCount > 3 ? "rounded-md" : "rounded-none"
+            }`}
             placeholder={t("Ask anything...")}
-            onValueChange={handleInputChange}
+            onValueChange={handleCustomInputChange}
             value={userInput}
             minRows={1}
             maxRows={18}
@@ -341,19 +369,22 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
             onCompositionStart={() => setIsTyping(true)}
             onCompositionEnd={() => setIsTyping(false)}
           />
-          <div className="flex cursor-pointer justify-end">
-            <div className={"flex flex-nowrap overflow-hidden"}>
+          <div className="flex cursor-pointer items-end justify-end space-x-2">
+            <div className="flex flex-nowrap items-end overflow-hidden">
               {recognition && (
-                <button onClick={listening ? stopListening : restartListening}>
+                <button
+                  onClick={listening ? stopListening : restartListening}
+                  className="focus:outline-none"
+                >
                   {listening ? (
                     <IconPlayerRecordFilled
                       stroke={1.5}
-                      className={"animate-pulse text-red-500"}
+                      className="animate-pulse text-red-500"
                       size={24}
                     />
                   ) : (
                     <IconMicrophone
-                      className={"m-1 cursor-pointer p-0.5 hover:opacity-50"}
+                      className="m-1 cursor-pointer p-0.5 hover:opacity-50"
                       stroke={1.5}
                       size={24}
                     />
@@ -368,7 +399,7 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
                   size={24}
                 />
               ) : (
-                <IconArrowUp
+                <IconSend
                   className={cn(
                     "bg-primary text-secondary m-1 rounded-lg p-0.5 hover:opacity-50",
                     (!userInput || isUploading) &&

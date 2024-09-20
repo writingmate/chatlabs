@@ -21,15 +21,21 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
     hashtagCommand,
     focusPrompt,
     focusFile,
+    focusAssistant,
     selectedAssistant,
     isPromptPickerOpen,
     isToolPickerOpen,
     isAssistantPickerOpen,
-    isMessageHistoryPickerOpen
+    setIsAssistantPickerOpen,
+    isMessageHistoryPickerOpen,
+    atCommand
   } = useContext(ChatbotUIContext)
 
-  const { handleSelectUserFile, handleSelectUserCollection } =
-    usePromptAndCommand()
+  const {
+    handleSelectUserFile,
+    handleSelectUserCollection,
+    handleSelectAssistant
+  } = usePromptAndCommand()
 
   const isOpen =
     isPromptPickerOpen ||
@@ -62,7 +68,17 @@ export const ChatCommandInput: FC<ChatCommandInputProps> = ({}) => {
       />
       <ToolPicker />
 
-      <AssistantPicker />
+      {isAssistantPickerOpen && (
+        <AssistantPicker
+          isOpen={isAssistantPickerOpen}
+          onOpenChange={setIsAssistantPickerOpen}
+          searchQuery={atCommand}
+          onSelectAssistant={handleSelectAssistant}
+          isFocused={focusAssistant}
+        />
+      )}
+
+      <MessageHistoryPicker />
     </div>
   )
 }

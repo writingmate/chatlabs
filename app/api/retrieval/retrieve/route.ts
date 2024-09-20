@@ -1,15 +1,13 @@
-import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+import { generateCohereEmbedding } from "@/lib/generate-cohere-embedding"
+import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
-import OpenAI from "openai"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { userInput, fileIds, embeddingsProvider, sourceCount } = json as {
+  const { userInput, fileIds, sourceCount } = json as {
     userInput: string
     fileIds: string[]
-    embeddingsProvider: "openai" | "local"
     sourceCount: number
   }
 
@@ -23,66 +21,39 @@ export async function POST(request: Request) {
 
     const profile = await getServerProfile()
 
-    if (embeddingsProvider === "openai") {
-      if (profile.use_azure_openai) {
-        checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
-      } else {
-        checkApiKey(profile.openai_api_key, "OpenAI")
-      }
-    }
-
     let chunks: any[] = []
+    let embedding: number[] = []
 
-    let openai
-    if (profile.use_azure_openai) {
-      openai = new OpenAI({
-        apiKey: profile.azure_openai_api_key || "",
-        baseURL: `${profile.azure_openai_endpoint}/openai/deployments/${profile.azure_openai_embeddings_id}`,
-        defaultQuery: { "api-version": "2023-12-01-preview" },
-        defaultHeaders: { "api-key": profile.azure_openai_api_key }
-      })
-    } else {
-      openai = new OpenAI({
-        apiKey: profile.openai_api_key || "",
-        organization: profile.openai_organization_id
-      })
+    const cohereApiKey = process.env.COHERE_API_KEY
+    if (!cohereApiKey) {
+      throw new Error("Admin Cohere API key is not set.")
     }
 
-    if (embeddingsProvider === "openai") {
-      const response = await openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: userInput
-      })
+    try {
+      const embeddings = await generateCohereEmbedding([userInput])
+      const cohereEmbedding = embeddings[0] // Get the first (and only) embedding
 
-      const openaiEmbedding = response.data.map(item => item.embedding)[0]
-
-      const { data: openaiFileItems, error: openaiError } =
-        await supabaseAdmin.rpc("match_file_items_openai", {
-          query_embedding: openaiEmbedding as any,
+      const { data: cohereFileItems, error: cohereError } =
+        await supabaseAdmin.rpc("match_file_items_cohere", {
+          query_embedding: cohereEmbedding as any,
           match_count: sourceCount,
           file_ids: uniqueFileIds
         })
 
-      if (openaiError) {
-        throw openaiError
+      if (cohereError) {
+        if (cohereError.message.includes("cohere_embedding does not exist")) {
+          console.error("Cohere embedding column is missing in the database")
+          throw new Error(
+            "Database schema issue: cohere_embedding column is missing"
+          )
+        }
+        throw cohereError
       }
 
-      chunks = openaiFileItems
-    } else if (embeddingsProvider === "local") {
-      const localEmbedding = await generateLocalEmbedding(userInput)
-
-      const { data: localFileItems, error: localFileItemsError } =
-        await supabaseAdmin.rpc("match_file_items_local", {
-          query_embedding: localEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
-
-      if (localFileItemsError) {
-        throw localFileItemsError
-      }
-
-      chunks = localFileItems
+      chunks = cohereFileItems
+    } catch (error) {
+      console.error("Cohere embedding failed:", error)
+      throw new Error("Failed to generate or retrieve embeddings")
     }
 
     const mostSimilarChunks = chunks?.sort(
@@ -94,7 +65,7 @@ export async function POST(request: Request) {
     })
   } catch (error: any) {
     console.error(error)
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    const errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode

@@ -1,8 +1,8 @@
 "use client"
 
 import { FC } from "react"
-import { ChatbotUISVG } from "../icons/chatbotui-svg"
-import { AnimatedChatbotUISVG } from "../icons/chatbotui-svg-animation"
+import { ChatbotUISVG } from "../icons/chatbotui-svg" // Static SVG
+import { AnimatedChatbotUISVG } from "../icons/chatbotui-svg-animation" // Animated SVG
 import { useTranslation } from "react-i18next"
 
 interface BrandProps {
@@ -15,7 +15,8 @@ export const Brand: FC<BrandProps> = ({ theme = "dark" }) => {
   return (
     <div className="flex cursor-pointer flex-col items-center">
       <div className="mb-2">
-        <AnimatedChatbotUISVG size={141 * 0.6} />
+        <AnimatedChatbotUISVG size={141 * 0.6} />{" "}
+        {/* Only Brand uses Animated SVG */}
       </div>
 
       <h1 className="text-4xl font-semibold tracking-wide">ImogenAI</h1>
