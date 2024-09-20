@@ -40,15 +40,20 @@ const SharePage = async ({
   params: { file_id },
   searchParams: { __show_banner = true }
 }: SharePageProps) => {
-  const file = await getFileByHashId(file_id)
   const showBanner = parseBoolean(__show_banner)
+  let file
+  try {
+    file = await getFileByHashId(file_id)
 
-  if (
-    !file ||
-    file.type != "html" ||
-    file.sharing != "public" ||
-    file.file_items.length == 0
-  ) {
+    if (
+      !file ||
+      file.type != "html" ||
+      file.sharing != "public" ||
+      file.file_items.length == 0
+    ) {
+      return notFound()
+    }
+  } catch (error) {
     return notFound()
   }
 

@@ -48,7 +48,7 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
   const isProGrandfathered =
     userPlan === "pro" &&
     profile.created_at < "2024-09-16" &&
-    modelData?.modelId.includes("opus")
+    modelData?.modelId?.includes("opus")
 
   if (userPlan === "ultimate") {
     if (modelTier === "ultimate") {

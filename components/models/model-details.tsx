@@ -16,7 +16,7 @@ export function ModelDetails({
   selectedTools?: Tables<"tools">[]
 }) {
   let contextLength =
-    CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH || 0
+    CHAT_SETTING_LIMITS[model?.modelId]?.MAX_CONTEXT_LENGTH || 0
 
   if ("maxContext" in model) {
     contextLength = model.maxContext as number

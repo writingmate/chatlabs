@@ -22,8 +22,6 @@ export const QuickSettingOption: FC<QuickSettingOptionProps> = ({
   onSelect,
   image
 }) => {
-  const modelDetails = LLM_LIST.find(model => model.modelId === item.model)
-
   return (
     <DropdownMenuItem
       tabIndex={0}
