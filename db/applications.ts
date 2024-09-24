@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { Database, Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
-import { LLM } from "@/types"
+import { LLM, LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 
 export const getApplicationById = async (
@@ -9,15 +9,32 @@ export const getApplicationById = async (
 ) => {
   const { data: application, error } = await client
     .from("applications")
-    .select("*")
+    .select(
+      "*, files(*), tools(*), application_models(*), application_platform_tools(*)"
+    )
     .eq("id", applicationId)
     .single()
+
+  const applicationModels = application?.application_models.map(
+    model => model.model_id
+  )
 
   if (!application) {
     throw new Error(error.message)
   }
 
-  return application
+  return {
+    ...application,
+    models: applicationModels,
+    tools: application.tools,
+    platformToolsIds: application.application_platform_tools.map(
+      tool => tool.platform_tool_id
+    )
+  } as Tables<"applications"> & {
+    models: LLMID[]
+    tools: Tables<"tools">[]
+    platformToolsIds: string[]
+  }
 }
 
 export const getApplicationsByWorkspaceId = async (workspaceId: string) => {
@@ -40,9 +57,20 @@ export const createApplication = async (
   tools: string[],
   platformTools: string[]
 ) => {
+  // @ts-ignore
+  delete application.tools
+  // @ts-ignore
+  delete application.models
+  // @ts-ignore
+  delete application.id
+
   const { data: createdApplication, error } = await supabase
     .from("applications")
-    .insert([application])
+    .insert([
+      {
+        ...application
+      }
+    ])
     .select("*")
     .single()
 
@@ -266,4 +294,24 @@ export const getApplicationTools = async (applicationId: string) => {
   if (error) throw new Error(error.message)
 
   return applicationTools.map(item => item.tools).filter(tool => tool !== null)
+}
+
+// Add this function to update the chat_id for an application
+export async function updateApplicationChatId(
+  applicationId: string,
+  chatId: string,
+  client: SupabaseClient<Database> = supabase
+) {
+  const { data, error } = await client
+    .from("applications")
+    .update({ chat_id: chatId })
+    .eq("id", applicationId)
+    .single()
+
+  if (error) {
+    console.error("Error updating application chat_id:", error)
+    throw error
+  }
+
+  return data
 }

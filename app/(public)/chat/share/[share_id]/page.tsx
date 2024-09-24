@@ -7,6 +7,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { notFound } from "next/navigation"
 import { getChatById } from "@/db/chats"
+import { parseDBMessageCodeBlocksAndContent } from "@/lib/messages"
 
 export function generateMetadata({ params }: { params: { share_id: string } }) {
   return {
@@ -58,7 +59,9 @@ export default async function SharedChatPage({
     return notFound()
   }
 
-  messages = messages.slice(0, lastSharedMessageIndex + 1)
+  const chatMessages = messages
+    .slice(0, lastSharedMessageIndex + 1)
+    .map(parseDBMessageCodeBlocksAndContent)
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
@@ -68,16 +71,18 @@ export default async function SharedChatPage({
           {new Date(chatData.shared_at).toLocaleString()}
         </div>
         <div className="mb-8">
-          {messages.map((message, index, array) => (
+          {chatMessages.map((message, index, array) => (
             <Message
               showActions={false}
-              key={message.id}
-              message={message}
+              key={message.message.id}
+              message={message.message}
               isGenerating={false}
               firstTokenReceived={false}
               fileItems={[]} // Assuming no file items in shared view
               isEditing={false}
               isLast={false}
+              isExperimentalCodeEditor={false}
+              codeBlocks={message.codeBlocks}
             />
           ))}
         </div>

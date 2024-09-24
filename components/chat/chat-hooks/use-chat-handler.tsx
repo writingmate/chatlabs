@@ -23,9 +23,16 @@ import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
-import { createApplication } from "@/db/applications"
 
-export const useChatHandler = () => {
+interface UseChatHandlerProps {
+  onChatCreate?: (chat: Tables<"chats">) => void
+  onChatUpdate?: (chat: Tables<"chats">) => void
+}
+
+export const useChatHandler = ({
+  onChatCreate,
+  onChatUpdate
+}: UseChatHandlerProps = {}) => {
   const router = useRouter()
 
   const {
@@ -174,7 +181,11 @@ export const useChatHandler = () => {
       })
     }
 
-    return router.push(redirectTo || `/chat`)
+    if (redirectTo) {
+      return router.push(redirectTo)
+    } else {
+      router.push(`/chat`)
+    }
   }
 
   const handleFocusChatInput = () => {
@@ -340,7 +351,12 @@ export const useChatHandler = () => {
           setSelectedTools
         )
 
-        window.history.pushState({}, "", `/chat/${currentChat.id}`)
+        console.log("currentChat", currentChat, onChatCreate)
+
+        if (onChatCreate) {
+          console.log("onChatCreate", currentChat)
+          onChatCreate(currentChat)
+        }
       } else {
         const updatedChat = await updateChat(currentChat.id, {
           updated_at: new Date().toISOString()
@@ -353,6 +369,10 @@ export const useChatHandler = () => {
 
           return updatedChats
         })
+
+        if (onChatUpdate) {
+          onChatUpdate(updatedChat)
+        }
       }
 
       await handleCreateMessages(

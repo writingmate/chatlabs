@@ -21,6 +21,7 @@ import {
 import CodeViewerSidebar from "./code-viewer-sidebar"
 import { DEFAULT_THEME, THEMES } from "./theme-config"
 import { updateMessage } from "@/db/messages" // Add this import
+import { fi } from "date-fns/locale"
 
 interface CodeViewerProps {
   isGenerating?: boolean
@@ -119,11 +120,14 @@ export const CodeViewer: FC<CodeViewerProps> = ({
           showCloseButton={showCloseButton}
           downloadAsFile={downloadAsFile}
           copyValue={codeBlock.code}
-          showShareButton={true}
+          showShareButton={!!profile}
           onThemeChange={() => {}}
           onFork={onFork}
-          showSidebarButton={!!user?.email?.endsWith("@writingmate.ai")}
-          showForkButton={!!codeBlock.messageId && codeBlock.sequenceNo > -1}
+          showSidebarButton={false}
+          // showSidebarButton={!!user?.email?.endsWith("@writingmate.ai")}
+          showForkButton={
+            !!codeBlock.messageId && codeBlock.sequenceNo > -1 && !!profile
+          }
         />
         <div className="relative w-full flex-1 overflow-auto bg-zinc-950">
           {execute ? (

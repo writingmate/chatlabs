@@ -41,7 +41,6 @@ import { SidebarDataList } from "./sidebar-data-list"
 import { ContentType } from "@/types"
 import Link from "next/link"
 import { WithTooltip } from "../ui/with-tooltip"
-import { ChevronLeftIcon } from "lucide-react"
 
 export const Sidebar: FC = () => {
   const {
@@ -215,6 +214,7 @@ export const Sidebar: FC = () => {
             )}
           >
             <WithTooltip
+              asChild
               display={<div>New Chat</div>}
               trigger={
                 <Button
@@ -232,6 +232,7 @@ export const Sidebar: FC = () => {
               {activeSubmenu && getSubmenuTitle(activeSubmenu)}
             </div>
             <WithTooltip
+              asChild
               display={<div>{isCollapsed ? "Expand" : "Collapse"}</div>}
               trigger={
                 <Button

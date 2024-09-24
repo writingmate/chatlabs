@@ -26,12 +26,21 @@ import { toast } from "sonner"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatSelectedHtmlElements } from "@/components/chat/chat-selected-html-elements"
+import { ChatMessage } from "@/types"
 
 interface ChatInputProps {
   showAssistant: boolean
+  handleSendMessage?: (
+    message: string,
+    chatMessages: ChatMessage[],
+    isUserMessage: boolean
+  ) => void
 }
 
-export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
+export const ChatInput: FC<ChatInputProps> = ({
+  showAssistant = true,
+  handleSendMessage
+}) => {
   useHotkey("l", () => {
     handleFocusChatInput()
   })
@@ -72,10 +81,14 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
 
   const {
     chatInputRef,
-    handleSendMessage,
+    handleSendMessage: handleSendMessageInternal,
     handleStopMessage,
     handleFocusChatInput
   } = useChatHandler()
+
+  if (!handleSendMessage) {
+    handleSendMessage = handleSendMessageInternal
+  }
 
   const { handleInputChange } = usePromptAndCommand()
 

@@ -12,8 +12,8 @@ import {
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import { ChatbotUIContext } from "@/context/context"
-import { updateApplication } from "@/db/applications"
-import { Application, LLM } from "@/types"
+import { getApplicationTools, updateApplication } from "@/db/applications"
+import { Application, LLM, LLMID } from "@/types"
 import { toast } from "sonner"
 import { Tables } from "@/supabase/types"
 import { MultiSelect } from "../ui/multi-select"
@@ -22,6 +22,7 @@ import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { Label } from "@/components/ui/label"
 import { Description } from "../ui/description"
+import { RadioGroupItem, RadioGroup } from "../ui/radio-group"
 
 const themes = [
   "light",
@@ -59,119 +60,83 @@ const themes = [
 ]
 
 interface UpdateApplicationProps {
-  application: Tables<"applications">
-  onUpdateApplication: (application: Tables<"applications">) => void
-  onCancel: () => void
+  application: Tables<"applications"> & {
+    models: LLMID[]
+    tools: Tables<"tools">[]
+  }
+  onUpdateApplication: (
+    application: Tables<"applications"> & {
+      tools: Tables<"tools">[]
+      models: LLMID[]
+    }
+  ) => void
 }
 
 export const UpdateApplication: FC<UpdateApplicationProps> = ({
   application,
-  onUpdateApplication,
-  onCancel
+  onUpdateApplication
 }) => {
-  const { profile, selectedWorkspace, tools, allModels } =
-    useContext(ChatbotUIContext)
+  const { tools, allModels } = useContext(ChatbotUIContext)
   const [name, setName] = useState(application.name)
   const [description, setDescription] = useState(application.description)
   const [sharing, setSharing] = useState<Application["sharing"]>(
     application.sharing
   )
-  const [selectedTools, setSelectedTools] = useState<string[]>([])
-  const [selectedModels, setSelectedModels] = useState<LLM[]>([])
+  const [selectedTools, setSelectedTools] = useState<string[]>([
+    ...application.tools.map(tool => tool.id)
+  ])
+  const [selectedModels, setSelectedModels] = useState<LLM[]>(
+    application.models?.map(
+      model => allModels.find(m => m.modelId === model) || []
+    ) as LLM[]
+  )
   const [theme, setTheme] = useState(application.theme || "light")
   const [applicationType, setApplicationType] = useState(
     application.application_type || "web_app"
   )
 
   useEffect(() => {
-    // Fetch current tools and models for this application
-    const fetchApplicationDetails = async () => {
-      // Fetch tools
-      // const appTools = await getApplicationTools(application.id)
-      // setSelectedTools(appTools.map(tool => tool.id))
-      // Fetch models
-      // const appModels = await getApplicationModels(application.id)
-      // setSelectedModels(appModels)
-    }
-
-    fetchApplicationDetails()
-  }, [application.id])
-
-  const handleUpdate = async () => {
-    if (!profile || !selectedWorkspace) return
-
-    try {
-      const updatedApplication: Partial<Tables<"applications">> = {
-        name,
-        description,
-        sharing,
-        updated_at: new Date().toISOString(),
-        application_type: applicationType,
-        theme: applicationType === "web_app" ? theme : undefined,
-        user_id: profile.user_id // Make sure to include the user_id
-      }
-
-      const platformTools = tools.filter(tool => tool.sharing === "platform")
-      const selectedPlatformTools = selectedTools.filter(tool =>
-        platformTools.find(platformTool => platformTool.id === tool)
-      )
-      const filteredSelectedTools = selectedTools.filter(
-        tool =>
-          !selectedPlatformTools.find(platformTool => platformTool === tool)
-      )
-
-      const result = await updateApplication(
-        application.id,
-        updatedApplication as Tables<"applications">,
-        filteredSelectedTools,
-        selectedPlatformTools,
-        selectedModels
-      )
-
-      onUpdateApplication(result)
-      toast.success("Application updated successfully")
-    } catch (error) {
-      console.error("Error updating application:", error)
-      toast.error("Failed to update application")
-    }
-  }
-
-  const appTypeTooltips = {
-    web_app:
-      "Web Apps enable theme selection, while other types have predefined layouts.",
-    chatbot: "Chatbots have a predefined layout with a chat interface.",
-    game: "Games have a predefined layout with a game interface.",
-    free_form: "Free form has no predefined layout."
-  }
+    onUpdateApplication({
+      ...application,
+      name,
+      description,
+      sharing,
+      tools: selectedTools
+        .map(tool => tools.find(t => t.id === tool))
+        .filter(Boolean) as Tables<"tools">[],
+      models: selectedModels.map(model => model.modelId),
+      theme,
+      application_type: applicationType
+    })
+  }, [])
 
   return (
-    <div className="space-y-4">
+    <div className="mx-auto max-w-xl space-y-4">
       <div>
         <Label>Application Type</Label>
         <Description>
-          Choose the type of application you want to create. This determines the
-          layout and features available.
+          Choose the type of application you want to create. <br />
+          This determines the layout and features available.
         </Description>
-        <Tabs value={applicationType} onValueChange={setApplicationType}>
-          <TabsList className="grid w-full grid-cols-4">
-            {APPLICATION_TYPES.map(type => (
-              <TabsTrigger key={type.value} value={type.value}>
-                <WithTooltip
-                  trigger={<>{type.label}</>}
-                  display={
-                    <p className="max-w-xs">
-                      {
-                        appTypeTooltips[
-                          type.value as keyof typeof appTypeTooltips
-                        ]
-                      }
-                    </p>
-                  }
-                />
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+        <RadioGroup
+          orientation="horizontal"
+          value={applicationType}
+          onValueChange={setApplicationType}
+          className="flex space-x-2"
+        >
+          {APPLICATION_TYPES.map(type => (
+            <div
+              key={type.value}
+              className="flex items-center space-x-2 text-sm"
+            >
+              <RadioGroupItem
+                key={type.value}
+                value={type.value}
+              ></RadioGroupItem>
+              <label>{type.label}</label>
+            </div>
+          ))}
+        </RadioGroup>
       </div>
 
       <div>
@@ -266,27 +231,19 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
             type applications.
           </Description>
           <Select value={theme} onValueChange={setTheme}>
-            <SelectTrigger>
+            <SelectTrigger className="capitalize">
               <SelectValue placeholder="Select theme" />
             </SelectTrigger>
             <SelectContent>
               {themes.map(t => (
-                <SelectItem key={t} value={t}>
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                <SelectItem key={t} value={t} className="capitalize">
+                  {t}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
       )}
-      <div className="space-x-2">
-        <Button onClick={handleUpdate} disabled={!name}>
-          Update Application
-        </Button>
-        <Button onClick={onCancel} variant="outline">
-          Cancel
-        </Button>
-      </div>
     </div>
   )
 }

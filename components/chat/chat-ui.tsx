@@ -26,11 +26,7 @@ import { ConversationStarters } from "@/components/chat/conversation-starters"
 import { getPromptById } from "@/db/prompts"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getChatFilesByChatId } from "@/db/chat-files"
-import {
-  getMessageById,
-  getMessagesByChatId,
-  updateMessage
-} from "@/db/messages"
+import { getMessageById, getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
@@ -40,14 +36,18 @@ import {
   parseDBMessageCodeBlocksAndContent
 } from "@/lib/messages"
 import { CodeBlock } from "@/types/chat-message"
+import { isMobileScreen } from "@/lib/mobile"
 
 interface ChatUIProps {
+  chatId?: string
   showModelSelector?: boolean
   showChatSettings?: boolean
   showAssistantSelector?: boolean
   assistant?: Tables<"assistants">
-  application?: Tables<"applications">
   onSelectCodeBlock?: (codeBlock: CodeBlock | null) => void
+  onChatCreate?: (chat: Tables<"chats">) => void
+  onChatUpdate?: (chat: Tables<"chats">) => void
+  experimentalCodeEditor: boolean // New prop
 }
 
 export const ChatUI: React.FC<ChatUIProps> = ({
@@ -55,11 +55,13 @@ export const ChatUI: React.FC<ChatUIProps> = ({
   showChatSettings = true,
   showAssistantSelector = true,
   assistant,
-  application,
-  onSelectCodeBlock
+  onSelectCodeBlock,
+  onChatCreate,
+  onChatUpdate,
+  chatId,
+  experimentalCodeEditor // Default to false
 }) => {
   const params = useParams()
-  const chatId = params.chatid as string
   const searchParams = useSearchParams()
   const { theme } = useTheme()
 
@@ -73,8 +75,6 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setChatFiles,
     setShowFilesDisplay,
     setUseRetrieval,
-    showSidebar,
-    setShowSidebar,
     selectedAssistant
   } = useContext(ChatbotUIContext)
 
@@ -85,16 +85,20 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setChatFileItems,
     setSelectedTools,
     chatMessages,
-    setChatMessages,
-    isGenerating
+    setChatMessages
   } = useContext(ChatbotUIChatContext)
 
-  const {
-    handleNewChat,
-    handleFocusChatInput,
-    handleSendMessage,
-    handleSendEdit
-  } = useChatHandler()
+  if (!onChatCreate) {
+    onChatCreate = () => {
+      window.history.pushState({}, "", `/chat/${chatId}`)
+    }
+  }
+
+  const { handleNewChat, handleFocusChatInput, handleSendMessage } =
+    useChatHandler({
+      onChatCreate,
+      onChatUpdate
+    })
 
   const { handleSelectPromptWithVariables, handleSelectAssistant } =
     usePromptAndCommand()
@@ -107,11 +111,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setIsAtBottom
   } = useScroll()
 
-  const [editorOpen, setEditorOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(true)
-  const [selectedCodeBlock, setSelectedCodeBlock] = useState<CodeBlock | null>(
-    null
-  )
 
   useHotkey("o", handleNewChat)
   useHotkey("l", handleFocusChatInput)
@@ -130,16 +130,6 @@ export const ChatUI: React.FC<ChatUIProps> = ({
   useEffect(() => {
     handleSearchParams()
   }, [searchParams])
-
-  useEffect(() => {
-    if (application) {
-      const applicationPrompt = `This is an application named "${application.name}". Description: ${application.description}. Application type: ${application.application_type}.`
-      setChatSettings(prevSettings => ({
-        ...prevSettings,
-        prompt: `${applicationPrompt}\n\n${prevSettings.prompt}`
-      }))
-    }
-  }, [application])
 
   const fetchChatData = async (): Promise<void> => {
     await Promise.all([fetchMessages(), fetchChat()])
@@ -318,7 +308,7 @@ ${content}
         codeBlocks.length > 0 &&
         !!codeBlocks[codeBlocks.length - 1].filename
       ) {
-        setSelectedCodeBlock(codeBlocks[codeBlocks.length - 1])
+        onSelectCodeBlock?.(codeBlocks[codeBlocks.length - 1])
       }
     }
   }, [chatMessages])
@@ -384,6 +374,9 @@ ${content}
     })
   }
 
+  const isMobile = isMobileScreen()
+  const isExperimentalCodeEditor = experimentalCodeEditor && !isMobile
+
   return (
     <div
       ref={scrollRef}
@@ -408,12 +401,14 @@ ${content}
               <EmptyChatView
                 selectedAssistant={selectedAssistant}
                 theme={theme}
-                application={application}
               />
             ) : (
               <>
                 <div ref={messagesStartRef} />
-                <ChatMessages onSelectCodeBlock={onSelectCodeBlock} />
+                <ChatMessages
+                  onSelectCodeBlock={onSelectCodeBlock}
+                  isExperimentalCodeEditor={isExperimentalCodeEditor}
+                />
                 <div ref={messagesEndRef} className="min-h-20 flex-1" />
               </>
             )}
@@ -428,6 +423,7 @@ ${content}
               )}
               <ChatInput
                 showAssistant={showAssistantSelector && !selectedAssistant}
+                handleSendMessage={handleSendMessage}
               />
               <ChatMessageCounter />
             </div>
@@ -441,26 +437,15 @@ ${content}
 interface EmptyChatViewProps {
   selectedAssistant: Tables<"assistants"> | null
   theme: string | undefined
-  application?: Tables<"applications">
 }
 
 const EmptyChatView: React.FC<EmptyChatViewProps> = ({
   selectedAssistant,
-  theme,
-  application
+  theme
 }) => (
   <div className="center flex w-full flex-1 flex-col items-center justify-center transition-[height]">
-    {!selectedAssistant && !application ? (
+    {!selectedAssistant ? (
       <Brand theme={theme === "dark" ? "dark" : "light"} />
-    ) : application ? (
-      <>
-        <div className="text-foreground mt-4 text-center text-2xl font-bold">
-          {application.name}
-        </div>
-        <div className="text-foreground mt-2 text-center text-sm">
-          {application.description}
-        </div>
-      </>
     ) : (
       <>
         <AssistantIcon

@@ -197,6 +197,7 @@ export interface Database {
       applications: {
         Row: {
           application_type: string
+          chat_id: string | null
           created_at: string
           description: string
           folder_id: string | null
@@ -210,6 +211,7 @@ export interface Database {
         }
         Insert: {
           application_type: string
+          chat_id?: string | null
           created_at?: string
           description: string
           folder_id?: string | null
@@ -223,6 +225,7 @@ export interface Database {
         }
         Update: {
           application_type?: string
+          chat_id?: string | null
           created_at?: string
           description?: string
           folder_id?: string | null
@@ -235,6 +238,13 @@ export interface Database {
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "applications_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "applications_folder_id_fkey"
             columns: ["folder_id"]
