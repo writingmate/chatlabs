@@ -69,6 +69,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
+  const [loadingBillingPortal, setLoadingBillingPortal] = useState(false)
+
   const router = useRouter()
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -328,6 +330,19 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     }
   }
 
+  const handleRedirectToBillingPortal = async () => {
+    setLoadingBillingPortal(true)
+    try {
+      await redirectToBillingPortal()
+    } catch (error) {
+      toast.error(
+        "Failed to redirect to billing portal. Something went wrong. Please try again."
+      )
+    } finally {
+      setLoadingBillingPortal(false)
+    }
+  }
+
   if (!profile) return null
 
   return (
@@ -517,8 +532,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 <div className={"space-y-1"}>
                   {profile.plan != PLAN_FREE ? (
                     <Button
+                      loading={loadingBillingPortal}
                       className={"w-full"}
-                      formAction={redirectToBillingPortal}
+                      onClick={handleRedirectToBillingPortal}
                     >
                       Manage subscription
                     </Button>

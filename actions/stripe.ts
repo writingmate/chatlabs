@@ -26,15 +26,16 @@ export async function createCheckoutSession(
     }
 
     if (!PLANS.includes(plan)) {
-      throw new Error("Invalid plan");
+      throw new Error(`Invalid plan: ${plan}`);
     }
 
     const prices = await stripe.prices.list({
       lookup_keys: [plan],
+      active: true,
     });
 
     if (prices.data.length === 0) {
-      throw new Error("Invalid plan");
+      throw new Error(`No active price found for plan: ${plan}`);
     }
 
     const customerId = await getOrCreateCustomer({

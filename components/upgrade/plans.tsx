@@ -1,5 +1,4 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { WithTooltip } from "@/components/ui/with-tooltip"
 import {
   IconX,
   IconSparkles,
@@ -15,11 +14,10 @@ import {
 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { PlanFeature } from "@/components/upgrade/plan-picker"
-import { useContext, useState, useRef, useEffect } from "react"
+import { useContext, useState, useRef, useEffect, useCallback } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { supabase } from "@/lib/supabase/browser-client"
 import { createCheckoutSession } from "@/actions/stripe"
-import { router } from "next/client"
 import { Badge } from "@/components/ui/badge"
 import {
   Collapsible,
@@ -29,6 +27,7 @@ import {
 import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
+import { toast } from "sonner"
 
 const BYOK_PLAN_PREFIX = "byok"
 const PRO_PLAN_PREFIX = "pro"
@@ -54,43 +53,57 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
   const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false)
 
   const formAction = async (data: FormData): Promise<void> => {
-    const user = (await supabase.auth.getUser()).data.user
+    try {
+      const user = (await supabase.auth.getUser()).data.user
 
-    if (!user) {
-      return window.location.assign("/login")
+      if (!user) {
+        return window.location.assign("/login")
+      }
+
+      data.set("email", user?.email as string)
+      data.set("userId", user?.id)
+
+      const { url } = await createCheckoutSession(data)
+
+      window.location.assign(url as string)
+    } catch (error) {
+      setLoading("")
+      toast.error(
+        "Failed to upgrade plan. Something went wrong. Please try again."
+      )
+      console.error(error)
     }
-
-    data.set("email", user?.email as string)
-    data.set("userId", user?.id)
-
-    const { url } = await createCheckoutSession(data)
-
-    window.location.assign(url as string)
   }
 
-  function createFormAction(plan_prefix: string) {
-    return (data: FormData) => {
-      const plan = `${plan_prefix}_${billingCycle}`
-      data.set("plan", plan)
-      return formAction(data)
-    }
-  }
+  const createFormAction = useCallback(
+    (plan_prefix: string) => {
+      return (data: FormData) => {
+        const plan = `${plan_prefix}_${billingCycle}`
+        data.set("plan", plan)
+        return formAction(data)
+      }
+    },
+    [billingCycle]
+  )
 
-  const handleClick = (plan: string) => {
-    const event = `click_${plan}_${billingCycle}`
-    window.gtag?.("event", event)
-    window.dataLayer?.push({ event })
-    setLoading(plan)
-  }
+  const handleClick = useCallback(
+    (plan: string) => {
+      const event = `click_${plan}_${billingCycle}`
+      window.gtag?.("event", event)
+      window.dataLayer?.push({ event })
+      setLoading(plan)
+    },
+    [billingCycle]
+  )
 
-  const closeDialog = () => {
+  const closeDialog = useCallback(() => {
     setIsDialogVisible(false)
     onClose()
-  }
+  }, [onClose])
 
-  const toggleCollapsible = () => {
+  const toggleCollapsible = useCallback(() => {
     setIsCollapsibleOpen(prev => !prev)
-  }
+  }, [])
 
   const FeatureGroup = ({
     icon,
@@ -161,9 +174,7 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                 type={"single"}
                 className={"w-2/3 sm:translate-x-11"}
                 value={billingCycle}
-                onValueChange={value =>
-                  setBillingCycle(value as "yearly" | "monthly")
-                }
+                onValueChange={value => setBillingCycle(value as BILLING_CYCLE)}
               >
                 <ToggleGroupItem value={BILLING_CYCLE_MONTHLY}>
                   Monthly
