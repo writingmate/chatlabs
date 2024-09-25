@@ -309,6 +309,8 @@ ${content}
       ) {
         setSelectedCodeBlock(codeBlocks[codeBlocks.length - 1])
       }
+    } else {
+      setSelectedCodeBlock(null)
     }
   }, [chatMessages])
 
