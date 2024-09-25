@@ -18,6 +18,7 @@ export const getMessageById = async (messageId: string) => {
 export const getMessageCountForModel = async (model: string, since?: Date) => {
   if (!since) {
     // one day ago
+    // clone date and set it to midnight
     since = new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
   }
 

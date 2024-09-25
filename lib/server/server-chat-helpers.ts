@@ -156,9 +156,11 @@ export async function validateMessageCount(
     )
   }
 
-  // subtract 24 hours
-  let previousDate = new Date(date.getTime() - 24 * 60 * 60 * 1000)
+  // clone date and set it to midnight
+  let previousDate = new Date(date)
+  previousDate.setUTCHours(0, 0, 0, 0)
 
+  // count messages sent today starting from midnight
   const { count } = await supabase
     .from("messages")
     .select("*", {
