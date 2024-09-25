@@ -36,7 +36,7 @@ export const getMessageImageFromStorage = async (filePath: string) => {
     .createSignedUrl(filePath, 60 * 60 * 24) // 24hrs
 
   if (error) {
-    throw new Error("Error downloading message image")
+    throw new Error("Error downloading message image", error)
   }
 
   return data.signedUrl

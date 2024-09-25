@@ -289,11 +289,13 @@ export const Message: FC<MessageProps> = ({
 
   useEffect(() => {
     if (message.image_paths.length > 0) {
-      Promise.all(message.image_paths.map(getMessageImageFromStorage)).then(
-        imagePaths => {
-          setImages(imagePaths.filter(Boolean) as string[])
-        }
-      )
+      Promise.all(
+        message.image_paths.map(filePath =>
+          getMessageImageFromStorage(filePath).catch(() => null)
+        )
+      ).then(imagePaths => {
+        setImages(imagePaths.filter(Boolean) as string[])
+      })
     }
   }, [message])
 
