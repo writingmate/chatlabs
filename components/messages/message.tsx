@@ -37,6 +37,10 @@ import {
   ToolCalls
 } from "@/components/messages/annotations/toolCalls"
 import { SelectedHtmlElements } from "@/components/messages/annotations/selectedHtmlElements"
+import {
+  reconstructContentWithCodeBlocks,
+  reconstructContentWithCodeBlocksInChatMessage
+} from "@/lib/messages"
 
 const ICON_SIZE = 32
 
@@ -106,7 +110,10 @@ export const Message: FC<MessageProps> = ({
       navigator.clipboard.writeText(message.content)
     } else {
       const textArea = document.createElement("textarea")
-      textArea.value = message.content
+      textArea.value = reconstructContentWithCodeBlocks(
+        message.content,
+        codeBlocks ?? []
+      )
       document.body.appendChild(textArea)
       textArea.focus()
       textArea.select()
