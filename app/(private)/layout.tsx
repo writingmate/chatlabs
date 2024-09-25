@@ -96,11 +96,6 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             <SpeedInsights />
             <GoogleAnalytics gaId="G-Y14R2TP0QH" />
             <GoogleTagManager gtmId={"GTM-5SBXJ23Q"} />
-            <Script
-              id="nr-browser-agent"
-              strategy="beforeInteractive"
-              dangerouslySetInnerHTML={{ __html: browserTimingHeader }}
-            />
           </>
         )}
       </body>
