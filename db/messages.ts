@@ -15,7 +15,11 @@ export const getMessageById = async (messageId: string) => {
   return message
 }
 
-export const getMessageCountForModel = async (model: string, since?: Date) => {
+export const getMessageCountForModel = async (
+  userId: string,
+  model: string,
+  since?: Date
+) => {
   if (!since) {
     // one day ago
     // clone date and set it to midnight
@@ -26,6 +30,7 @@ export const getMessageCountForModel = async (model: string, since?: Date) => {
   const { count, error } = await supabase
     .from("messages")
     .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
     .gt("created_at", since.toISOString())
     .eq("role", "user")
     .eq("model", model)
