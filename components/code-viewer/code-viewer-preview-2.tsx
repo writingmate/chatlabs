@@ -17,6 +17,7 @@ interface PreviewProps2 {
   value: string
   language: string
   inspectMode: boolean
+  showFooter?: boolean
   theme: { name: string; theme: UITheme }
   setInspectMode: (inspectMode: boolean) => void
   onElementClick: (element: MessageHtmlElement) => void
@@ -26,6 +27,7 @@ interface PreviewProps2 {
 const CodeViewerPreview2: React.FC<PreviewProps2> = ({
   value: fullHtmlContent,
   inspectMode,
+  showFooter = true,
   theme,
   setInspectMode,
   onElementClick,
@@ -223,30 +225,32 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
         ))}
         <div ref={consoleEndRef} />
       </div>
-      <div className="bg-accent text-foreground flex items-center justify-end space-x-3 p-3 px-4">
-        <Button
-          size={"icon"}
-          variant={"link"}
-          className={cn(
-            "size-5 hover:opacity-50 active:opacity-75",
-            inspectMode && "text-violet-500"
-          )}
-          onClick={() => setInspectMode(!inspectMode)}
-        >
-          <IconClick size={16} stroke={1.5} />
-        </Button>
-        <Button
-          variant="link"
-          size={"icon"}
-          className={cn(
-            "console-toggle size-5 hover:opacity-50 active:opacity-75",
-            isConsoleExpanded && "text-violet-500"
-          )}
-          onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
-        >
-          <IconTerminal2 size={16} stroke={1.5} />
-        </Button>
-      </div>
+      {showFooter && (
+        <div className="bg-accent text-foreground flex items-center justify-end space-x-3 p-3 px-4">
+          <Button
+            size={"icon"}
+            variant={"link"}
+            className={cn(
+              "size-5 hover:opacity-50 active:opacity-75",
+              inspectMode && "text-violet-500"
+            )}
+            onClick={() => setInspectMode(!inspectMode)}
+          >
+            <IconClick size={16} stroke={1.5} />
+          </Button>
+          <Button
+            variant="link"
+            size={"icon"}
+            className={cn(
+              "console-toggle size-5 hover:opacity-50 active:opacity-75",
+              isConsoleExpanded && "text-violet-500"
+            )}
+            onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
+          >
+            <IconTerminal2 size={16} stroke={1.5} />
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
