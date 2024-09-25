@@ -144,6 +144,7 @@
     "@types/canvas-confetti": "^1.6.4",
     "@types/jest": "^29.5.11",
     "@types/js-yaml": "^4.0.9",
+    "@types/lodash": "^4.17.9",
     "@types/node": "^20",
     "@types/pdf-parse": "^1.1.4",
     "@types/react": "^18",
