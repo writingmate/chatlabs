@@ -2,8 +2,7 @@
 
 <img width="1464" alt="image" src="https://github.com/writingmate/chatlabs/assets/420428/aad7706f-8b8d-4671-b668-0e38babc5f09">
 
-
-[ChatLabs](https://writingmate.ai/) is all-in-one LLM chat platform with access to over 40+ LLMs in one place. 
+[ChatLabs](https://writingmate.ai/) is all-in-one LLM chat platform with access to over 40+ LLMs in one place.
 It comes with Web Search and Image Generation plugins included.
 
 ChatLabs is a fork of the [ChatbotUI](https://github.com/mckaywrigley/chatbot-ui) project.
@@ -266,9 +265,9 @@ Once deployed, you should be able to use your hosted instance of ChatLabs via th
 
 We've introduced a new feature that allows every user to access a set of platform tools directly within the application. These tools are designed to enhance your productivity and streamline your workflow. Here's a quick overview of the tools currently available:
 
-* **Web Scraper Tool**:  This tool fetches data from a URL and returns it in markdown format to the LLM. It's perfect for quickly grabbing content from web pages without having to manually copy and paste or write markdown. It also supports google fetching results from google search and summarizing youtube videos. 
+- **Web Scraper Tool**: This tool fetches data from a URL and returns it in markdown format to the LLM. It's perfect for quickly grabbing content from web pages without having to manually copy and paste or write markdown. It also supports google fetching results from google search and summarizing youtube videos.
 
-* **Image Generation Tool**:  This tool generates AI images with Dall-E. 
+- **Image Generation Tool**: This tool generates AI images with Dall-E.
 
 For adding or removing platform tools, consult the [platformToolsList.ts](./lib/platformTools/platformToolsList.ts) document.
 

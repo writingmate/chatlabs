@@ -350,63 +350,83 @@ export const fetchChatResponse = async (
   controller: AbortController,
   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setPaywallOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setPaywallOpen?: React.Dispatch<React.SetStateAction<boolean>>,
+  maxRetries = 3,
+  retryDelay = 1000
 ) => {
   let errorMessage = "Error fetching chat response"
   let errorLogLevel = toast.error
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify(body),
-      signal: controller.signal
-    })
+  const fetchWithRetry = async (retriesLeft: number): Promise<Response> => {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(body),
+        signal: controller.signal
+      })
 
-    if (!response.ok) {
-      console.error("Error fetching chat response:", response)
+      if (!response.ok) {
+        console.error("Error fetching chat response:", response)
 
-      const statusToError = {
-        404: { message: "Model not found.", logLevel: toast.error },
-        429: {
-          message:
-            "You are sending too many messages. Please try again in a few minutes.",
-          logLevel: toast.warning
-        },
-        402: {
-          message:
-            "You have reached the limit of free messages. Please upgrade to a paid plan.",
-          logLevel: toast.warning
-        },
-        413: {
-          message:
-            "Message is too long or image is too large. Please shorten it.",
-          logLevel: toast.error
+        const statusToError = {
+          404: { message: "Model not found.", logLevel: toast.error },
+          429: {
+            message:
+              "You are sending too many messages. Please try again in a few minutes.",
+            logLevel: toast.warning
+          },
+          402: {
+            message:
+              "You have reached the limit of free messages. Please upgrade to a paid plan.",
+            logLevel: toast.warning
+          },
+          413: {
+            message:
+              "Message is too long or image is too large. Please shorten it.",
+            logLevel: toast.error
+          }
         }
-      }
 
-      const errorInfo =
-        statusToError[response.status as keyof typeof statusToError]
+        const errorInfo =
+          statusToError[response.status as keyof typeof statusToError]
 
-      if (errorInfo) {
-        errorMessage = errorInfo.message
-        errorLogLevel = errorInfo.logLevel
-      } else {
-        try {
-          const errorData = await response.json()
-          errorMessage = errorData.message || errorMessage
-        } catch {
-          errorMessage = "Failed to send the message. Please try again."
+        if (errorInfo) {
+          errorMessage = errorInfo.message
+          errorLogLevel = errorInfo.logLevel
+        } else {
+          try {
+            const errorData = await response.json()
+            errorMessage = errorData.message || errorMessage
+          } catch {
+            errorMessage = "Failed to send the message. Please try again."
+          }
         }
+
+        if (response.status === 402) {
+          setPaywallOpen?.(true)
+        }
+
+        if (response.status === 504 && retriesLeft > 0) {
+          console.log("Retrying...", retriesLeft)
+          await new Promise(resolve => setTimeout(resolve, retryDelay))
+          return fetchWithRetry(retriesLeft - 1)
+        }
+
+        throw new Error(errorMessage)
       }
 
-      if (response.status === 402) {
-        setPaywallOpen?.(true)
+      return response
+    } catch (error: any) {
+      if (retriesLeft > 0) {
+        await new Promise(resolve => setTimeout(resolve, retryDelay))
+        return fetchWithRetry(retriesLeft - 1)
       }
-
-      throw new Error(errorMessage)
+      throw error
     }
+  }
 
-    return response
+  try {
+    return await fetchWithRetry(maxRetries)
   } catch (error: any) {
     console.error("Error fetching chat response:", error)
     setIsGenerating(false)
