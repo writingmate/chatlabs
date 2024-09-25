@@ -4,6 +4,10 @@ import * as amplitude from '@amplitude/analytics-browser'
 import { Experiment, ExperimentClient } from '@amplitude/experiment-js-client'
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { useAuth } from '@/context/auth'
+import { sessionReplayPlugin } from '@amplitude/plugin-session-replay-browser';
+
+
+const sessionReplayTracking = sessionReplayPlugin();
 
 interface AmplitudeContextType {
     amplitude: typeof amplitude
@@ -19,6 +23,7 @@ export function AmplitudeProvider({ children }: { children: ReactNode }) {
     const [experiment, setExperiment] = useState<ExperimentClient | null>(null)
 
     useEffect(() => {
+        amplitude.add(sessionReplayTracking)
         amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY || '959de43582eb3458ab34b08a446e036c')
         const experiment = Experiment.initializeWithAmplitudeAnalytics(
             process.env.NEXT_PUBLIC_AMPLITUDE_DEPLOYMENT_KEY || 'client-fwdKioDMLvus1pDKtgsiZZ5YCt5oiSCA',
@@ -29,13 +34,18 @@ export function AmplitudeProvider({ children }: { children: ReactNode }) {
 
         experiment.fetch().then(() => setIsReady(true))
 
+        const identify = new amplitude.Identify()
+
         if (user) {
-            amplitude.identify(new amplitude.Identify().set('email', user.email as string))
+            identify.set('email', user.email as string)
+            identify.set('id', user.id)
         }
 
         if (profile) {
-            amplitude.identify(new amplitude.Identify().set('plan', profile.plan as string))
+            identify.set('plan', profile.plan as string)
         }
+
+        amplitude.identify(identify)
     }, [user, profile])
 
     if (!experiment) {
