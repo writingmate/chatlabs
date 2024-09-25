@@ -7,10 +7,7 @@ import { ReactNode } from "react"
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-// @ts-ignore
-import * as newrelic from "newrelic"
 import "./globals.css"
-import Script from "next/script"
 
 const font = DM_Sans({ subsets: ["latin"] })
 const APP_NAME = "ChatLabs"
@@ -70,17 +67,6 @@ export const viewport: Viewport = {
 }
 
 export default async function RootLayout({ children }: RootLayoutProps) {
-  if (newrelic.agent.collector.isConnected() === false) {
-    await new Promise(resolve => {
-      newrelic.agent.on("connected", resolve)
-    })
-  }
-
-  const browserTimingHeader = newrelic.getBrowserTimingHeader({
-    hasToRemoveScriptWrapper: true,
-    allowTransactionlessInjection: true
-  })
-
   return (
     <html lang="en" suppressHydrationWarning className={"h-full"}>
       <body className={font.className + " h-full antialiased"}>
