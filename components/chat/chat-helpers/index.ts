@@ -771,6 +771,14 @@ export const handleCreateMessages = async (
       image_paths: paths
     })
 
+    console.log(
+      "paths",
+      paths,
+      newMessageImages,
+      createdUserMessage,
+      createdUserMessage.id
+    )
+
     // Update chat images state
     setChatImages(prevImages => [
       ...prevImages,

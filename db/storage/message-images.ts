@@ -20,7 +20,17 @@ export const uploadMessageImage = async (path: string, image: File) => {
   return path
 }
 
+const imageCache = new Map<string, string>()
+
 export const getMessageImageFromStorage = async (filePath: string) => {
+  if (filePath.startsWith("data")) {
+    return filePath
+  }
+
+  if (imageCache.has(filePath)) {
+    return imageCache.get(filePath)
+  }
+
   const { data, error } = await supabase.storage
     .from("message_images")
     .createSignedUrl(filePath, 60 * 60 * 24) // 24hrs
