@@ -103,14 +103,15 @@ export const Message: FC<MessageProps> = ({
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const handleCopy = () => {
+    const content = reconstructContentWithCodeBlocks(
+      message.content,
+      codeBlocks ?? []
+    )
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(message.content)
+      navigator.clipboard.writeText(content)
     } else {
       const textArea = document.createElement("textarea")
-      textArea.value = reconstructContentWithCodeBlocks(
-        message.content,
-        codeBlocks ?? []
-      )
+      textArea.value = content
       document.body.appendChild(textArea)
       textArea.focus()
       textArea.select()
