@@ -24,14 +24,14 @@ export default async function SharedChatPage({
   let chatName = ""
   let messages: Tables<"messages">[] = []
 
-  const { data: chatData } = await supabase
+  const { data: chatData, error: chatError } = await supabase
     .from("chats")
-    .select("*, messages(*)")
+    .select("*, messages!messages_chat_id_fkey(*)")
     .eq("last_shared_message_id", params.share_id)
     .single()
 
-  if (!chatData) {
-    console.error("chatData not found")
+  if (!chatData || chatError) {
+    console.error("chatData not found", chatError)
     return notFound()
   }
 
