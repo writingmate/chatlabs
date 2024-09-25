@@ -1,16 +1,19 @@
 import { Session, User } from "@supabase/supabase-js"
 import { useContext, useState, useEffect, createContext } from "react"
 import { supabase } from "@/lib/supabase/browser-client"
+import { Tables } from "@/supabase/types"
 
 // create a context for authentication
 const AuthContext = createContext<{
   session: Session | null | undefined
   user: User | null | undefined
+  profile: Tables<"profiles"> | null | undefined
   signOut: () => void
-}>({ session: null, user: null, signOut: () => {} })
+}>({ session: null, user: null, profile: null, signOut: () => {} })
 
 export const AuthProvider = ({ children }: any) => {
   const [user, setUser] = useState<User>()
+  const [profile, setProfile] = useState<Tables<"profiles">>()
   const [session, setSession] = useState<Session | null>()
   const [loading, setLoading] = useState(true)
 
@@ -21,8 +24,20 @@ export const AuthProvider = ({ children }: any) => {
         error
       } = await supabase.auth.getSession()
       if (error) throw error
+
       setSession(session)
       setUser(session?.user)
+
+      if (session?.user) {
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session?.user?.id as string)
+          .single()
+
+        if (profileData) setProfile(profileData)
+      }
+
       setLoading(false)
     }
 
@@ -44,6 +59,7 @@ export const AuthProvider = ({ children }: any) => {
   const value = {
     session,
     user,
+    profile,
     signOut: () => supabase.auth.signOut()
   }
 

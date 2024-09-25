@@ -173,7 +173,10 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
               type={"single"}
               className={"w-2/3 sm:translate-x-11"}
               value={billingCycle}
-              onValueChange={value => setBillingCycle(value as BILLING_CYCLE)}
+              onValueChange={value => {
+                if (!value) return
+                setBillingCycle(value as BILLING_CYCLE)
+              }}
             >
               <ToggleGroupItem value={BILLING_CYCLE_MONTHLY}>
                 Monthly

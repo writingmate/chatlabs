@@ -9,11 +9,10 @@ import {
 } from "@/components/ui/card"
 import { FC, useRef } from "react"
 
-export const SETUP_STEP_COUNT = 3
-
 interface StepContainerProps {
   stepDescription: string
   stepNum: number
+  totalSteps: number
   stepTitle: string
   onShouldProceed: (shouldProceed: boolean) => void
   children?: React.ReactNode
@@ -24,6 +23,7 @@ interface StepContainerProps {
 export const StepContainer: FC<StepContainerProps> = ({
   stepDescription,
   stepNum,
+  totalSteps,
   stepTitle,
   onShouldProceed,
   children,
@@ -50,7 +50,7 @@ export const StepContainer: FC<StepContainerProps> = ({
           <div>{stepTitle}</div>
 
           <div className="text-sm">
-            {stepNum} / {SETUP_STEP_COUNT}
+            {stepNum} / {totalSteps}
           </div>
         </CardTitle>
 

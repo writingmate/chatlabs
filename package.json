@@ -27,6 +27,8 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.11.6",
+    "@amplitude/experiment-js-client": "^1.11.0",
     "@anthropic-ai/sdk": "^0.24.3",
     "@apidevtools/json-schema-ref-parser": "^11.1.0",
     "@codemirror/lang-cpp": "^6.0.2",
