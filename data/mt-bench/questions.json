@@ -170,10 +170,7 @@
       "Imagine you are participating in a race with a group of people. If you have just overtaken the second person, what's your current position? Where is the person you just overtook?",
       "If the \"second person\" is changed to \"last person\" in the above question, what would the answer be?"
     ],
-    "reference": [
-      "You are in second place.",
-      "Uncertain."
-    ]
+    "reference": ["You are in second place.", "Uncertain."]
   },
   {
     "question_id": 102,
@@ -182,10 +179,7 @@
       "You can see a beautiful red house to your left and a hypnotic greenhouse to your right, an attractive heated pink place in the front. So, where is the White House?",
       "Does the original question contain any clues to definitively determine the location of the White House?"
     ],
-    "reference": [
-      "The answer is \"Washington, DC\".",
-      "No."
-    ]
+    "reference": ["The answer is \"Washington, DC\".", "No."]
   },
   {
     "question_id": 103,
@@ -194,10 +188,7 @@
       "Thomas is very healthy, but he has to go to the hospital every day. What could be the reasons?",
       "Can you explain why the above question is interesting?"
     ],
-    "reference": [
-      "Thomas may work at a hospital.",
-      ""
-    ]
+    "reference": ["Thomas may work at a hospital.", ""]
   },
   {
     "question_id": 104,
@@ -230,10 +221,7 @@
       "Each problem consists of three statements. Based on the first two statements, the third statement may be true, false, or uncertain.\n1. Oranges cost more than apples.\n2. Oranges cost less than bananas.\n3. Bananas cost more than apples and bananas cost more than orange.\nIf the first two statements are true, then the third statement is",
       "If the third statement is true. Is the first statement true, false, or uncertain? Please explain."
     ],
-    "reference": [
-      "True.",
-      "Uncertain."
-    ]
+    "reference": ["True.", "Uncertain."]
   },
   {
     "question_id": 107,
@@ -266,10 +254,7 @@
       "One morning after sunrise, Suresh was standing facing a pole. The shadow of the pole fell exactly to his right. Can you tell me the direction towards which the shadow was pointing - east, south, west, or north? Explain your reasoning steps.",
       "To which direction was Suresh facing? How do you solve this?"
     ],
-    "reference": [
-      "West",
-      "South."
-    ]
+    "reference": ["West", "South."]
   },
   {
     "question_id": 110,
@@ -278,10 +263,7 @@
       "Parents have complained to the principal about bullying during recess. The principal wants to quickly resolve this, instructing recess aides to be vigilant. Which situation should the aides report to the principal?\na) An unengaged girl is sitting alone on a bench, engrossed in a book and showing no interaction with her peers.\nb) Two boys engaged in a one-on-one basketball game are involved in a heated argument regarding the last scored basket.\nc) A group of four girls has surrounded another girl and appears to have taken possession of her backpack.\nd) Three boys are huddled over a handheld video game, which is against the rules and not permitted on school grounds.",
       "If the aides confront the group of girls from situation (c) and they deny bullying, stating that they were merely playing a game, what specific evidence should the aides look for to determine if this is a likely truth or a cover-up for bullying?"
     ],
-    "reference": [
-      "The aides should report (c).",
-      ""
-    ]
+    "reference": ["The aides should report (c).", ""]
   },
   {
     "question_id": 111,
@@ -290,10 +272,7 @@
       "The vertices of a triangle are at points (0, 0), (-1, 1), and (3, 3). What is the area of the triangle?",
       "What's area of the circle circumscribing the triangle?"
     ],
-    "reference": [
-      "Area is 3",
-      "5pi"
-    ]
+    "reference": ["Area is 3", "5pi"]
   },
   {
     "question_id": 112,
@@ -302,10 +281,7 @@
       "A tech startup invests $8000 in software development in the first year, and then invests half of that amount in software development in the second year.\nWhat's the total amount the startup invested in software development over the two years?",
       "If the startup maintains the same strategy for the third year, investing half of the previous year's amount into software development, how much will they invest in the third year?"
     ],
-    "reference": [
-      "12000",
-      "2000"
-    ]
+    "reference": ["12000", "2000"]
   },
   {
     "question_id": 113,
@@ -314,10 +290,7 @@
       "In a survey conducted at a local high school, preferences for a new school color were measured: 58% of students liked the color blue, 45% preferred green, and 22% liked both colors. If we randomly pick a student from the school, what's the probability that they would like neither blue nor green?",
       "If we select a student liked green, what's the probability that he or she would dislike both colors?"
     ],
-    "reference": [
-      "19%",
-      "0%"
-    ]
+    "reference": ["19%", "0%"]
   },
   {
     "question_id": 114,
@@ -338,18 +311,12 @@
       "Some people got on a bus at the terminal. At the first bus stop, half of the people got down and 4 more people got in. Then at the second bus stop, 6 people got down and 8 more got in. If there were a total of 25 people heading to the third stop, how many people got on the bus at the terminal?",
       "If the ticket is $2 per person, how much is the total money earned by the bus?"
     ],
-    "reference": [
-      "38 people",
-      "Total number of passenger is 50 * 2 = $100"
-    ]
+    "reference": ["38 people", "Total number of passenger is 50 * 2 = $100"]
   },
   {
     "question_id": 116,
     "category": "math",
-    "turns": [
-      "x+y = 4z, x*y = 4z^2, express x-y in z",
-      "Express z-x in y"
-    ],
+    "turns": ["x+y = 4z, x*y = 4z^2, express x-y in z", "Express z-x in y"],
     "reference": [
       "0\n\nVery simple. just (x+y)^2 - 4xy = (4z)^2 - 4*4z^2 = 0 = (x-y)^2\nso x-y = 0.",
       "(-1/2)y\n\nz-x = z - 2z = -z = (-1/2)y"
@@ -362,10 +329,7 @@
       "How many integers are in the solution of the inequality |x + 5| < 10",
       "What about |x + 10| < 5"
     ],
-    "reference": [
-      "19 integers (-14, ..., 4)",
-      "9 integers (-14, ..., -6)"
-    ]
+    "reference": ["19 integers (-14, ..., 4)", "9 integers (-14, ..., -6)"]
   },
   {
     "question_id": 118,
@@ -386,10 +350,7 @@
       "Benjamin went to a bookstore and purchased a variety of books. He bought 5 copies of a sci-fi novel, each priced at $20, 3 copies of a history book priced at $30 each, and 2 copies of a philosophy book for $45 each.\nWhat was the total cost of his purchases?",
       "Suppose Benjamin decides to sell each of these books at a 25% markup from the price he purchased them. What would be his total revenue if he sold all the books he bought?"
     ],
-    "reference": [
-      "280",
-      "350"
-    ]
+    "reference": ["280", "350"]
   },
   {
     "question_id": 120,
@@ -398,10 +359,7 @@
       "Given that f(x) = 4x^3 - 9x - 14, find the value of f(2).",
       "Find x such that f(x) = 0."
     ],
-    "reference": [
-      "f(2) = 0",
-      "x = 2"
-    ]
+    "reference": ["f(2) = 0", "x = 2"]
   },
   {
     "question_id": 121,
@@ -526,10 +484,7 @@
       "Evaluate the following movie reviews on a scale of 1 to 5, with 1 being very negative, 3 being neutral, and 5 being very positive:\n1. This movie released on Nov. 18, 2019, was phenomenal. The cinematography, the acting, the plot - everything was top-notch.\n2. Never before have I been so disappointed with a movie. The plot was predictable and the characters were one-dimensional. In my opinion, this movie is the worst one to have been released in 2022.\n3. The movie was okay. There were some parts I  enjoyed, but there were also parts that felt lackluster. This is a movie that was released in Feb 2018 and seems to be quite ordinary.\nReturn the answer as a JSON array of integers.",
       "Update your previous reply by including the release date as part of the JSON content."
     ],
-    "reference": [
-      "The answer to the first question should be [5, 1, 3].",
-      ""
-    ]
+    "reference": ["The answer to the first question should be [5, 1, 3].", ""]
   },
   {
     "question_id": 132,
@@ -558,10 +513,7 @@
       "Given the following data, identify the company with the highest profit in 2021 and provide its CEO's name:\na) Company X, with CEO Amy Williams, reported $30 billion in revenue and a $3 billion profit in 2021.\nb) Company Y, led by CEO Mark Thompson, posted a $60 billion revenue and a $6 billion profit in the same year.\nc) Company Z, under CEO Sarah Johnson, announced a $20 billion revenue and a $7 billion profit in 2021.\nd) Company W, managed by CEO James Smith, revealed a $300 billion revenue with a $21 billion profit in 2021.\ne) Company V, with CEO Lisa Brown, reported a $200 billion revenue and a $25 billion profit in 2021.\nf) Company U, under CEO John White, posted a $180 billion revenue and a $20 billion profit in the same year.",
       "Which company had the highest profit margin (profit/revenue ratio))?"
     ],
-    "reference": [
-      "Company V ($25 billion).",
-      "Company Z (35%)"
-    ]
+    "reference": ["Company V ($25 billion).", "Company Z (35%)"]
   },
   {
     "question_id": 135,
@@ -578,10 +530,7 @@
       "Please read the paragraph below and count how many times the words \"Amazon\", \"river\", and \"you\" appear. Please present the results in the format of \"word, number of appearances\" with each word on a separate line. Sort the lines in order of the number of appearances.\nThe Amazon, a mesmerizing expanse of nature's wonders, is home to the legendary Amazon River. Flowing through awe-inspiring landscapes like the Amazon rainforest, the river weaves its way through Brazil, Colombia, and Peru, giving life to countless creatures. From the mighty jaguars prowling the Amazon jungle to the vibrant macaws soaring above the canopy, this remarkable region teems with biodiversity. Deep within the river's currents, magnificent pink river dolphins gracefully glide alongside piranhas and electric eels. Along the riverbanks, you'll find bustling cities like Manaus, where the urban meets the wild, and Iquitos, a gateway to the heart of the Amazon rainforest. As you venture further, the Amazon River reveals hidden gems like the captivating Anavilhanas Archipelago, a mosaic of islands brimming with rare species. Embark on an adventure, explore the enchanting Amazon River, and immerse yourself in a world teeming with life and untamed beauty.",
       "Please repeat the same task using the words 'the', 'and', and 'to'"
     ],
-    "reference": [
-      "Amazon, 7; river, 6; you, 2",
-      "the, 17; and, 5; to, 4"
-    ]
+    "reference": ["Amazon, 7; river, 6; you, 2", "the, 17; and, 5; to, 4"]
   },
   {
     "question_id": 137,
