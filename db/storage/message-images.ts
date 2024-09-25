@@ -28,7 +28,7 @@ export const getMessageImageFromStorage = async (filePath: string) => {
   }
 
   if (imageCache.has(filePath)) {
-    return imageCache.get(filePath)
+    return imageCache.get(filePath) as string
   }
 
   const { data, error } = await supabase.storage
