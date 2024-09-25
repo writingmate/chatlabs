@@ -90,10 +90,14 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatSettings, setChatSettings] = useState<ChatSettings>(() => {
     if (typeof window !== "undefined") {
-      const storedSettings = window?.localStorage?.getItem("chatSettings")
+      try {
+        const storedSettings = window?.localStorage?.getItem("chatSettings")
 
-      if (storedSettings) {
-        return JSON.parse(storedSettings)
+        if (storedSettings) {
+          return JSON.parse(storedSettings)
+        }
+      } catch (error) {
+        console.error("Error getting chat settings:", error)
       }
     }
 
@@ -214,7 +218,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   useEffect(() => {
     if (chatSettings) {
-      localStorage.setItem("chatSettings", JSON.stringify(chatSettings))
+      try {
+        localStorage.setItem("chatSettings", JSON.stringify(chatSettings))
+      } catch (error) {
+        console.error("Error setting chat settings:", error)
+      }
     }
   }, [chatSettings])
 
