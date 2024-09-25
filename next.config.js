@@ -45,7 +45,6 @@ module.exports = {
   ),
   ...newrelicConfig
 }
-
 // Injected content via Sentry wizard below
 
 const { withSentryConfig } = require("@sentry/nextjs")
@@ -55,7 +54,7 @@ module.exports = withSentryConfig(module.exports, {
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
   org: "writingmate-dd4c76deb",
-  project: "writingmate-api",
+  project: "chatlabs",
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
@@ -87,5 +86,7 @@ module.exports = withSentryConfig(module.exports, {
   // See the following for more information:
   // https://docs.sentry.io/product/crons/
   // https://vercel.com/docs/cron-jobs
-  automaticVercelMonitors: true
+  automaticVercelMonitors: true,
+
+  authToken: process.env.SENTRY_AUTH_TOKEN,
 })
