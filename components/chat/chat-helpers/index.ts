@@ -365,7 +365,7 @@ export const fetchChatResponse = async (
         signal: controller.signal
       })
 
-      if (!response.ok && !shouldRandomlyRetry) {
+      if (!response.ok) {
         console.error("Error fetching chat response:", response)
 
         const statusToError = {
