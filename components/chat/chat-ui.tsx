@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useCallback, useContext, useEffect, useState } from "react"
-import { useParams, useSearchParams } from "next/navigation"
+import { notFound, useParams, useSearchParams } from "next/navigation"
 import { ChatbotUIContext } from "@/context/context"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { useAuth } from "@/context/auth"
@@ -123,7 +123,12 @@ export const ChatUI: React.FC<ChatUIProps> = ({
       setLoading(false)
       return
     }
-    fetchChatData()
+    try {
+      fetchChatData()
+    } catch (error) {
+      console.error(error)
+      return notFound()
+    }
   }, [params, chatId, assistant])
 
   useEffect(() => {
