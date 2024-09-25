@@ -25,7 +25,10 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
       if (!chatSettings?.model) {
         return
       }
-      const count = await getMessageCountForModel(chatSettings?.model)
+      const count = await getMessageCountForModel(
+        profile.user_id,
+        chatSettings?.model
+      )
       setMessageCount(count || 0)
     }
     fetchMessageCount()
