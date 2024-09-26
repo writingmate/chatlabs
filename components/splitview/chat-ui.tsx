@@ -109,7 +109,7 @@ const ChatWrapper = forwardRef(
         handleSendEdit,
         handleStopMessage,
         handleSendMessage: (input: string, isRegeneration: boolean) =>
-          handleSendMessage(input, chatMessages, isRegeneration, false),
+          handleSendMessage(input, chatMessages, isRegeneration),
         handleReset: () => {
           setResponseTimeTotal(0)
           setResponseTokensTotal(0)
@@ -262,22 +262,28 @@ export const ChatUI: FC<ChatUIProps> = () => {
 
   const handleSendMessage = (input: string, isRegeneration: boolean) => {
     chatMessagesRef.current.forEach(ref => {
-      ref.handleSendMessage(input, isRegeneration)
+      if (ref) {
+        ref.handleSendMessage(input, isRegeneration)
+      }
     })
   }
 
   const handleReset = () => {
     chatMessagesRef.current.forEach(ref => {
-      ref.handleReset()
+      if (ref) {
+        ref.handleReset()
+      }
     })
   }
 
   const handleStopMessage = () => {
     chatMessagesRef.current.forEach(ref => {
-      try {
-        ref.handleStopMessage()
-      } catch (e) {
-        console.error(e)
+      if (ref) {
+        try {
+          ref.handleStopMessage()
+        } catch (e) {
+          console.error(e)
+        }
       }
     })
   }

@@ -13,6 +13,14 @@ export async function createCheckoutSession(
 ): Promise<{ client_secret: string | null; url: string | null }> {
   try {
     const plan = data.get("plan") as string;
+    console.log("Received plan:", plan);
+    console.log("Available plans:", PLANS);
+
+    if (!PLANS.includes(plan)) {
+      console.error(`Plan "${plan}" is not included in PLANS array`);
+      throw new Error("Invalid plan");
+    }
+
     const userId = data.get('userId') as string;
     const email = data.get("email") as string;
 
@@ -23,10 +31,6 @@ export async function createCheckoutSession(
     const origin = headers().get("origin");
     if (!origin) {
       throw new Error("Origin header is missing");
-    }
-
-    if (!PLANS.includes(plan)) {
-      throw new Error("Invalid plan");
     }
 
     const prices = await stripe.prices.list({

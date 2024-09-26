@@ -41,6 +41,15 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
   const [billingCycle, setBillingCycle] =
     useState<BILLING_CYCLE>(BILLING_CYCLE_YEARLY)
 
+  const handleBillingCycleChange = (value: string) => {
+    if (value === BILLING_CYCLE_YEARLY || value === BILLING_CYCLE_MONTHLY) {
+      setBillingCycle(value)
+    } else {
+      console.error("Invalid billing cycle selected:", value)
+      setBillingCycle(BILLING_CYCLE_YEARLY)
+    }
+  }
+
   const [loading, setLoading] = useState("")
   const [isDialogVisible, setIsDialogVisible] = useState(true)
 
@@ -62,6 +71,7 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
   function createFormAction(plan_prefix: string) {
     return (data: FormData) => {
       const plan = `${plan_prefix}_${billingCycle}`
+      console.log("Selected plan:", plan)
       data.set("plan", plan)
       return formAction(data)
     }
@@ -116,17 +126,29 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
             <input type={"hidden"} value={billingCycle} name={"billingCycle"} />
             <div className="mx-auto my-2 flex justify-center">
               <ToggleGroup
-                type={"single"}
-                className={"w-2/3 sm:translate-x-11"}
+                type="single"
+                className="w-auto rounded-full bg-gray-200 p-1"
                 value={billingCycle}
-                onValueChange={value =>
-                  setBillingCycle(value as "yearly" | "monthly")
-                }
+                onValueChange={handleBillingCycleChange}
               >
-                <ToggleGroupItem value={BILLING_CYCLE_MONTHLY}>
+                <ToggleGroupItem
+                  value={BILLING_CYCLE_MONTHLY}
+                  className={`rounded-full px-4 py-2 transition-all duration-200 ${
+                    billingCycle === BILLING_CYCLE_MONTHLY
+                      ? "bg-violet-700 text-white shadow-lg"
+                      : "bg-transparent text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
                   {t("Monthly")}
                 </ToggleGroupItem>
-                <ToggleGroupItem value={BILLING_CYCLE_YEARLY}>
+                <ToggleGroupItem
+                  value={BILLING_CYCLE_YEARLY}
+                  className={`rounded-full px-4 py-2 transition-all duration-200 ${
+                    billingCycle === BILLING_CYCLE_YEARLY
+                      ? "bg-violet-700 text-white shadow-lg"
+                      : "bg-transparent text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
                   {t("Yearly")}
                   <span className="ml-2 line-clamp-1 text-nowrap rounded bg-green-500 px-2 py-1 text-xs text-white">
                     {t("2 months free")}
@@ -224,7 +246,7 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                 <div className="bg-token-main-surface-primary relative flex flex-col">
                   <div className="flex flex-col gap-1">
                     <p className="flex items-center space-x-2 text-xl font-semibold">
-                      <span>{t("Professional Plan")}</span>{" "}
+                      <span>{t("Professional Plan")}</span>
                       <Badge variant={"outline"}>{t("Popular")}</Badge>
                     </p>
                     <p className="text-foreground/60 mb-4 text-sm">

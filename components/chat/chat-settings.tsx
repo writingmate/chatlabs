@@ -2,20 +2,27 @@ import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLMID, ModelProvider } from "@/types"
-import React, { FC, useContext, useEffect, useRef } from "react"
+import React, { FC, useContext, useEffect, useRef, useCallback } from "react"
 import { ModelSelectChat } from "@/components/models/model-select-chat"
 import { ToolSelect } from "@/components/tools/tool-select"
 import { cn } from "@/lib/utils"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ShareChatButton } from "@/components/chat/chat-share-button"
 import LanguageSwitcher from "../languageswitcher/LanguageSwitcher"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 interface ChatSettingsProps {
   className?: string
 }
 
 export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
-  useHotkey("i", () => handleClick())
+  const router = useRouter()
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const { allModels } = useContext(ChatbotUIContext)
 
@@ -29,6 +36,13 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
       buttonRef.current.click()
     }
   }
+
+  // const handleImageGeneration = () => {
+  //   if (isClient) {
+  //     router.push('/image-generation');
+  //   }
+  // };
+  // Related to image generation feature
 
   useEffect(() => {
     if (!chatSettings) return
@@ -62,6 +76,15 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
   return (
     <div className={cn("flex items-center space-x-1", className)}>
       <LanguageSwitcher />
+
+      {/* New Text to Image Button */}
+      {/* <button
+        onClick={handleImageGeneration}
+        className="btn-sidebar"
+      >
+        Text to Image
+      </button> */}
+
       <ShareChatButton />
       {selectedModel?.tools && (
         <ToolSelect
@@ -89,13 +112,13 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
     //       <div className="text-lg">
     //         {fullModel?.modelName || chatSettings.model}
     //       </div>
-    //
+
     //       <IconAdjustmentsHorizontal size={28}/>
     //     </Button>
     //   </PopoverTrigger>
-    //
+
     //   <ModelSelect selectedModelId={chatSettings.model} onSelectModel={handleSelectModel} />
-    //
+
     //   {/*<PopoverContent*/}
     //   {/*  // className="bg-background border-input relative flex max-h-[calc(100vh-60px)] w-[300px] flex-col space-y-4 overflow-auto rounded-lg border p-6 sm:w-[350px] md:w-[400px] lg:w-[500px] dark:border-none"*/}
     //   {/*  align="end"*/}

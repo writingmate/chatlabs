@@ -37,9 +37,7 @@ export const useChatHandler = () => {
     profile,
     selectedWorkspace,
     setChats,
-    // setSelectedTools,
-    availableLocalModels,
-    availableOpenRouterModels,
+    allModels,
     newMessageImages,
     selectedAssistant,
     chatImages,
@@ -53,52 +51,59 @@ export const useChatHandler = () => {
     sourceCount,
     setIsPromptPickerOpen,
     setIsFilePickerOpen,
-    // selectedTools,
     selectedPreset,
     models,
     isPromptPickerOpen,
     isFilePickerOpen,
     isToolPickerOpen,
-    setIsPaywallOpen,
-    userInput,
-    setUserInput
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const {
+    userInput,
+    setUserInput,
     isGenerating,
     setIsGenerating,
     setChatMessages,
     setFirstTokenReceived,
     selectedChat,
     setSelectedChat,
+    setSelectedTools,
     abortController,
     setAbortController,
     chatSettings,
     chatMessages,
     chatFileItems,
     setChatFileItems,
+    selectedTools,
     setChatSettings,
+    selectedHtmlElements,
+    setResponseTimeToFirstToken,
     setResponseTimeTotal,
     setResponseTokensTotal,
-    setResponseTimeToFirstToken,
     setRequestTokensTotal,
-    selectedTools,
-    setSelectedTools
+    setSelectedHtmlElements
   } = useContext(ChatbotUIChatContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
+    if (window.top !== window.self) {
+      return
+    }
     if (!isPromptPickerOpen || !isFilePickerOpen || !isToolPickerOpen) {
       chatInputRef.current?.focus()
     }
   }, [isPromptPickerOpen, isFilePickerOpen, isToolPickerOpen])
 
-  const handleNewChat = async () => {
+  const handleNewChat = async (
+    redirectTo = "",
+    chatMessages: ChatMessage[] = []
+  ) => {
     if (!selectedWorkspace) return
 
     setUserInput("")
-    setChatMessages([])
+    setChatMessages(chatMessages)
     setSelectedChat(null)
     setChatFileItems([])
 
@@ -112,6 +117,7 @@ export const useChatHandler = () => {
     setShowFilesDisplay(false)
     setIsPromptPickerOpen(false)
     setIsFilePickerOpen(false)
+    setSelectedHtmlElements([])
 
     // setSelectedTools([])
     setToolInUse("none")
@@ -175,26 +181,9 @@ export const useChatHandler = () => {
           | "openai"
           | "local"
       })
-    } else if (selectedWorkspace) {
-      // setChatSettings({
-      //   model: (selectedWorkspace.default_model ||
-      //     "gpt-4-1106-preview") as LLMID,
-      //   prompt:
-      //     selectedWorkspace.default_prompt ||
-      //     "You are a friendly, helpful AI assistant.",
-      //   temperature: selectedWorkspace.default_temperature || 0.5,
-      //   contextLength: selectedWorkspace.default_context_length || 4096,
-      //   includeProfileContext:
-      //     selectedWorkspace.include_profile_context || true,
-      //   includeWorkspaceInstructions:
-      //     selectedWorkspace.include_workspace_instructions || true,
-      //   embeddingsProvider:
-      //     (selectedWorkspace.embeddings_provider as "openai" | "local") ||
-      //     "openai"
-      // })
     }
 
-    return router.push(`/chat`)
+    return router.push(redirectTo || `/chat`)
   }
 
   const handleFocusChatInput = () => {
@@ -213,10 +202,10 @@ export const useChatHandler = () => {
   const handleSendMessage = async (
     messageContent: string,
     chatMessages: ChatMessage[],
-    isRegeneration: boolean,
-    saveMessages = true
+    isRegeneration: boolean
   ) => {
     const startingInput = messageContent
+    console.log("startingInput", startingInput)
 
     try {
       setUserInput("")
@@ -224,24 +213,16 @@ export const useChatHandler = () => {
       setIsPromptPickerOpen(false)
       setIsFilePickerOpen(false)
       setNewMessageImages([])
+      setSelectedHtmlElements([])
 
       const newAbortController = new AbortController()
       setAbortController(newAbortController)
 
-      const modelData = [
-        ...models.map(model => ({
-          modelId: model.model_id as LLMID,
-          modelName: model.name,
-          provider: "custom" as ModelProvider,
-          hostedId: model.id,
-          platformLink: "",
-          imageInput: false,
-          supportsStreaming: false
-        })),
-        ...LLM_LIST,
-        ...availableLocalModels,
-        ...availableOpenRouterModels
-      ].find(llm => llm.modelId === chatSettings?.model)
+      const modelData = allModels.find(
+        llm =>
+          llm.modelId === chatSettings?.model ||
+          llm.hostedId === chatSettings?.model
+      )
 
       validateChatSettings(
         chatSettings,
@@ -293,13 +274,14 @@ export const useChatHandler = () => {
           : [...chatMessages, tempUserChatMessage],
         assistant: selectedChat?.assistant_id ? selectedAssistant : null,
         messageFileItems: retrievedFileItems,
-        chatFileItems: chatFileItems
+        chatFileItems: chatFileItems,
+        messageHtmlElements: selectedHtmlElements
       }
 
       let generatedText = ""
       let data = null
 
-      if (selectedTools.length > 0) {
+      if (selectedTools.length > 0 && modelData!.tools) {
         ;({ generatedText, data } = await handleToolsChat(
           payload,
           profile!,
@@ -312,11 +294,7 @@ export const useChatHandler = () => {
           setChatMessages,
           setToolInUse,
           selectedTools,
-          modelData!.supportsStreaming,
-          setResponseTimeToFirstToken,
-          setResponseTimeTotal,
-          setResponseTokensTotal,
-          setRequestTokensTotal
+          modelData!.supportsStreaming
         ))
       } else {
         if (modelData!.provider === "ollama") {
@@ -353,8 +331,6 @@ export const useChatHandler = () => {
           ))
         }
       }
-
-      if (!saveMessages) return
 
       if (!currentChat) {
         currentChat = await handleCreateChat(
@@ -401,6 +377,10 @@ export const useChatHandler = () => {
         data,
         isGenerating
       )
+
+      setIsGenerating(false)
+      setFirstTokenReceived(false)
+      // setUserInput("")
     } catch (error) {
       if (error instanceof SubscriptionRequiredError) {
         setIsPaywallOpen(true)
@@ -410,6 +390,7 @@ export const useChatHandler = () => {
     } finally {
       setIsGenerating(false)
       setFirstTokenReceived(false)
+      setUserInput(startingInput)
     }
   }
 
@@ -436,7 +417,7 @@ export const useChatHandler = () => {
 
   return {
     chatInputRef,
-    prompt,
+    // prompt,
     handleNewChat,
     handleSendMessage,
     handleFocusChatInput,

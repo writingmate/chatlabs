@@ -18,6 +18,13 @@ export async function POST(request: Request) {
     messages: any[]
   }
 
+  // Validate input data
+  if (!chatSettings || !messages || !Array.isArray(messages)) {
+    return new Response(JSON.stringify({ message: "Invalid input data" }), {
+      status: 400
+    })
+  }
+
   try {
     const profile = await getServerProfile()
 

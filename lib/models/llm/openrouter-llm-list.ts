@@ -8,8 +8,8 @@ const O1_MINI: LLM = {
   provider: "openrouter",
   hostedId: "o1-mini",
   platformLink: OPENROUTER_PLATFORM_LINK,
-  imageInput: true,
-  tools: true,
+  imageInput: false,
+  tools: false,
   supportsStreaming: true,
   paid: true,
   new: true

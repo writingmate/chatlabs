@@ -77,7 +77,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const [displayName, setDisplayName] = useState(profile?.display_name || "")
-  const [username, setUsername] = useState(profile?.username || "")
+  const [username, setUsername] = useState<string>(profile?.username ?? "")
   const [usernameAvailable, setUsernameAvailable] = useState(true)
   const [loadingUsername, setLoadingUsername] = useState(false)
   const [experimentalCodeEditor, setExperimentalCodeEditor] = useState(
@@ -87,8 +87,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     profile?.image_url || ""
   )
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null)
-  const [profileInstructions, setProfileInstructions] = useState(
-    profile?.profile_context || ""
+  const [profileInstructions, setProfileInstructions] = useState<string>(
+    profile?.profile_context ?? ""
   )
 
   const [useAzureOpenai, setUseAzureOpenai] = useState(
@@ -488,7 +488,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                   />
 
                   <LimitDisplay
-                    used={profileInstructions.length}
+                    used={profileInstructions?.length ?? 0}
                     limit={PROFILE_CONTEXT_MAX}
                   />
                 </div>

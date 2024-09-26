@@ -5,6 +5,11 @@ export async function consumeReadableStream(
   callback: (chunk: string) => void,
   signal: AbortSignal
 ): Promise<void> {
+  // Check if the stream is already locked
+  if (stream.locked) {
+    throw new Error("Stream is already locked")
+  }
+
   const reader = stream.getReader()
   const decoder = new TextDecoder()
 

@@ -368,6 +368,7 @@ export const copyFileAndFileItems = async (
   const newFileItems = originalFile.file_items.map(item => ({
     content: item.content,
     tokens: item.tokens,
+    cohere_embedding: item.cohere_embedding,
     openai_embedding: item.openai_embedding,
     local_embedding: item.local_embedding,
     user_id: userId,
