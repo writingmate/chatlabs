@@ -30,11 +30,7 @@ import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
 import { isMobileScreen } from "@/lib/mobile"
-import {
-  getPopularAssistants,
-  getPublicAssistants,
-  getPublicAssistantsOrderedByMessageCountDesc
-} from "@/db/assistants"
+import { getPopularAssistants } from "@/db/assistants"
 import { getPublicTools } from "@/db/tools"
 import { getPlatformTools } from "@/db/platform-tools"
 import { onlyUniqueById } from "@/lib/utils"
