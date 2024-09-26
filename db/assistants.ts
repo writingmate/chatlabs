@@ -64,16 +64,16 @@ export const getAssistantWorkspacesOrderedByMessageCountDesc = async (
 ) => {
   const { data: assistants, error } = await client
     .from("assistants")
-    .select("*, messages(count)", { count: "exact" })
+    .select("*, chats(count)", { count: "exact" })
     .eq("sharing", "private")
-    .eq("messages.user_id", userId)
-    .order("count", { ascending: false, referencedTable: "messages" })
+    .eq("chats.user_id", userId)
+    .order("count", { ascending: false, referencedTable: "chats" })
 
   if (error) {
     throw new Error(error.message)
   }
 
-  return assistants.sort((a, b) => b.messages[0].count - a.messages[0].count)
+  return assistants.sort((a, b) => b.chats[0].count - a.chats[0].count)
 }
 
 export const getPopularAssistants = async (
@@ -90,14 +90,14 @@ export const getPublicAssistantsOrderedByMessageCountDesc = async (
 ) => {
   const { data: assistants, error } = await client
     .from("assistants")
-    .select("*, messages (count)", { count: "exact" })
+    .select("*, chats (count)", { count: "exact" })
     .eq("sharing", "public")
-    .order("count", { ascending: false, referencedTable: "messages" })
+    .order("count", { ascending: false, referencedTable: "chats" })
   if (error) {
     throw new Error(error.message)
   }
 
-  return assistants.sort((a, b) => b.messages[0].count - a.messages[0].count)
+  return assistants.sort((a, b) => b.chats[0].count - a.chats[0].count)
 }
 
 export const getAssistantWorkspacesByAssistantId = async (

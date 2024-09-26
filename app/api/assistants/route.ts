@@ -5,9 +5,7 @@ import {
   getPublicAssistantsOrderedByMessageCountDesc
 } from "@/db/assistants"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
-import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
-import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 
 // first the assistants that user chatted with, then the most popular ones that user didn't chat with
