@@ -64,7 +64,7 @@ export const getAssistantWorkspacesOrderedByMessageCountDesc = async (
 ) => {
   const { data: assistants, error } = await client
     .from("assistants")
-    .select("*, workspaces(id), chats(count)", { count: "exact" })
+    .select("*, workspaces!inner(id), chats(count)", { count: "exact" })
     .eq("sharing", "private")
     .eq("workspaces.id", workspace_id)
     .order("count", { ascending: false, referencedTable: "chats" })
