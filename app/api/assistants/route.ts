@@ -1,8 +1,10 @@
 // endpoint returns the list of assistants for the given user
 
 import {
-  getAssistantWorkspacesOrderedByMessageCountDesc,
-  getPublicAssistantsOrderedByMessageCountDesc
+  getAssistantWorkspacesByWorkspaceId,
+  getPrivatePopularAssistantsByUserId,
+  getPublicAssistantsOrderedByMessageCountDesc,
+  getWorkspaceAssistantsByWorkspaceId
 } from "@/db/assistants"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { NextResponse } from "next/server"
@@ -25,16 +27,17 @@ export async function GET(req: Request) {
     )
 
     const response = await Promise.all([
-      getAssistantWorkspacesOrderedByMessageCountDesc(
-        workspace_id,
-        supabaseAdmin
-      ),
+      getPrivatePopularAssistantsByUserId(profile.user_id, supabaseAdmin),
+      getAssistantWorkspacesByWorkspaceId(workspace_id, supabaseAdmin),
       getPublicAssistantsOrderedByMessageCountDesc(supabaseAdmin)
     ])
 
     const assistants = [
       ...response[0],
       ...response[1].filter(
+        assistant => !response[0].some(a => a.id === assistant.id)
+      ),
+      ...response[2].filter(
         assistant => !response[0].some(a => a.id === assistant.id)
       )
     ]

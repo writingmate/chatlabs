@@ -37,9 +37,10 @@ export const getAssistantByHashId = async (
 }
 
 export const getAssistantWorkspacesByWorkspaceId = async (
-  workspaceId: string
+  workspaceId: string,
+  client: SupabaseClient = supabase
 ) => {
-  const { data: workspace, error } = await supabase
+  const { data: workspace, error } = await client
     .from("workspaces")
     .select(
       `
@@ -55,19 +56,17 @@ export const getAssistantWorkspacesByWorkspaceId = async (
     throw new Error(error.message)
   }
 
-  return workspace
+  return workspace.assistants as Tables<"assistants">[]
 }
 
-export const getAssistantWorkspacesOrderedByMessageCountDesc = async (
-  workspace_id: string,
+export const getPrivatePopularAssistantsByUserId = async (
+  userId: string,
   client: SupabaseClient = supabase
 ) => {
   const { data: assistants, error } = await client
     .from("assistants")
-    .select("*, workspaces!inner(id), chats(count)", { count: "exact" })
-    .eq("sharing", "private")
-    .eq("workspaces.id", workspace_id)
-    .order("count", { ascending: false, referencedTable: "chats" })
+    .select("*, chats!inner(count)", { count: "exact" })
+    .eq("chats.user_id", userId)
 
   if (error) {
     throw new Error(error.message)
