@@ -326,40 +326,37 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         return Promise.all(promises)
       }
 
-      await parallelize(
-        [...workspace.assistants, ...publicAssistantData],
-        async (assistant: any) => {
-          let url = assistant.image_path
-            ? getAssistantPublicImageUrl(assistant.image_path)
-            : ""
+      await parallelize(popularAssistants, async (assistant: any) => {
+        let url = assistant.image_path
+          ? getAssistantPublicImageUrl(assistant.image_path)
+          : ""
 
-          if (url) {
-            // const response = await fetch(url)
-            // const blob = await response.blob()
-            // const base64 = await convertBlobToBase64(blob)
+        if (url) {
+          // const response = await fetch(url)
+          // const blob = await response.blob()
+          // const base64 = await convertBlobToBase64(blob)
 
-            setAssistantImages(prev => [
-              ...prev,
-              {
-                assistantId: assistant.id,
-                path: assistant.image_path,
-                base64: "",
-                url
-              }
-            ])
-          } else {
-            setAssistantImages(prev => [
-              ...prev,
-              {
-                assistantId: assistant.id,
-                path: assistant.image_path,
-                base64: "",
-                url
-              }
-            ])
-          }
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: assistant.id,
+              path: assistant.image_path,
+              base64: "",
+              url
+            }
+          ])
+        } else {
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: assistant.id,
+              path: assistant.image_path,
+              base64: "",
+              url
+            }
+          ])
         }
-      )
+      })
 
       setChatSettings({
         model: (chatSettings?.model ||
