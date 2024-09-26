@@ -30,12 +30,16 @@ import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
 import { isMobileScreen } from "@/lib/mobile"
-import { getPublicAssistants } from "@/db/assistants"
+import {
+  getPopularAssistants,
+  getPublicAssistants,
+  getPublicAssistantsOrderedByMessageCountDesc
+} from "@/db/assistants"
 import { getPublicTools } from "@/db/tools"
 import { getPlatformTools } from "@/db/platform-tools"
 import { onlyUniqueById } from "@/lib/utils"
 import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
-import Loading from "@/components/ui/loading"
+import { Loading } from "@/components/ui/loading"
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -270,7 +274,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       }
     }
 
-    await fetchWorkspaceData(workspaces.find(w => w.is_home)?.id as string)
+    await fetchWorkspaceData(
+      workspaces.find(w => w.is_home)?.id as string,
+      profile?.user_id as string
+    )
     setUserInput("")
     setChatMessages([])
     setSelectedChat(null)
@@ -287,7 +294,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     return profile
   }
 
-  const fetchWorkspaceData = async (workspaceId: string) => {
+  const fetchWorkspaceData = async (workspaceId: string, userId: string) => {
     setLoading(true)
 
     try {
@@ -300,7 +307,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
       const [publicAssistantData, publicToolData, platformToolData] =
         await Promise.all([
-          getPublicAssistants(),
+          getPopularAssistants(userId),
           getPublicTools(),
           getPlatformTools()
         ])

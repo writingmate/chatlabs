@@ -303,27 +303,29 @@ export const Sidebar: FC = () => {
               {/*</Link>*/}
             </div>
 
-            <div
-              className={cn(
-                "flex grow flex-col border-t",
-                isCollapsed ? "hidden" : ""
-              )}
-            >
-              <div className="flex grow flex-col p-2 pb-0">
-                <SearchInput
-                  placeholder="Search chats"
-                  value={searchQueries.chats}
-                  onChange={value =>
-                    setSearchQueries(prev => ({ ...prev, chats: value }))
-                  }
-                />
-                <SidebarDataList
-                  contentType="chats"
-                  data={dataMap.chats}
-                  folders={foldersMap.chats}
-                />
+            {dataMap.chats.length > 0 && (
+              <div
+                className={cn(
+                  "flex grow flex-col border-t",
+                  isCollapsed ? "hidden" : ""
+                )}
+              >
+                <div className="flex grow flex-col p-2 pb-0">
+                  <SearchInput
+                    placeholder="Search chats"
+                    value={searchQueries.chats}
+                    onChange={value =>
+                      setSearchQueries(prev => ({ ...prev, chats: value }))
+                    }
+                  />
+                  <SidebarDataList
+                    contentType="chats"
+                    data={dataMap.chats}
+                    folders={foldersMap.chats}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="border-t p-2">

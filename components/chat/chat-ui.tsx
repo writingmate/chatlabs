@@ -14,7 +14,7 @@ import { ChatMessage, LLMID, MessageImage } from "@/types"
 import { Tables } from "@/supabase/types"
 import { parseIdFromSlug } from "@/lib/slugify"
 
-import Loading from "@/components/ui/loading"
+import { Loading } from "@/components/ui/loading"
 import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 import { QuickSettings } from "@/components/chat/quick-settings"
