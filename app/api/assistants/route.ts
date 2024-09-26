@@ -7,6 +7,7 @@ import {
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { getHomeWorkspaceByUserId } from "@/db/workspaces"
 
 // first the assistants that user chatted with, then the most popular ones that user didn't chat with
 export async function GET(req: Request) {
@@ -17,9 +18,15 @@ export async function GET(req: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
+
+    const workspace_id = await getHomeWorkspaceByUserId(
+      profile.user_id,
+      supabaseAdmin
+    )
+
     const response = await Promise.all([
       getAssistantWorkspacesOrderedByMessageCountDesc(
-        profile.user_id,
+        workspace_id,
         supabaseAdmin
       ),
       getPublicAssistantsOrderedByMessageCountDesc(supabaseAdmin)

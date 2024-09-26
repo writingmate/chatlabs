@@ -59,14 +59,14 @@ export const getAssistantWorkspacesByWorkspaceId = async (
 }
 
 export const getAssistantWorkspacesOrderedByMessageCountDesc = async (
-  userId: string,
+  workspace_id: string,
   client: SupabaseClient = supabase
 ) => {
   const { data: assistants, error } = await client
     .from("assistants")
-    .select("*, chats(count)", { count: "exact" })
+    .select("*, workspaces(id), chats(count)", { count: "exact" })
     .eq("sharing", "private")
-    .eq("chats.user_id", userId)
+    .eq("workspaces.id", workspace_id)
     .order("count", { ascending: false, referencedTable: "chats" })
 
   if (error) {
