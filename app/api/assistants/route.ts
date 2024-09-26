@@ -5,22 +5,26 @@ import {
   getPublicAssistantsOrderedByMessageCountDesc
 } from "@/db/assistants"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
-import { createClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
+import { Database } from "@/supabase/types"
+import { createClient } from "@supabase/supabase-js"
 
 // first the assistants that user chatted with, then the most popular ones that user didn't chat with
 export async function GET(req: Request) {
   try {
     const profile = await getServerProfile()
 
-    const supabase = createClient(cookies())
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
     const response = await Promise.all([
       getAssistantWorkspacesOrderedByMessageCountDesc(
         profile.user_id,
-        supabase
+        supabaseAdmin
       ),
-      getPublicAssistantsOrderedByMessageCountDesc(supabase)
+      getPublicAssistantsOrderedByMessageCountDesc(supabaseAdmin)
     ])
 
     const assistants = [
