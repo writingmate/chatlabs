@@ -301,14 +301,14 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       }
       setSelectedWorkspace(workspace)
 
-      const [publicAssistantData, publicToolData, platformToolData] =
+      const [popularAssistants, publicToolData, platformToolData] =
         await Promise.all([
           getPopularAssistants(userId),
           getPublicTools(),
           getPlatformTools()
         ])
 
-      setAssistants(assistants)
+      setAssistants(popularAssistants)
       setChats(workspace.chats)
       setFolders(workspace.folders)
       setFiles(workspace.files)
