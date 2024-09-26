@@ -24,7 +24,7 @@ export default function LoginForm({
   const [disabled, setDisabled] = useState(false)
   const params = useSearchParams()
 
-  redirectTo = params.get("next") || redirectTo
+  redirectTo = params?.get("next") || redirectTo
 
   const { theme } = useTheme()
 
