@@ -65,7 +65,6 @@ export const getAssistantWorkspacesOrderedByMessageCountDesc = async (
   const { data: assistants, error } = await client
     .from("assistants")
     .select("*, messages(count)", { count: "exact" })
-    .eq("user_id", userId)
     .eq("sharing", "private")
     .eq("messages.user_id", userId)
     .order("count", { ascending: false, referencedTable: "messages" })
@@ -74,7 +73,7 @@ export const getAssistantWorkspacesOrderedByMessageCountDesc = async (
     throw new Error(error.message)
   }
 
-  return assistants
+  return assistants.sort((a, b) => b.messages[0].count - a.messages[0].count)
 }
 
 export const getPopularAssistants = async (
@@ -98,7 +97,7 @@ export const getPublicAssistantsOrderedByMessageCountDesc = async (
     throw new Error(error.message)
   }
 
-  return assistants
+  return assistants.sort((a, b) => b.messages[0].count - a.messages[0].count)
 }
 
 export const getAssistantWorkspacesByAssistantId = async (
