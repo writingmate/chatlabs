@@ -308,9 +308,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
           getPlatformTools()
         ])
 
-      setAssistants(
-        [...workspace.assistants, ...publicAssistantData].filter(onlyUniqueById)
-      )
+      setAssistants(assistants)
       setChats(workspace.chats)
       setFolders(workspace.folders)
       setFiles(workspace.files)
