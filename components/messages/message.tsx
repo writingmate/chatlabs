@@ -37,6 +37,11 @@ import {
   ToolCalls
 } from "@/components/messages/annotations/toolCalls"
 import { SelectedHtmlElements } from "@/components/messages/annotations/selectedHtmlElements"
+import {
+  reconstructContentWithCodeBlocks,
+  reconstructContentWithCodeBlocksInChatMessage
+} from "@/lib/messages"
+import { getMessageImageFromStorage } from "@/db/storage/message-images"
 
 const ICON_SIZE = 32
 
@@ -75,14 +80,8 @@ export const Message: FC<MessageProps> = ({
   codeBlocks,
   isExperimentalCodeEditor
 }) => {
-  const {
-    assistants,
-    profile,
-    allModels,
-    selectedAssistant,
-    chatImages,
-    files
-  } = useContext(ChatbotUIContext)
+  const { assistants, profile, allModels, selectedAssistant, files } =
+    useContext(ChatbotUIContext)
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -99,14 +98,20 @@ export const Message: FC<MessageProps> = ({
 
   const [isVoiceToTextPlaying, setIsVoiceToTextPlaying] = useState(false)
 
+  const [images, setImages] = useState<string[]>([])
+
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const handleCopy = () => {
+    const content = reconstructContentWithCodeBlocks(
+      message.content,
+      codeBlocks ?? []
+    )
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(message.content)
+      navigator.clipboard.writeText(content)
     } else {
       const textArea = document.createElement("textarea")
-      textArea.value = message.content
+      textArea.value = content
       document.body.appendChild(textArea)
       textArea.focus()
       textArea.select()
@@ -281,6 +286,18 @@ export const Message: FC<MessageProps> = ({
       input.setSelectionRange(input.value.length, input.value.length)
     }
   }, [isEditing])
+
+  useEffect(() => {
+    if (message.image_paths.length > 0) {
+      Promise.all(
+        message.image_paths.map(filePath =>
+          getMessageImageFromStorage(filePath).catch(() => null)
+        )
+      ).then(imagePaths => {
+        setImages(imagePaths.filter(Boolean) as string[])
+      })
+    }
+  }, [message])
 
   const MODEL_DATA = allModels.find(llm => llm.modelId === message.model) as LLM
 
@@ -563,16 +580,14 @@ export const Message: FC<MessageProps> = ({
           </div>
         )}
 
-        {message.image_paths.length > 0 && (
+        {images.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
-            {message.image_paths.map((path, index) => {
-              const item = chatImages.find(image => image.path === path)
-
+            {images.map((path, index) => {
               return (
                 <Image
                   key={index}
                   className="cursor-pointer rounded hover:opacity-50"
-                  src={path.startsWith("data") ? path : item?.base64}
+                  src={path}
                   alt="message image"
                   width={300}
                   height={300}
@@ -580,10 +595,8 @@ export const Message: FC<MessageProps> = ({
                     setSelectedImage({
                       messageId: message.id,
                       path,
-                      base64: path.startsWith("data")
-                        ? path
-                        : item?.base64 || "",
-                      url: path.startsWith("data") ? "" : item?.url || "",
+                      base64: "",
+                      url: path,
                       file: null
                     })
 

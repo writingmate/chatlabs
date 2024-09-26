@@ -90,7 +90,11 @@ export const Sidebar: FC = () => {
       setActiveSubmenu(null)
     } else {
       setIsCollapsed(!isCollapsed)
-      localStorage.setItem("sidebarCollapsed", (!isCollapsed).toString())
+      try {
+        localStorage.setItem("sidebarCollapsed", (!isCollapsed).toString())
+      } catch (error) {
+        console.error("Error setting sidebar collapsed state:", error)
+      }
     }
   }
 

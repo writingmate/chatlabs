@@ -9,6 +9,7 @@ import { getMessageCountForModel } from "@/db/messages"
 import { Button } from "@/components/ui/button"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { tr } from "date-fns/locale"
 
 interface ChatMessageCounterProps {}
 
@@ -25,8 +26,15 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
       if (!chatSettings?.model) {
         return
       }
-      const count = await getMessageCountForModel(chatSettings?.model)
-      setMessageCount(count || 0)
+      try {
+        const count = await getMessageCountForModel(
+          profile.user_id,
+          chatSettings?.model
+        )
+        setMessageCount(count || 0)
+      } catch (error) {
+        console.error(error)
+      }
     }
     fetchMessageCount()
   }, [profile, isGenerating, chatSettings])

@@ -6,7 +6,7 @@ import { Tables } from "@/supabase/types"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { notFound } from "next/navigation"
-import { getChatById } from "@/db/chats"
+import { parseDBMessageCodeBlocksAndContent } from "@/lib/messages"
 import { parseDBMessageCodeBlocksAndContent } from "@/lib/messages"
 
 export function generateMetadata({ params }: { params: { share_id: string } }) {
@@ -25,29 +25,18 @@ export default async function SharedChatPage({
   let chatName = ""
   let messages: Tables<"messages">[] = []
 
-  const { data: chatData } = await supabase
+  const { data: chatData, error: chatError } = await supabase
     .from("chats")
-    .select("*")
+    .select("*, messages!messages_chat_id_fkey(*)")
     .eq("last_shared_message_id", params.share_id)
     .single()
 
-  if (!chatData) {
-    console.error("chatData not found")
+  if (!chatData || chatError) {
+    console.error("chatData not found", chatError)
     return notFound()
   }
 
-  const { data: messagesData, error: messagesError } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("chat_id", chatData.id)
-    .order("created_at", { ascending: true })
-
-  if (messagesError) {
-    console.error("messagesError", messagesError)
-    return notFound()
-  }
-
-  messages = messagesData
+  messages = chatData.messages
 
   // cut messages after last shared message
   const lastSharedMessageIndex = messages.findIndex(
@@ -60,6 +49,7 @@ export default async function SharedChatPage({
   }
 
   const chatMessages = messages
+    .sort((a, b) => a.sequence_number - b.sequence_number)
     .slice(0, lastSharedMessageIndex + 1)
     .map(parseDBMessageCodeBlocksAndContent)
 
