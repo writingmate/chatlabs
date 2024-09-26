@@ -59,7 +59,13 @@ const SharePage = async ({
 
   const updateHtmlFromString = (html: string) => {
     const cleanHtml = html.replace(REGEX_FILENAME, "")
-    const parser = new DOMParser()
+    const parser = new DOMParser({
+      errorHandler: {
+        warning: () => {}
+        // error: () => {},
+        // fatalError: () => {}
+      }
+    })
     const doc = parser.parseFromString(cleanHtml, "text/html")
     return updateHtml(doc).toString()
   }
