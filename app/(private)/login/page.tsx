@@ -12,13 +12,13 @@ export default function Login() {
 
       {searchParams?.get("message") && (
         <p className="bg-accent text-foreground mt-4 rounded-lg bg-purple-300 p-4 text-center">
-          {searchParams.get("message")}
+          {searchParams?.get("message")}
         </p>
       )}
 
       {searchParams?.get("error_message") && (
         <p className="text-foreground mt-4 rounded-lg bg-red-300 p-4 text-center">
-          {searchParams.get("error_message")}
+          {searchParams?.get("error_message")}
         </p>
       )}
     </div>

@@ -35,7 +35,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
 
   const router = useRouter()
   const params = useParams()
-  const isActive = params.chatid === chat.id || selectedChat?.id === chat.id
+  const isActive = params?.chatid === chat.id || selectedChat?.id === chat.id
 
   const itemRef = useRef<HTMLDivElement>(null)
 

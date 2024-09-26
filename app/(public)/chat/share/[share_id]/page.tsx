@@ -27,7 +27,7 @@ export default async function SharedChatPage({
   const { data: chatData } = await supabase
     .from("chats")
     .select("*")
-    .eq("last_shared_message_id", params.share_id)
+    .eq("last_shared_message_id", params?.share_id)
     .single()
 
   if (!chatData) {
@@ -50,7 +50,7 @@ export default async function SharedChatPage({
 
   // cut messages after last shared message
   const lastSharedMessageIndex = messages.findIndex(
-    message => message.id === params.share_id
+    message => message.id === params?.share_id
   )
 
   if (lastSharedMessageIndex === -1) {

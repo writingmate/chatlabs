@@ -17,7 +17,7 @@ export default async function AssistantPage({
   const user = await supabase.auth.getUser()
 
   const assistant = await getAssistantByHashId(
-    parseIdFromSlug(params.id),
+    parseIdFromSlug(params?.id),
     supabase
   )
 
