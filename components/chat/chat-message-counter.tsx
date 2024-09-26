@@ -49,7 +49,10 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
   )
   const modelTier = modelData?.tier
 
-  let limit = FREE_MESSAGE_DAILY_LIMIT
+  let limit = process.env.NEXT_PUBLIC_FREE_MESSAGE_DAILY_LIMIT
+    ? parseInt(process.env.NEXT_PUBLIC_FREE_MESSAGE_DAILY_LIMIT)
+    : FREE_MESSAGE_DAILY_LIMIT
+
   let showCounter = true
 
   // we should not show the counter for pro users created before 2024-09-16 and using opus models
