@@ -30,12 +30,12 @@ import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
 import { isMobileScreen } from "@/lib/mobile"
-import { getPublicAssistants } from "@/db/assistants"
+import { getPopularAssistants } from "@/db/assistants"
 import { getPublicTools } from "@/db/tools"
 import { getPlatformTools } from "@/db/platform-tools"
 import { onlyUniqueById } from "@/lib/utils"
 import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
-import Loading from "@/components/ui/loading"
+import { Loading } from "@/components/ui/loading"
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -270,7 +270,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       }
     }
 
-    await fetchWorkspaceData(workspaces.find(w => w.is_home)?.id as string)
+    await fetchWorkspaceData(
+      workspaces.find(w => w.is_home)?.id as string,
+      profile?.user_id as string
+    )
     setUserInput("")
     setChatMessages([])
     setSelectedChat(null)
@@ -287,7 +290,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     return profile
   }
 
-  const fetchWorkspaceData = async (workspaceId: string) => {
+  const fetchWorkspaceData = async (workspaceId: string, userId: string) => {
     setLoading(true)
 
     try {
@@ -298,16 +301,14 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       }
       setSelectedWorkspace(workspace)
 
-      const [publicAssistantData, publicToolData, platformToolData] =
+      const [popularAssistants, publicToolData, platformToolData] =
         await Promise.all([
-          getPublicAssistants(),
+          getPopularAssistants(userId),
           getPublicTools(),
           getPlatformTools()
         ])
 
-      setAssistants(
-        [...workspace.assistants, ...publicAssistantData].filter(onlyUniqueById)
-      )
+      setAssistants(popularAssistants)
       setChats(workspace.chats)
       setFolders(workspace.folders)
       setFiles(workspace.files)
@@ -325,40 +326,37 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         return Promise.all(promises)
       }
 
-      await parallelize(
-        [...workspace.assistants, ...publicAssistantData],
-        async (assistant: any) => {
-          let url = assistant.image_path
-            ? getAssistantPublicImageUrl(assistant.image_path)
-            : ""
+      await parallelize(popularAssistants, async (assistant: any) => {
+        let url = assistant.image_path
+          ? getAssistantPublicImageUrl(assistant.image_path)
+          : ""
 
-          if (url) {
-            // const response = await fetch(url)
-            // const blob = await response.blob()
-            // const base64 = await convertBlobToBase64(blob)
+        if (url) {
+          // const response = await fetch(url)
+          // const blob = await response.blob()
+          // const base64 = await convertBlobToBase64(blob)
 
-            setAssistantImages(prev => [
-              ...prev,
-              {
-                assistantId: assistant.id,
-                path: assistant.image_path,
-                base64: "",
-                url
-              }
-            ])
-          } else {
-            setAssistantImages(prev => [
-              ...prev,
-              {
-                assistantId: assistant.id,
-                path: assistant.image_path,
-                base64: "",
-                url
-              }
-            ])
-          }
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: assistant.id,
+              path: assistant.image_path,
+              base64: "",
+              url
+            }
+          ])
+        } else {
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: assistant.id,
+              path: assistant.image_path,
+              base64: "",
+              url
+            }
+          ])
         }
-      )
+      })
 
       setChatSettings({
         model: (chatSettings?.model ||
