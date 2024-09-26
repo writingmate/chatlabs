@@ -3,8 +3,7 @@
 import {
   getAssistantWorkspacesByWorkspaceId,
   getPrivatePopularAssistantsByUserId,
-  getPublicAssistantsOrderedByMessageCountDesc,
-  getWorkspaceAssistantsByWorkspaceId
+  getPublicAssistantsOrderedByMessageCountDesc
 } from "@/db/assistants"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { NextResponse } from "next/server"
