@@ -23,6 +23,7 @@ import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
+import { toast } from "sonner"
 
 interface UseChatHandlerProps {
   onChatCreate?: (chat: Tables<"chats">) => void
@@ -352,7 +353,7 @@ export const useChatHandler = ({
         )
 
         if (!onChatCreate) {
-          window.history.pushState("", "", `/chat/${currentChat.id}`)
+          window.history.pushState({}, "", `/chat/${currentChat.id}`)
         }
 
         if (onChatCreate) {
@@ -397,10 +398,11 @@ export const useChatHandler = ({
       setIsGenerating(false)
       setFirstTokenReceived(false)
       // setUserInput("")
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof SubscriptionRequiredError) {
         setIsPaywallOpen(true)
       }
+      toast.error(`Something went wrong. Please try again. ${error?.message}`)
       console.error(error)
       setIsGenerating(false)
       setFirstTokenReceived(false)
