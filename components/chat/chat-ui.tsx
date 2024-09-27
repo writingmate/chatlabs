@@ -401,7 +401,7 @@ ${content}
       {/* Chat Content */}
       <div className="flex size-full">
         {loading ? (
-          <Loading />
+          <Loading withMessage={true} />
         ) : (
           <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col">
             {chatMessages?.length === 0 ? (

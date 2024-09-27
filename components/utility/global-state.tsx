@@ -392,7 +392,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }
 
   if (loading) {
-    return <Loading />
+    return <Loading withMessage={true} />
   }
 
   return (
