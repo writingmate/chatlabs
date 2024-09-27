@@ -9,7 +9,6 @@ import React, {
 } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChatUI } from "@/components/chat/chat-ui"
-import { CreateApplication } from "@/components/applications/create-application"
 import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
 import { Tables, TablesInsert } from "@/supabase/types"
 import { CodeBlock } from "@/types/chat-message"
@@ -157,6 +156,7 @@ export const CreateApplicationPage: React.FC = () => {
             </TabsContent>
             <TabsContent value="edit" className="grow overflow-y-auto">
               <UpdateApplication
+                // @ts-ignore
                 application={application!}
                 onUpdateApplication={setApplication}
               />

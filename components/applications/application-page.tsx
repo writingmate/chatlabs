@@ -301,7 +301,6 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
               <UpdateApplication
                 application={application}
                 onUpdateApplication={handleUpdateApplication}
-                onCancel={() => setActiveTab("chat")}
               />
             </TabsContent>
           </Tabs>

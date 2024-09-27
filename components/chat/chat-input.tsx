@@ -195,7 +195,7 @@ export const ChatInput: FC<ChatInputProps> = ({
       setIsPromptPickerOpen(false)
       setTranscript("")
       setUserInputBeforeRecording("")
-      handleSendMessage(userInput, chatMessages, false)
+      handleSendMessage!(userInput, chatMessages, false)
     }
 
     if (
@@ -386,7 +386,7 @@ export const ChatInput: FC<ChatInputProps> = ({
                   )}
                   onClick={() => {
                     if (!userInput || isUploading) return
-                    handleSendMessage(userInput, chatMessages, false)
+                    handleSendMessage!(userInput, chatMessages, false)
                     setTranscript("")
                     setUserInputBeforeRecording("")
                   }}

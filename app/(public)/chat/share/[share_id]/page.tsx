@@ -7,7 +7,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { notFound } from "next/navigation"
 import { parseDBMessageCodeBlocksAndContent } from "@/lib/messages"
-import { parseDBMessageCodeBlocksAndContent } from "@/lib/messages"
 
 export function generateMetadata({ params }: { params: { share_id: string } }) {
   return {
