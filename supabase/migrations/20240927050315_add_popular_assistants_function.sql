@@ -1,11 +1,7 @@
-CREATE OR REPLACE FUNCTION get_assistants_for_user(p_user_id UUID, p_workspace_id UUID)
-RETURNS TABLE (
-  id UUID,
-  name TEXT,
-  -- Include other fields from the assistants table here
-  chat_count BIGINT,
-  is_private BOOLEAN
-) AS $$
+DROP FUNCTION IF EXISTS get_assistants_for_user(UUID, UUID);
+
+CREATE FUNCTION get_assistants_for_user(p_user_id UUID, p_workspace_id UUID)
+RETURNS setof public.assistants AS $$
 BEGIN
   RETURN QUERY
   WITH user_chats AS (
@@ -36,8 +32,9 @@ BEGIN
       OR wa.id IS NOT NULL 
       OR a.sharing = 'public'
   )
-  SELECT *
-  FROM all_assistants
+  SELECT a.*
+  FROM all_assistants inner join
+    assistants a on a.id = all_assistants.id
   ORDER BY 
     is_private DESC,
     chat_count DESC,

@@ -159,7 +159,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
           assistant_id: assistantId || null,
           created_at: new Date().toISOString(),
           role: "user",
-          chat_id: chatId,
+          chat_id: chatId!,
           id: "",
           image_paths: [],
           model: model || chatSettings?.model!,
@@ -180,7 +180,7 @@ ${content}
           assistant_id: assistantId || null,
           created_at: new Date().toISOString(),
           role: "assistant",
-          chat_id: chatId,
+          chat_id: chatId!,
           id: "",
           image_paths: [],
           model: model || chatSettings?.model!,
@@ -316,7 +316,7 @@ ${content}
         onSelectCodeBlock?.(codeBlocks[codeBlocks.length - 1])
       }
     } else {
-      setSelectedCodeBlock(null)
+      onSelectCodeBlock?.(null)
     }
   }, [chatMessages])
 

@@ -76,12 +76,23 @@ export const getPrivatePopularAssistantsByUserId = async (
 }
 
 export const getPopularAssistants = async (
+  workspaceId: string,
   userId: string,
   client: SupabaseClient = supabase
 ) => {
-  const response = await fetch("/api/assistants")
-  const data = await response.json()
-  return data.assistants as Tables<"assistants">[]
+  const { data: assistants, error } = await client.rpc(
+    "get_assistants_for_user",
+    {
+      p_workspace_id: workspaceId,
+      p_user_id: userId
+    }
+  )
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return assistants
 }
 
 export const getPublicAssistantsOrderedByMessageCountDesc = async (
