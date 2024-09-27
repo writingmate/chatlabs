@@ -304,7 +304,7 @@ export const Sidebar: FC = () => {
               {/*</Link>*/}
             </div>
 
-            {dataMap.chats.length > 0 && (
+            {(searchQueries.chats || dataMap.chats.length > 0) && (
               <div
                 className={cn(
                   "flex grow flex-col border-t",
