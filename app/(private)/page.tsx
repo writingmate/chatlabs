@@ -23,7 +23,7 @@ export default function HomePage() {
   return (
     <>
       <Dashboard>
-        <ChatUI />
+        <ChatUI experimentalCodeEditor={false} />
       </Dashboard>
       <LoginDialog />
     </>

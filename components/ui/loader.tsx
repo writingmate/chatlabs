@@ -16,9 +16,11 @@ const INITIAL_TIMEOUT = 3000
 const MESSAGE_INTERVAL = 3000
 const FADE_DURATION = 500 // Duration for fade effect in milliseconds
 
-interface LoaderProps {}
+interface LoaderProps {
+  withMessage?: boolean
+}
 
-export const Loader: FC<LoaderProps> = () => {
+export const Loader: FC<LoaderProps> = ({ withMessage = false }) => {
   const [messageIndex, setMessageIndex] = useState(0)
   const [message, setMessage] = useState("")
   const [isVisible, setIsVisible] = useState(true)
@@ -47,6 +49,14 @@ export const Loader: FC<LoaderProps> = () => {
 
     return () => clearTimeout(timer)
   }, [])
+
+  if (!withMessage) {
+    return (
+      <div className="animate-fade-in flex size-full items-center justify-center">
+        <IconLoader2 className="size-12 animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="animate-fade-in flex size-full flex-col items-center justify-center">

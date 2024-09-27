@@ -8,6 +8,17 @@ const generateToolSchema = (tool: any) => {
         description: toolFunction.description,
         operationId: `${tool.toolName}__${toolFunction.id}`,
         parameters: toolFunction.parameters,
+        responses: toolFunction.responseSchema
+          ? {
+              200: {
+                content: {
+                  "application/json": {
+                    schema: toolFunction.responseSchema
+                  }
+                }
+              }
+            }
+          : {},
         deprecated: false
       }
     }

@@ -20,45 +20,48 @@ import { ChatMessages } from "./chat-messages"
 import { QuickSettings } from "@/components/chat/quick-settings"
 import { ChatSettings } from "@/components/chat/chat-settings"
 import { Brand } from "@/components/ui/brand"
-import { WithTooltip } from "@/components/ui/with-tooltip"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { ConversationStarters } from "@/components/chat/conversation-starters"
-import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
-
-import { IconMessagePlus } from "@tabler/icons-react"
 
 import { getPromptById } from "@/db/prompts"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getChatFilesByChatId } from "@/db/chat-files"
-import {
-  getMessageById,
-  getMessagesByChatId,
-  updateMessage
-} from "@/db/messages"
+import { getMessageById, getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { ChatMessageCounter } from "@/components/chat/chat-message-counter"
 import { getFileByHashId } from "@/db/files"
 import {
   parseChatMessageCodeBlocksAndContent,
-  parseDBMessageCodeBlocksAndContent,
-  reconstructContentWithCodeBlocks,
-  reconstructContentWithCodeBlocksInChatMessage
+  parseDBMessageCodeBlocksAndContent
 } from "@/lib/messages"
 import { CodeBlock } from "@/types/chat-message"
-import { as } from "@upstash/redis/zmscore-10fd3773"
+import { isMobileScreen } from "@/lib/mobile"
 
 interface ChatUIProps {
+  chatId?: string
   showModelSelector?: boolean
+  showChatSettings?: boolean
+  showAssistantSelector?: boolean
   assistant?: Tables<"assistants">
+  onSelectCodeBlock?: (codeBlock: CodeBlock | null) => void
+  onChatCreate?: (chat: Tables<"chats">) => void
+  onChatUpdate?: (chat: Tables<"chats">) => void
+  experimentalCodeEditor: boolean // New prop
 }
 
 export const ChatUI: React.FC<ChatUIProps> = ({
+  showModelSelector = true,
+  showChatSettings = true,
+  showAssistantSelector = true,
   assistant,
-  showModelSelector = true
+  onSelectCodeBlock,
+  onChatCreate,
+  onChatUpdate,
+  chatId,
+  experimentalCodeEditor // Default to false
 }) => {
   const params = useParams()
-  const chatId = params.chatid as string
   const searchParams = useSearchParams()
   const { theme } = useTheme()
 
@@ -72,8 +75,6 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setChatFiles,
     setShowFilesDisplay,
     setUseRetrieval,
-    showSidebar,
-    setShowSidebar,
     selectedAssistant
   } = useContext(ChatbotUIContext)
 
@@ -84,16 +85,20 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setChatFileItems,
     setSelectedTools,
     chatMessages,
-    setChatMessages,
-    isGenerating
+    setChatMessages
   } = useContext(ChatbotUIChatContext)
 
-  const {
-    handleNewChat,
-    handleFocusChatInput,
-    handleSendMessage,
-    handleSendEdit
-  } = useChatHandler()
+  if (!onChatCreate) {
+    onChatCreate = () => {
+      window.history.pushState({}, "", `/chat/${chatId}`)
+    }
+  }
+
+  const { handleNewChat, handleFocusChatInput, handleSendMessage } =
+    useChatHandler({
+      onChatCreate,
+      onChatUpdate
+    })
 
   const { handleSelectPromptWithVariables, handleSelectAssistant } =
     usePromptAndCommand()
@@ -106,11 +111,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setIsAtBottom
   } = useScroll()
 
-  const [editorOpen, setEditorOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(true)
-  const [selectedCodeBlock, setSelectedCodeBlock] = useState<CodeBlock | null>(
-    null
-  )
 
   useHotkey("o", handleNewChat)
   useHotkey("l", handleFocusChatInput)
@@ -158,7 +159,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
           assistant_id: assistantId || null,
           created_at: new Date().toISOString(),
           role: "user",
-          chat_id: chatId,
+          chat_id: chatId!,
           id: "",
           image_paths: [],
           model: model || chatSettings?.model!,
@@ -179,7 +180,7 @@ ${content}
           assistant_id: assistantId || null,
           created_at: new Date().toISOString(),
           role: "assistant",
-          chat_id: chatId,
+          chat_id: chatId!,
           id: "",
           image_paths: [],
           model: model || chatSettings?.model!,
@@ -312,10 +313,10 @@ ${content}
         codeBlocks.length > 0 &&
         !!codeBlocks[codeBlocks.length - 1].filename
       ) {
-        setSelectedCodeBlock(codeBlocks[codeBlocks.length - 1])
+        onSelectCodeBlock?.(codeBlocks[codeBlocks.length - 1])
       }
     } else {
-      setSelectedCodeBlock(null)
+      onSelectCodeBlock?.(null)
     }
   }, [chatMessages])
 
@@ -380,126 +381,63 @@ ${content}
     })
   }
 
-  const handleSelectCodeBlock = useCallback(
-    (codeBlock: CodeBlock | null): void => {
-      setSelectedCodeBlock(prev => {
-        if (codeBlock) {
-          setEditorOpen(true)
-        } else {
-          setEditorOpen(false)
-        }
-        return codeBlock
-      })
-    },
-    []
-  )
-
-  const handleCodeChange = (updatedCode: string): void => {
-    if (selectedCodeBlock) {
-      const updatedMessage = chatMessages?.find(
-        message => message.message?.id === selectedCodeBlock.messageId
-      )
-      if (
-        updatedMessage &&
-        updatedMessage.codeBlocks &&
-        updatedMessage.codeBlocks.length > 0
-      ) {
-        updatedMessage.codeBlocks[updatedMessage.codeBlocks.length - 1].code =
-          updatedCode
-        setChatMessages(prev => {
-          const updatedMessages = [...prev]
-          const index = updatedMessages.findIndex(
-            message => message.message?.id === selectedCodeBlock.messageId
-          )
-          if (index !== -1) {
-            updatedMessages[index] = updatedMessage
-          }
-          return updatedMessages
-        })
-        setSelectedCodeBlock(
-          updatedMessage.codeBlocks[updatedMessage.codeBlocks.length - 1]
-        )
-        updateMessage(updatedMessage.message!.id, {
-          content: reconstructContentWithCodeBlocks(
-            updatedMessage.message?.content || "",
-            updatedMessage.codeBlocks
-          )
-        })
-      }
-    }
-  }
-
-  const isCodeBlockEditable = useCallback(
-    (codeBlock: CodeBlock | null): boolean => {
-      if (!codeBlock) return false
-      // only allow editing if the code block is the last one in the conversation
-      // we need to find the last message that has a code block
-      const lastMessage = chatMessages
-        ?.filter(message => message.codeBlocks && message.codeBlocks.length > 0)
-        .pop()
-      return lastMessage?.message?.id === codeBlock.messageId && !isGenerating
-    },
-    [chatMessages, isGenerating]
-  )
+  const isMobile = isMobileScreen()
+  const isExperimentalCodeEditor = experimentalCodeEditor && !isMobile
 
   return (
-    <>
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="relative flex h-full flex-1 shrink-0 flex-col overflow-hidden overflow-y-auto"
-      >
-        {/* Header */}
-        <div className="bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 justify-between p-2">
-          <div className="flex items-center">
-            {!assistant && <QuickSettings />}
-          </div>
-          {showModelSelector && <ChatSettings />}
+    <div
+      ref={scrollRef}
+      onScroll={handleScroll}
+      className="relative flex h-full flex-1 shrink-0 flex-col overflow-hidden overflow-y-auto"
+    >
+      {/* Header */}
+      <div className="bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 justify-between p-2">
+        <div className="flex items-center">
+          {!assistant && showChatSettings && <QuickSettings />}
         </div>
-
-        {/* Chat Content */}
-        <div className="flex size-full">
-          {loading ? (
-            <Loading />
-          ) : (
-            <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col">
-              {chatMessages?.length === 0 ? (
-                <EmptyChatView
-                  selectedAssistant={selectedAssistant}
-                  theme={theme}
-                />
-              ) : (
-                <>
-                  <div ref={messagesStartRef} />
-                  <ChatMessages onSelectCodeBlock={handleSelectCodeBlock} />
-                  <div ref={messagesEndRef} className="min-h-20 flex-1" />
-                </>
-              )}
-              <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
-                {chatMessages?.length === 0 && (
-                  <ConversationStarters
-                    values={selectedAssistant?.conversation_starters}
-                    onSelect={(value: string) =>
-                      handleSendMessage(value, chatMessages, false)
-                    }
-                  />
-                )}
-                <ChatInput showAssistant={!selectedAssistant} />
-                <ChatMessageCounter />
-              </div>
-            </div>
-          )}
-        </div>
+        {showModelSelector && showChatSettings && <ChatSettings />}
       </div>
-      <ChatPreviewContent
-        open={editorOpen}
-        isGenerating={isGenerating}
-        selectedCodeBlock={selectedCodeBlock}
-        onSelectCodeBlock={handleSelectCodeBlock}
-        isEditable={isCodeBlockEditable(selectedCodeBlock)}
-        onCodeChange={handleCodeChange}
-      />
-    </>
+
+      {/* Chat Content */}
+      <div className="flex size-full">
+        {loading ? (
+          <Loading withMessage={true} />
+        ) : (
+          <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col">
+            {chatMessages?.length === 0 ? (
+              <EmptyChatView
+                selectedAssistant={selectedAssistant}
+                theme={theme}
+              />
+            ) : (
+              <>
+                <div ref={messagesStartRef} />
+                <ChatMessages
+                  onSelectCodeBlock={onSelectCodeBlock}
+                  isExperimentalCodeEditor={isExperimentalCodeEditor}
+                />
+                <div ref={messagesEndRef} className="min-h-20 flex-1" />
+              </>
+            )}
+            <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
+              {chatMessages?.length === 0 && (
+                <ConversationStarters
+                  values={selectedAssistant?.conversation_starters}
+                  onSelect={(value: string) =>
+                    handleSendMessage(value, chatMessages, false)
+                  }
+                />
+              )}
+              <ChatInput
+                showAssistant={showAssistantSelector && !selectedAssistant}
+                handleSendMessage={handleSendMessage}
+              />
+              <ChatMessageCounter />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -519,14 +457,14 @@ const EmptyChatView: React.FC<EmptyChatViewProps> = ({
       <>
         <AssistantIcon
           className="size-[100px] rounded-xl"
-          assistant={selectedAssistant}
+          assistant={selectedAssistant!}
           size={100}
         />
         <div className="text-foreground mt-4 text-center text-2xl font-bold">
-          {selectedAssistant.name}
+          {selectedAssistant!.name}
         </div>
         <div className="text-foreground mt-2 text-center text-sm">
-          {selectedAssistant.description}
+          {selectedAssistant!.description}
         </div>
       </>
     )}

@@ -303,7 +303,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
       const [popularAssistants, publicToolData, platformToolData] =
         await Promise.all([
-          getPopularAssistants(userId),
+          getPopularAssistants(workspaceId, userId),
           getPublicTools(),
           getPlatformTools()
         ])
@@ -392,7 +392,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }
 
   if (loading) {
-    return <Loading />
+    return <Loading withMessage={true} />
   }
 
   return (

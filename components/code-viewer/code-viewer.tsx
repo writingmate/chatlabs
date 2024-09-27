@@ -21,6 +21,7 @@ import {
 import CodeViewerSidebar from "./code-viewer-sidebar"
 import { DEFAULT_THEME, THEMES } from "./theme-config"
 import { updateMessage } from "@/db/messages" // Add this import
+import { fi } from "date-fns/locale"
 
 interface CodeViewerProps {
   isGenerating?: boolean
@@ -123,6 +124,7 @@ export const CodeViewer: FC<CodeViewerProps> = ({
           onThemeChange={() => {}}
           onFork={onFork}
           showSidebarButton={false}
+          // showSidebarButton={false}
           showForkButton={
             !!codeBlock.messageId && codeBlock.sequenceNo > -1 && !!profile
           }
