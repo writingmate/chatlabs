@@ -88,12 +88,6 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setChatMessages
   } = useContext(ChatbotUIChatContext)
 
-  if (!onChatCreate) {
-    onChatCreate = () => {
-      window.history.pushState({}, "", `/chat/${chatId}`)
-    }
-  }
-
   const { handleNewChat, handleFocusChatInput, handleSendMessage } =
     useChatHandler({
       onChatCreate,

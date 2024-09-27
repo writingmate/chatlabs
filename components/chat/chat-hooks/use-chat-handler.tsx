@@ -351,10 +351,11 @@ export const useChatHandler = ({
           setSelectedTools
         )
 
-        console.log("currentChat", currentChat, onChatCreate)
+        if (!onChatCreate) {
+          window.history.pushState("", "", `/chat/${currentChat.id}`)
+        }
 
         if (onChatCreate) {
-          console.log("onChatCreate", currentChat)
           onChatCreate(currentChat)
         }
       } else {
