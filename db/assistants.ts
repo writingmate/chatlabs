@@ -92,6 +92,7 @@ export const getPublicAssistantsOrderedByMessageCountDesc = async (
     .select("*, chats (count)", { count: "exact" })
     .eq("sharing", "public")
     .order("count", { ascending: false, referencedTable: "chats" })
+
   if (error) {
     throw new Error(error.message)
   }
