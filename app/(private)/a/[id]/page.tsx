@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
 import LoginDialog from "@/components/login/login-dialog"
 import { PlanPicker } from "@/components/upgrade/plan-picker"
+import { getServerProfile } from "@/lib/server/server-chat-helpers"
 
 export default async function AssistantPage({
   params
@@ -21,10 +22,16 @@ export default async function AssistantPage({
     supabase
   )
 
+  const profile = await getServerProfile()
+
   return (
     <ChatbotUIChatProvider id={"one"}>
       <div className={"size-full"}>
-        <ChatUI showModelSelector={false} assistant={assistant} />
+        <ChatUI
+          showModelSelector={false}
+          assistant={assistant}
+          experimentalCodeEditor={!!profile?.experimental_code_editor}
+        />
       </div>
       <PlanPicker />
       {user?.data?.user ? null : <LoginDialog />}

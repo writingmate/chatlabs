@@ -83,7 +83,11 @@ export async function buildFinalMessages(
     CHUNK_SIZE = CHAT_SETTING_LIMITS[chatSettings.model].MAX_CONTEXT_LENGTH
   }
 
-  const PROMPT_TOKENS = encode(chatSettings.prompt).length
+  if (chatSettings.prompt) {
+    BUILT_PROMPT += `\n\n${chatSettings.prompt}`
+  }
+
+  const PROMPT_TOKENS = encode(BUILT_PROMPT).length
 
   let remainingTokens = CHUNK_SIZE - PROMPT_TOKENS
 
@@ -281,11 +285,15 @@ export async function buildGoogleGeminiFinalMessages(
   BUILT_PROMPT += SYSTEM_PROMPT_CODE_EDITOR
   // }
 
+  if (chatSettings.prompt) {
+    BUILT_PROMPT += `\n\n${chatSettings.prompt}`
+  }
+
   let finalMessages = []
 
   let usedTokens = 0
   const CHUNK_SIZE = CHAT_SETTING_LIMITS[chatSettings.model].MAX_CONTEXT_LENGTH
-  const PROMPT_TOKENS = encode(chatSettings.prompt).length
+  const PROMPT_TOKENS = encode(BUILT_PROMPT).length
   let REMAINING_TOKENS = CHUNK_SIZE - PROMPT_TOKENS
 
   usedTokens += PROMPT_TOKENS

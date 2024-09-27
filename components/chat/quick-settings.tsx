@@ -10,7 +10,6 @@ import { LLMID } from "@/types"
 import { IconChevronDown, IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
 import {
@@ -29,8 +28,6 @@ import { AssistantIcon } from "@/components/assistants/assistant-icon"
 interface QuickSettingsProps {}
 
 export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
-  const { t } = useTranslation()
-
   useHotkey("p", () => setIsOpen(prevState => !prevState))
 
   const {
@@ -202,7 +199,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
                 <div className="overflow-hidden text-ellipsis">
                   {selectedPreset?.name ||
                     selectedAssistant?.name ||
-                    t("Assistants")}
+                    "Assistants"}
                 </div>
 
                 <IconChevronDown className="ml-1" />
@@ -292,7 +289,6 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
       presets,
       assistants,
       search,
-      t,
       assistantImages,
       handleSelectQuickSetting,
       inputRef,

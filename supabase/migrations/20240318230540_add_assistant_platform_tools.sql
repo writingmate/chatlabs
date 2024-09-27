@@ -23,7 +23,7 @@ CREATE INDEX assistant_platform_tools_tool_id_idx ON assistant_platform_tools(to
 
 -- RLS --
 
-ALTER TABLE assistant_tools ENABLE ROW LEVEL SECURITY;
+ALTER TABLE assistant_platform_tools ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Allow full access to own assistant_tools"
     ON assistant_platform_tools

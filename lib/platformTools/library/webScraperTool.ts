@@ -197,7 +197,21 @@ export const webScraperTool: PlatformTool = {
             type: "string"
           }
         }
-      ]
+      ],
+      responseSchema: {
+        type: "object",
+        properties: {
+          url: {
+            type: "string",
+            description: "The url that was fetched."
+          },
+          mdDoc: {
+            type: "string",
+            description:
+              "The markdown document fetched from the url. Render it in markdown format."
+          }
+        }
+      }
     },
     {
       id: "googleSearch",
@@ -218,7 +232,29 @@ Each unique link has unique reference number.
             type: "string"
           }
         }
-      ]
+      ],
+      responseSchema: {
+        type: "object",
+        properties: {
+          organic: {
+            type: "array",
+            description: "The organic search results.",
+            items: {
+              type: "object",
+              properties: {
+                title: {
+                  type: "string",
+                  description: "The title of the search result."
+                },
+                link: {
+                  type: "string",
+                  description: "The link to the search result."
+                }
+              }
+            }
+          }
+        }
+      }
     },
     {
       id: "youtubeCaptions",
@@ -238,7 +274,41 @@ Always break down youtube captions in to three sentence paragraphs and add links
             type: "string"
           }
         }
-      ]
+      ],
+      responseSchema: {
+        type: "object",
+        properties: {
+          subtitles: {
+            type: "array",
+            description: "The subtitles of the youtube video.",
+            items: {
+              type: "object",
+              properties: {
+                start: {
+                  type: "number",
+                  description: "The start time of the subtitle."
+                },
+                text: {
+                  type: "string",
+                  description: "The text of the subtitle."
+                },
+                dur: {
+                  type: "number",
+                  description: "The duration of the subtitle."
+                }
+              }
+            }
+          },
+          imageUrl: {
+            type: "string",
+            description: "The image url of the youtube video."
+          },
+          videoUrl: {
+            type: "string",
+            description: "The video url of the youtube video."
+          }
+        }
+      }
     }
   ]
 }

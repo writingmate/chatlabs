@@ -44,6 +44,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   if (isCollapsed) {
     return (
       <WithTooltip
+        asChild
         display={<div>{label}</div>}
         trigger={buttonContent}
         side="right"

@@ -49,6 +49,10 @@ const CodeViewerSidebar: FC<CodeViewerSidebarProps> = ({
   )
   const [selectedPlugins, setSelectedPlugins] = useState<Tables<"tools">[]>([])
 
+  // useEffect(() => {
+  //   updateSystemPromptWithTools()
+  // }, [selectedPlugins])
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetContent className="flex flex-col justify-between" side="right">

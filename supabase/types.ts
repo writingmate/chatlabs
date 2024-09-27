@@ -109,6 +109,45 @@ export interface Database {
           }
         ]
       }
+      application_platform_tools: {
+        Row: {
+          application_id: string
+          created_at: string
+          platform_tool_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          platform_tool_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          platform_tool_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_platform_tools_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "application_platform_tools_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       application_tools: {
         Row: {
           application_id: string
@@ -157,39 +196,55 @@ export interface Database {
       }
       applications: {
         Row: {
+          application_type: string
+          chat_id: string | null
           created_at: string
           description: string
           folder_id: string | null
           id: string
           name: string
           sharing: string
+          theme: string
           updated_at: string | null
           user_id: string
           workspace_id: string
         }
         Insert: {
+          application_type: string
+          chat_id?: string | null
           created_at?: string
           description: string
           folder_id?: string | null
           id?: string
           name: string
           sharing?: string
+          theme: string
           updated_at?: string | null
           user_id: string
           workspace_id: string
         }
         Update: {
+          application_type?: string
+          chat_id?: string | null
           created_at?: string
           description?: string
           folder_id?: string | null
           id?: string
           name?: string
           sharing?: string
+          theme?: string
           updated_at?: string | null
           user_id?: string
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "applications_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "applications_folder_id_fkey"
             columns: ["folder_id"]
