@@ -33,7 +33,7 @@ interface CodeViewerProps {
 export const CodeViewer: FC<CodeViewerProps> = ({
   codeBlock,
   className,
-  theme = "light",
+  theme,
   onClose,
   isGenerating,
   showCloseButton = false,
