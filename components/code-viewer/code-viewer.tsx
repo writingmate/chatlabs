@@ -19,7 +19,7 @@ import {
 } from "react"
 
 interface CodeViewerProps {
-  theme: string
+  theme?: string
   isGenerating?: boolean
   codeBlock: CodeBlock
   className?: string
@@ -33,7 +33,7 @@ interface CodeViewerProps {
 export const CodeViewer: FC<CodeViewerProps> = ({
   codeBlock,
   className,
-  theme,
+  theme = "light",
   onClose,
   isGenerating,
   showCloseButton = false,
