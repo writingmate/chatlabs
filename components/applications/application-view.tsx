@@ -89,6 +89,7 @@ export const ApplicationView: FC = () => {
               <TableHead>Description</TableHead>
               <TableHead>Sharing</TableHead>
               <TableHead>Theme</TableHead>
+              <TableHead>Created At</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -99,6 +100,9 @@ export const ApplicationView: FC = () => {
                 <TableCell>{app.description}</TableCell>
                 <TableCell>{app.sharing}</TableCell>
                 <TableCell>{app.theme || "Default"}</TableCell>
+                <TableCell>
+                  {new Date(app.created_at).toLocaleDateString()}
+                </TableCell>
                 <TableCell>
                   <Button
                     variant="outline"

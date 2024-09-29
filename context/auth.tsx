@@ -2,6 +2,7 @@ import { Session, User } from "@supabase/supabase-js"
 import { useContext, useState, useEffect, createContext } from "react"
 import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
+import { usePathname, useRouter } from "next/navigation"
 
 // create a context for authentication
 const AuthContext = createContext<{
@@ -16,6 +17,8 @@ export const AuthProvider = ({ children }: any) => {
   const [profile, setProfile] = useState<Tables<"profiles">>()
   const [session, setSession] = useState<Session | null>()
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     const setData = async () => {
@@ -36,9 +39,9 @@ export const AuthProvider = ({ children }: any) => {
           .single()
 
         if (profileData) setProfile(profileData)
+      } else {
+        if (pathname !== "/") router.push("/login?next=" + pathname)
       }
-
-      setLoading(false)
     }
 
     const { data: listener } = supabase.auth.onAuthStateChange(

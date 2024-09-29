@@ -78,13 +78,14 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
 
   useEffect(() => {
     if (autoScroll && ref.current?.view) {
-      ref.current?.view?.dispatch({
-        effects: EditorView.scrollIntoView(
-          ref.current?.view?.state.doc.length,
-          {
-            y: "end"
-          }
-        )
+      const view = ref.current.view
+      const doc = view.state.doc
+      const lastLine = doc.line(doc.lines)
+
+      view.dispatch({
+        effects: EditorView.scrollIntoView(lastLine.from, {
+          y: "end"
+        })
       })
     }
   }, [code, ref, autoScroll])

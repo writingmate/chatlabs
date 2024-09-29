@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabase/browser-client"
 import { Database, Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
 import { LLM, LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
+import { getPlatformTools, platformToolDefinitionById } from "./platform-tools"
 
 export const getApplicationById = async (
   applicationId: string,
@@ -26,14 +27,17 @@ export const getApplicationById = async (
   return {
     ...application,
     models: applicationModels,
-    tools: application.tools,
-    platformToolsIds: application.application_platform_tools.map(
-      tool => tool.platform_tool_id
-    )
+    tools: [
+      ...application.tools,
+      ...(await Promise.all(
+        application.application_platform_tools.map(
+          async tool => await platformToolDefinitionById(tool.platform_tool_id)
+        )
+      ))
+    ]
   } as Tables<"applications"> & {
     models: LLMID[]
     tools: Tables<"tools">[]
-    platformToolsIds: string[]
   }
 }
 
@@ -53,7 +57,7 @@ export const getApplicationsByWorkspaceId = async (workspaceId: string) => {
 
 export const createApplication = async (
   application: TablesInsert<"applications">,
-  files: string[],
+  models: string[],
   tools: string[],
   platformTools: string[]
 ) => {
@@ -78,12 +82,12 @@ export const createApplication = async (
     throw new Error(error.message)
   }
 
-  if (files.length > 0) {
-    await createApplicationFiles(
-      files.map(fileId => ({
-        user_id: application.user_id,
+  if (models.length > 0) {
+    await createApplicationModels(
+      models.map(modelId => ({
+        // user_id: application.user_id,
         application_id: createdApplication.id,
-        file_id: fileId
+        model_id: modelId
       }))
     )
   }
@@ -115,7 +119,7 @@ export const updateApplication = async (
   application: TablesUpdate<"applications">,
   tools: string[],
   platformTools: string[],
-  models: LLM[]
+  models: string[]
 ) => {
   const { data: updatedApplication, error } = await supabase
     .from("applications")
@@ -130,6 +134,7 @@ export const updateApplication = async (
 
   // Update tools
   if (tools.length > 0 || platformTools.length > 0) {
+    console.log("Updating tools", tools, platformTools)
     await updateApplicationTools(
       tools.map(toolId => ({
         user_id: application.user_id!,
@@ -154,8 +159,6 @@ const updateApplicationTools = async (
   tools: TablesInsert<"application_tools">[],
   platformTools: TablesInsert<"application_platform_tools">[]
 ) => {
-  console.log("tools", tools, "platformTools", platformTools)
-
   const applicationId =
     tools?.[0]?.application_id || platformTools?.[0]?.application_id
 
@@ -164,18 +167,18 @@ const updateApplicationTools = async (
   }
 
   // Remove existing tools
-  await supabase
-    .from("application_tools")
-    .delete()
-    .eq("application_id", applicationId)
-
-  await supabase
-    .from("application_platform_tools")
-    .delete()
-    .eq("application_id", applicationId)
 
   // Add new tools
   if (tools.length > 0) {
+    const { error: toolsDeleteError } = await supabase
+      .from("application_tools")
+      .delete()
+      .eq("application_id", applicationId)
+
+    if (toolsDeleteError) {
+      throw new Error(toolsDeleteError.message)
+    }
+
     const { error: toolsError } = await supabase
       .from("application_tools")
       .insert(tools)
@@ -187,6 +190,15 @@ const updateApplicationTools = async (
 
   // Add new platform tools
   if (platformTools.length > 0) {
+    const { error: platformToolsDeleteError } = await supabase
+      .from("application_platform_tools")
+      .delete()
+      .eq("application_id", applicationId)
+
+    if (platformToolsDeleteError) {
+      throw new Error(platformToolsDeleteError.message)
+    }
+
     const { error: platformToolsError } = await supabase
       .from("application_platform_tools")
       .insert(platformTools)
@@ -199,7 +211,7 @@ const updateApplicationTools = async (
 
 const updateApplicationModels = async (
   applicationId: string,
-  models: LLM[]
+  models: string[]
 ) => {
   // Remove existing models
   await supabase
@@ -210,7 +222,7 @@ const updateApplicationModels = async (
   // Add new models
   const modelsToInsert = models.map(model => ({
     application_id: applicationId,
-    model_id: model.modelId
+    model_id: model
   }))
 
   const { error } = await supabase
@@ -272,6 +284,19 @@ export const createApplicationTools = async (
   if (error) throw new Error(error.message)
 
   return createdApplicationTools
+}
+
+export const createApplicationModels = async (
+  items: TablesInsert<"application_models">[]
+) => {
+  const { data: createdApplicationModels, error } = await supabase
+    .from("application_models")
+    .insert(items)
+    .select("*")
+
+  if (error) throw new Error(error.message)
+
+  return createdApplicationModels
 }
 
 export const getApplicationFiles = async (applicationId: string) => {

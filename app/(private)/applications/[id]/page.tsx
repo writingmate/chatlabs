@@ -1,19 +1,42 @@
+"use client"
+
 import { ApplicationPage } from "@/components/applications/application-page"
 import { getApplicationById } from "@/db/applications"
-import { createClient } from "@/lib/supabase/server"
-import { ChatbotUIChatProvider } from "@/context/chat"
-import { notFound } from "next/navigation"
+import { Tables } from "@/supabase/types"
+import { LLMID } from "@/types"
+import React, { useEffect, useState } from "react"
+import { Loader } from "@/components/ui/loader"
 
-export default async function ApplicationDetailPage({
+export default function ApplicationDetailPage({
   params
 }: {
   params: { id: string }
 }) {
-  const supabase = createClient()
-  const application = await getApplicationById(params.id, supabase)
+  const [isLoading, setIsLoading] = useState(true)
+  const [application, setApplication] = useState<
+    | (Tables<"applications"> & {
+        models: LLMID[]
+        tools: Tables<"tools">[]
+      })
+    | null
+  >(null)
 
-  if (!application) {
-    return notFound()
+  const fetchApplication = async () => {
+    try {
+      const app = await getApplicationById(params.id)
+      setApplication(app)
+      setIsLoading(false)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchApplication()
+  }, [])
+
+  if (isLoading || !application) {
+    return <Loader withMessage={true} />
   }
 
   return <ApplicationPage application={application} />

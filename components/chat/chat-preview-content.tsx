@@ -1,19 +1,21 @@
-import { FC, useMemo } from "react"
+import React, { FC, useMemo } from "react"
 import { cn } from "@/lib/utils"
 import { CodeViewer } from "@/components/code-viewer/code-viewer"
 import { CodeBlock } from "@/types/chat-message"
 
 interface ChatPreviewContentProps {
   open: boolean
+  theme: string
   isGenerating: boolean
   selectedCodeBlock: CodeBlock | null
-  onSelectCodeBlock?: (codeBlock: CodeBlock | null) => void
+  onSelectCodeBlock: (codeBlock: CodeBlock | null) => void
   isEditable: boolean
   onCodeChange: (updatedCode: string) => void
 }
 
 export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
   open,
+  theme = "light",
   isGenerating,
   selectedCodeBlock,
   onSelectCodeBlock,
@@ -30,8 +32,9 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
       >
         {open && selectedCodeBlock && (
           <CodeViewer
+            theme={theme}
             isGenerating={isGenerating}
-            onClose={() => onSelectCodeBlock?.(null)}
+            onClose={() => onSelectCodeBlock(null)}
             className={"h-full rounded-none"}
             codeBlock={selectedCodeBlock}
             showCloseButton={true}
@@ -42,6 +45,14 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
         )}
       </div>
     ),
-    [open, isGenerating, selectedCodeBlock, isEditable, onCodeChange]
+    [
+      open,
+      isGenerating,
+      selectedCodeBlock,
+      isEditable,
+      onCodeChange,
+      onSelectCodeBlock,
+      theme
+    ]
   )
 }

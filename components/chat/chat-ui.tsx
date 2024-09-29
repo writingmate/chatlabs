@@ -1,6 +1,12 @@
 "use client"
 
-import React, { useCallback, useContext, useEffect, useState } from "react"
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useState
+} from "react"
 import { notFound, useParams, useSearchParams } from "next/navigation"
 import { ChatbotUIContext } from "@/context/context"
 import { ChatbotUIChatContext } from "@/context/chat"
@@ -37,6 +43,10 @@ import {
 } from "@/lib/messages"
 import { CodeBlock } from "@/types/chat-message"
 import { isMobileScreen } from "@/lib/mobile"
+import { IconArrowDown } from "@tabler/icons-react"
+import { Button } from "../ui/button"
+import { motion, AnimatePresence } from "framer-motion" // Add this import
+import { cn } from "@/lib/utils"
 
 interface ChatUIProps {
   chatId?: string
@@ -100,6 +110,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     scrollRef,
     messagesStartRef,
     messagesEndRef,
+    isAtBottom,
     handleScroll,
     scrollToBottom,
     setIsAtBottom
@@ -118,12 +129,15 @@ export const ChatUI: React.FC<ChatUIProps> = ({
       setLoading(false)
       return
     }
-    try {
-      fetchChatData()
-    } catch (error) {
-      console.error(error)
-      return notFound()
-    }
+    ;(async () => {
+      // New async function
+      try {
+        await fetchChatData()
+      } catch (error) {
+        console.error(error)
+        return notFound()
+      }
+    })()
   }, [params, chatId, assistant])
 
   useEffect(() => {
@@ -153,7 +167,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
           assistant_id: assistantId || null,
           created_at: new Date().toISOString(),
           role: "user",
-          chat_id: chatId!,
+          chat_id: chatId || "",
           id: "",
           image_paths: [],
           model: model || chatSettings?.model!,
@@ -174,7 +188,7 @@ ${content}
           assistant_id: assistantId || null,
           created_at: new Date().toISOString(),
           role: "assistant",
-          chat_id: chatId!,
+          chat_id: chatId || "",
           id: "",
           image_paths: [],
           model: model || chatSettings?.model!,
@@ -298,22 +312,6 @@ ${content}
     setChatMessages(fetchedMessages.map(parseDBMessageCodeBlocksAndContent))
   }
 
-  useEffect(() => {
-    if (chatMessages?.length > 0) {
-      const lastMessage = chatMessages[chatMessages.length - 1]
-      const codeBlocks = lastMessage?.codeBlocks
-      if (
-        codeBlocks &&
-        codeBlocks.length > 0 &&
-        !!codeBlocks[codeBlocks.length - 1].filename
-      ) {
-        onSelectCodeBlock?.(codeBlocks[codeBlocks.length - 1])
-      }
-    } else {
-      onSelectCodeBlock?.(null)
-    }
-  }, [chatMessages])
-
   const fetchMessageImages = async (
     messages: Tables<"messages">[]
   ): Promise<MessageImage[]> => {
@@ -385,13 +383,14 @@ ${content}
       className="relative flex h-full flex-1 shrink-0 flex-col overflow-hidden overflow-y-auto"
     >
       {/* Header */}
-      <div className="bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 justify-between p-2">
-        <div className="flex items-center">
-          {!assistant && showChatSettings && <QuickSettings />}
+      {showChatSettings && (
+        <div className="bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 justify-between p-2">
+          <div className="flex items-center">
+            {!assistant && <QuickSettings />}
+          </div>
+          {showModelSelector && <ChatSettings />}
         </div>
-        {showModelSelector && showChatSettings && <ChatSettings />}
-      </div>
-
+      )}
       {/* Chat Content */}
       <div className="flex size-full">
         {loading ? (
@@ -411,6 +410,21 @@ ${content}
                   isExperimentalCodeEditor={isExperimentalCodeEditor}
                 />
                 <div ref={messagesEndRef} className="min-h-20 flex-1" />
+
+                <div className="sticky bottom-16 mx-auto flex min-h-8">
+                  {!isAtBottom && (
+                    <Button
+                      size={"icon"}
+                      variant={"outline"}
+                      className={cn(
+                        "bg-background/80 size-8 rounded-full transition-colors duration-200"
+                      )}
+                      onClick={scrollToBottom}
+                    >
+                      <IconArrowDown size={20} stroke={2} />
+                    </Button>
+                  )}
+                </div>
               </>
             )}
             <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
@@ -440,27 +454,28 @@ interface EmptyChatViewProps {
   theme: string | undefined
 }
 
-const EmptyChatView: React.FC<EmptyChatViewProps> = ({
-  selectedAssistant,
-  theme
-}) => (
-  <div className="center flex w-full flex-1 flex-col items-center justify-center transition-[height]">
-    {!selectedAssistant ? (
-      <Brand theme={theme === "dark" ? "dark" : "light"} />
-    ) : (
-      <>
-        <AssistantIcon
-          className="size-[100px] rounded-xl"
-          assistant={selectedAssistant!}
-          size={100}
-        />
-        <div className="text-foreground mt-4 text-center text-2xl font-bold">
-          {selectedAssistant!.name}
-        </div>
-        <div className="text-foreground mt-2 text-center text-sm">
-          {selectedAssistant!.description}
-        </div>
-      </>
-    )}
-  </div>
+const EmptyChatView: React.FC<EmptyChatViewProps> = memo(
+  ({ selectedAssistant, theme }) => (
+    <div className="center flex w-full flex-1 flex-col items-center justify-center transition-[height]">
+      {!selectedAssistant ? (
+        <Brand theme={theme === "dark" ? "dark" : "light"} />
+      ) : (
+        <>
+          <AssistantIcon
+            className="size-[100px] rounded-xl"
+            assistant={selectedAssistant!}
+            size={100}
+          />
+          <div className="text-foreground mt-4 text-center text-2xl font-bold">
+            {selectedAssistant!.name}
+          </div>
+          <div className="text-foreground mt-2 text-center text-sm">
+            {selectedAssistant!.description}
+          </div>
+        </>
+      )}
+    </div>
+  )
 )
+
+EmptyChatView.displayName = "EmptyChatView"

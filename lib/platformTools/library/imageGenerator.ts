@@ -91,9 +91,7 @@ export const imageGeneratorTool: PlatformTool = {
       resultProcessingMode: "render_markdown",
       id: "generateImage", // This is the unique identifier of the tool function.
       toolFunction: imageGenerator, // This is the function that will be called when the tool function is executed.
-      description: `Generate an image from a prompt. Returns the URL of the image. 
-Never display the image in the response, nor include the link or url, it is handled in the frontend.
-Never include image url in the response for generated images. Do not say you can't display image. 
+      description: `Generate an image from a prompt. Returns a string with the markdown to display the image. 
 Do not use semi-colons when describing the image. Never use html, always use Markdown.
 You should only return the function call in tools call sections.
         `, // This is the description of the tool function.
@@ -117,7 +115,11 @@ You should only return the function call in tools call sections.
             type: "string"
           }
         }
-      ]
+      ],
+      responseSchema: {
+        type: "string",
+        description: "The markdown with URL of the generated image."
+      }
     }
   ]
 }

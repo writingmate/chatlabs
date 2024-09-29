@@ -8,30 +8,31 @@ import { ChatbotUIContext } from "@/context/context"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { useCodeChange } from "@/hooks/useCodeChange"
 import { useCodeBlockEditable } from "@/hooks/useCodeBlockEditable"
+import { useSelectCodeBlock } from "@/hooks/useSelectCodeBlock"
 
 export default function ChatPage() {
-  const [selectedCodeBlock, setSelectedCodeBlock] = useState<CodeBlock | null>(
-    null
-  )
+  const { chatMessages } = useContext(ChatbotUIChatContext)
+  const { selectedCodeBlock, handleSelectCodeBlock } =
+    useSelectCodeBlock(chatMessages)
   const { profile } = useContext(ChatbotUIContext)
   const { isGenerating } = useContext(ChatbotUIChatContext)
   const handleCodeChange = useCodeChange(
     selectedCodeBlock,
-    setSelectedCodeBlock
+    handleSelectCodeBlock
   )
   const isCodeBlockEditable = useCodeBlockEditable()
 
   return (
     <>
       <ChatUI
-        onSelectCodeBlock={setSelectedCodeBlock}
+        onSelectCodeBlock={handleSelectCodeBlock}
         experimentalCodeEditor={!!profile?.experimental_code_editor}
       />
       <ChatPreviewContent
         open={!!selectedCodeBlock}
         isGenerating={isGenerating}
         selectedCodeBlock={selectedCodeBlock}
-        onSelectCodeBlock={setSelectedCodeBlock}
+        onSelectCodeBlock={handleSelectCodeBlock}
         isEditable={isCodeBlockEditable(selectedCodeBlock)}
         onCodeChange={handleCodeChange}
       />

@@ -15,6 +15,7 @@ import { useAuth } from "@/context/auth"
 import { upsertUserQuestion } from "@/db/user_questions"
 import { motion, AnimatePresence } from "framer-motion"
 import { useFeatureFlag } from "@/lib/amplitude" // Add this import
+import { toast } from "sonner"
 
 export default function SetupPage() {
   const {
@@ -78,18 +79,25 @@ export default function SetupPage() {
       if (!user) {
         return router.push("/login")
       } else {
-        const profile = await getProfileByUserId(user.id)
+        try {
+          const profile = await getProfileByUserId(user.id)
 
-        setProfile(profile)
-        setDisplayName(
-          profile.display_name || user?.user_metadata?.display_name || ""
-        )
-        setUsername(profile.username)
+          setProfile(profile)
+          setDisplayName(
+            profile.display_name || user?.user_metadata?.display_name || ""
+          )
+          setUsername(profile.username)
 
-        if (!profile.has_onboarded || bypassOnboardingRedirect) {
+          if (!profile.has_onboarded || bypassOnboardingRedirect) {
+            setLoading(false)
+          } else {
+            redirectToHome()
+          }
+        } catch (error) {
+          console.error(error)
           setLoading(false)
-        } else {
-          redirectToHome()
+          toast.error("Something went wrong. Please try again.")
+          return router.push("/login")
         }
       }
     })()
@@ -110,9 +118,14 @@ export default function SetupPage() {
 
   const handleOnFinishShouldProceed = (proceed: boolean) => {
     if (proceed) {
-      handleSaveSetupSetting().then(() => {
-        redirectToHome()
-      })
+      handleSaveSetupSetting()
+        .then(() => {
+          redirectToHome()
+        })
+        .catch(error => {
+          console.error(error)
+          toast.error("Failed to save setup settings")
+        })
     } else {
       setCurrentStep(currentStep - 1)
     }

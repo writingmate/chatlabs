@@ -14,7 +14,6 @@ export function useFeatureFlag(
   useEffect(() => {
     if (isReady) {
       const flag = experiment.variant(flagName)
-      console.log("flag", flag, loading)
       setFlagValue(flag.value === "on" || flag.value === "true")
       setLoading(false)
     }

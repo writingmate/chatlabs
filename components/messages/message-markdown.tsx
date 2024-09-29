@@ -1,4 +1,4 @@
-import React, { FC, useState, useMemo } from "react"
+import React, { FC, useState, useMemo, useCallback } from "react"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import { MessageMarkdownMemoized } from "./message-markdown-memoized"
@@ -63,11 +63,14 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
   onSelectCodeBlock,
   experimental_code_editor
 }) => {
-  const handleCodeBlockClick = (block: CodeBlock) => {
-    if (experimental_code_editor) {
-      onSelectCodeBlock?.(block)
-    }
-  }
+  const handleCodeBlockClick = useCallback(
+    (block: CodeBlock) => {
+      if (experimental_code_editor) {
+        onSelectCodeBlock?.(block)
+      }
+    },
+    [experimental_code_editor, onSelectCodeBlock]
+  )
 
   const contentParts = useMemo(() => {
     const parts = content.split(/(\[CODE_BLOCK_\d+\])/)
