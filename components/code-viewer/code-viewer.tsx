@@ -19,7 +19,7 @@ import {
 } from "react"
 
 interface CodeViewerProps {
-  theme: string
+  theme?: string
   isGenerating?: boolean
   codeBlock: CodeBlock
   className?: string

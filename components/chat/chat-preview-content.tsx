@@ -5,7 +5,7 @@ import { CodeBlock } from "@/types/chat-message"
 
 interface ChatPreviewContentProps {
   open: boolean
-  theme: string
+  theme?: string
   isGenerating: boolean
   selectedCodeBlock: CodeBlock | null
   onSelectCodeBlock: (codeBlock: CodeBlock | null) => void

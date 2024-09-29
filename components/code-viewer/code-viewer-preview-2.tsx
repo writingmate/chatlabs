@@ -11,7 +11,7 @@ interface PreviewProps2 {
   language: string
   inspectMode: boolean
   showFooter?: boolean
-  theme: string
+  theme?: string
   setInspectMode: (inspectMode: boolean) => void
   onElementClick: (element: MessageHtmlElement) => void
   handleFixError: (error: string) => void // New prop for handling error fixes
@@ -21,7 +21,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
   value: fullHtmlContent,
   inspectMode,
   showFooter = true,
-  theme = "light",
+  theme,
   setInspectMode,
   onElementClick,
   handleFixError
@@ -49,6 +49,8 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
 
     const iframeWindow = iframe.contentWindow
     if (!iframeWindow) return
+
+    theme = theme || ""
     if (renderRef.current + theme === fullHtmlContent + theme) return
 
     renderRef.current = fullHtmlContent + theme
@@ -62,7 +64,8 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
             }
           `
 
-    dom.documentElement.setAttribute("data-theme", theme)
+    if (theme) dom.documentElement.setAttribute("data-theme", theme)
+
     dom.head.appendChild(styleElement)
 
     updateHtml(dom)
