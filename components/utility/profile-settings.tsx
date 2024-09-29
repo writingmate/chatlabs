@@ -272,50 +272,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     setIsOpen(false)
   }
 
-  const checkUsernameAvailability = useCallback(
-    debounce(async (username: string) => {
-      if (!username) return
-
-      if (username.length < PROFILE_USERNAME_MIN) {
-        setUsernameAvailable(false)
-        return
-      }
-
-      if (username.length > PROFILE_USERNAME_MAX) {
-        setUsernameAvailable(false)
-        return
-      }
-
-      const usernameRegex = /^[a-zA-Z0-9_]+$/
-      if (!usernameRegex.test(username)) {
-        setUsernameAvailable(false)
-        alert(
-          "Username must be letters, numbers, or underscores only - no other characters or spacing allowed."
-        )
-        return
-      }
-
-      setLoadingUsername(true)
-
-      const response = await fetch(`/api/username/available`, {
-        method: "POST",
-        body: JSON.stringify({ username })
-      })
-
-      const data = await response.json()
-      const isAvailable = data.isAvailable
-
-      setUsernameAvailable(isAvailable)
-
-      if (username === profile?.username) {
-        setUsernameAvailable(true)
-      }
-
-      setLoadingUsername(false)
-    }, 500),
-    []
-  )
-
   function resetToDefaults() {
     setFilesCommand("#")
     setAssistantCommand("@")

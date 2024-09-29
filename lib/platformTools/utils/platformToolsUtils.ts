@@ -3,6 +3,34 @@ import { platformToolList } from "../platformToolsList"
 import { Tables } from "@/supabase/types"
 const generateToolSchema = (tool: any) => {
   const paths = tool.toolsFunctions.reduce((acc: any, toolFunction: any) => {
+    let responses = {}
+    switch (toolFunction.responseSchema?.type) {
+      case "object":
+        responses = {
+          200: {
+            content: {
+              "application/json": {
+                schema: toolFunction.responseSchema
+              }
+            }
+          }
+        }
+        break
+      case "string":
+        responses = {
+          200: {
+            content: {
+              "text/plain": {
+                description: toolFunction.responseSchema.description
+              }
+            }
+          }
+        }
+        break
+      default:
+        break
+    }
+
     acc[`/${toolFunction.id}`] = {
       get: {
         description: toolFunction.description,

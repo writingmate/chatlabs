@@ -1,13 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
-import {
-  IconChevronDown,
-  IconChevronUp,
-  IconClick,
-  IconBulb,
-  IconX,
-  IconTerminal2
-} from "@tabler/icons-react"
-import { cn, generateRandomString } from "@/lib/utils"
+import { IconClick, IconX, IconTerminal2 } from "@tabler/icons-react"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { MessageHtmlElement } from "@/types/html"
 import { UITheme } from "./theme-configurator"
@@ -18,7 +11,7 @@ interface PreviewProps2 {
   language: string
   inspectMode: boolean
   showFooter?: boolean
-  theme: { name: string; theme: UITheme }
+  theme: string
   setInspectMode: (inspectMode: boolean) => void
   onElementClick: (element: MessageHtmlElement) => void
   handleFixError: (error: string) => void // New prop for handling error fixes
@@ -28,7 +21,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
   value: fullHtmlContent,
   inspectMode,
   showFooter = true,
-  theme,
+  theme = "light",
   setInspectMode,
   onElementClick,
   handleFixError
@@ -56,9 +49,9 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
 
     const iframeWindow = iframe.contentWindow
     if (!iframeWindow) return
-    if (renderRef.current === fullHtmlContent) return
+    if (renderRef.current + theme === fullHtmlContent + theme) return
 
-    renderRef.current = fullHtmlContent
+    renderRef.current = fullHtmlContent + theme
 
     const dom = new DOMParser().parseFromString(fullHtmlContent, "text/html")
 
@@ -68,6 +61,8 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
               outline: dashed 1px blue;
             }
           `
+
+    dom.documentElement.setAttribute("data-theme", theme)
     dom.head.appendChild(styleElement)
 
     updateHtml(dom)
@@ -115,7 +110,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
         }
       })
     }
-  }, [fullHtmlContent, inspectMode])
+  }, [fullHtmlContent, inspectMode, theme])
 
   useEffect(() => {
     const iframe = iframeRef.current

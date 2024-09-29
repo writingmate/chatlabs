@@ -32,7 +32,7 @@ async function flux1Pro(
     throw new Error("Prompt is required")
   }
 
-  if (prompt.length < 10) {
+  if (prompt.length < 3) {
     throw new Error("Prompt must be at least 10 characters long")
   }
 
@@ -88,7 +88,7 @@ export const flux1ProTools: PlatformTool = {
       toolFunction: flux1Pro, // This is the function that will be called when the tool function is executed.
       resultProcessingMode: "render_markdown",
       description: `Generate images using FLUX.1 Pro based on a text description. 
-Returns the URL of the image.
+Returns a string with the markdown to display the image. 
 Do not use semi-colons when describing the image. Never use html, always use Markdown.
         `, // This is the description of the tool function.
       parameters: [
@@ -102,7 +102,11 @@ Do not use semi-colons when describing the image. Never use html, always use Mar
             type: "string"
           }
         }
-      ]
+      ],
+      responseSchema: {
+        type: "string",
+        description: "The markdown with URL of the generated image."
+      }
     }
   ]
 }

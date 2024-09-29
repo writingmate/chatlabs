@@ -27,8 +27,6 @@ import {
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ModelDetails } from "@/components/models/model-details"
 import { ResizableSplitView } from "./chat-resizable-split-view"
-import { Button } from "@/components/ui/button"
-import { IconPlus, IconMinus } from "@tabler/icons-react"
 import {
   Select,
   SelectContent,
@@ -263,36 +261,30 @@ export const ChatUI: FC<ChatUIProps> = () => {
 
   const handleSendMessage = (input: string, isRegeneration: boolean) => {
     chatMessagesRef.current.forEach(ref => {
-      ref.handleSendMessage(input, isRegeneration)
+      if (ref?.handleSendMessage) {
+        ref.handleSendMessage(input, isRegeneration)
+      }
     })
   }
 
   const handleReset = () => {
     chatMessagesRef.current.forEach(ref => {
-      ref.handleReset()
+      if (ref?.handleReset) {
+        ref.handleReset()
+      }
     })
   }
 
   const handleStopMessage = () => {
     chatMessagesRef.current.forEach(ref => {
       try {
-        ref.handleStopMessage()
+        if (ref?.handleStopMessage) {
+          ref.handleStopMessage()
+        }
       } catch (e) {
         console.error(e)
       }
     })
-  }
-
-  const handleAddChat = () => {
-    if (chatsSize < 6) {
-      setChatsSize(prevSize => prevSize + 1)
-    }
-  }
-
-  const handleRemoveChat = () => {
-    if (chatsSize > 2) {
-      setChatsSize(prevSize => prevSize - 1)
-    }
   }
 
   const renderChatWrappers = () => {

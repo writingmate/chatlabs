@@ -50,6 +50,7 @@ export const Sidebar: FC = () => {
     tools,
     assistants,
     folders,
+    profile,
     showSidebar,
     setShowSidebar
   } = useContext(ChatbotUIContext)
@@ -141,10 +142,6 @@ export const Sidebar: FC = () => {
     [folders]
   )
 
-  useEffect(() => {
-    console.log("Folders changed:", foldersMap.chats)
-  }, [foldersMap])
-
   function getSubmenuTitle(contentType: ContentType) {
     switch (contentType) {
       case "prompts":
@@ -200,6 +197,9 @@ export const Sidebar: FC = () => {
             !isLoaded && "invisible",
             showSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           )}
+          initial={{
+            width: isCollapsed ? 64 : 300
+          }}
           animate={{
             width: isCollapsed ? 64 : 300
           }}
@@ -329,45 +329,48 @@ export const Sidebar: FC = () => {
             )}
           </div>
 
-          <div className="border-t p-2">
-            <ProfileSettings isCollapsed={isCollapsed} />
-          </div>
-
-          {(["prompts", "assistants", "files", "tools"] as const).map(
-            contentType => (
-              <SlidingSubmenu
-                key={contentType}
-                isOpen={activeSubmenu === contentType}
-                contentType={contentType}
-                isCollapsed={isCollapsed}
-              >
-                <>
-                  <div className="mb-2 flex items-center justify-between space-x-2">
-                    <SearchInput
-                      className="w-full"
-                      placeholder={`Search ${contentType}`}
-                      value={searchQueries[contentType]}
-                      onChange={value =>
-                        setSearchQueries(prev => ({
-                          ...prev,
-                          [contentType]: value
-                        }))
-                      }
-                    />
-                    <SidebarCreateButtons
-                      contentType={contentType}
-                      hasData={dataMap[contentType].length > 0}
-                    />
-                  </div>
-                  <SidebarDataList
-                    contentType={contentType}
-                    data={dataMap[contentType]}
-                    folders={foldersMap[contentType]}
-                  />
-                </>
-              </SlidingSubmenu>
-            )
+          {profile && (
+            <div className="border-t p-2">
+              <ProfileSettings isCollapsed={isCollapsed} />
+            </div>
           )}
+
+          {!isCollapsed &&
+            (["prompts", "assistants", "files", "tools"] as const).map(
+              contentType => (
+                <SlidingSubmenu
+                  key={contentType}
+                  isOpen={activeSubmenu === contentType}
+                  contentType={contentType}
+                  isCollapsed={isCollapsed}
+                >
+                  <>
+                    <div className="mb-2 flex items-center justify-between space-x-2">
+                      <SearchInput
+                        className="w-full"
+                        placeholder={`Search ${contentType}`}
+                        value={searchQueries[contentType]}
+                        onChange={value =>
+                          setSearchQueries(prev => ({
+                            ...prev,
+                            [contentType]: value
+                          }))
+                        }
+                      />
+                      <SidebarCreateButtons
+                        contentType={contentType}
+                        hasData={dataMap[contentType].length > 0}
+                      />
+                    </div>
+                    <SidebarDataList
+                      contentType={contentType}
+                      data={dataMap[contentType]}
+                      folders={foldersMap[contentType]}
+                    />
+                  </>
+                </SlidingSubmenu>
+              )
+            )}
         </motion.div>
       </>
     ),

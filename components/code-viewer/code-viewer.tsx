@@ -9,7 +9,6 @@ import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { cn, generateRandomString, programmingLanguages } from "@/lib/utils"
 import { CodeBlock } from "@/types"
-import { useRouter } from "next/navigation"
 import {
   FC,
   useCallback,
@@ -18,12 +17,9 @@ import {
   useMemo,
   useState
 } from "react"
-import CodeViewerSidebar from "./code-viewer-sidebar"
-import { DEFAULT_THEME, THEMES } from "./theme-config"
-import { updateMessage } from "@/db/messages" // Add this import
-import { fi } from "date-fns/locale"
 
 interface CodeViewerProps {
+  theme: string
   isGenerating?: boolean
   codeBlock: CodeBlock
   className?: string
@@ -37,6 +33,7 @@ interface CodeViewerProps {
 export const CodeViewer: FC<CodeViewerProps> = ({
   codeBlock,
   className,
+  theme,
   onClose,
   isGenerating,
   showCloseButton = false,
@@ -45,7 +42,6 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   onCodeChange
 }) => {
   const { user } = useAuth()
-  const router = useRouter()
   const { selectedWorkspace, profile, selectedAssistant } =
     useContext(ChatbotUIContext)
   const { setSelectedHtmlElements, chatSettings } =
@@ -55,9 +51,6 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   const [inspectMode, setInspectMode] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [theme, setTheme] = useState<{ name: string; theme: UITheme }>(
-    THEMES[0]
-  )
 
   const downloadAsFile = useCallback(() => {
     if (typeof window === "undefined") return
@@ -152,12 +145,12 @@ export const CodeViewer: FC<CodeViewerProps> = ({
             />
           )}
         </div>
-        <CodeViewerSidebar
+        {/* <CodeViewerSidebar
           theme={theme}
           setTheme={setTheme}
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
-        />
+        /> */}
         <MessageSharingDialog
           open={sharing}
           setOpen={setSharing}
