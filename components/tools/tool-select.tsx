@@ -98,7 +98,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
         setIsOpen(isOpen)
       }}
     >
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button
           ref={triggerRef}
           className={cn(
