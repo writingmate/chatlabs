@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     )?.supportsStreaming
 
     const response = await openai.chat.completions.create({
-      model: chatSettings.model || "gpt-4o-mini",
+      model: "gpt-4o-mini",
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       // temperature: chatSettings.temperature,
       // max_tokens: 16384, // 16k tokens,
