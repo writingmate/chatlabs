@@ -76,7 +76,7 @@ export default function LoginForm({
         provider,
         options: {
           scopes: "email",
-          redirectTo: `${window.location.origin}/auth/callback?${callbackRedirectSearchParams.toString()}`,
+          redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL || window.location.origin}/auth/callback?${callbackRedirectSearchParams.toString()}`,
           skipBrowserRedirect: popup
         }
       })

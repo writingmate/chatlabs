@@ -1,13 +1,15 @@
 "use client"
 
-import * as amplitude from '@amplitude/analytics-browser'
-import { Experiment, ExperimentClient } from '@amplitude/experiment-js-client'
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { useAuth } from '@/context/auth'
-import { sessionReplayPlugin } from '@amplitude/plugin-session-replay-browser';
-
-
-const sessionReplayTracking = sessionReplayPlugin();
+import * as amplitude from "@amplitude/analytics-browser"
+import { Experiment, ExperimentClient } from "@amplitude/experiment-js-client"
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    ReactNode
+} from "react"
+import { useAuth } from "@/context/auth"
 
 interface AmplitudeContextType {
     amplitude: typeof amplitude
@@ -15,7 +17,9 @@ interface AmplitudeContextType {
     isReady: boolean
 }
 
-const AmplitudeContext = createContext<AmplitudeContextType | undefined>(undefined)
+const AmplitudeContext = createContext<AmplitudeContextType | undefined>(
+    undefined
+)
 
 export function AmplitudeProvider({ children }: { children: ReactNode }) {
     const [isReady, setIsReady] = useState(false)
@@ -23,26 +27,38 @@ export function AmplitudeProvider({ children }: { children: ReactNode }) {
     const [experiment, setExperiment] = useState<ExperimentClient | null>(null)
 
     useEffect(() => {
-        amplitude.add(sessionReplayTracking)
-        amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY || '959de43582eb3458ab34b08a446e036c')
+        if (process.env.NODE_ENV === "development") {
+            setIsReady(true)
+            setExperiment(null)
+            return
+        }
+
+        amplitude.init(
+            process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY ||
+            "959de43582eb3458ab34b08a446e036c"
+        )
         const experiment = Experiment.initializeWithAmplitudeAnalytics(
-            process.env.NEXT_PUBLIC_AMPLITUDE_DEPLOYMENT_KEY || 'client-fwdKioDMLvus1pDKtgsiZZ5YCt5oiSCA',
-            { debug: process.env.NODE_ENV === 'development' }
+            process.env.NEXT_PUBLIC_AMPLITUDE_DEPLOYMENT_KEY ||
+            "client-fwdKioDMLvus1pDKtgsiZZ5YCt5oiSCA"
         )
 
         setExperiment(experiment)
 
-        experiment.fetch().then(() => setIsReady(true))
+        experiment
+            .fetch()
+            .then(() => setIsReady(true))
+            .catch(console.error)
+            .finally(() => setIsReady(true))
 
         const identify = new amplitude.Identify()
 
         if (user) {
-            identify.set('email', user.email as string)
-            identify.set('id', user.id)
+            identify.set("email", user.email as string)
+            identify.set("id", user.id)
         }
 
         if (profile) {
-            identify.set('plan', profile.plan as string)
+            identify.set("plan", profile.plan as string)
         }
 
         amplitude.identify(identify)
@@ -62,7 +78,7 @@ export function AmplitudeProvider({ children }: { children: ReactNode }) {
 export function useAmplitude() {
     const context = useContext(AmplitudeContext)
     if (context === undefined) {
-        throw new Error('useAmplitude must be used within an AmplitudeProvider')
+        throw new Error("useAmplitude must be used within an AmplitudeProvider")
     }
     return context
 }
