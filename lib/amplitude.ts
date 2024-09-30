@@ -12,7 +12,10 @@ export function useFeatureFlag(
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (isReady) {
+    if (process.env.NODE_ENV === "development") {
+      setFlagValue(defaultValue)
+      setLoading(false)
+    } else if (isReady) {
       const flag = experiment.variant(flagName)
       setFlagValue(flag.value === "on" || flag.value === "true")
       setLoading(false)

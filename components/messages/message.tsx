@@ -349,7 +349,7 @@ export const Message: FC<MessageProps> = ({
     const annotationMap: {
       [key: string]: React.FC<{ annotation: Annotation | Annotation2 }>
     } = {
-      imageGenerator__generateImage: AnnotationImage,
+      // imageGenerator__generateImage: AnnotationImage,
       webScraper__youtubeCaptions: YouTube,
       webScraper__googleSearch: WebSearch,
       toolCalls: ToolCalls,
@@ -359,7 +359,7 @@ export const Message: FC<MessageProps> = ({
     const annotationResponseTimeLabelMap: {
       [key: string]: string
     } = {
-      imageGenerator__generateImage: "Image",
+      // imageGenerator__generateImage: "Image",
       webScraper__youtubeCaptions: "YouTube",
       webScraper__googleSearch: "Google Search"
     }

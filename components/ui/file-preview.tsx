@@ -24,8 +24,7 @@ export const FilePreview: FC<FilePreviewProps> = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          "flex items-center justify-center outline-none",
-          "border-transparent bg-transparent"
+          "flex overflow-hidden rounded-lg border p-0 outline-none"
         )}
       >
         {(() => {
