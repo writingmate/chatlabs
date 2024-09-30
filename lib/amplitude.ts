@@ -13,7 +13,7 @@ export function useFeatureFlag(
 
   useEffect(() => {
     if (process.env.NODE_ENV == "development") {
-      setFlagValue(true)
+      setFlagValue(defaultValue)
       setLoading(false)
       return
     }
