@@ -27,7 +27,7 @@ const CodeBlockButton: FC<
     variant={"outline"}
     size={"lg"}
     className={
-      "text-foreground flex h-auto max-w-[300px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:shadow"
+      "text-foreground hover:opacity-1 flex h-auto max-w-[300px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:bg-transparent hover:shadow-md"
     }
     onClick={onClick}
   >
