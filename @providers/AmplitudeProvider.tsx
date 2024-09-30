@@ -10,9 +10,6 @@ import {
     ReactNode
 } from "react"
 import { useAuth } from "@/context/auth"
-import { sessionReplayPlugin } from "@amplitude/plugin-session-replay-browser"
-
-const sessionReplayTracking = sessionReplayPlugin()
 
 interface AmplitudeContextType {
     amplitude: typeof amplitude
@@ -36,7 +33,6 @@ export function AmplitudeProvider({ children }: { children: ReactNode }) {
             return
         }
 
-        amplitude.add(sessionReplayTracking)
         amplitude.init(
             process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY ||
             "959de43582eb3458ab34b08a446e036c"
