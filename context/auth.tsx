@@ -12,7 +12,15 @@ const AuthContext = createContext<{
   signOut: () => void
 }>({ session: null, user: null, profile: null, signOut: () => {} })
 
-export const AuthProvider = ({ children }: any) => {
+interface AuthProviderProps {
+  children: React.ReactNode
+  forceLogin?: boolean
+}
+
+export const AuthProvider = ({
+  children,
+  forceLogin = false
+}: AuthProviderProps) => {
   const [user, setUser] = useState<User>()
   const [profile, setProfile] = useState<Tables<"profiles">>()
   const [session, setSession] = useState<Session | null>()
@@ -40,7 +48,8 @@ export const AuthProvider = ({ children }: any) => {
 
         if (profileData) setProfile(profileData)
       } else {
-        if (pathname !== "/") router.push("/login?next=" + pathname)
+        if (pathname !== "/" && forceLogin)
+          router.push("/login?next=" + pathname)
       }
     }
 

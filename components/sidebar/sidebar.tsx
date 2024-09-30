@@ -56,7 +56,10 @@ export const Sidebar: FC = () => {
   } = useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
   const [activeSubmenu, setActiveSubmenu] = useState<ContentType | null>(null)
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const storedCollapsedState = localStorage.getItem("sidebarCollapsed")
+    return storedCollapsedState === "true"
+  })
   const [isLoaded, setIsLoaded] = useState(false)
   const sidebarRef = useRef<HTMLDivElement>(null)
 
@@ -70,8 +73,6 @@ export const Sidebar: FC = () => {
   const [expandDelay, setExpandDelay] = useState(false)
 
   useEffect(() => {
-    const storedCollapsedState = localStorage.getItem("sidebarCollapsed")
-    setIsCollapsed(storedCollapsedState === "true")
     setIsLoaded(true)
   }, [])
 

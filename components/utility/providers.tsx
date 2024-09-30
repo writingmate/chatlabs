@@ -11,7 +11,7 @@ export const Providers: FC<ThemeProviderProps> = ({ children, ...props }) => {
   return (
     <NextThemesProvider {...props}>
       <TooltipProvider>
-        <AuthProvider>
+        <AuthProvider forceLogin={true}>
           <AmplitudeProvider>{children}</AmplitudeProvider>
         </AuthProvider>
       </TooltipProvider>

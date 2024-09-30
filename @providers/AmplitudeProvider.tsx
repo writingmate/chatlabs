@@ -29,7 +29,7 @@ export function AmplitudeProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         if (process.env.NODE_ENV === "development") {
             setIsReady(true)
-            setExperiment(null)
+            setExperiment({} as ExperimentClient)
             return
         }
 
