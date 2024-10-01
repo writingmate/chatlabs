@@ -64,8 +64,7 @@ function addApiKeysToProfile(profile: Tables<"profiles">) {
     [VALID_ENV_KEYS.PERPLEXITY_API_KEY]: "perplexity_api_key",
     [VALID_ENV_KEYS.AZURE_OPENAI_API_KEY]: "azure_openai_api_key",
     [VALID_ENV_KEYS.OPENROUTER_API_KEY]: "openrouter_api_key",
-    [VALID_ENV_KEYS.JINA_API_KEY]:
-      "jina_f182e39f7f814d9d9c18ef59649491bbZegZBGmGfcSaFu-ap6i29IkJQtY_",
+    [VALID_ENV_KEYS.JINA_API_KEY]: "jina_api_key",
 
     [VALID_ENV_KEYS.OPENAI_ORGANIZATION_ID]: "openai_organization_id",
 
