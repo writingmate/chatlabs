@@ -93,7 +93,7 @@ export const createFileBasedOnExtension = async (
   file: File,
   fileRecord: TablesInsert<"files">,
   workspace_id: string,
-  embeddingsProvider: "cohere" | "openai" | "local"
+  embeddingsProvider: "jina" | "openai" | "local"
 ) => {
   const fileExtension = file.name.split(".").pop()
 
@@ -120,7 +120,7 @@ export const createFile = async (
   file: File,
   fileRecord: TablesInsert<"files">,
   workspace_id: string,
-  embeddingsProvider: "cohere" | "openai" | "local"
+  embeddingsProvider: "jina" | "openai" | "local"
 ) => {
   const { data: createdFile, error } = await supabase
     .from("files")
@@ -174,7 +174,7 @@ export const createDocXFile = async (
   file: File,
   fileRecord: TablesInsert<"files">,
   workspace_id: string,
-  embeddingsProvider: "cohere" | "openai" | "local"
+  embeddingsProvider: "jina" | "openai" | "local"
 ) => {
   const { data: createdFile, error } = await supabase
     .from("files")
@@ -368,7 +368,7 @@ export const copyFileAndFileItems = async (
   const newFileItems = originalFile.file_items.map(item => ({
     content: item.content,
     tokens: item.tokens,
-    cohere_embedding: item.cohere_embedding,
+    jina_embedding: item.jina_embedding,
     openai_embedding: item.openai_embedding,
     local_embedding: item.local_embedding,
     user_id: userId,

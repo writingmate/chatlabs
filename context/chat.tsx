@@ -114,7 +114,7 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
       contextLength: 4000,
       includeProfileContext: true,
       includeWorkspaceInstructions: true,
-      embeddingsProvider: "cohere"
+      embeddingsProvider: "jina"
     }
   })
 

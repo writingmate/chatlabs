@@ -11,7 +11,7 @@ export interface ChatSettings {
   contextLength: number
   includeProfileContext: boolean
   includeWorkspaceInstructions: boolean
-  embeddingsProvider: "cohere" | "openai" | "local"
+  embeddingsProvider: "jina" | "openai" | "local"
 }
 
 export interface ChatPayload {

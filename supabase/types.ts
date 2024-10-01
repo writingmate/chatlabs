@@ -876,7 +876,7 @@ export interface Database {
           created_at: string
           file_id: string
           id: string
-          cohere_embedding: string | null
+          jina_embedding: string | null
           local_embedding: string | null
           openai_embedding: string | null
           sharing: string
@@ -889,7 +889,7 @@ export interface Database {
           created_at?: string
           file_id: string
           id?: string
-          cohere_embedding?: string | null
+          jina_embedding?: string | null
           local_embedding?: string | null
           openai_embedding?: string | null
           sharing?: string
@@ -902,7 +902,7 @@ export interface Database {
           created_at?: string
           file_id?: string
           id?: string
-          cohere_embedding?: string | null
+          jina_embedding?: string | null
           local_embedding?: string | null
           openai_embedding?: string | null
           sharing?: string
@@ -2078,7 +2078,7 @@ export interface Database {
             }
             Returns: string
           }
-      match_file_items_cohere: {
+      match_file_items_jina: {
         Args: {
           query_embedding: string
           match_count?: number

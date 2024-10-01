@@ -101,7 +101,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
           includeWorkspaceInstructions:
             selectedWorkspace.include_workspace_instructions,
           embeddingsProvider: selectedWorkspace.embeddings_provider as
-            | "cohere"
+            | "jina"
             | "openai"
             | "local"
         })
@@ -117,7 +117,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
       includeProfileContext: item.include_profile_context,
       includeWorkspaceInstructions: item.include_workspace_instructions,
       embeddingsProvider: item.embeddings_provider as
-        | "cohere"
+        | "jina"
         | "openai"
         | "local"
     })

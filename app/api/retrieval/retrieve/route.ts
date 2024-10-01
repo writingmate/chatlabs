@@ -1,7 +1,8 @@
-import { generateCohereEmbedding } from "@/lib/generate-cohere-embedding"
+import { generateJinaEmbedding } from "@/lib/generate-jina-embedding"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
+import { unique } from "next/dist/build/utils"
 
 export async function POST(request: Request) {
   const json = await request.json()
@@ -24,41 +25,44 @@ export async function POST(request: Request) {
     let chunks: any[] = []
     let embedding: number[] = []
 
-    const cohereApiKey = process.env.COHERE_API_KEY
-    if (!cohereApiKey) {
-      throw new Error("Admin Cohere API key is not set.")
+    const jinaApiKey = process.env.JINA_API_KEY
+    if (!jinaApiKey) {
+      throw new Error("Admin Jina API key is not set.")
     }
 
     try {
-      const embeddings = await generateCohereEmbedding([userInput])
-      const cohereEmbedding = embeddings[0] // Get the first (and only) embedding
-
-      const { data: cohereFileItems, error: cohereError } =
-        await supabaseAdmin.rpc("match_file_items_cohere", {
-          query_embedding: cohereEmbedding as any,
+      const embeddings = await generateJinaEmbedding([userInput])
+      const jinaEmbedding = embeddings[0] // Get the first (and only) embedding
+      const { data: jinaFileItems, error: jinaError } = await supabaseAdmin.rpc(
+        "match_file_items_jina",
+        {
+          query_embedding: jinaEmbedding as any,
           match_count: sourceCount,
           file_ids: uniqueFileIds
-        })
+        }
+      )
 
-      if (cohereError) {
-        if (cohereError.message.includes("cohere_embedding does not exist")) {
-          console.error("Cohere embedding column is missing in the database")
+      if (jinaError) {
+        if (jinaError.message.includes("jina_embedding does not exist")) {
+          console.error("Jina embedding column is missing in the database")
           throw new Error(
-            "Database schema issue: cohere_embedding column is missing"
+            "Database schema issue: jina_embedding column is missing"
           )
         }
-        throw cohereError
+        throw jinaError
       }
 
-      chunks = cohereFileItems
+      chunks = jinaFileItems
     } catch (error) {
-      console.error("Cohere embedding failed:", error)
+      console.error("Jina embedding failed:", error)
       throw new Error("Failed to generate or retrieve embeddings")
     }
 
     const mostSimilarChunks = chunks?.sort(
       (a, b) => b.similarity - a.similarity
     )
+
+    console.log(mostSimilarChunks)
 
     return new Response(JSON.stringify({ results: mostSimilarChunks }), {
       status: 200
