@@ -6,7 +6,7 @@ export async function generateJinaEmbedding(
   const url = "https://api.jina.ai/v1/embeddings"
   const headers = {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${VALID_ENV_KEYS.JINA_API_KEY}`
+    Authorization: `Bearer ${process.env.JINA_API_KEY}`
   }
 
   const data = {
