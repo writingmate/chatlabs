@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
     // TODO: remove below line after migration is done
     // let currentProvider: "jina" | "openai" | "local" = initialProvider || "jina"
-    let currentProvider: "jina" | "openai" | "local" = "jina"
+    let currentProvider: string = "jina"
 
     // Check API keys first
     if (currentProvider === "jina") {
