@@ -85,7 +85,7 @@ export async function POST(req: Request) {
         chunks = await processTxt(blob)
         break
       case "html":
-        chunks = await processTxt(blob, 0)
+        chunks = await processTxt(blob)
         break
       default:
         return createErrorResponse(
