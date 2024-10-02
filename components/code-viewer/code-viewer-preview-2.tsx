@@ -51,7 +51,10 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
     if (!iframeWindow) return
 
     theme = theme || ""
-    if (renderRef.current + theme === fullHtmlContent + theme) return
+    if (renderRef.current === fullHtmlContent + theme) {
+      console.info("Skipping render")
+      return
+    }
 
     renderRef.current = fullHtmlContent + theme
 
@@ -70,7 +73,9 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
 
     updateHtml(dom)
 
-    iframe.srcdoc = dom.documentElement.outerHTML
+    iframe.contentWindow?.document.open()
+    iframe.contentWindow?.document.write(dom.documentElement.outerHTML)
+    iframe.contentWindow?.document.close()
 
     const captureConsole = (methodName: keyof Console, messageType: string) => {
       const originalMethod = iframeWindow.console[methodName]
