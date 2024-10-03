@@ -151,7 +151,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     <div
       ref={itemRef}
       className={cn(
-        "hover:bg-accent focus:bg-accent group flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none",
+        "hover:bg-accent focus:bg-accent hover:bg-accent group flex w-full cursor-pointer items-center rounded p-2 focus:outline-none",
         isActiveMap[contentType]?.(item) && "bg-accent"
       )}
       tabIndex={0}

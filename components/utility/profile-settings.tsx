@@ -66,7 +66,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     setAvailableHostedModels,
     setAvailableOpenRouterModels,
     availableOpenRouterModels,
-    setIsPaywallOpen
+    setIsPaywallOpen,
+    isProfileSettingsOpen,
+    setIsProfileSettingsOpen
   } = useContext(ChatbotUIContext)
 
   const [loadingBillingPortal, setLoadingBillingPortal] = useState(false)
@@ -74,8 +76,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
   const router = useRouter()
 
   const buttonRef = useRef<HTMLButtonElement>(null)
-
-  const [isOpen, setIsOpen] = useState(false)
 
   const [displayName, setDisplayName] = useState(profile?.display_name || "")
   const [username, setUsername] = useState(profile?.username || "")
@@ -269,7 +269,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
       }
     })
 
-    setIsOpen(false)
+    setIsProfileSettingsOpen("")
   }
 
   function resetToDefaults() {
@@ -302,7 +302,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
   if (!profile) return null
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet
+      open={isProfileSettingsOpen !== ""}
+      onOpenChange={open => setIsProfileSettingsOpen(open ? "profile" : "")}
+    >
       <SheetTrigger asChild>
         <Button
           variant="ghost"
@@ -353,7 +356,12 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
             </SheetTitle>
           </SheetHeader>
 
-          <Tabs defaultValue="profile">
+          <Tabs
+            value={isProfileSettingsOpen}
+            onValueChange={value =>
+              value !== "" && setIsProfileSettingsOpen(value)
+            }
+          >
             <TabsList className="mt-4 flex w-full space-x-1">
               <TabsTrigger className={"flex-1"} value="profile">
                 Profile
@@ -877,7 +885,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
               }
               trigger={
                 <IconFileDownload
-                  className="cursor-pointer hover:opacity-50"
+                  className="hover:bg-accent cursor-pointer"
                   size={32}
                   onClick={exportLocalStorageAsJSON}
                 />

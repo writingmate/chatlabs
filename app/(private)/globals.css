@@ -104,6 +104,11 @@
   }
 }
 
+mjx-container[jax="SVG"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

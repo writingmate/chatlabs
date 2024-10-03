@@ -202,7 +202,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
                     "Assistants"}
                 </div>
 
-                <IconChevronDown className="ml-1" />
+                <IconChevronDown className="ml-1" stroke={1.5} />
               </>
             )}
           </Button>

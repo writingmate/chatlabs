@@ -63,7 +63,7 @@ const AssistantToolItem: FC<AssistantToolItemProps> = ({
 
   return (
     <div
-      className="flex cursor-pointer items-center justify-between py-0.5 hover:opacity-50"
+      className="hover:bg-accent flex cursor-pointer items-center justify-between py-0.5"
       onClick={onSelect}
     >
       <div className="flex grow items-center truncate">

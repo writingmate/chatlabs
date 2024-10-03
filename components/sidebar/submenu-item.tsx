@@ -39,7 +39,7 @@ export const SubmenuItem: FC<SubmenuItemProps> = ({
   return (
     <div
       className={cn(
-        "hover:bg-accent focus:bg-accent group flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none",
+        "hover:bg-accent focus:bg-accent hover:bg-accent group flex w-full cursor-pointer items-center rounded p-2 focus:outline-none",
         isActive && "bg-accent"
       )}
       onClick={onClick}

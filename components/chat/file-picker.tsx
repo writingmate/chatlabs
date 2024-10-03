@@ -106,7 +106,7 @@ export const FilePicker: FC<FilePickerProps> = ({
       {isOpen && (
         <div className="flex flex-col space-y-1 p-2 text-sm">
           {filteredFiles.length === 0 && filteredCollections.length === 0 ? (
-            <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
+            <div className="text-md hover:bg-accent flex h-14 cursor-pointer items-center justify-center italic">
               No matching files.
             </div>
           ) : (

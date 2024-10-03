@@ -163,6 +163,10 @@ interface ChatbotUIContext {
   isPaywallOpen: boolean
   setIsPaywallOpen: Dispatch<SetStateAction<boolean>>
 
+  // PROFILE SETTINGS
+  isProfileSettingsOpen: string
+  setIsProfileSettingsOpen: Dispatch<SetStateAction<string>>
+
   // SIDEBAR
   showSidebar: boolean
   setShowSidebar: Dispatch<SetStateAction<boolean>>
@@ -308,6 +312,10 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   // PAYWALL
   isPaywallOpen: false,
   setIsPaywallOpen: () => {},
+
+  // PROFILE SETTINGS
+  isProfileSettingsOpen: "",
+  setIsProfileSettingsOpen: () => {},
 
   // SIDEBAR
   showSidebar: false,

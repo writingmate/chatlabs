@@ -65,7 +65,7 @@ export const CollectionFileSelect: FC<CollectionFileSelectProps> = ({
             </div>
           </div>
 
-          <IconChevronDown />
+          <IconChevronDown stroke={1.5} />
         </Button>
       </DropdownMenuTrigger>
 
@@ -136,7 +136,7 @@ const CollectionFileItem: FC<CollectionFileItemProps> = ({
 
   return (
     <div
-      className="flex cursor-pointer items-center justify-between py-0.5 hover:opacity-50"
+      className="hover:bg-accent flex cursor-pointer items-center justify-between py-0.5"
       onClick={handleSelect}
     >
       <div className="flex grow items-center truncate">

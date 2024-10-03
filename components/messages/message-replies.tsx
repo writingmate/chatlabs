@@ -25,7 +25,7 @@ export const MessageReplies: FC<MessageRepliesProps> = ({}) => {
           display={<div>View Replies</div>}
           trigger={
             <div
-              className="relative cursor-pointer hover:opacity-50"
+              className="hover:bg-accent relative cursor-pointer"
               onClick={() => setIsOpen(true)}
             >
               <IconMessage size={MESSAGE_ICON_SIZE} />

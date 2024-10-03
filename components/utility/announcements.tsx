@@ -108,7 +108,7 @@ export const Announcements: FC<AnnouncementsProps> = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="relative cursor-pointer hover:opacity-50">
+        <div className="hover:bg-accent relative cursor-pointer">
           <IconSpeakerphone size={SIDEBAR_ICON_SIZE} />
           {unreadCount > 0 && (
             <div className="notification-indicator absolute right-[-4px] top-[-4px] flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">

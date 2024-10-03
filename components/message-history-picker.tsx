@@ -69,7 +69,7 @@ export const MessageHistoryPicker: FC<MessageHistoryPickerProps> = ({}) => {
       {isMessageHistoryPickerOpen && (
         <div className="flex flex-col space-y-1 p-2 text-sm">
           {filteredMessages.length === 0 ? (
-            <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
+            <div className="text-md hover:bg-accent flex h-14 cursor-pointer items-center justify-center italic">
               No matching prompts.
             </div>
           ) : (

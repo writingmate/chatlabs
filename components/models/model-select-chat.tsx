@@ -3,6 +3,7 @@ import { LLM, LLMID, ModelProvider } from "@/types"
 import {
   IconCheck,
   IconChevronDown,
+  IconKey,
   IconSquarePlus,
   IconX
 } from "@tabler/icons-react"
@@ -44,8 +45,14 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   detailsLocation = "left",
   showModelSettings = true
 }) => {
-  const { profile, availableLocalModels, allModels, setIsPaywallOpen } =
-    useContext(ChatbotUIContext)
+  const {
+    profile,
+    availableLocalModels,
+    allModels,
+    setIsPaywallOpen,
+    isProfileSettingsOpen,
+    setIsProfileSettingsOpen
+  } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -110,6 +117,22 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
 
   const modelForDetails = hoveredModel || filteredModels?.[0]
 
+  if (allModels.length === 0 && profile?.plan.startsWith("byok_")) {
+    return (
+      <Button
+        className="items-end"
+        onClick={e => {
+          e.stopPropagation()
+          setIsProfileSettingsOpen("keys")
+        }}
+        variant="ghost"
+      >
+        <IconKey className="mr-1" size={20} stroke={1.5} />
+        Enter API keys.
+      </Button>
+    )
+  }
+
   return (
     <DropdownMenu
       open={isOpen}
@@ -123,37 +146,31 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
         asChild
         disabled={allModels.length === 0}
       >
-        {allModels.length === 0 && profile?.plan.startsWith("byok_") ? (
-          <div className="rounded text-sm font-bold">
-            Unlock models by entering API keys in your profile settings.
+        <Button
+          ref={triggerRef}
+          className="flex items-center justify-between space-x-1"
+          variant="ghost"
+        >
+          <div className="flex items-center">
+            {selectedModel ? (
+              <>
+                <ModelIcon
+                  provider={selectedModel?.provider}
+                  modelId={selectedModel?.modelId}
+                  width={26}
+                  height={26}
+                />
+                <div className="ml-2 flex items-center text-lg">
+                  {selectedModel?.modelName}
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center">Select a model</div>
+            )}
           </div>
-        ) : (
-          <Button
-            ref={triggerRef}
-            className="flex items-center justify-between space-x-1"
-            variant="ghost"
-          >
-            <div className="flex items-center">
-              {selectedModel ? (
-                <>
-                  <ModelIcon
-                    provider={selectedModel?.provider}
-                    modelId={selectedModel?.modelId}
-                    width={26}
-                    height={26}
-                  />
-                  <div className="ml-2 flex items-center text-lg">
-                    {selectedModel?.modelName}
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center">Select a model</div>
-              )}
-            </div>
 
-            <IconChevronDown />
-          </Button>
-        )}
+          <IconChevronDown stroke={1.5} />
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent

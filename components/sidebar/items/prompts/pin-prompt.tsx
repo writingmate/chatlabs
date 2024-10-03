@@ -27,7 +27,7 @@ export const PinPrompt: FC<UpdatePromptProps> = ({
 
   return (
     <IconPin
-      className={cn("hover:opacity-50", className)}
+      className={cn("hover:bg-accent", className)}
       size={18}
       onClick={handlePinPrompt}
     />

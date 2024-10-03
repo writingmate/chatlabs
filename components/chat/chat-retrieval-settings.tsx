@@ -28,7 +28,7 @@ export const ChatRetrievalSettings: FC<ChatRetrievalSettingsProps> = ({}) => {
           display={<div>Adjust retrieval settings.</div>}
           trigger={
             <IconAdjustmentsHorizontal
-              className="cursor-pointer pt-[4px] hover:opacity-50"
+              className="hover:bg-accent cursor-pointer pt-[4px]"
               size={24}
             />
           }

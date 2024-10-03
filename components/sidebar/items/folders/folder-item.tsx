@@ -75,16 +75,16 @@ export const Folder: FC<FolderProps> = ({
       <div
         tabIndex={0}
         className={cn(
-          "hover:bg-accent focus:bg-accent flex w-full cursor-pointer items-center justify-between rounded p-2 hover:opacity-50 focus:outline-none"
+          "hover:bg-accent focus:bg-accent hover:bg-accent flex w-full cursor-pointer items-center justify-between rounded p-2 focus:outline-none"
         )}
         onClick={handleClick}
       >
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center space-x-2">
             {isExpanded ? (
-              <IconChevronDown stroke={3} />
+              <IconChevronDown stroke={1.5} />
             ) : (
-              <IconChevronRight stroke={3} />
+              <IconChevronRight stroke={1.5} />
             )}
 
             <div>{folder.name}</div>

@@ -86,7 +86,7 @@ const ImagePicker: FC<ImagePickerProps> = ({
       )}
 
       <Input
-        className="mt-1 cursor-pointer hover:opacity-50"
+        className="hover:bg-accent mt-1 cursor-pointer"
         type="file"
         accept="image/png, image/jpeg, image/jpg"
         onChange={handleImageSelect}

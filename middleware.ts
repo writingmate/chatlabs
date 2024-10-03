@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/middleware"
-import { NextResponse, type NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { Ratelimit } from "@upstash/ratelimit"
 import { kv } from "@vercel/kv"
 import { Session, SupabaseClient } from "@supabase/supabase-js"
@@ -72,7 +72,7 @@ async function redirectToSetupMiddleware(
     .single()
 
   if (!profile) {
-    throw new Error(error?.message)
+    return NextResponse.redirect(new URL("/login", request.url))
   }
 
   if (!profile.has_onboarded) {

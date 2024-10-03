@@ -55,7 +55,7 @@ export const UpdateChat: FC<UpdateChatProps> = ({
     <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
       <DialogTrigger asChild>
         <IconEdit
-          className={cn("hover:opacity-50", className)}
+          className={cn("hover:bg-accent", className)}
           strokeWidth={1.5}
           size={18}
         />
