@@ -894,7 +894,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
           </div>
 
           <div className="ml-auto space-x-2">
-            <Button variant="ghost" onClick={() => setIsOpen(false)}>
+            <Button
+              variant="ghost"
+              onClick={() => setIsProfileSettingsOpen("")}
+            >
               Cancel
             </Button>
 
