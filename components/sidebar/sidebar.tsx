@@ -158,6 +158,9 @@ export const Sidebar: FC = () => {
     }
   }
 
+  const COLLAPSED_SIDEBAR_WIDTH = 58
+  const EXPANDED_SIDEBAR_WIDTH = 300
+
   return useMemo(
     () => (
       <>
@@ -199,10 +202,14 @@ export const Sidebar: FC = () => {
             showSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           )}
           initial={{
-            width: isCollapsed ? 64 : 300
+            width: isCollapsed
+              ? COLLAPSED_SIDEBAR_WIDTH
+              : EXPANDED_SIDEBAR_WIDTH
           }}
           animate={{
-            width: isCollapsed ? 64 : 300
+            width: isCollapsed
+              ? COLLAPSED_SIDEBAR_WIDTH
+              : EXPANDED_SIDEBAR_WIDTH
           }}
           transition={{
             duration: 0.3,
@@ -212,10 +219,8 @@ export const Sidebar: FC = () => {
         >
           <div
             className={cn(
-              "flex border-b",
-              isCollapsed
-                ? "flex-col items-center py-2"
-                : "items-center justify-between p-2"
+              "flex items-start border-b p-2",
+              isCollapsed ? "flex-col" : "justify-between"
             )}
           >
             <WithTooltip
@@ -223,6 +228,7 @@ export const Sidebar: FC = () => {
               display={<div>New Chat</div>}
               trigger={
                 <Button
+                  className="w-10 shrink-0"
                   variant="ghost"
                   size={"icon"}
                   onClick={handleCreateChat}
@@ -233,7 +239,7 @@ export const Sidebar: FC = () => {
               }
               side="right"
             />
-            <div className="flex items-center justify-between">
+            <div className="align-center flex h-full grow items-center justify-center">
               {activeSubmenu && getSubmenuTitle(activeSubmenu)}
             </div>
             <WithTooltip
@@ -244,7 +250,7 @@ export const Sidebar: FC = () => {
                   variant="ghost"
                   size="icon"
                   onClick={toggleCollapseOrSubmenu}
-                  className="hidden md:flex"
+                  className="w-10"
                 >
                   {isCollapsed ? (
                     <IconChevronRight {...iconProps} />

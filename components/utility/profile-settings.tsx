@@ -317,8 +317,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
           variant="ghost"
           size="sm"
           className={cn(
-            "flex w-full items-center justify-start space-x-2 rounded-lg p-2 pl-1 text-sm",
-            isCollapsed ? "justify-center pl-2" : ""
+            "flex w-full items-center justify-start space-x-2 rounded-lg p-2 pl-1 text-sm"
           )}
         >
           <Avatar className="size-8">
