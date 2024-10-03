@@ -160,7 +160,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
                   width={26}
                   height={26}
                 />
-                <div className="ml-2 flex items-center text-lg">
+                <div className="ml-2 flex items-center">
                   {selectedModel?.modelName}
                 </div>
               </>
@@ -168,8 +168,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
               <div className="flex items-center">Select a model</div>
             )}
           </div>
-
-          <IconChevronDown stroke={1.5} />
+          <IconChevronDown stroke={1.5} className="ml-1 size-5 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
 

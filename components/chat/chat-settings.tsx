@@ -61,12 +61,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
   )
 
   return (
-    <div
-      className={cn(
-        "flex w-2/3 items-center justify-end space-x-1 md:w-full",
-        className
-      )}
-    >
+    <div className={cn("flex items-center space-x-1", className)}>
       <ShareChatButton />
       {selectedModel?.tools && (
         <ToolSelect
