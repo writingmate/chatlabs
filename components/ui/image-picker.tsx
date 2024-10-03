@@ -73,7 +73,7 @@ const ImagePicker: FC<ImagePickerProps> = ({
   }
 
   return (
-    <div>
+    <div className="flex w-auto space-x-2">
       {previewSrc && (
         <Image
           style={{ width: `${width}px`, height: `${width}px` }}

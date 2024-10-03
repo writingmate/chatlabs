@@ -8,11 +8,11 @@ const calloutVariants = cva(
     variants: {
       variant: {
         default: "bg-background text-foreground",
-        info: "border-blue-500/50 bg-blue-100 text-blue-700 dark:border-blue-500 [&>svg]:text-blue-700",
+        info: "border-blue-500/50 bg-blue-50 text-blue-700 dark:border-blue-400/30 dark:bg-blue-950/50 dark:text-blue-300 [&>svg]:text-blue-700 dark:[&>svg]:text-blue-300",
         destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+          "border-destructive/50 text-destructive dark:border-destructive/30 dark:text-destructive/90 [&>svg]:text-destructive dark:[&>svg]:text-destructive/90 bg-destructive/10",
         warning:
-          "border-yellow-500/50 bg-yellow-100 text-yellow-700 dark:border-yellow-500 [&>svg]:text-yellow-700"
+          "border-yellow-500/50 bg-yellow-50 text-yellow-700 dark:border-yellow-400/30 dark:bg-yellow-950/50 dark:text-yellow-300 [&>svg]:text-yellow-700 dark:[&>svg]:text-yellow-300"
       }
     },
     defaultVariants: {
