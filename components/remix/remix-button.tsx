@@ -38,27 +38,6 @@ function InnerRemixButton({ fileId }: RemixButtonProps) {
         <IconArrowFork size={18} className={"mr-2"} stroke={1.5} />
         {isRemixing ? "Creating..." : "Make your version"}
       </Button>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="ghost" size="sm" className="size-8 p-0">
-            <IconInfoCircle size={18} stroke={1.5} />
-            <span className="sr-only">What is ChatLabs?</span>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="w-80">
-          <div className="grid gap-4">
-            <div className="space-y-2">
-              <h4 className="font-medium leading-none">What is ChatLabs?</h4>
-              <p className="text-muted-foreground text-sm">
-                ChatLabs is an open-source platform that allows you to create,
-                share, and remix AI-powered chat experiences. Built with
-                Next.js, Supabase, and various AI models, it enables users to
-                customize and experiment with different chat configurations.
-              </p>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
