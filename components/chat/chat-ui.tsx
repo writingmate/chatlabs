@@ -469,13 +469,13 @@ const EmptyChatView: React.FC<EmptyChatViewProps> = memo(
       {!selectedAssistant && !!model && (
         <>
           <ModelIcon
-            className="size-[100px]rounded-full"
+            className="size-[100px] overflow-hidden rounded-2xl"
             modelId={model.modelId}
             provider={model.provider}
             height={100}
             width={100}
           />
-          <div className="text-foreground mt-4 text-center text-2xl font-semibold">
+          <div className="text-foreground mt-4 text-center text-2xl">
             How can I help you today?
           </div>
         </>

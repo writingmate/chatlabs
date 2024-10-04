@@ -29,6 +29,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
   height,
   width,
   modelId,
+  className,
   ...props
 }) => {
   const { theme } = useTheme()
@@ -39,7 +40,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <OpenAISVG
           className={cn(
             "rounded-sm bg-[#fff] p-1 text-black",
-            props.className,
+            className,
             theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
           )}
           width={width}
@@ -51,7 +52,8 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]",
+            className
           )}
           src={mistral.src}
           alt="Mistral"
@@ -64,7 +66,8 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-0",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]",
+            className
           )}
           src={groq.src}
           alt="Groq"
@@ -77,7 +80,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <AnthropicSVG
           className={cn(
             "rounded-sm bg-[#fff] p-1 text-black",
-            props.className,
+            className,
             theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
           )}
           width={width}
@@ -89,7 +92,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <GoogleSVG
           className={cn(
             "rounded-sm bg-[#fff] p-1 text-black",
-            props.className,
+            className,
             theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
           )}
           width={width}
@@ -101,7 +104,8 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]",
+            className
           )}
           src={perplexity.src}
           alt="Mistral"
@@ -114,7 +118,8 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]",
+            className
           )}
           src={databricks.src}
           alt="Databricks"
@@ -127,7 +132,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <MicrosoftSVG
           className={cn(
             "rounded-sm bg-[#fff] p-1 text-black",
-            props.className,
+            className,
             theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
           )}
           width={width}
@@ -139,7 +144,8 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]",
+            className
           )}
           src={meta.src}
           alt="Meta Llama"
@@ -151,6 +157,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
       const { provider } = parseOpenRouterModelName(modelId!)
       return (
         <ModelIcon
+          className={className}
           provider={provider as ModelProvider}
           height={height}
           width={width}
@@ -159,7 +166,10 @@ export const ModelIcon: FC<ModelIconProps> = ({
     default:
       return (
         <ChatbotUISVG
-          className="dark:border-foreground/10 rounded-sm dark:border-[1px]"
+          className={cn(
+            "dark:border-foreground/10 rounded-sm dark:border-[1px]",
+            className
+          )}
           theme={theme === "dark" ? "light" : "dark"}
           size={width}
         />
