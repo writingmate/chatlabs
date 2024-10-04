@@ -323,7 +323,7 @@ export const ChatInput: FC<ChatInputProps> = ({
               <IconPaperclip
                 onClick={() => fileInputRef.current?.click()}
                 stroke={1.5}
-                className="hover:bg-accent m-1 cursor-pointer p-0.5"
+                className="m-1 cursor-pointer p-0.5 hover:opacity-50"
                 size={24}
               />
               <Input
@@ -363,7 +363,7 @@ export const ChatInput: FC<ChatInputProps> = ({
                     />
                   ) : (
                     <IconMicrophone
-                      className={"hover:bg-accent m-1 cursor-pointer p-0.5"}
+                      className={"m-1 cursor-pointer p-0.5 hover:opacity-50"}
                       stroke={1.5}
                       size={24}
                     />
@@ -372,7 +372,7 @@ export const ChatInput: FC<ChatInputProps> = ({
               )}
               {isGenerating ? (
                 <IconPlayerStopFilled
-                  className="hover:bg-background hover:bg-accent m-1 animate-pulse rounded bg-transparent p-0.5"
+                  className="hover:bg-background m-1 animate-pulse rounded bg-transparent p-0.5 hover:opacity-50"
                   onClick={handleStopMessage}
                   stroke={1.5}
                   size={24}
@@ -380,7 +380,7 @@ export const ChatInput: FC<ChatInputProps> = ({
               ) : (
                 <IconArrowUp
                   className={cn(
-                    "bg-primary text-secondary hover:bg-accent m-1 rounded-lg p-0.5",
+                    "bg-primary text-secondary m-1 rounded-lg p-0.5 hover:opacity-50",
                     (!userInput || isUploading) &&
                       "cursor-not-allowed opacity-50"
                   )}
