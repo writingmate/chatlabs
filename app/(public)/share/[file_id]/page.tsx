@@ -80,7 +80,7 @@ const SharePage = async ({
       {showBanner && (
         <div
           className={
-            "flex h-[60px] w-full items-center justify-center space-x-1 bg-violet-700 text-sm text-white"
+            "flex h-[60px] w-full items-center justify-center space-x-1 border-t text-sm"
           }
         >
           Built with

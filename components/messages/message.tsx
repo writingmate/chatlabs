@@ -354,8 +354,11 @@ export const Message: FC<MessageProps> = ({
       // imageGenerator__generateImage: AnnotationImage,
       webScraper__youtubeCaptions: YouTube,
       webScraper__googleSearch: WebSearch,
-      toolCalls: ToolCalls,
       selected_html_elements: SelectedHtmlElements
+    }
+
+    if (showResponseTime) {
+      annotationMap.toolCalls = ToolCalls
     }
 
     const annotationResponseTimeLabelMap: {

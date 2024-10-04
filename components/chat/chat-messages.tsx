@@ -67,6 +67,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
               onSubmitEdit={handleSendEdit}
               onSelectCodeBlock={onSelectCodeBlock}
               onRegenerate={handleRegenerate}
+              showResponseTime={false}
               isExperimentalCodeEditor={isExperimentalCodeEditor}
             />
           )

@@ -15,6 +15,7 @@ BEGIN
       c.name ILIKE '%' || p_query || '%'
       OR m.content ILIKE '%' || p_query || '%'
     )
-  ORDER BY c.id, c.created_at DESC;
+  ORDER BY c.id, c.created_at DESC
+  LIMIT 100;
 END;
 $$ LANGUAGE plpgsql;
