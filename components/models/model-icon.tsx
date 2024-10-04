@@ -14,6 +14,8 @@ import { GoogleSVG } from "../icons/google-svg"
 import { OpenAISVG } from "../icons/openai-svg"
 import { parseOpenRouterModelName } from "@/lib/models/fetch-models"
 import { MicrosoftSVG } from "@/components/icons/microsoft-svg"
+import { Chat } from "openai/resources/index.mjs"
+import { ChatbotUISVG } from "../icons/chatbotui-svg"
 
 interface ModelIconProps extends HTMLAttributes<HTMLDivElement> {
   provider: ModelProvider
@@ -155,6 +157,12 @@ export const ModelIcon: FC<ModelIconProps> = ({
         />
       )
     default:
-      return <IconSparkles size={width} />
+      return (
+        <ChatbotUISVG
+          className="dark:border-foreground/10 rounded-sm dark:border-[1px]"
+          theme={theme === "dark" ? "light" : "dark"}
+          size={width}
+        />
+      )
   }
 }

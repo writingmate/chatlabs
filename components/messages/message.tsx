@@ -61,6 +61,7 @@ interface MessageProps {
   setIsGenerating?: (value: boolean) => void
   onSelectCodeBlock?: (codeBlock: ChatMessageCodeBlock | null) => void
   isExperimentalCodeEditor?: boolean
+  showResponseTime?: boolean
 }
 
 export const Message: FC<MessageProps> = ({
@@ -76,9 +77,10 @@ export const Message: FC<MessageProps> = ({
   onRegenerate,
   onSubmitEdit,
   onSelectCodeBlock,
-  showActions = true,
   codeBlocks,
-  isExperimentalCodeEditor
+  isExperimentalCodeEditor,
+  showActions = true,
+  showResponseTime = false
 }) => {
   const { assistants, profile, allModels, selectedAssistant, files } =
     useContext(ChatbotUIContext)
@@ -359,7 +361,7 @@ export const Message: FC<MessageProps> = ({
     const annotationResponseTimeLabelMap: {
       [key: string]: string
     } = {
-      // imageGenerator__generateImage: "Image",
+      imageGenerator__generateImage: "Image",
       webScraper__youtubeCaptions: "YouTube",
       webScraper__googleSearch: "Google Search"
     }
@@ -375,7 +377,7 @@ export const Message: FC<MessageProps> = ({
       return (
         <div key={key} className={"flex flex-col space-y-3"}>
           <AnnotationComponent annotation={annotation} />
-          {responseTime > 0 && (
+          {showResponseTime && responseTime > 0 && (
             <ResponseTime
               icon={<IconApi stroke={1.5} size={18} />}
               label={responseTimeLabel}

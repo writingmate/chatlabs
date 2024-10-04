@@ -239,9 +239,11 @@ export const Sidebar: FC = () => {
               }
               side="right"
             />
-            <div className="align-center flex h-full grow items-center justify-center">
-              {activeSubmenu && getSubmenuTitle(activeSubmenu)}
-            </div>
+            {!isCollapsed && (
+              <div className="align-center flex h-0 items-center justify-center">
+                {activeSubmenu && getSubmenuTitle(activeSubmenu)}
+              </div>
+            )}
             <WithTooltip
               asChild
               display={<div>{isCollapsed ? "Expand" : "Collapse"}</div>}

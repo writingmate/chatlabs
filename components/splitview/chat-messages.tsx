@@ -40,6 +40,7 @@ const ChatMessages = forwardRef<ChatMessagesProps>(({}, ref) => {
             onCancelEdit={() => setEditingMessage(undefined)}
             onSubmitEdit={handleSendEdit}
             isExperimentalCodeEditor={false}
+            showResponseTime={true}
           />
         )
       })
