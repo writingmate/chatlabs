@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/browser-client"
-import { TablesInsert, TablesUpdate } from "@/supabase/types"
+import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
 
 export const getChatById = async (chatId: string, client = supabase) => {
   const { data: chat } = await client
@@ -81,4 +81,16 @@ export const deleteChat = async (chatId: string) => {
   }
 
   return true
+}
+
+// Add this new function at the end of the file
+
+export const searchChatsAndMessages = async (
+  workspaceId: string,
+  query: string
+): Promise<{ data: Tables<"chats">[] | null; error: any }> => {
+  return await supabase.rpc("search_chats_and_messages", {
+    p_workspace_id: workspaceId,
+    p_query: query
+  })
 }
