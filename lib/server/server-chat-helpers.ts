@@ -90,8 +90,11 @@ function addApiKeysToProfile(profile: Tables<"profiles">) {
   return profile
 }
 
-export function checkApiKey(apiKey: string | null, keyName: string) {
-  if (apiKey === null || apiKey === "") {
+export function checkApiKey(
+  apiKey: string | null | undefined,
+  keyName: string
+) {
+  if (!!!apiKey) {
     throw new Error(`${keyName} API Key not found`)
   }
 }

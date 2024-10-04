@@ -20,6 +20,7 @@ export interface Parameter {
 
 export interface Schema {
   type: string
+  enum?: Array<string>
 }
 
 export interface PlatformTool {
