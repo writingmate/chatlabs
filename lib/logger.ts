@@ -1,11 +1,4 @@
 import pino from "pino"
+import pretty from "pino-pretty"
 
-export const logger = pino({
-  level: process.env.LOG_LEVEL || "debug",
-  transport: {
-    target: "pino-pretty",
-    options: {
-      colorize: true
-    }
-  }
-})
+export const logger = pino(pretty())
