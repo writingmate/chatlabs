@@ -28,7 +28,7 @@ export function WebSearch({
         const hostname = new URL(item.link).hostname
         const displayHostname = hostname.replace("www.", "")
         return (
-          <Card className={"hover:bg-accent flex border-0"} key={index}>
+          <Card className={"hover:opactity-50 flex border-0"} key={index}>
             <a
               className="overflow-hidden p-2 text-xs"
               href={item.link}
@@ -60,7 +60,7 @@ export function WebSearch({
           <a
             href={"#"}
             onClick={() => setShowAll(true)}
-            className="col hover:bg-accent col-span-2 w-full text-right text-xs font-semibold underline md:col-span-4"
+            className="col hover:opactity-50 col-span-2 w-full text-right text-xs font-semibold underline md:col-span-4"
           >
             Show {organic.length - 4} more
           </a>
@@ -68,7 +68,7 @@ export function WebSearch({
           <a
             href={"#"}
             onClick={() => setShowAll(false)}
-            className="col hover:bg-accent col-span-2 w-full text-right text-xs font-semibold underline md:col-span-4"
+            className="col hover:opactity-50 col-span-2 w-full text-right text-xs font-semibold underline md:col-span-4"
           >
             Show less
           </a>

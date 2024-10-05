@@ -40,7 +40,7 @@ export const ModelOption: FC<ModelOptionProps> = ({
   }
   return (
     <div
-      className="hover:bg-accent flex w-full cursor-pointer justify-start space-x-3 truncate rounded p-2"
+      className="hover:opactity-50 flex w-full cursor-pointer justify-start space-x-3 truncate rounded p-2"
       onClick={onSelect}
     >
       <div className="flex w-full items-center justify-between space-x-2">
@@ -48,10 +48,8 @@ export const ModelOption: FC<ModelOptionProps> = ({
           {recent ? (
             <IconHistory
               className={cn(
-                "rounded-sm bg-[#fff] p-1 text-black",
-                theme === "dark"
-                  ? "bg-white"
-                  : "border-foreground/10 border-[1px]"
+                "rounded-sm bg-white p-1 text-black",
+                theme === "dark" ? "bg-white" : "border-foreground/10 border"
               )}
               stroke={1.5}
               size={24}

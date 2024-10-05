@@ -87,7 +87,7 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
       {isAssistantPickerOpen && (
         <div className="flex flex-col border p-2 text-sm shadow-lg">
           {filteredAssistants.length === 0 ? (
-            <div className="text-md hover:bg-accent flex h-14 cursor-pointer items-center justify-center italic">
+            <div className="text-md hover:opactity-50 flex h-14 cursor-pointer items-center justify-center italic">
               No matching assistants.
             </div>
           ) : (
@@ -99,7 +99,7 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
                     itemsRef.current[index] = ref
                   }}
                   tabIndex={0}
-                  className="hover:bg-accent focus:bg-accent flex cursor-pointer items-center rounded-lg p-2 focus:outline-none"
+                  className="hover:opactity-50 focus:bg-accent flex cursor-pointer items-center rounded-lg p-2 focus:outline-none"
                   onClick={() =>
                     callSelectAssistant(item as Tables<"assistants">)
                   }

@@ -29,7 +29,13 @@ import { logger } from "@/lib/logger"
 export const maxDuration = 300
 
 export async function GET() {
-  return new Response(JSON.stringify(platformToolDefinitions()), {
+  logger.debug("GET request received for tool definitions")
+  const definitions = platformToolDefinitions()
+  logger.debug(
+    { definitionCount: Object.keys(definitions).length },
+    "Returning tool definitions"
+  )
+  return new Response(JSON.stringify(definitions), {
     headers: {
       "Content-Type": "application/json"
     }
@@ -38,11 +44,11 @@ export async function GET() {
 
 function getClient(model: string, profile: Tables<"profiles">) {
   const provider = LLM_LIST.find(llm => llm.modelId === model)?.provider
-  logger.debug(`Getting client for provider: ${provider}`)
+  logger.debug({ model, provider }, "Getting client for provider")
 
   if (provider === "openai") {
     checkApiKey(profile.openai_api_key, "OpenAI")
-
+    logger.debug("Creating OpenAI client")
     return new OpenAI({
       apiKey: process.env.OPENAI_API_KEY || "",
       organization: process.env.OPENAI_ORGANIZATION_ID
@@ -51,6 +57,7 @@ function getClient(model: string, profile: Tables<"profiles">) {
 
   if (provider === "mistral") {
     checkApiKey(profile.mistral_api_key, "Mistral")
+    logger.debug("Creating Mistral client")
     return new OpenAI({
       apiKey: profile.mistral_api_key || "",
       baseURL: "https://api.mistral.ai/v1"
@@ -59,6 +66,7 @@ function getClient(model: string, profile: Tables<"profiles">) {
 
   if (provider === "groq") {
     checkApiKey(profile.groq_api_key, "Groq")
+    logger.debug("Creating Groq client")
     return new OpenAI({
       apiKey: profile.groq_api_key || "",
       baseURL: "https://api.groq.com/openai/v1"
@@ -68,19 +76,21 @@ function getClient(model: string, profile: Tables<"profiles">) {
   if (provider === undefined) {
     // special case for openrouter
     checkApiKey(profile.openrouter_api_key, "OpenRouter")
+    logger.debug("Creating OpenRouter client")
     return new OpenAI({
       apiKey: profile.openrouter_api_key || "",
       baseURL: "https://openrouter.ai/api/v1"
     })
   }
 
+  logger.error({ provider }, "Unsupported provider")
   throw new Error(`Provider not supported: ${provider}`)
 }
 
 async function* fixGroqStream(response: AsyncIterable<any>) {
-  logger.debug("Fixing Groq stream")
+  logger.debug("Starting Groq stream fix")
   for await (let chunk of response) {
-    // Assuming chunk is an object and we need to extract text from it
+    logger.debug({ chunk }, "Processing Groq stream chunk")
 
     if (
       chunk.choices?.[0]?.delta?.tool_calls?.[0]?.function.name &&
@@ -88,6 +98,7 @@ async function* fixGroqStream(response: AsyncIterable<any>) {
     ) {
       const toolCalls = chunk.choices?.[0]?.delta?.tool_calls
       try {
+        logger.debug({ toolCalls }, "Fixing tool calls in Groq stream")
         const newChunk = {
           id: chunk.id,
           object: chunk.object,
@@ -139,11 +150,12 @@ async function* fixGroqStream(response: AsyncIterable<any>) {
 
         continue
       } catch (e) {
-        console.error(e)
+        logger.error({ error: e }, "Error fixing Groq stream")
       }
     }
     yield chunk
   }
+  logger.debug("Finished Groq stream fix")
 }
 
 export async function POST(request: Request) {
@@ -164,6 +176,7 @@ export async function POST(request: Request) {
   )
 
   prependSystemPrompt(messages)
+  logger.debug("System prompt prepended to messages")
 
   const streamData = new experimental_StreamData()
 
@@ -240,13 +253,14 @@ export async function POST(request: Request) {
           )
 
           // Append all tool response messages
-          toolResponses.forEach(response =>
+          toolResponses.forEach(response => {
+            logger.debug({ response }, "Appending tool response message")
             appendToolCallMessage({
               tool_call_id: response.tool_call_id,
-              tool_call_result: response.content,
-              function_name: response.function_name
+              function_name: response.function_name,
+              tool_call_result: response.content
             })
-          )
+          })
 
           if (
             toolResponses.some(
@@ -305,7 +319,7 @@ export async function POST(request: Request) {
       experimental_onToolCall: onToolCallCallback,
       experimental_streamData: true,
       onFinal(completion) {
-        logger.debug("Stream completed")
+        logger.debug({ completion }, "Stream completed")
         streamData.close()
       }
     })
@@ -313,7 +327,7 @@ export async function POST(request: Request) {
     logger.debug("Returning streaming response")
     return new StreamingTextResponse(stream, {}, streamData)
   } catch (error: any) {
-    logger.error("Error in POST handler", error)
+    logger.error({ error }, "Error in POST handler")
     const errorMessage = error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     logger.error("Returning error response", { errorMessage, errorCode })

@@ -70,7 +70,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       <div
         ref={itemRef}
         className={cn(
-          "hover:bg-accent focus:bg-accent hover:bg-accent group flex w-full cursor-pointer items-center rounded p-2 focus:outline-none",
+          "hover:opactity-50 focus:bg-accent hover:opactity-50 group flex w-full cursor-pointer items-center rounded p-2 focus:outline-none",
           isActive && "bg-accent"
         )}
         tabIndex={0}

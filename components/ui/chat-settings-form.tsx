@@ -110,7 +110,9 @@ export const InfoIconTooltip: FC<InfoIconTooltipProps> = ({ label }) => {
     <WithTooltip
       delayDuration={0}
       display={label}
-      trigger={<IconInfoCircle className="cursor-hover:bg-accent" size={16} />}
+      trigger={
+        <IconInfoCircle className="cursor-hover:opactity-50" size={16} />
+      }
     />
   )
 }

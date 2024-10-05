@@ -42,7 +42,7 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
         <>
           <div className={"flex space-x-2"}>
             <div
-              className="hover:bg-accent cursor-pointer underline"
+              className="hover:opactity-50 cursor-pointer underline"
               onClick={getLinkAndView}
             >
               View {file.name}
@@ -50,7 +50,7 @@ export const FileItem: FC<FileItemProps> = ({ file }) => {
 
             {file.sharing == "public" && (
               <a
-                className="hover:bg-accent block cursor-pointer underline"
+                className="hover:opactity-50 block cursor-pointer underline"
                 href={`/share/${file.hashid}`}
                 target={"_blank"}
               >

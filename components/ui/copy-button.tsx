@@ -18,7 +18,7 @@ export function CopyButton({
   return (
     <Button
       size={"icon"}
-      className={cn("hover:bg-accent size-4 text-red-800", className)}
+      className={cn("hover:opactity-50 size-4 text-red-800", className)}
       variant={variant}
       onClick={() => {
         if (isCopied) return

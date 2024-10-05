@@ -65,12 +65,12 @@ export const CommandK: FC<CommandKProps> = ({}) => {
                 />
                 {loading ? (
                   <IconLoader2
-                    className="hover:bg-accent absolute bottom-[8px] right-3 animate-spin cursor-pointer rounded p-1"
+                    className="hover:opactity-50 absolute bottom-[8px] right-3 animate-spin cursor-pointer rounded p-1"
                     size={30}
                   />
                 ) : (
                   <IconSend
-                    className="bg-primary text-secondary hover:bg-accent absolute bottom-[8px] right-3 cursor-pointer rounded p-1"
+                    className="bg-primary text-secondary hover:opactity-50 absolute bottom-[8px] right-3 cursor-pointer rounded p-1"
                     onClick={handleCommandK}
                     size={30}
                   />

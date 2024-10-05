@@ -212,7 +212,7 @@ export const ChatInput: FC<ChatInputProps> = ({
           <div className={"relative my-2 flex items-center justify-center"}>
             <div className={"absolute left-3 flex items-center space-x-1"}>
               <IconPaperclip
-                className="hover:bg-accent cursor-pointer p-1"
+                className="hover:opactity-50 cursor-pointer p-1"
                 size={32}
                 onClick={() => fileInputRef.current?.click()}
               />
@@ -261,7 +261,7 @@ export const ChatInput: FC<ChatInputProps> = ({
             <div className="absolute bottom-1.5 right-3 flex cursor-pointer items-center space-x-2">
               {!isGenerating && hasMessages && (
                 <IconPlaylistX
-                  className={"hover:bg-accent cursor-pointer"}
+                  className={"hover:opactity-50 cursor-pointer"}
                   onClick={handleReset}
                   stroke={1.5}
                   size={24}
@@ -269,7 +269,7 @@ export const ChatInput: FC<ChatInputProps> = ({
               )}
               {isGenerating ? (
                 <IconPlayerStopFilled
-                  className="hover:bg-accent animate-pulse cursor-pointer rounded bg-transparent p-1"
+                  className="hover:opactity-50 animate-pulse cursor-pointer rounded bg-transparent p-1"
                   onClick={handleStopMessage}
                   size={30}
                 />

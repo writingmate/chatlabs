@@ -136,7 +136,7 @@ const CollectionFileItem: FC<CollectionFileItemProps> = ({
 
   return (
     <div
-      className="hover:bg-accent flex cursor-pointer items-center justify-between py-0.5"
+      className="hover:opactity-50 flex cursor-pointer items-center justify-between py-0.5"
       onClick={handleSelect}
     >
       <div className="flex grow items-center truncate">

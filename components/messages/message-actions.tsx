@@ -62,7 +62,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
           display={<div>Fork Chat</div>}
           trigger={
             <IconGitFork
-              className="cursor-pointer hover:bg-accent"
+              className="cursor-pointer hover:opactity-50"
               size={MESSAGE_ICON_SIZE}
               onClick={handleForkChat}
             />
@@ -76,7 +76,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         display={<div>Edit</div>}
         trigger={
           <IconEdit
-            className="hover:bg-accent hidden cursor-pointer group-hover:group-[.role-user]:block"
+            className="hover:opactity-50 hidden cursor-pointer group-hover:group-[.role-user]:block"
             size={MESSAGE_ICON_SIZE}
             onClick={onEdit}
           />
@@ -91,13 +91,13 @@ export const MessageActions: FC<MessageActionsProps> = ({
           trigger={
             isVoiceToTextPlaying ? (
               <IconPlayerStop
-                className="hover:bg-accent hidden cursor-pointer group-hover:block group-[.is-last]:block"
+                className="hover:opactity-50 hidden cursor-pointer group-hover:block group-[.is-last]:block"
                 size={MESSAGE_ICON_SIZE}
                 onClick={onVoiceToText}
               />
             ) : (
               <IconPlayerPlay
-                className="hover:bg-accent hidden cursor-pointer group-hover:block group-[.is-last]:block"
+                className="hover:opactity-50 hidden cursor-pointer group-hover:block group-[.is-last]:block"
                 size={MESSAGE_ICON_SIZE}
                 onClick={onVoiceToText}
               />
@@ -115,7 +115,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
             <IconCheck size={MESSAGE_ICON_SIZE} />
           ) : (
             <IconClipboard
-              className="hover:bg-accent hidden cursor-pointer group-hover:block group-[.is-last]:block"
+              className="hover:opactity-50 hidden cursor-pointer group-hover:block group-[.is-last]:block"
               size={MESSAGE_ICON_SIZE}
               onClick={handleCopy}
             />
@@ -129,7 +129,7 @@ export const MessageActions: FC<MessageActionsProps> = ({
         display={<div>Regenerate</div>}
         trigger={
           <IconRepeat
-            className="hover:bg-accent hidden cursor-pointer group-[.is-last]:block"
+            className="hover:opactity-50 hidden cursor-pointer group-[.is-last]:block"
             size={MESSAGE_ICON_SIZE}
             onClick={onRegenerate}
           />

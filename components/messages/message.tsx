@@ -417,7 +417,7 @@ export const Message: FC<MessageProps> = ({
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
               <IconBulb
-                className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
+                className="border-primary bg-primary text-secondary rounded border p-1"
                 size={ICON_SIZE}
               />
 
@@ -455,7 +455,7 @@ export const Message: FC<MessageProps> = ({
                 />
               ) : (
                 <IconMoodSmile
-                  className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+                  className="bg-primary text-secondary border-primary rounded border p-1"
                   size={ICON_SIZE}
                 />
               )}
@@ -469,7 +469,7 @@ export const Message: FC<MessageProps> = ({
                     : selectedAssistant
                       ? selectedAssistant?.name
                       : MODEL_DATA?.modelName
-                  : profile?.display_name ?? profile?.username}
+                  : (profile?.display_name ?? profile?.username)}
               </div>
               {showActions && (
                 <div className={"absolute right-0"}>
@@ -520,7 +520,7 @@ export const Message: FC<MessageProps> = ({
           <div className="border-primary mt-6 border-t pt-4 font-semibold">
             {!viewSources ? (
               <div
-                className="hover:bg-accent flex cursor-pointer items-center text-lg"
+                className="hover:opactity-50 flex cursor-pointer items-center text-lg"
                 onClick={() => setViewSources(true)}
               >
                 {fileItems.length}
@@ -532,7 +532,7 @@ export const Message: FC<MessageProps> = ({
             ) : (
               <>
                 <div
-                  className="hover:bg-accent flex cursor-pointer items-center text-lg"
+                  className="hover:opactity-50 flex cursor-pointer items-center text-lg"
                   onClick={() => setViewSources(false)}
                 >
                   {fileItems.length}
@@ -563,7 +563,7 @@ export const Message: FC<MessageProps> = ({
                         .map((fileItem, index) => (
                           <div
                             key={index}
-                            className="hover:bg-accent ml-8 mt-1.5 flex cursor-pointer items-center space-x-2"
+                            className="hover:opactity-50 ml-8 mt-1.5 flex cursor-pointer items-center space-x-2"
                             onClick={() => {
                               setSelectedFileItem(fileItem)
                               setShowFileItemPreview(true)
@@ -591,7 +591,7 @@ export const Message: FC<MessageProps> = ({
               return (
                 <Image
                   key={index}
-                  className="hover:bg-accent cursor-pointer rounded"
+                  className="hover:opactity-50 cursor-pointer rounded"
                   src={path}
                   alt="message image"
                   width={300}

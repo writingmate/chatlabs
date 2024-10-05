@@ -27,6 +27,9 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^0.0.51",
+    "@ai-sdk/mistral": "^0.0.42",
+    "@ai-sdk/openai": "^0.0.66",
     "@amplitude/analytics-browser": "^2.11.6",
     "@amplitude/experiment-js-client": "^1.11.0",
     "@amplitude/plugin-session-replay-browser": "^1.7.0",
@@ -86,7 +89,7 @@
     "@vercel/kv": "^0.2.4",
     "@vercel/speed-insights": "^1.0.10",
     "@xenova/transformers": "^2.13.4",
-    "ai": "^2.2.37",
+    "ai": "^3.4.9",
     "axios": "^1.6.7",
     "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.0",

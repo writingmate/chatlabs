@@ -39,9 +39,9 @@ export const ModelIcon: FC<ModelIconProps> = ({
       return (
         <OpenAISVG
           className={cn(
-            "rounded-sm bg-[#fff] p-1 text-black",
+            "rounded-sm bg-white p-1 text-black",
             className,
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           width={width}
           height={height}
@@ -52,7 +52,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]",
+            theme === "dark" ? "bg-white" : "border-foreground/10 border",
             className
           )}
           src={mistral.src}
@@ -66,7 +66,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-0",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]",
+            theme === "dark" ? "bg-white" : "border-foreground/10 border",
             className
           )}
           src={groq.src}
@@ -79,9 +79,9 @@ export const ModelIcon: FC<ModelIconProps> = ({
       return (
         <AnthropicSVG
           className={cn(
-            "rounded-sm bg-[#fff] p-1 text-black",
+            "rounded-sm bg-white p-1 text-black",
             className,
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           width={width}
           height={height}
@@ -91,9 +91,9 @@ export const ModelIcon: FC<ModelIconProps> = ({
       return (
         <GoogleSVG
           className={cn(
-            "rounded-sm bg-[#fff] p-1 text-black",
+            "rounded-sm bg-white p-1 text-black",
             className,
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           width={width}
           height={height}
@@ -104,7 +104,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]",
+            theme === "dark" ? "bg-white" : "border-foreground/10 border",
             className
           )}
           src={perplexity.src}
@@ -118,7 +118,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]",
+            theme === "dark" ? "bg-white" : "border-foreground/10 border",
             className
           )}
           src={databricks.src}
@@ -131,9 +131,9 @@ export const ModelIcon: FC<ModelIconProps> = ({
       return (
         <MicrosoftSVG
           className={cn(
-            "rounded-sm bg-[#fff] p-1 text-black",
+            "rounded-sm bg-white p-1 text-black",
             className,
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]"
+            theme === "dark" ? "bg-white" : "border-foreground/10 border"
           )}
           width={width}
           height={height}
@@ -144,7 +144,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         <Image
           className={cn(
             "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-foreground/10 border-[1px]",
+            theme === "dark" ? "bg-white" : "border-foreground/10 border",
             className
           )}
           src={meta.src}
@@ -167,7 +167,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
       return (
         <ChatbotUISVG
           className={cn(
-            "dark:border-foreground/10 rounded-sm dark:border-[1px]",
+            "dark:border-foreground/10 rounded-sm dark:border",
             className
           )}
           theme={theme === "dark" ? "light" : "dark"}

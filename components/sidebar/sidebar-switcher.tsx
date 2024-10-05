@@ -96,7 +96,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           asChild
           trigger={
             <Button
-              className="hover:bg-accent mx-auto"
+              className="hover:opactity-50 mx-auto"
               variant="ghost"
               size="icon"
               onClick={e => {
@@ -123,7 +123,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
             trigger={
               <IconDiamondFilled
                 onClick={() => setIsPaywallOpen(true)}
-                className="hover:bg-accent cursor-pointer pt-[4px] text-violet-700"
+                className="hover:opactity-50 cursor-pointer pt-[4px] text-violet-700"
                 stroke={1.5}
                 size={SIDEBAR_ICON_SIZE}
               />
