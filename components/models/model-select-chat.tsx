@@ -120,7 +120,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   if (allModels.length === 0 && profile?.plan.startsWith("byok_")) {
     return (
       <Button
-        className="items-end"
+        className="text-md items-end"
         onClick={e => {
           e.stopPropagation()
           setIsProfileSettingsOpen("keys")
@@ -148,7 +148,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
       >
         <Button
           ref={triggerRef}
-          className="flex items-center justify-between space-x-1"
+          className="text-md flex items-center justify-between space-x-1"
           variant="ghost"
         >
           <div className="flex items-center">
