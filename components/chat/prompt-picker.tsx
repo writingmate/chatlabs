@@ -169,7 +169,7 @@ export const PromptPicker: FC<PromptPickerProps> = ({}) => {
                   itemsRef.current[index] = ref
                 }}
                 tabIndex={0}
-                className="hover:bg-accent focus:bg-accent flex cursor-pointer flex-col rounded p-2 hover:opacity-50 focus:outline-none"
+                className="hover:bg-accent focus:bg-accent flex cursor-pointer flex-col rounded p-2 focus:outline-none"
                 onClick={() => handleSelectPromptWithVariables(prompt)}
                 onKeyDown={getKeyDownHandler(index)}
               >
