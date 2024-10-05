@@ -144,7 +144,7 @@ const WorkspaceItem: FC<WorkspaceItemProps> = ({
 
   return (
     <div
-      className="hover:opactity-50 flex cursor-pointer items-center justify-between py-0.5"
+      className="flex cursor-pointer items-center justify-between py-0.5 hover:opacity-50"
       onClick={handleSelect}
     >
       <div className="flex grow items-center truncate">

@@ -213,7 +213,7 @@ export const Import: FC<ImportProps> = ({}) => {
   return (
     <>
       <IconUpload
-        className="hover:opactity-50 cursor-pointer"
+        className="cursor-pointer hover:opacity-50"
         size={SIDEBAR_ICON_SIZE}
         onClick={() => setIsOpen(true)}
       />
@@ -238,7 +238,7 @@ export const Import: FC<ImportProps> = ({}) => {
                   <div key={index} className="flex space-x-2">
                     <Button className="shrink-0" variant="ghost" size="icon">
                       <IconX
-                        className="hover:opactity-50 cursor-pointer"
+                        className="cursor-pointer hover:opacity-50"
                         onClick={() => handleRemoveItem(item)}
                       />
                     </Button>

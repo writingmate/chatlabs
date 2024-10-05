@@ -215,7 +215,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
           <Button
             size={"icon"}
             variant={"link"}
-            className="text-foreground hover:opactity-50 size-5 active:opacity-75"
+            className="text-foreground size-5 hover:opacity-50 active:opacity-75"
             onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
           >
             <IconX />
@@ -234,7 +234,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
             size={"icon"}
             variant={"link"}
             className={cn(
-              "hover:opactity-50 size-5 active:opacity-75",
+              "size-5 hover:opacity-50 active:opacity-75",
               inspectMode && "text-violet-500"
             )}
             onClick={() => setInspectMode(!inspectMode)}
@@ -245,7 +245,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
             variant="link"
             size={"icon"}
             className={cn(
-              "console-toggle hover:opactity-50 size-5 active:opacity-75",
+              "console-toggle size-5 hover:opacity-50 active:opacity-75",
               isConsoleExpanded && "text-violet-500"
             )}
             onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}

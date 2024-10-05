@@ -47,7 +47,7 @@ export const UpdateFolder: FC<UpdateFolderProps> = ({ folder }) => {
   return (
     <Dialog open={showFolderDialog} onOpenChange={setShowFolderDialog}>
       <DialogTrigger asChild>
-        <IconEdit className="hover:opactity-50" size={18} />
+        <IconEdit className="hover:opacity-50" size={18} />
       </DialogTrigger>
 
       <DialogContent onKeyDown={handleKeyDown}>

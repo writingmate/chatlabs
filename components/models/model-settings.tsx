@@ -129,7 +129,7 @@ function ModelSettings({ models }: { models?: LLM[] }) {
       <DialogTrigger asChild>
         <div
           className={
-            "hover:opactity-50 flex w-full cursor-pointer items-center justify-start truncate rounded p-2 text-sm"
+            "flex w-full cursor-pointer items-center justify-start truncate rounded p-2 text-sm hover:opacity-50"
           }
         >
           <IconSettings

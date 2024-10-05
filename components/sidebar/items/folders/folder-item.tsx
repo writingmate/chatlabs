@@ -75,7 +75,7 @@ export const Folder: FC<FolderProps> = ({
       <div
         tabIndex={0}
         className={cn(
-          "hover:opactity-50 focus:bg-accent hover:opactity-50 flex w-full cursor-pointer items-center justify-between rounded p-2 focus:outline-none"
+          "focus:bg-accent flex w-full cursor-pointer items-center justify-between rounded p-2 hover:opacity-50 focus:outline-none"
         )}
         onClick={handleClick}
       >

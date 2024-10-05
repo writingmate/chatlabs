@@ -520,7 +520,7 @@ export const Message: FC<MessageProps> = ({
           <div className="border-primary mt-6 border-t pt-4 font-semibold">
             {!viewSources ? (
               <div
-                className="hover:opactity-50 flex cursor-pointer items-center text-lg"
+                className="flex cursor-pointer items-center text-lg hover:opacity-50"
                 onClick={() => setViewSources(true)}
               >
                 {fileItems.length}
@@ -532,7 +532,7 @@ export const Message: FC<MessageProps> = ({
             ) : (
               <>
                 <div
-                  className="hover:opactity-50 flex cursor-pointer items-center text-lg"
+                  className="flex cursor-pointer items-center text-lg hover:opacity-50"
                   onClick={() => setViewSources(false)}
                 >
                   {fileItems.length}
@@ -563,7 +563,7 @@ export const Message: FC<MessageProps> = ({
                         .map((fileItem, index) => (
                           <div
                             key={index}
-                            className="hover:opactity-50 ml-8 mt-1.5 flex cursor-pointer items-center space-x-2"
+                            className="ml-8 mt-1.5 flex cursor-pointer items-center space-x-2 hover:opacity-50"
                             onClick={() => {
                               setSelectedFileItem(fileItem)
                               setShowFileItemPreview(true)
@@ -591,7 +591,7 @@ export const Message: FC<MessageProps> = ({
               return (
                 <Image
                   key={index}
-                  className="hover:opactity-50 cursor-pointer rounded"
+                  className="cursor-pointer rounded hover:opacity-50"
                   src={path}
                   alt="message image"
                   width={300}

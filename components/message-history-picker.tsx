@@ -69,7 +69,7 @@ export const MessageHistoryPicker: FC<MessageHistoryPickerProps> = ({}) => {
       {isMessageHistoryPickerOpen && (
         <div className="flex flex-col space-y-1 p-2 text-sm">
           {filteredMessages.length === 0 ? (
-            <div className="text-md hover:opactity-50 flex h-14 cursor-pointer items-center justify-center italic">
+            <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
               No matching prompts.
             </div>
           ) : (
@@ -80,7 +80,7 @@ export const MessageHistoryPicker: FC<MessageHistoryPickerProps> = ({}) => {
                   itemsRef.current[index] = ref
                 }}
                 tabIndex={0}
-                className="hover:opactity-50 focus:bg-accent flex cursor-pointer flex-col rounded p-2 focus:outline-none"
+                className="focus:bg-accent flex cursor-pointer flex-col rounded p-2 hover:opacity-50 focus:outline-none"
                 onClick={() =>
                   handleSelectHistoryMessage(message.message.content)
                 }

@@ -155,7 +155,7 @@ interface PluginItemProps {
 const PluginItem: FC<PluginItemProps> = ({ plugin, selected, onSelect }) => {
   return (
     <div
-      className="hover:opactity-50 flex cursor-pointer items-center justify-between py-0.5 pl-2 text-sm"
+      className="flex cursor-pointer items-center justify-between py-0.5 pl-2 text-sm hover:opacity-50"
       onClick={onSelect}
     >
       <div className="flex grow items-center truncate">

@@ -35,7 +35,7 @@ export function PromptCatalog({
       <DialogTrigger onClick={() => setIsDialogOpen(true)}>
         <IconPencil
           size={32}
-          className={"hover:opactity-50 cursor-pointer p-1"}
+          className={"cursor-pointer p-1 hover:opacity-50"}
         />
       </DialogTrigger>
       <DialogContent>

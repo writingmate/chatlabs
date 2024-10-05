@@ -13,7 +13,7 @@ export const Alerts: FC<AlertsProps> = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="hover:opactity-50 relative cursor-pointer">
+        <div className="relative cursor-pointer hover:opacity-50">
           <IconBell size={SIDEBAR_ICON_SIZE} />
           {1 > 0 && (
             <span className="notification-indicator absolute right-[-4px] top-[-4px] flex size-4 items-center justify-center rounded-full bg-red-600 text-[10px] text-white">

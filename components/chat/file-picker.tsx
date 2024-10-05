@@ -106,7 +106,7 @@ export const FilePicker: FC<FilePickerProps> = ({
       {isOpen && (
         <div className="flex flex-col space-y-1 p-2 text-sm">
           {filteredFiles.length === 0 && filteredCollections.length === 0 ? (
-            <div className="text-md hover:opactity-50 flex h-14 cursor-pointer items-center justify-center italic">
+            <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
               No matching files.
             </div>
           ) : (
@@ -118,7 +118,7 @@ export const FilePicker: FC<FilePickerProps> = ({
                     itemsRef.current[index] = ref
                   }}
                   tabIndex={0}
-                  className="hover:opactity-50 focus:bg-accent flex cursor-pointer items-center rounded p-2 focus:outline-none"
+                  className="focus:bg-accent flex cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none"
                   onClick={() => {
                     if ("type" in item) {
                       handleSelectFile(item as Tables<"files">)

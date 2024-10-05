@@ -94,11 +94,11 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
       {isToolPickerOpen && (
         <div className="bg-background flex flex-col space-y-1 rounded-xl border p-2 text-sm">
           {!toolsSupported ? (
-            <div className="text-md hover:opactity-50 flex h-14 cursor-pointer items-center justify-center italic">
+            <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
               This model does not support plugins. Select a different model.
             </div>
           ) : filteredTools.length === 0 ? (
-            <div className="text-md hover:opactity-50 flex h-14 cursor-pointer items-center justify-center italic">
+            <div className="text-md flex h-14 cursor-pointer items-center justify-center italic hover:opacity-50">
               No matching tools.
             </div>
           ) : (
@@ -110,7 +110,7 @@ export const ToolPicker: FC<ToolPickerProps> = ({}) => {
                     itemsRef.current[index] = ref
                   }}
                   tabIndex={0}
-                  className="hover:opactity-50 focus:bg-accent flex cursor-pointer items-center rounded p-2 focus:outline-none"
+                  className="focus:bg-accent flex cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none"
                   onClick={() => callSelectTool(item as Tables<"tools">)}
                   onKeyDown={getKeyDownHandler(index)}
                 >
