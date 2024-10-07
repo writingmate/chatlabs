@@ -122,19 +122,3 @@ mjx-container[jax="SVG"] {
 .animate-fade-in {
   animation: fadeIn 1s ease-in-out;
 }
-
-.sp-preview-container {
-  @apply flex h-full w-full grow flex-col justify-center;
-}
-
-.relative .sp-wrapper {
-  @apply flex flex-col grow h-full;
-}
-
-.relative .sp-console {
-  @apply absolute bottom-0 left-0 right-0 h-1/4;
-}
-
-.cm-scroller::-webkit-scrollbar-thumb {
-  @apply bg-white/30;
-}
