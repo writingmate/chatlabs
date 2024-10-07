@@ -140,7 +140,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   )
 
   // Debounce search input
-  const handleSearchChange = useCallback(e => {
+  const handleSearchChange = useCallback((e: any) => {
     const value = e.target.value
     setSearch(value)
   }, [])
