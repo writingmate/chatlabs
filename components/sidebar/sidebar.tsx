@@ -27,7 +27,8 @@ import {
   IconLayoutColumns,
   IconPuzzle2,
   IconBulb,
-  IconLayoutSidebar
+  IconLayoutSidebar,
+  IconSparkles
 } from "@tabler/icons-react"
 import { ChatbotUIContext } from "@/context/context"
 import { Button } from "../ui/button"
@@ -55,7 +56,9 @@ export const Sidebar: FC = () => {
     profile,
     selectedWorkspace,
     showSidebar,
-    setShowSidebar
+    setShowSidebar,
+    isPaywallOpen,
+    setIsPaywallOpen // Use context's state
   } = useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
   const [activeSubmenu, setActiveSubmenu] = useState<ContentType | null>(null)
@@ -200,6 +203,10 @@ export const Sidebar: FC = () => {
 
   const COLLAPSED_SIDEBAR_WIDTH = 58
   const EXPANDED_SIDEBAR_WIDTH = 300
+
+  const handleUpgrade = () => {
+    setIsPaywallOpen(true)
+  }
 
   return useMemo(
     () => (
@@ -377,6 +384,36 @@ export const Sidebar: FC = () => {
             </div>
           </div>
 
+          {/* Upgrade message for free plan users */}
+          {profile?.plan === "free" && (
+            <div className="border-t p-2">
+              <div className="flex flex-col items-center justify-between space-y-2 text-sm">
+                {!isCollapsed && (
+                  <div className="font-semibold">Upgrade to Pro</div>
+                )}
+                {!isCollapsed && (
+                  <div className="text-muted-foreground text-center text-xs">
+                    Upgrade to get access to all models, assistants, plugins and
+                    more.
+                  </div>
+                )}
+                <Button
+                  variant="default"
+                  size={isCollapsed ? "icon" : "sm"}
+                  className="rounded-full bg-violet-700"
+                  onClick={handleUpgrade}
+                >
+                  <IconSparkles
+                    {...iconProps}
+                    className="text-white"
+                    stroke={1.5}
+                  />
+                  {!isCollapsed && <span className="ml-2">Upgrade</span>}
+                </Button>
+              </div>
+            </div>
+          )}
+
           {profile && (
             <div className="border-t p-2">
               <ProfileSettings isCollapsed={isCollapsed} />
@@ -435,7 +472,9 @@ export const Sidebar: FC = () => {
       showSidebar,
       searchQueries,
       chatSearchResults,
-      searchLoading
+      searchLoading,
+      profile,
+      isPaywallOpen // Use context's state
     ]
   )
 }

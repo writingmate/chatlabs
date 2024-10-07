@@ -339,7 +339,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="flex h-[80vh] flex-col gap-0 p-0 sm:max-w-[900px]">
+      <DialogContent className="flex h-screen flex-col gap-0 p-0 sm:h-[80vh] sm:max-w-[900px]">
         <DialogHeader className="border-b px-6 py-4">
           <DialogTitle className="flex items-center justify-between space-x-2">
             <div className="flex items-center space-x-2">
@@ -365,7 +365,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
           }
           className="my-0 flex flex-1 overflow-hidden"
         >
-          <TabsList className="flex h-full w-48 flex-col justify-start rounded-none border-r">
+          <TabsList className="flex h-full flex-col justify-start rounded-none border-r sm:w-48">
             <TabsTrigger value="profile" className="w-full justify-start">
               Profile
             </TabsTrigger>
