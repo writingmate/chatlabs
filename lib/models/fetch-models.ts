@@ -33,7 +33,7 @@ const KNOWN_MODEL_NAMES: {
     categories: [CATEGORIES.PROGRAMMING]
   },
   "gryphe/mythomax-l2-13b": {
-    provider: "openrouter",
+    provider: "gryphe" as any,
     modelName: "Mythomax 13B",
     categories: [CATEGORIES.ROLEPLAY]
   }
