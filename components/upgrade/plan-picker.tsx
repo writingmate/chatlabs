@@ -2,9 +2,9 @@
 import { ChatbotUIContext } from "@/context/context"
 import { IconCheck, IconCircleCheck } from "@tabler/icons-react"
 import { FC, ReactNode, useContext } from "react"
-import { Dialog, DialogContent } from "../ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog"
 import Plans from "@/components/upgrade/plans"
-
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 interface PlanPickerProps {}
 
 export function PlanFeature({
@@ -29,6 +29,9 @@ export const PlanPicker: FC<PlanPickerProps> = () => {
 
   return (
     <Dialog open={isPaywallOpen} onOpenChange={setIsPaywallOpen}>
+      <VisuallyHidden>
+        <DialogTitle></DialogTitle>
+      </VisuallyHidden>
       <DialogContent className="sm:max-w-2xl sm:border">
         <Plans onClose={() => setIsPaywallOpen(false)} showCloseIcon={true} />
       </DialogContent>

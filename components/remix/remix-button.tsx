@@ -1,9 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { FC, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { IconArrowsShuffle } from "@tabler/icons-react"
+import {
+  IconArrowFork,
+  IconArrowsShuffle,
+  IconCopy,
+  IconInfoCircle
+} from "@tabler/icons-react"
 import { AuthProvider, useAuth } from "@/context/auth"
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
 
 interface RemixButtonProps {
   fileId: string
@@ -20,21 +26,23 @@ function InnerRemixButton({ fileId }: RemixButtonProps) {
   }
 
   return (
-    <Button
-      color={"primary"}
-      variant={"ghost"}
-      loading={isRemixing}
-      onClick={handleRemix}
-      size={"sm"}
-      disabled={isRemixing}
-    >
-      <IconArrowsShuffle size={18} className={"mr-2"} stroke={1.5} />
-      {isRemixing ? "Remixing..." : "Remix"}
-    </Button>
+    <div className="flex items-center space-x-2">
+      <Button
+        variant={"default"}
+        loading={isRemixing}
+        onClick={handleRemix}
+        size={"sm"}
+        disabled={isRemixing}
+        title="Create your own version of this chat"
+      >
+        <IconArrowFork size={18} className={"mr-2"} stroke={1.5} />
+        {isRemixing ? "Creating..." : "Make your version"}
+      </Button>
+    </div>
   )
 }
 
-const RemixButton: React.FC<RemixButtonProps> = ({ fileId }) => {
+const RemixButton: FC<RemixButtonProps> = ({ fileId }) => {
   return (
     <AuthProvider>
       <InnerRemixButton fileId={fileId} />

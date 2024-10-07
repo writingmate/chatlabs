@@ -163,6 +163,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   const [isPaywallOpen, setIsPaywallOpen] = useState<boolean>(false)
 
+  // PROFILE SETTINGS
+  const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState<string>("")
+
   // SIDEBAR
   const [showSidebar, setShowSidebar] = useState<boolean>(
     () => !isMobileScreen()
@@ -170,49 +173,54 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   useEffect(() => {
     ;(async () => {
-      const profile = await fetchStartingData()
-      const hostedModelRes = await fetchHostedModels(profile)
-      if (!hostedModelRes) return
+      try {
+        const profile = await fetchStartingData()
+        const hostedModelRes = await fetchHostedModels(profile)
+        if (!hostedModelRes) return
 
-      const allModels = []
+        const allModels = []
 
-      setEnvKeyMap(hostedModelRes.envKeyMap)
-      setAvailableHostedModels(hostedModelRes.hostedModels)
+        setEnvKeyMap(hostedModelRes.envKeyMap)
+        setAvailableHostedModels(hostedModelRes.hostedModels)
 
-      allModels.push(...hostedModelRes.hostedModels)
+        allModels.push(...hostedModelRes.hostedModels)
 
-      if (profile) {
-        if (
-          profile["openrouter_api_key"] ||
-          hostedModelRes.envKeyMap["openrouter"]
-        ) {
-          const openRouterModels = await fetchOpenRouterModels()
-          if (!openRouterModels) return
-          allModels.push(...openRouterModels)
-          setAvailableOpenRouterModels(openRouterModels)
+        if (profile) {
+          if (
+            profile["openrouter_api_key"] ||
+            hostedModelRes.envKeyMap["openrouter"]
+          ) {
+            const openRouterModels = await fetchOpenRouterModels()
+            if (!openRouterModels) return
+            allModels.push(...openRouterModels)
+            setAvailableOpenRouterModels(openRouterModels)
+          }
         }
-      }
 
-      if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
-        const localModels = await fetchOllamaModels()
-        if (!localModels) return
-        allModels.push(...localModels)
-        setAvailableLocalModels(localModels)
-      }
+        if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
+          const localModels = await fetchOllamaModels()
+          if (!localModels) return
+          allModels.push(...localModels)
+          setAvailableLocalModels(localModels)
+        }
 
-      setAllModels([
-        ...models.map(model => ({
-          modelId: model.model_id as LLMID,
-          modelName: model.name,
-          provider: "custom" as ModelProvider,
-          hostedId: model.id,
-          platformLink: "",
-          imageInput: false,
-          paid: "paid" in model ? !!model.paid : false,
-          maxContext: null
-        })),
-        ...allModels
-      ])
+        setAllModels([
+          ...models.map(model => ({
+            modelId: model.model_id as LLMID,
+            modelName: model.name,
+            provider: "custom" as ModelProvider,
+            hostedId: model.id,
+            platformLink: "",
+            imageInput: false,
+            paid: "paid" in model ? !!model.paid : false,
+            maxContext: null
+          })),
+          ...allModels
+        ])
+      } catch (error) {
+        setLoading(false)
+        console.error("Error fetching models:", error)
+      }
     })()
   }, [])
 
@@ -538,7 +546,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setShowSidebar,
 
         allModels,
-        setAllModels
+        setAllModels,
+
+        // PROFILE SETTINGS
+        isProfileSettingsOpen,
+        setIsProfileSettingsOpen
       }}
     >
       {children}

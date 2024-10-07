@@ -1,7 +1,10 @@
 import { IconMoon, IconSun } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
 import { FC } from "react"
-import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
+import {
+  SIDEBAR_ICON_SIZE,
+  SIDEBAR_ICON_STROKE
+} from "../sidebar/sidebar-switcher"
 import { Button } from "../ui/button"
 
 interface ThemeSwitcherProps {}
@@ -26,9 +29,9 @@ export const ThemeSwitcher: FC<ThemeSwitcherProps> = () => {
       onClick={() => handleChange(theme === "light" ? "dark" : "light")}
     >
       {theme === "dark" ? (
-        <IconMoon size={SIDEBAR_ICON_SIZE} />
+        <IconMoon size={SIDEBAR_ICON_SIZE} stroke={SIDEBAR_ICON_STROKE} />
       ) : (
-        <IconSun size={SIDEBAR_ICON_SIZE} />
+        <IconSun size={SIDEBAR_ICON_SIZE} stroke={SIDEBAR_ICON_STROKE} />
       )}
     </Button>
   )

@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -77,7 +77,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       application_models: {
@@ -106,7 +106,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "applications"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       application_platform_tools: {
@@ -145,7 +145,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       application_tools: {
@@ -191,7 +191,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       applications: {
@@ -265,7 +265,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       assistant_collections: {
@@ -311,7 +311,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       assistant_files: {
@@ -357,7 +357,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       assistant_platform_tools: {
@@ -396,7 +396,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       assistant_prompts: {
@@ -441,7 +441,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       assistant_tools: {
@@ -487,7 +487,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       assistant_workspaces: {
@@ -533,7 +533,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       assistants: {
@@ -611,7 +611,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       chat_files: {
@@ -657,7 +657,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       chats: {
@@ -782,7 +782,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       collection_files: {
@@ -828,7 +828,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       collection_workspaces: {
@@ -874,7 +874,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       collections: {
@@ -922,7 +922,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       file_items: {
@@ -976,7 +976,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       file_workspaces: {
@@ -1022,7 +1022,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       files: {
@@ -1085,7 +1085,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       folders: {
@@ -1133,7 +1133,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       message_file_items: {
@@ -1179,7 +1179,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       messages: {
@@ -1249,7 +1249,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       model_workspaces: {
@@ -1295,7 +1295,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       models: {
@@ -1355,7 +1355,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       preset_workspaces: {
@@ -1401,7 +1401,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       presets: {
@@ -1470,7 +1470,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       profiles: {
@@ -1595,7 +1595,7 @@ export interface Database {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       prompt_category: {
@@ -1668,7 +1668,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       prompts: {
@@ -1728,7 +1728,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       prompts_categories: {
@@ -1758,7 +1758,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "prompts"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       shared_chats: {
@@ -1817,7 +1817,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       tool_workspaces: {
@@ -1863,7 +1863,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       tools: {
@@ -1923,7 +1923,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       user_questions: {
@@ -1970,7 +1970,7 @@ export interface Database {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       workspaces: {
@@ -2038,7 +2038,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -2056,7 +2056,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -2135,7 +2135,7 @@ export interface Database {
         Args: {
           "": string
         }
-        Returns: unknown
+        Returns: number[]
       }
       id_decode_once: {
         Args: {
@@ -2207,6 +2207,36 @@ export interface Database {
           p_name: string
         }
         Returns: boolean
+      }
+      search_chats_and_messages: {
+        Args: {
+          p_workspace_id: string
+          p_query: string
+        }
+        Returns: {
+          assistant_id: string | null
+          context_length: number
+          created_at: string
+          embeddings_provider: string
+          folder_id: string | null
+          hashid: string
+          id: string
+          include_profile_context: boolean
+          include_workspace_instructions: boolean
+          last_chat_message_id: string | null
+          last_shared_message_id: string | null
+          model: string
+          name: string
+          pinned: boolean | null
+          prompt: string
+          shared_at: string | null
+          shared_by: string | null
+          sharing: string
+          temperature: number
+          updated_at: string | null
+          user_id: string
+          workspace_id: string
+        }[]
       }
       unaccent: {
         Args: {
@@ -2343,7 +2373,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "buckets"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -2376,7 +2406,7 @@ export interface Database {
         Args: {
           name: string
         }
-        Returns: unknown
+        Returns: string[]
       }
       get_size_by_bucket: {
         Args: Record<PropertyKey, never>
@@ -2415,14 +2445,16 @@ export interface Database {
   }
 }
 
+type PublicSchema = Database[Extract<keyof Database, "public">]
+
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -2430,68 +2462,68 @@ export type Tables<
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
-      Database["public"]["Views"])
-  ? (Database["public"]["Tables"] &
-      Database["public"]["Views"])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
     : never
-  : never
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Insert: infer I
-    }
-    ? I
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never
 
 export type Enums<
   PublicEnumNameOrOptions extends
-    | keyof Database["public"]["Enums"]
+    | keyof PublicSchema["Enums"]
     | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
-    : never = never
+    : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
-  ? Database["public"]["Enums"][PublicEnumNameOrOptions]
-  : never
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
 

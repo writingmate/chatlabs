@@ -27,7 +27,7 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = ({
       <div
         className={cn(
           "max-w-[50%] shrink-0 overflow-hidden transition-[width] duration-200",
-          open ? "w-[100%]" : "w-[0%]"
+          open ? "w-full" : "w-0"
         )}
       >
         {open && selectedCodeBlock && (

@@ -62,8 +62,7 @@ export const useSelectFileHandler = ({
           simplifiedFileType = "pdf"
         } else if (
           simplifiedFileType.includes(
-            "vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-              "docx"
+            "vnd.openxmlformats-officedocument.wordprocessingml.document"
           )
         ) {
           simplifiedFileType = "docx"
@@ -82,8 +81,7 @@ export const useSelectFileHandler = ({
         // Handle docx files
         if (
           file.type.includes(
-            "vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-              "docx"
+            "vnd.openxmlformats-officedocument.wordprocessingml.document"
           )
         ) {
           const arrayBuffer = await file.arrayBuffer()

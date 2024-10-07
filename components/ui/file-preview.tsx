@@ -34,16 +34,16 @@ export const FilePreview: FC<FilePreviewProps> = ({
             return imageItem.file ? (
               <DrawingCanvas imageItem={imageItem} />
             ) : (
-              <Image
+              <img
                 className="rounded"
                 src={imageItem.base64 || imageItem.url}
                 alt="File image"
-                width={2000}
-                height={2000}
-                style={{
-                  maxHeight: "67vh",
-                  maxWidth: "67vw"
-                }}
+                // width={2000}
+                // height={2000}
+                // style={{
+                //   maxHeight: "67vh",
+                //   maxWidth: "67vw"
+                // }}
               />
             )
           } else if (type === "file_item") {

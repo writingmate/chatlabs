@@ -25,7 +25,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       size="icon"
       className={cn(
         "flex cursor-pointer items-center justify-start rounded-lg p-2 text-left text-sm font-normal",
-        isCollapsed ? "w-12 justify-center" : "w-full"
+        isCollapsed ? "w-10 justify-center" : "w-full"
       )}
       onClick={onClick}
     >

@@ -37,6 +37,7 @@ export const UserSettings: FC<UserSettingsProps> = ({
             {!isCollapsed && (
               <IconChevronUp
                 size={18}
+                stroke={1.5}
                 className={`shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
               />
             )}

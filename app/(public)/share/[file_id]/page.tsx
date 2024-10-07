@@ -1,10 +1,19 @@
 import { getFileByHashId } from "@/db/files"
 import { notFound } from "next/navigation"
-import { IconExternalLink } from "@tabler/icons-react"
+import {
+  IconExternalLink,
+  IconInfoCircle,
+  IconRocket,
+  IconShoppingCart,
+  IconUsers,
+  IconWorld
+} from "@tabler/icons-react"
 import { DOMParser } from "xmldom"
 import RemixButton from "@/components/remix/remix-button"
 import { REGEX_FILENAME } from "@/lib/preview"
 import { updateHtml } from "@/lib/code-viewer"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 interface SharePageProps {
   params: {
@@ -80,26 +89,74 @@ const SharePage = async ({
       {showBanner && (
         <div
           className={
-            "flex h-[60px] w-full items-center justify-center space-x-1 bg-violet-700 text-sm text-white"
+            "flex h-[60px] w-full items-center justify-center space-x-1 border-t text-sm"
           }
         >
-          Built with
-          <div className={"flex items-center space-x-1 px-1"}>
-            <a
-              target={"_blank"}
-              className={"font-semibold hover:underline"}
-              href={`https://labs.writingmate.ai/?utm_source=app_share&utm_medium=${file_id}`}
-            >
-              ChatLabs
-            </a>
-            <IconExternalLink stroke={1.5} size={16} />
-          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <IconInfoCircle size={18} className={"mr-2"} stroke={1.5} />
+                Built with ChatLabs
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <div className="grid gap-4">
+                <h4 className="text-lg font-medium leading-none">
+                  What is ChatLabs?
+                </h4>
+                <p className="text-muted-foreground text-sm">
+                  ChatLabs is a platform for creating, sharing, and exploring
+                  groundbreaking AI applications.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <FeatureCard
+                    icon={<IconRocket size={24} />}
+                    title="Build AI Apps"
+                    description="Create custom AI applications without any coding skills"
+                  />
+                  <FeatureCard
+                    icon={<IconShoppingCart size={24} />}
+                    title="Build upon existing apps"
+                    description="Find pre-built AI applications that you can modify to your needs"
+                  />
+                  <FeatureCard
+                    icon={<IconUsers size={24} />}
+                    title="Collaborate"
+                    description="Work together with others on exciting AI projects"
+                  />
+                  <FeatureCard
+                    icon={<IconWorld size={24} />}
+                    title="Share & Deploy"
+                    description="Easily deploy and share your AI creations with the world"
+                  />
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
           <RemixButton fileId={file_id} />
         </div>
       )}
     </div>
   )
 }
+
+interface FeatureCardProps {
+  icon: React.ReactNode
+  title: string
+  description: string
+}
+
+const FeatureCard: React.FC<FeatureCardProps> = ({
+  icon,
+  title,
+  description
+}) => (
+  <div className="flex flex-col items-center rounded-lg bg-gray-100 p-3 text-center">
+    <div className="mb-2 text-blue-500">{icon}</div>
+    <h5 className="mb-1 text-sm font-medium">{title}</h5>
+    <p className="text-xs text-gray-600">{description}</p>
+  </div>
+)
 
 SharePage.layout = "none"
 
