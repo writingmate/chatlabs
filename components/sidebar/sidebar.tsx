@@ -299,7 +299,7 @@ export const Sidebar: FC = () => {
                   variant="ghost"
                   size="icon"
                   onClick={toggleCollapseOrSubmenu}
-                  className="w-10"
+                  className="hidden w-10 shrink-0 md:flex"
                 >
                   {isCollapsed ? (
                     <IconChevronRight {...iconProps} />

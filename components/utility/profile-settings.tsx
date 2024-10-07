@@ -48,13 +48,14 @@ import {
   createBillingPortalSession,
   redirectToBillingPortal
 } from "@/actions/stripe"
-import { PLAN_FREE } from "@/lib/stripe/config"
+import { PLAN_FREE, PLAN_PRO, PLAN_ULTIMATE } from "@/lib/stripe/config"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { debounce } from "@/lib/debounce"
 import { Callout, CalloutDescription, CalloutTitle } from "../ui/callout"
 import { Loader } from "lucide-react"
+import { ButtonWithTooltip } from "../ui/button-with-tooltip"
 
 interface ProfileSettingsProps {
   isCollapsed: boolean
@@ -345,7 +346,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
             <div className="flex items-center space-x-2">
               <IconSettings className="mr-1" size={20} stroke={1.5} /> Settings
             </div>
-            <Button
+
+            <ButtonWithTooltip
+              tooltip="Sign out"
               tabIndex={-1}
               className="text-xs"
               size="icon"
@@ -353,7 +356,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
               onClick={handleSignOut}
             >
               <IconLogout stroke={1.5} size={20} />
-            </Button>
+            </ButtonWithTooltip>
           </DialogTitle>
         </DialogHeader>
 
@@ -375,20 +378,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
             <TabsTrigger value="keys" className="w-full justify-start">
               API Keys
             </TabsTrigger>
-            {profile.plan != PLAN_FREE && (
-              <TabsTrigger
-                value="subscription"
-                className="w-full justify-start"
-                onClick={handleRedirectToBillingPortal}
-              >
-                Manage Subscription
-                {loadingBillingPortal ? (
-                  <Loader className="ml-1 size-4 animate-spin" />
-                ) : (
-                  <IconExternalLink className="ml-1 size-4" stroke={1.5} />
-                )}
-              </TabsTrigger>
-            )}
+            <TabsTrigger value="subscription" className="w-full justify-start">
+              Subscription
+            </TabsTrigger>
           </TabsList>
 
           <div className="flex-1 overflow-y-auto p-6">
@@ -396,7 +388,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
               <form className={"space-y-2"}>
                 <div className="space-y-1">
                   <Label>Profile Image</Label>
-
                   <ImagePicker
                     src={profileImageSrc}
                     image={profileImageFile}
@@ -409,7 +400,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
 
                 <div className="space-y-1">
                   <Label>Chat Display Name</Label>
-
                   <Input
                     placeholder="Chat display name..."
                     value={displayName}
@@ -423,7 +413,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                     What would you like the AI to know about you to provide
                     better responses?
                   </Label>
-
                   <TextareaAutosize
                     value={profileInstructions}
                     onValueChange={setProfileInstructions}
@@ -431,7 +420,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                     minRows={6}
                     maxRows={10}
                   />
-
                   <LimitDisplay
                     used={profileInstructions.length}
                     limit={PROFILE_CONTEXT_MAX}
@@ -441,6 +429,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                   <div className="flex items-center space-x-2">
                     <Label>Artifacts</Label>
                     <WithTooltip
+                      asChild={true}
                       trigger={
                         <IconInfoCircle
                           size={18}
@@ -704,6 +693,48 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                   value={openrouterAPIKey}
                   onChange={e => setOpenrouterAPIKey(e.target.value)}
                 />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="subscription">
+              <div className="space-y-2">
+                <Label>Current Subscription Plan</Label>
+                <div className="text-xl font-semibold capitalize">
+                  {profile.plan.split("_")[0]}
+                </div>
+                <p className="text-sm">
+                  {
+                    {
+                      [PLAN_FREE]:
+                        "Upgrade to paid plan to unlock all models, plugins and image generation.",
+                      [PLAN_PRO]:
+                        "Upgrade to Ultimate to get access to OpenAI o1-preview and Claude 3 Opus",
+                      [PLAN_ULTIMATE]:
+                        "You're on the Ultimate plan! Enjoy your access to all models, plugins and image generation."
+                    }[profile.plan.split("_")[0]]
+                  }
+                </p>
+                {profile?.plan !== PLAN_FREE ? (
+                  <Button
+                    className="bg-violet-600"
+                    loading={loadingBillingPortal}
+                    onClick={handleRedirectToBillingPortal}
+                  >
+                    Manage Subscription
+                    {loadingBillingPortal ? (
+                      <Loader className="ml-1 size-4 animate-spin" />
+                    ) : (
+                      <IconExternalLink className="ml-1 size-4" stroke={1.5} />
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    className="bg-violet-600"
+                    onClick={() => setIsPaywallOpen(true)}
+                  >
+                    Upgrade
+                  </Button>
+                )}
               </div>
             </TabsContent>
           </div>
