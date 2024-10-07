@@ -127,31 +127,6 @@ export const Sidebar: FC = () => {
     className: "text-muted-foreground"
   }
 
-  const handleSearch = useCallback(
-    debounce(async (query: string) => {
-      setSearchLoading(true)
-      if (query.trim() === "") {
-        setChatSearchResults(chats)
-        setSearchLoading(false)
-        return
-      }
-
-      try {
-        const { data, error } = await searchChatsAndMessages(
-          selectedWorkspace?.id || "",
-          query
-        )
-        if (error) throw error
-        setChatSearchResults(data || [])
-      } catch (error) {
-        console.error("Error searching chats and messages:", error)
-        setChatSearchResults([])
-      }
-      setSearchLoading(false)
-    }, 300),
-    [selectedWorkspace?.id]
-  )
-
   const dataMap = useMemo(
     () => ({
       chats: chats.filter(chat =>
@@ -471,8 +446,6 @@ export const Sidebar: FC = () => {
       isLoaded,
       showSidebar,
       searchQueries,
-      chatSearchResults,
-      searchLoading,
       profile,
       isPaywallOpen // Use context's state
     ]
