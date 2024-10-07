@@ -25,6 +25,7 @@ import { ChatbotUIChatContext } from "@/context/chat"
 import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
 import { toast } from "sonner"
 import { t } from "i18next"
+import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
 
 interface UseChatHandlerProps {
   onChatCreate?: (chat: Tables<"chats">) => void
@@ -437,6 +438,13 @@ export const useChatHandler = ({
     handleSendMessage(editedContent, filteredMessages, false)
   }
 
+  const {
+    selectedCodeBlock,
+    handleSelectCodeBlock,
+    handleCodeChange,
+    isEditable
+  } = useCodeBlockManager(chatMessages)
+
   return {
     chatInputRef,
     // prompt,
@@ -444,6 +452,10 @@ export const useChatHandler = ({
     handleSendMessage,
     handleFocusChatInput,
     handleStopMessage,
-    handleSendEdit
+    handleSendEdit,
+    selectedCodeBlock,
+    handleSelectCodeBlock,
+    handleCodeChange,
+    isEditable
   }
 }

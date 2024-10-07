@@ -65,9 +65,9 @@ export const ChatUI: React.FC<ChatUIProps> = ({
   showChatSettings = true,
   showAssistantSelector = true,
   assistant,
-  onSelectCodeBlock,
   onChatCreate,
   onChatUpdate,
+  onSelectCodeBlock,
   chatId,
   experimentalCodeEditor // Default to false
 }) => {

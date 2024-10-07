@@ -6,6 +6,8 @@ export interface CodeBlock {
   language: string
   code: string
   filename?: string
+  version?: number
+  type?: string
 }
 
 export interface ChatMessage {

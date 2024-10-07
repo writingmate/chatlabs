@@ -15,6 +15,7 @@ import { toast } from "sonner"
 import { updateChat } from "@/db/chats"
 import { useSelectCodeBlock } from "@/hooks/useSelectCodeBlock"
 import { useCodeBlockEditable } from "@/hooks/useCodeBlockEditable"
+import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
 
 interface ApplicationPageProps {
   application: Tables<"applications"> & {
@@ -286,12 +287,12 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
   const [application, setApplication] = useState(defaultApplication)
   const { allModels, tools } = useContext(ChatbotUIContext)
   const { chatMessages, isGenerating } = useContext(ChatbotUIChatContext)
-  const { selectedCodeBlock, handleSelectCodeBlock } =
-    useSelectCodeBlock(chatMessages)
-  const handleCodeChange = useCodeChange(
+  const {
     selectedCodeBlock,
-    handleSelectCodeBlock
-  )
+    handleSelectCodeBlock,
+    handleCodeChange,
+    isEditable
+  } = useCodeBlockManager(chatMessages)
 
   const handleUpdateApplication = useCallback(
     (
@@ -350,8 +351,6 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
     [allModels, application, application.models, application.tools]
   )
 
-  const isCodeBlockEditable = useCodeBlockEditable()
-
   const handleChatCreate = useCallback(
     async (chat: Tables<"chats">) => {
       try {
@@ -402,7 +401,7 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
           isGenerating={isGenerating}
           selectedCodeBlock={selectedCodeBlock}
           onSelectCodeBlock={handleSelectCodeBlock}
-          isEditable={isCodeBlockEditable(selectedCodeBlock)}
+          isEditable={isEditable}
           onCodeChange={handleCodeChange}
         />
       </>
@@ -413,6 +412,8 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
       isGenerating,
       activeTab,
       handleSelectCodeBlock,
+      handleCodeChange,
+      isEditable,
       application.theme
     ]
   )

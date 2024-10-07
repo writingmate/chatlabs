@@ -17,6 +17,7 @@ import {
   useMemo,
   useState
 } from "react"
+import { ChatMessages } from "../chat/chat-messages"
 
 interface CodeViewerProps {
   theme?: string
@@ -44,13 +45,25 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   const { user } = useAuth()
   const { selectedWorkspace, profile, selectedAssistant } =
     useContext(ChatbotUIContext)
-  const { setSelectedHtmlElements, chatSettings } =
+  const { setSelectedHtmlElements, chatSettings, chatMessages } =
     useContext(ChatbotUIChatContext)
+  const { handleSendMessage } = useChatHandler()
   const [sharing, setSharing] = useState(false)
   const [execute, setExecute] = useState(false)
   const [inspectMode, setInspectMode] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  const handleFixError = useCallback(
+    (error: string) => {
+      handleSendMessage(
+        `We have experienced an error: ${error}. Please fix the error`,
+        chatMessages,
+        false
+      )
+    },
+    [handleSendMessage]
+  )
 
   const downloadAsFile = useCallback(() => {
     if (typeof window === "undefined") return
@@ -90,7 +103,15 @@ export const CodeViewer: FC<CodeViewerProps> = ({
     if (codeBlock.language !== "html") {
       setExecute(false)
     }
-  }, [codeBlock.language])
+  }, [codeBlock, isGenerating])
+
+  useEffect(() => {
+    if (isGenerating) {
+      setExecute(false)
+    } else if (!execute) {
+      setExecute(true)
+    }
+  }, [isGenerating])
 
   return useMemo(
     () => (
@@ -127,14 +148,13 @@ export const CodeViewer: FC<CodeViewerProps> = ({
             <CodeViewerPreview2
               showFooter={!!profile}
               theme={theme}
-              value={codeBlock.code}
-              language={codeBlock.language}
+              codeBlock={codeBlock}
               inspectMode={inspectMode}
               setInspectMode={setInspectMode}
               onElementClick={element => {
                 setSelectedHtmlElements([element])
               }}
-              handleFixError={() => {}}
+              handleFixError={handleFixError}
             />
           ) : (
             <CodeViewerCode
@@ -145,12 +165,6 @@ export const CodeViewer: FC<CodeViewerProps> = ({
             />
           )}
         </div>
-        {/* <CodeViewerSidebar
-          theme={theme}
-          setTheme={setTheme}
-          isOpen={isSidebarOpen}
-          setIsOpen={setIsSidebarOpen}
-        /> */}
         <MessageSharingDialog
           open={sharing}
           setOpen={setSharing}
@@ -163,8 +177,7 @@ export const CodeViewer: FC<CodeViewerProps> = ({
       </div>
     ),
     [
-      codeBlock.language,
-      codeBlock.code,
+      codeBlock,
       execute,
       inspectMode,
       error,
