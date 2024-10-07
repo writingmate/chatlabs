@@ -61,6 +61,7 @@ interface MessageProps {
   setIsGenerating?: (value: boolean) => void
   onSelectCodeBlock?: (codeBlock: ChatMessageCodeBlock | null) => void
   isExperimentalCodeEditor?: boolean
+  showResponseTime?: boolean
 }
 
 export const Message: FC<MessageProps> = ({
@@ -76,9 +77,10 @@ export const Message: FC<MessageProps> = ({
   onRegenerate,
   onSubmitEdit,
   onSelectCodeBlock,
-  showActions = true,
   codeBlocks,
-  isExperimentalCodeEditor
+  isExperimentalCodeEditor,
+  showActions = true,
+  showResponseTime = false
 }) => {
   const { assistants, profile, allModels, selectedAssistant, files } =
     useContext(ChatbotUIContext)
@@ -352,14 +354,17 @@ export const Message: FC<MessageProps> = ({
       // imageGenerator__generateImage: AnnotationImage,
       webScraper__youtubeCaptions: YouTube,
       webScraper__googleSearch: WebSearch,
-      toolCalls: ToolCalls,
       selected_html_elements: SelectedHtmlElements
+    }
+
+    if (showResponseTime) {
+      annotationMap.toolCalls = ToolCalls
     }
 
     const annotationResponseTimeLabelMap: {
       [key: string]: string
     } = {
-      // imageGenerator__generateImage: "Image",
+      imageGenerator__generateImage: "Image",
       webScraper__youtubeCaptions: "YouTube",
       webScraper__googleSearch: "Google Search"
     }
@@ -375,7 +380,7 @@ export const Message: FC<MessageProps> = ({
       return (
         <div key={key} className={"flex flex-col space-y-3"}>
           <AnnotationComponent annotation={annotation} />
-          {responseTime > 0 && (
+          {showResponseTime && responseTime > 0 && (
             <ResponseTime
               icon={<IconApi stroke={1.5} size={18} />}
               label={responseTimeLabel}
@@ -412,7 +417,7 @@ export const Message: FC<MessageProps> = ({
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
               <IconBulb
-                className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
+                className="border-primary bg-primary text-secondary rounded border p-1"
                 size={ICON_SIZE}
               />
 
@@ -450,7 +455,7 @@ export const Message: FC<MessageProps> = ({
                 />
               ) : (
                 <IconMoodSmile
-                  className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+                  className="bg-primary text-secondary border-primary rounded border p-1"
                   size={ICON_SIZE}
                 />
               )}
@@ -464,7 +469,7 @@ export const Message: FC<MessageProps> = ({
                     : selectedAssistant
                       ? selectedAssistant?.name
                       : MODEL_DATA?.modelName
-                  : profile?.display_name ?? profile?.username}
+                  : (profile?.display_name ?? profile?.username)}
               </div>
               {showActions && (
                 <div className={"absolute right-0"}>

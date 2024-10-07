@@ -116,7 +116,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
               )}
             </div>
 
-            <IconChevronDown />
+            <IconChevronDown stroke={1.5} />
           </Button>
         )}
       </DropdownMenuTrigger>

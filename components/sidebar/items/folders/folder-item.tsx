@@ -82,9 +82,9 @@ export const Folder: FC<FolderProps> = ({
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center space-x-2">
             {isExpanded ? (
-              <IconChevronDown stroke={3} />
+              <IconChevronDown stroke={1.5} />
             ) : (
-              <IconChevronRight stroke={3} />
+              <IconChevronRight stroke={1.5} />
             )}
 
             <div>{folder.name}</div>

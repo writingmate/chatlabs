@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation"
 import { PLAN_FREE } from "@/lib/stripe/config"
 
 export const SIDEBAR_ICON_SIZE = 28
+export const SIDEBAR_ICON_STROKE = 1.5
 
 interface SidebarSwitcherProps {
   onContentTypeChange: (contentType: ContentType) => void

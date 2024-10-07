@@ -27,13 +27,13 @@ import {
   IconLayoutColumns,
   IconPuzzle2,
   IconBulb,
-  IconLayoutSidebar
+  IconLayoutSidebar,
+  IconSparkles
 } from "@tabler/icons-react"
 import { ChatbotUIContext } from "@/context/context"
 import { Button } from "../ui/button"
 import { cn } from "@/lib/utils"
 import { SIDEBAR_ITEM_ICON_SIZE } from "@/components/sidebar/items/all/sidebar-display-item"
-import { useParams, useRouter } from "next/navigation"
 import { SearchInput } from "../ui/search-input"
 import { ProfileSettings } from "../utility/profile-settings"
 import { useChatHandler } from "../chat/chat-hooks/use-chat-handler"
@@ -41,6 +41,9 @@ import { SidebarDataList } from "./sidebar-data-list"
 import { ContentType } from "@/types"
 import Link from "next/link"
 import { WithTooltip } from "../ui/with-tooltip"
+import { searchChatsAndMessages } from "@/db/chats"
+import { debounce } from "@/lib/debounce"
+import { Tables } from "@/supabase/types"
 
 export const Sidebar: FC = () => {
   const {
@@ -51,8 +54,11 @@ export const Sidebar: FC = () => {
     assistants,
     folders,
     profile,
+    selectedWorkspace,
     showSidebar,
-    setShowSidebar
+    setShowSidebar,
+    isPaywallOpen,
+    setIsPaywallOpen // Use context's state
   } = useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
   const [activeSubmenu, setActiveSubmenu] = useState<ContentType | null>(null)
@@ -63,14 +69,25 @@ export const Sidebar: FC = () => {
   const [isLoaded, setIsLoaded] = useState(false)
   const sidebarRef = useRef<HTMLDivElement>(null)
 
-  const [searchQueries, setSearchQueries] = useState({
+  const [searchQueries, setSearchQueries] = useState<{
+    chats: string
+    prompts: string
+    assistants: string
+    files: string
+    tools: string
+  }>({
     chats: "",
     prompts: "",
     assistants: "",
     files: "",
     tools: ""
   })
+
+  const [chatSearchResults, setChatSearchResults] = useState<Tables<"chats">[]>(
+    []
+  )
   const [expandDelay, setExpandDelay] = useState(false)
+  const [searchLoading, setSearchLoading] = useState(false)
 
   useEffect(() => {
     setIsLoaded(true)
@@ -110,8 +127,8 @@ export const Sidebar: FC = () => {
     className: "text-muted-foreground"
   }
 
-  const dataMap = useMemo(() => {
-    return {
+  const dataMap = useMemo(
+    () => ({
       chats: chats.filter(chat =>
         chat.name.toLowerCase().includes(searchQueries.chats.toLowerCase())
       ),
@@ -129,8 +146,9 @@ export const Sidebar: FC = () => {
       tools: tools.filter(tool =>
         tool.name.toLowerCase().includes(searchQueries.tools.toLowerCase())
       )
-    }
-  }, [chats, prompts, assistants, files, tools, searchQueries])
+    }),
+    [chatSearchResults, prompts, assistants, files, tools, searchQueries]
+  )
 
   const foldersMap = useMemo(
     () => ({
@@ -140,7 +158,7 @@ export const Sidebar: FC = () => {
       files: folders.filter(folder => folder.type === "files"),
       tools: folders.filter(folder => folder.type === "tools")
     }),
-    [folders]
+    [folders, chatSearchResults]
   )
 
   function getSubmenuTitle(contentType: ContentType) {
@@ -156,6 +174,13 @@ export const Sidebar: FC = () => {
       default:
         return ""
     }
+  }
+
+  const COLLAPSED_SIDEBAR_WIDTH = 58
+  const EXPANDED_SIDEBAR_WIDTH = 300
+
+  const handleUpgrade = () => {
+    setIsPaywallOpen(true)
   }
 
   return useMemo(
@@ -199,10 +224,14 @@ export const Sidebar: FC = () => {
             showSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           )}
           initial={{
-            width: isCollapsed ? 64 : 300
+            width: isCollapsed
+              ? COLLAPSED_SIDEBAR_WIDTH
+              : EXPANDED_SIDEBAR_WIDTH
           }}
           animate={{
-            width: isCollapsed ? 64 : 300
+            width: isCollapsed
+              ? COLLAPSED_SIDEBAR_WIDTH
+              : EXPANDED_SIDEBAR_WIDTH
           }}
           transition={{
             duration: 0.3,
@@ -212,10 +241,8 @@ export const Sidebar: FC = () => {
         >
           <div
             className={cn(
-              "flex border-b",
-              isCollapsed
-                ? "flex-col items-center py-2"
-                : "items-center justify-between p-2"
+              "flex items-start border-b p-2",
+              isCollapsed ? "flex-col" : "justify-between"
             )}
           >
             <WithTooltip
@@ -223,6 +250,7 @@ export const Sidebar: FC = () => {
               display={<div>New Chat</div>}
               trigger={
                 <Button
+                  className="w-10 shrink-0"
                   variant="ghost"
                   size={"icon"}
                   onClick={handleCreateChat}
@@ -233,9 +261,11 @@ export const Sidebar: FC = () => {
               }
               side="right"
             />
-            <div className="flex items-center justify-between">
-              {activeSubmenu && getSubmenuTitle(activeSubmenu)}
-            </div>
+            {!isCollapsed && (
+              <div className="align-center flex h-0 items-center justify-center">
+                {activeSubmenu && getSubmenuTitle(activeSubmenu)}
+              </div>
+            )}
             <WithTooltip
               asChild
               display={<div>{isCollapsed ? "Expand" : "Collapse"}</div>}
@@ -244,7 +274,7 @@ export const Sidebar: FC = () => {
                   variant="ghost"
                   size="icon"
                   onClick={toggleCollapseOrSubmenu}
-                  className="hidden md:flex"
+                  className="hidden w-10 shrink-0 md:flex"
                 >
                   {isCollapsed ? (
                     <IconChevronRight {...iconProps} />
@@ -305,30 +335,59 @@ export const Sidebar: FC = () => {
               {/*</Link>*/}
             </div>
 
-            {(searchQueries.chats || dataMap.chats.length > 0) && (
-              <div
-                className={cn(
-                  "flex grow flex-col border-t",
-                  isCollapsed ? "hidden" : ""
-                )}
-              >
-                <div className="flex grow flex-col p-2 pb-0">
-                  <SearchInput
-                    placeholder="Search chats"
-                    value={searchQueries.chats}
-                    onChange={value =>
-                      setSearchQueries(prev => ({ ...prev, chats: value }))
-                    }
-                  />
-                  <SidebarDataList
-                    contentType="chats"
-                    data={dataMap.chats}
-                    folders={foldersMap.chats}
-                  />
-                </div>
+            <div
+              className={cn(
+                "flex grow flex-col border-t",
+                isCollapsed ? "hidden" : ""
+              )}
+            >
+              <div className="flex grow flex-col p-2 pb-0">
+                <SearchInput
+                  placeholder="Search chats and messages"
+                  value={searchQueries.chats}
+                  loading={searchLoading}
+                  onChange={e =>
+                    setSearchQueries({ ...searchQueries, chats: e })
+                  }
+                />
+                <SidebarDataList
+                  contentType="chats"
+                  data={dataMap.chats}
+                  folders={foldersMap.chats}
+                />
               </div>
-            )}
+            </div>
           </div>
+
+          {/* Upgrade message for free plan users */}
+          {profile?.plan === "free" && (
+            <div className="border-t p-2">
+              <div className="flex flex-col items-center justify-between space-y-2 text-sm">
+                {!isCollapsed && (
+                  <div className="font-semibold">Upgrade to Pro</div>
+                )}
+                {!isCollapsed && (
+                  <div className="text-muted-foreground text-center text-xs">
+                    Upgrade to get access to all models, assistants, plugins and
+                    more.
+                  </div>
+                )}
+                <Button
+                  variant="default"
+                  size={isCollapsed ? "icon" : "sm"}
+                  className="rounded-full bg-violet-700"
+                  onClick={handleUpgrade}
+                >
+                  <IconSparkles
+                    {...iconProps}
+                    className="text-white"
+                    stroke={1.5}
+                  />
+                  {!isCollapsed && <span className="ml-2">Upgrade</span>}
+                </Button>
+              </div>
+            </div>
+          )}
 
           {profile && (
             <div className="border-t p-2">
@@ -351,11 +410,11 @@ export const Sidebar: FC = () => {
                         className="w-full"
                         placeholder={`Search ${contentType}`}
                         value={searchQueries[contentType]}
-                        onChange={value =>
-                          setSearchQueries(prev => ({
-                            ...prev,
-                            [contentType]: value
-                          }))
+                        onChange={e =>
+                          setSearchQueries({
+                            ...searchQueries,
+                            [contentType]: e
+                          })
                         }
                       />
                       <SidebarCreateButtons
@@ -386,7 +445,9 @@ export const Sidebar: FC = () => {
       isCollapsed,
       isLoaded,
       showSidebar,
-      searchQueries
+      searchQueries,
+      profile,
+      isPaywallOpen // Use context's state
     ]
   )
 }

@@ -35,10 +35,7 @@ export function AssistantIcon({
           className={`max-w-[${size}px]`}
         />
       ) : (
-        <ChatbotUISVG
-          theme={theme === "dark" ? "light" : "dark"}
-          size={size * 0.7}
-        />
+        <ChatbotUISVG theme={theme === "dark" ? "light" : "dark"} size={size} />
       )}
     </div>
   )

@@ -16,7 +16,7 @@ import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and
 import { useScroll } from "./chat-hooks/use-scroll"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { useTheme } from "next-themes"
-import { ChatMessage, LLMID, MessageImage } from "@/types"
+import { ChatMessage, LLM, LLMID, MessageImage } from "@/types"
 import { Tables } from "@/supabase/types"
 import { parseIdFromSlug } from "@/lib/slugify"
 
@@ -47,6 +47,7 @@ import { IconArrowDown } from "@tabler/icons-react"
 import { Button } from "../ui/button"
 import { motion, AnimatePresence } from "framer-motion" // Add this import
 import { cn } from "@/lib/utils"
+import { ModelIcon } from "../models/model-icon"
 
 interface ChatUIProps {
   chatId?: string
@@ -85,7 +86,8 @@ export const ChatUI: React.FC<ChatUIProps> = ({
     setChatFiles,
     setShowFilesDisplay,
     setUseRetrieval,
-    selectedAssistant
+    selectedAssistant,
+    allModels
   } = useContext(ChatbotUIContext)
 
   const {
@@ -375,6 +377,11 @@ ${content}
 
   const isMobile = isMobileScreen()
   const isExperimentalCodeEditor = experimentalCodeEditor && !isMobile
+  const model = allModels.find(
+    model =>
+      model.modelId === chatSettings?.model ||
+      model.hostedId === chatSettings?.model
+  )
 
   return (
     <div
@@ -399,6 +406,7 @@ ${content}
           <div className="relative mx-auto flex size-full max-w-2xl flex-1 flex-col">
             {chatMessages?.length === 0 ? (
               <EmptyChatView
+                model={model!}
                 selectedAssistant={selectedAssistant}
                 theme={theme}
               />
@@ -450,23 +458,36 @@ ${content}
 }
 
 interface EmptyChatViewProps {
+  model: LLM
   selectedAssistant: Tables<"assistants"> | null
   theme: string | undefined
 }
 
 const EmptyChatView: React.FC<EmptyChatViewProps> = memo(
-  ({ selectedAssistant, theme }) => (
+  ({ selectedAssistant, model, theme }) => (
     <div className="center flex w-full flex-1 flex-col items-center justify-center transition-[height]">
-      {!selectedAssistant ? (
-        <Brand theme={theme === "dark" ? "dark" : "light"} />
-      ) : (
+      {!selectedAssistant && !!model && (
+        <>
+          <ModelIcon
+            className="size-[100px] overflow-hidden rounded-2xl"
+            modelId={model.modelId}
+            provider={model.provider}
+            height={100}
+            width={100}
+          />
+          <div className="text-foreground mt-4 text-center text-2xl">
+            How can I help you today?
+          </div>
+        </>
+      )}
+      {selectedAssistant && (
         <>
           <AssistantIcon
-            className="size-[100px] rounded-xl"
+            className="size-[100px] rounded-full"
             assistant={selectedAssistant!}
             size={100}
           />
-          <div className="text-foreground mt-4 text-center text-2xl font-bold">
+          <div className="text-foreground mt-4 text-center text-2xl font-semibold">
             {selectedAssistant!.name}
           </div>
           <div className="text-foreground mt-2 text-center text-sm">

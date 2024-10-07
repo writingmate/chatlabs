@@ -65,7 +65,7 @@ export const CollectionFileSelect: FC<CollectionFileSelectProps> = ({
             </div>
           </div>
 
-          <IconChevronDown />
+          <IconChevronDown stroke={1.5} />
         </Button>
       </DropdownMenuTrigger>
 

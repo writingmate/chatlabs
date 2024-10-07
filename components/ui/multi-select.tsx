@@ -109,7 +109,11 @@ export const MultiSelect: FC<MultiSelectProps<ModelOption>> = ({
               ? `${selectedOptions.length} selected`
               : placeholder}
           </div>
-          <IconChevronDown size={18} className="size-4 opacity-50" />
+          <IconChevronDown
+            size={18}
+            stroke={1.5}
+            className="size-4 opacity-50"
+          />
         </Button>
       </DropdownMenuTrigger>
 

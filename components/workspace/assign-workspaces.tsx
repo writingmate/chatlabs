@@ -64,7 +64,7 @@ export const AssignWorkspaces: FC<AssignWorkspaces> = ({
             </div>
           </div>
 
-          <IconChevronDown />
+          <IconChevronDown stroke={1.5} />
         </Button>
       </DropdownMenuTrigger>
 
