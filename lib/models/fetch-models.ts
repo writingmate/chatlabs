@@ -2,6 +2,7 @@ import { Tables } from "@/supabase/types"
 import { LLM, LLMID, OpenRouterLLM } from "@/types"
 import { toast } from "sonner"
 import { LLM_LIST_MAP } from "./llm/llm-list"
+import { CATEGORIES } from "./categories"
 
 const KNOWN_MODEL_NAMES: {
   [key: string]: Partial<LLM>
@@ -29,7 +30,12 @@ const KNOWN_MODEL_NAMES: {
   "deepseek/deepseek-coder": {
     provider: "deepseek",
     modelName: "DeepSeek Coder V2",
-    new: true
+    categories: [CATEGORIES.PROGRAMMING]
+  },
+  "gryphe/mythomax-l2-13b": {
+    provider: "gryphe" as any,
+    modelName: "Mythomax 13B",
+    categories: [CATEGORIES.ROLEPLAY]
   }
 }
 

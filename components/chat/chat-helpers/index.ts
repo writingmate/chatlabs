@@ -30,6 +30,7 @@ import {
   reconstructContentWithCodeBlocksInChatMessage
 } from "@/lib/messages"
 import { threadId } from "node:worker_threads"
+import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
 
 export const validateChatSettings = (
   chatSettings: ChatSettings | null,
