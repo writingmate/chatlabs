@@ -105,6 +105,14 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
     [allModels, selectedModelId]
   )
 
+  const mergedModelVisibility = useMemo(
+    () => ({
+      ...DEFAULT_MODEL_VISIBILITY,
+      ...((profile?.model_visibility as object) || {})
+    }),
+    [profile]
+  )
+
   const filteredModels = useMemo(
     () =>
       allModels
@@ -115,12 +123,9 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
         })
         .filter(
           model =>
-            (
-              (profile?.model_visibility || DEFAULT_MODEL_VISIBILITY) as Record<
-                LLMID,
-                boolean
-              >
-            )?.[model.modelId] ?? false
+            (mergedModelVisibility as Record<LLMID, boolean>)?.[
+              model.modelId
+            ] ?? false
         )
         .filter(model =>
           model.modelName.toLowerCase().includes(search.toLowerCase())
