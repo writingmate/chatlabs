@@ -1,4 +1,5 @@
 import { LLM } from "@/types"
+import { CATEGORIES } from "../categories"
 
 const OPENAI_PLATORM_LINK = "https://platform.openai.com/docs/overview"
 
@@ -19,7 +20,14 @@ const GPT4Turbo: LLM = {
     unit: "1M tokens",
     inputCost: 10,
     outputCost: 30
-  }
+  },
+  categories: [
+    CATEGORIES.TECHNOLOGY,
+    CATEGORIES.SCIENCE,
+    CATEGORIES.ACADEMIA,
+    CATEGORIES.PROGRAMMING,
+    CATEGORIES.PROGRAMMING_SCRIPTING
+  ]
 }
 
 // GPT-4 (UPDATED 1/29/24)
@@ -38,7 +46,16 @@ const GPT4: LLM = {
     unit: "1M tokens",
     inputCost: 30,
     outputCost: 60
-  }
+  },
+  categories: [
+    CATEGORIES.TECHNOLOGY,
+    CATEGORIES.SCIENCE,
+    CATEGORIES.ACADEMIA,
+    CATEGORIES.LEGAL,
+    CATEGORIES.FINANCE,
+    CATEGORIES.PROGRAMMING,
+    CATEGORIES.PROGRAMMING_SCRIPTING
+  ]
 }
 
 // GPT-3.5 Turbo (UPDATED 1/25/24)
@@ -56,7 +73,12 @@ const GPT3_5Turbo: LLM = {
     unit: "1M tokens",
     inputCost: 0.5,
     outputCost: 1.5
-  }
+  },
+  categories: [
+    CATEGORIES.TECHNOLOGY,
+    CATEGORIES.PROGRAMMING,
+    CATEGORIES.PROGRAMMING_SCRIPTING
+  ]
 }
 
 const GPT4O: LLM = {
@@ -74,7 +96,16 @@ const GPT4O: LLM = {
     unit: "1M tokens",
     inputCost: 2.5,
     outputCost: 10.0
-  }
+  },
+  categories: [
+    CATEGORIES.TECHNOLOGY,
+    CATEGORIES.SCIENCE,
+    CATEGORIES.ACADEMIA,
+    CATEGORIES.LEGAL,
+    CATEGORIES.FINANCE,
+    CATEGORIES.PROGRAMMING,
+    CATEGORIES.PROGRAMMING_SCRIPTING
+  ]
 }
 
 const GPT4O_Mini: LLM = {
@@ -93,7 +124,12 @@ const GPT4O_Mini: LLM = {
     unit: "1M tokens",
     inputCost: 0.15,
     outputCost: 0.6
-  }
+  },
+  categories: [
+    CATEGORIES.TECHNOLOGY,
+    CATEGORIES.SCIENCE,
+    CATEGORIES.PROGRAMMING
+  ]
 }
 
 const O1_Preview: LLM = {
@@ -112,7 +148,16 @@ const O1_Preview: LLM = {
     unit: "1M tokens",
     inputCost: 15,
     outputCost: 60
-  }
+  },
+  categories: [
+    CATEGORIES.TECHNOLOGY,
+    CATEGORIES.SCIENCE,
+    CATEGORIES.ACADEMIA,
+    CATEGORIES.LEGAL,
+    CATEGORIES.FINANCE,
+    CATEGORIES.PROGRAMMING,
+    CATEGORIES.PROGRAMMING_SCRIPTING
+  ]
 }
 
 const O1_Mini: LLM = {
@@ -131,7 +176,13 @@ const O1_Mini: LLM = {
     unit: "1M tokens",
     inputCost: 3,
     outputCost: 12
-  }
+  },
+  categories: [
+    CATEGORIES.TECHNOLOGY,
+    CATEGORIES.SCIENCE,
+    CATEGORIES.PROGRAMMING,
+    CATEGORIES.PROGRAMMING_SCRIPTING
+  ]
 }
 
 export const OPENAI_LLM_LIST: LLM[] = [

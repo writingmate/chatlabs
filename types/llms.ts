@@ -69,6 +69,14 @@ export type PerplexityLLMID =
   | "llama-3-sonar-large-32k-chat" // Sonar Medium Chat
   | "llama-3-sonar-large-32k-online" // Sonar Medium Online
 
+// Add this new type definition
+export type Category = {
+  category: string
+  description?: string
+  color?: string
+}
+
+// Update the LLM interface to include categories
 export interface LLM {
   modelId: LLMID
   modelName: string
@@ -79,6 +87,7 @@ export interface LLM {
   tools?: boolean
   supportsStreaming?: boolean
   description?: string
+  tags?: string[]
   pricing?: {
     currency: string
     unit: string
@@ -87,6 +96,7 @@ export interface LLM {
   }
   new?: boolean
   tier?: "free" | "pro" | "ultimate" | undefined
+  categories?: Category[]
 }
 
 export interface OpenRouterLLM extends LLM {
