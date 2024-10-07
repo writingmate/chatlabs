@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { Ratelimit } from "@upstash/ratelimit"
 import { kv } from "@vercel/kv"
 import { Session, SupabaseClient } from "@supabase/supabase-js"
-import { cookies } from "next/headers"
 
 const ratelimit = new Ratelimit({
+  // @ts-ignore
   redis: kv,
   limiter: Ratelimit.slidingWindow(100, "3600 s")
 })

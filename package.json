@@ -89,7 +89,7 @@
     "@vercel/kv": "^0.2.4",
     "@vercel/speed-insights": "^1.0.10",
     "@xenova/transformers": "^2.13.4",
-    "ai": "^3.4.9",
+    "ai": "^2.2.37",
     "axios": "^1.6.7",
     "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.0",

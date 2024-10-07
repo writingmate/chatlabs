@@ -149,13 +149,11 @@ export const Sidebar: FC = () => {
     [selectedWorkspace?.id]
   )
 
-  useEffect(() => {
-    handleSearch(searchQueries.chats)
-  }, [searchQueries.chats, handleSearch])
-
   const dataMap = useMemo(
     () => ({
-      chats: chatSearchResults,
+      chats: chats.filter(chat =>
+        chat.name.toLowerCase().includes(searchQueries.chats.toLowerCase())
+      ),
       prompts: prompts.filter(prompt =>
         prompt.name.toLowerCase().includes(searchQueries.prompts.toLowerCase())
       ),
@@ -176,10 +174,7 @@ export const Sidebar: FC = () => {
 
   const foldersMap = useMemo(
     () => ({
-      chats:
-        chatSearchResults.length > 0
-          ? []
-          : folders.filter(folder => folder.type === "chats"),
+      chats: folders.filter(folder => folder.type === "chats"),
       prompts: folders.filter(folder => folder.type === "prompts"),
       assistants: folders.filter(folder => folder.type === "assistants"),
       files: folders.filter(folder => folder.type === "files"),
