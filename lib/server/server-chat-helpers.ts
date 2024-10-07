@@ -20,6 +20,7 @@ import {
   PLAN_PRO,
   PLAN_ULTIMATE
 } from "@/lib/stripe/config"
+import { ApiError } from "next/dist/server/api-utils"
 
 function createClient() {
   return createServerClient<Database>(
@@ -41,7 +42,7 @@ export async function getServerProfile() {
 
   const user = (await supabase.auth.getUser()).data.user
   if (!user) {
-    throw new Error("User not found")
+    throw new ApiError(401, "User not found")
   }
 
   const { data: profile } = await supabase
@@ -51,7 +52,7 @@ export async function getServerProfile() {
     .single()
 
   if (!profile) {
-    throw new Error("Profile not found")
+    throw new ApiError(401, "Profile not found")
   }
 
   const profileWithKeys = addApiKeysToProfile(profile)

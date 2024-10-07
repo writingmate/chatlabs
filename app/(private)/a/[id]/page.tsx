@@ -10,6 +10,7 @@ import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { notFound } from "next/navigation"
 import { Tables } from "@/supabase/types"
 import { User } from "@sentry/nextjs"
+import { ApiError } from "next/dist/server/api-utils"
 
 export default async function AssistantPage({
   params
@@ -29,11 +30,14 @@ export default async function AssistantPage({
 
     profile = await getServerProfile()
   } catch (error) {
-    console.error(error)
-    return notFound()
+    if (error instanceof ApiError) {
+      console.error("ApiError", error)
+    } else {
+      return notFound()
+    }
   }
 
-  if (!assistant || !profile || !user) {
+  if (!assistant || !user) {
     return notFound()
   }
 
@@ -43,7 +47,7 @@ export default async function AssistantPage({
         <ChatUI
           showModelSelector={false}
           assistant={assistant}
-          experimentalCodeEditor={!!profile?.experimental_code_editor}
+          experimentalCodeEditor={profile?.experimental_code_editor || false}
         />
       </div>
       <PlanPicker />
