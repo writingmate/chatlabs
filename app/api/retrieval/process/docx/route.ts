@@ -6,7 +6,7 @@ import { FileItemChunk } from "@/types"
 import { createClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
-import { generateCohereEmbedding } from "@/lib/generate-cohere-embedding"
+import { generateJinaEmbedding } from "@/lib/generate-jina-embedding"
 
 export async function POST(req: Request) {
   const json = await req.json()
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
   } = json as {
     text: string
     fileId: string
-    embeddingsProvider: "cohere" | "openai" | "local"
+    embeddingsProvider: "jina" | "openai" | "local"
     fileExtension: string
   }
 
@@ -30,11 +30,13 @@ export async function POST(req: Request) {
 
     const profile = await getServerProfile()
 
-    let currentProvider = initialProvider || "cohere"
+    // TODO: remove below line after migration is done
+    // let currentProvider: "jina" | "openai" | "local" = initialProvider || "jina"
+    let currentProvider: string = "jina"
 
     // Check API keys first
-    if (currentProvider === "cohere") {
-      checkApiKey(process.env.COHERE_API_KEY!, "Cohere")
+    if (currentProvider === "jina") {
+      checkApiKey(process.env.JINA_API_KEY!, "Jina")
     } else if (currentProvider === "openai") {
       if (profile.use_azure_openai) {
         checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
@@ -58,13 +60,13 @@ export async function POST(req: Request) {
     // Generate embeddings
     let embeddings: any = []
 
-    if (currentProvider === "cohere") {
+    if (currentProvider === "jina") {
       try {
-        embeddings = await generateCohereEmbedding(
+        embeddings = await generateJinaEmbedding(
           chunks.map(chunk => chunk.content)
         )
       } catch (error) {
-        console.error("Cohere embedding failed, falling back to OpenAI:", error)
+        console.error("Jina embedding failed, falling back to OpenAI:", error)
         currentProvider = "openai"
       }
     }
@@ -120,10 +122,8 @@ export async function POST(req: Request) {
         currentProvider === "local"
           ? ((embeddings[index] || null) as any)
           : null,
-      cohere_embedding:
-        currentProvider === "cohere"
-          ? ((embeddings[index] || null) as any)
-          : null
+      jina_embedding:
+        currentProvider === "jina" ? ((embeddings[index] || null) as any) : null
     }))
 
     // Insert file items and update file tokens

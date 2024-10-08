@@ -91,7 +91,6 @@ export type OpenRouterLLMID =
   | "perplexity/llama-3.1-sonar-huge-128k-online"
   | "mattshumer/reflection-70b"
   | "deepseek/deepseek-chat"
-  | "cohere/command-r-plus-08-2024"
 
 export interface LLM {
   modelId: LLMID

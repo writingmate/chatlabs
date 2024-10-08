@@ -66,9 +66,16 @@ export async function POST(request: NextRequest) {
     checkApiKey(profile.anthropic_api_key, "Anthropic")
     await validateModelAndMessageCount(chatSettings.model, new Date())
 
-    let ANTHROPIC_FORMATTED_MESSAGES: any = addCacheControlToUserMessages(
-      messages.slice(1)
-    )
+    const modelsSupportingCacheControl = [
+      "claude-3-opus-20240229",
+      "claude-3-haiku-20240307",
+      "claude-3-5-sonnet-20240715"
+    ]
+
+    let ANTHROPIC_FORMATTED_MESSAGES: any =
+      modelsSupportingCacheControl.includes(chatSettings.model)
+        ? addCacheControlToUserMessages(messages.slice(1))
+        : messages.slice(1)
 
     const anthropic = new Anthropic({
       apiKey: profile.anthropic_api_key || "",

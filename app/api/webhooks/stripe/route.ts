@@ -39,8 +39,7 @@ export async function POST(req: Request) {
 
   const permittedEvents = [
     "customer.subscription.deleted",
-    "customer.subscription.updated",
-    "customer.subscription.created"
+    "customer.subscription.updated"
   ]
 
   if (!permittedEvents.includes(event.type)) {

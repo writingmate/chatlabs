@@ -1,5 +1,5 @@
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
-import { generateCohereEmbedding } from "@/lib/generate-cohere-embedding"
+import { generateJinaEmbedding } from "@/lib/generate-jina-embedding"
 import {
   processCSV,
   processJSON,
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     const file = formData.get("file") as File
     const file_id = formData.get("file_id") as string
     const initialProvider = formData.get("embeddingsProvider") as
-      | "cohere"
+      | "jina"
       | "openai"
       | "local"
 
@@ -40,11 +40,13 @@ export async function POST(req: Request) {
 
     const fileExtension = guessFileExtensionByContentType(file.type)
 
-    let currentProvider = initialProvider || "cohere"
+    // TODO: remove below line after migration is done
+    // let currentProvider: "jina" | "openai" | "local" = initialProvider || "jina"
+    let currentProvider: string = "jina"
 
     // Check API keys first
-    if (currentProvider === "cohere") {
-      checkApiKey(process.env.COHERE_API_KEY!, "Cohere")
+    if (currentProvider === "jina") {
+      checkApiKey(process.env.JINA_API_KEY!, "Jina")
     } else if (currentProvider === "openai") {
       if (profile.use_azure_openai) {
         checkApiKey(profile.azure_openai_api_key, "Azure OpenAI")
@@ -83,7 +85,7 @@ export async function POST(req: Request) {
         chunks = await processTxt(blob)
         break
       case "html":
-        chunks = await processTxt(blob, 0)
+        chunks = await processTxt(blob)
         break
       default:
         return createErrorResponse(
@@ -101,16 +103,15 @@ export async function POST(req: Request) {
       }
       return createErrorResponse("No text content found in file.", 400)
     }
-
     let embeddings: any = []
-
-    if (currentProvider === "cohere") {
+    if (currentProvider === "jina") {
       try {
-        embeddings = await generateCohereEmbedding(
+        embeddings = await generateJinaEmbedding(
           chunks.map(chunk => chunk.content)
         )
+        console.log(embeddings)
       } catch (error) {
-        console.error("Cohere embedding failed, falling back to OpenAI:", error)
+        console.error("Jina embedding failed, falling back to OpenAI:", error)
         currentProvider = "openai"
       }
     }
@@ -165,12 +166,9 @@ export async function POST(req: Request) {
         currentProvider === "local"
           ? ((embeddings[index] || null) as any)
           : null,
-      cohere_embedding:
-        currentProvider === "cohere"
-          ? ((embeddings[index] || null) as any)
-          : null
+      jina_embedding:
+        currentProvider === "jina" ? ((embeddings[index] || null) as any) : null
     }))
-
     await supabaseAdmin.from("file_items").upsert(file_items)
 
     const totalTokens = file_items.reduce((acc, item) => acc + item.tokens, 0)

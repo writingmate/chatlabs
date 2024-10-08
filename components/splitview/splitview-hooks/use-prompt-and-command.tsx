@@ -208,7 +208,7 @@ export const usePromptAndCommand = () => {
       includeProfileContext: assistant.include_profile_context,
       includeWorkspaceInstructions: assistant.include_workspace_instructions,
       embeddingsProvider: assistant.embeddings_provider as
-        | "cohere"
+        | "jina"
         | "openai"
         | "local"
     })

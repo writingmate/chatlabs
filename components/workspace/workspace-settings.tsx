@@ -136,7 +136,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
         includeWorkspaceInstructions:
           defaultChatSettings.includeWorkspaceInstructions,
         embeddingsProvider: defaultChatSettings.embeddingsProvider as
-          | "cohere"
+          | "jina"
           | "openai"
           | "local"
       })

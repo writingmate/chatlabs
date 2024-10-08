@@ -353,12 +353,6 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TOKEN_OUTPUT_LENGTH: 0,
     MAX_CONTEXT_LENGTH: 0
   },
-  "cohere/command-r-plus-08-2024": {
-    MIN_TEMPERATURE: 0,
-    MAX_TEMPERATURE: 1,
-    MAX_TOKEN_OUTPUT_LENGTH: 4000,
-    MAX_CONTEXT_LENGTH: 128000
-  },
   "mistralai/mixtral-8x22b-instruct": {
     MIN_TEMPERATURE: 0,
     MAX_TEMPERATURE: 1,

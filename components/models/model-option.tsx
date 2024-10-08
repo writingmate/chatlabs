@@ -15,6 +15,7 @@ import { WithTooltip } from "@/components/ui/with-tooltip"
 import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
 import { Badge } from "@/components/ui/badge"
+import { ImageIcon, WrenchIcon } from "lucide-react"
 
 interface ModelOptionProps {
   model: LLM | OpenRouterLLM
@@ -56,7 +57,7 @@ export const ModelOption: FC<ModelOptionProps> = ({
           ) : (
             <ModelIcon
               provider={model.provider}
-              modelId={model?.modelId}
+              modelId={model.modelId}
               width={24}
               height={24}
             />
@@ -69,12 +70,31 @@ export const ModelOption: FC<ModelOptionProps> = ({
             {model.modelName}
           </div>
           {model.paid && (
-            <Badge variant={"outline"} className={"h-5 text-xs"}>
-              Pro
+            <Badge variant="outline" className="relative overflow-hidden">
+              <span className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-600 opacity-10"></span>
+              <span className="relative bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                Pro
+              </span>
             </Badge>
           )}
           {model.new && (
             <Badge className="h-5 bg-violet-700 text-xs">New</Badge>
+          )}
+          {model.imageInput && (
+            <Badge
+              variant="outline"
+              className="flex size-5 items-center justify-center rounded-full p-0"
+            >
+              <ImageIcon className="size-3" />
+            </Badge>
+          )}
+          {model.tools && (
+            <Badge
+              variant="outline"
+              className="flex size-5 items-center justify-center rounded-full p-0"
+            >
+              <WrenchIcon className="size-3" />
+            </Badge>
           )}
         </div>
         <div className="flex items-center space-x-1">

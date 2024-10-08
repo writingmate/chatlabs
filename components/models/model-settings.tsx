@@ -96,7 +96,6 @@ export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "google/gemini-pro-1.5-exp": false,
 
   "databricks/dbrx-instruct": false,
-  "cohere/command-r-plus-08-2024": false,
   "mistralai/mixtral-8x22b-instruct": false,
   "microsoft/wizardlm-2-8x22b": false,
   "meta-llama/llama-3.1-405b-instruct": false,

@@ -25,8 +25,12 @@ export async function GET() {
     azure_gpt_45_vision_name: VALID_ENV_KEYS.AZURE_GPT_45_VISION_NAME,
     azure_gpt_45_turbo_name: VALID_ENV_KEYS.AZURE_GPT_45_TURBO_NAME,
     azure_embeddings_name: VALID_ENV_KEYS.AZURE_EMBEDDINGS_NAME,
-    cohere_api_key: VALID_ENV_KEYS.COHERE_API_KEY,
-    cohere_embeddings_name: VALID_ENV_KEYS.COHERE_EMBEDDINGS_NAME
+    jina_api_key: VALID_ENV_KEYS.JINA_API_KEY,
+    jina_model_name: VALID_ENV_KEYS.JINA_MODEL_NAME,
+    jina_task_name: VALID_ENV_KEYS.JINA_TASK_NAME,
+    jina_dimension: VALID_ENV_KEYS.JINA_DIMENSION,
+    jina_late_chunking: VALID_ENV_KEYS.JINA_LATE_CHUNKING,
+    jina_embedding_type: VALID_ENV_KEYS.JINA_EMBEDDING_TYPE
   }
 
   let profile: Tables<"profiles"> | null = null

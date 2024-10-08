@@ -25,7 +25,7 @@ import {
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { useRouter, redirect } from "next/navigation"
-import { FC, useCallback, useContext, useRef, useState } from "react"
+import { FC, Fragment, useCallback, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 import { Button } from "../ui/button"
@@ -53,7 +53,7 @@ import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { debounce } from "@/lib/debounce"
-import { useTranslation } from "react-i18next"
+import useTranslate from "@/lib/hooks/use-translate"
 
 interface ProfileSettingsProps {
   isCollapsed: boolean
@@ -71,6 +71,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
   } = useContext(ChatbotUIContext)
 
   const router = useRouter()
+  const { translate } = useTranslate()
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -328,8 +329,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
       buttonRef.current?.click()
     }
   }
-
-  const { t } = useTranslation()
   if (!profile) return null
 
   return (
@@ -370,7 +369,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
         <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center justify-between space-x-2">
-              <div>{t("User Settings")}</div>
+              <div>{translate("User Settings")}</div>
 
               <Button
                 tabIndex={-1}
@@ -379,7 +378,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 onClick={handleSignOut}
               >
                 <IconLogout className="mr-1" size={20} />
-                {t("Logout")}
+                {translate("Logout")}
               </Button>
             </SheetTitle>
           </SheetHeader>
@@ -387,14 +386,14 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
           <Tabs defaultValue="profile">
             <TabsList className="mt-4 flex w-full space-x-1">
               <TabsTrigger className={"flex-1"} value="profile">
-                {t("Profile")}
+                {translate("Profile")}
               </TabsTrigger>
               <TabsTrigger className={"flex-1"} value="shortcuts">
-                {t("Shortcuts")}
+                {translate("Shortcuts")}
               </TabsTrigger>
               {profile?.plan.startsWith("byok_") && (
                 <TabsTrigger className={"flex-1"} value="keys">
-                  {t("API Keys")}
+                  {translate("API Keys")}
                 </TabsTrigger>
               )}
             </TabsList>
@@ -449,7 +448,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 {/*</div>*/}
 
                 <div className="space-y-1">
-                  <Label>{t("Profile Image")}</Label>
+                  <Label>{translate("Profile Image")}</Label>
 
                   <ImagePicker
                     src={profileImageSrc}
@@ -462,10 +461,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label>{t("Chat Display Name")}</Label>
+                  <Label>{translate("Chat Display Name")}</Label>
 
                   <Input
-                    placeholder={t("Chat display name...")}
+                    placeholder={translate("Chat display name...")}
                     value={displayName}
                     onChange={e => setDisplayName(e.target.value)}
                     maxLength={PROFILE_DISPLAY_NAME_MAX}
@@ -474,7 +473,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
 
                 <div className="space-y-1">
                   <Label className="text-sm">
-                    {t(
+                    {translate(
                       "What would you like the AI to know about you to provide better responses?"
                     )}
                   </Label>
@@ -494,7 +493,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 </div>
                 <div className="flex items-center justify-between space-y-1">
                   <div className="flex items-center space-x-2">
-                    <Label>{t("Side-by-Side Code Viewer")}</Label>
+                    <Label>{translate("Side-by-Side Code Viewer")}</Label>
                     <WithTooltip
                       trigger={
                         <IconInfoCircle
@@ -505,7 +504,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       }
                       display={
                         <div className={"text-xs"}>
-                          {t(
+                          {translate(
                             "If enabled, code will be displayed in a side-by-side editor on the right from the message thread. This feature is currently in beta."
                           )}
                         </div>
@@ -523,7 +522,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       className={"w-full"}
                       formAction={redirectToBillingPortal}
                     >
-                      {t("Manage subscription")}
+                      {translate("Manage subscription")}
                     </Button>
                   ) : (
                     <Button
@@ -534,7 +533,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                         setIsPaywallOpen(true)
                       }}
                     >
-                      {t("Upgrade")}
+                      {translate("Upgrade")}
                     </Button>
                   )}
                 </div>
@@ -569,7 +568,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 </Label>
 
                 {useAzureOpenai ? (
-                  <>
+                  <Fragment>
                     {envKeyMap["azure"] ? (
                       <Label>Azure OpenAI API key set by admin.</Label>
                     ) : (
@@ -580,9 +579,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                         onChange={e => setAzureOpenaiAPIKey(e.target.value)}
                       />
                     )}
-                  </>
+                  </Fragment>
                 ) : (
-                  <>
+                  <Fragment>
                     {envKeyMap["openai"] ? (
                       <Label>OpenAI API key set by admin.</Label>
                     ) : (
@@ -593,13 +592,13 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                         onChange={e => setOpenaiAPIKey(e.target.value)}
                       />
                     )}
-                  </>
+                  </Fragment>
                 )}
               </div>
 
               <div className="ml-8 space-y-3">
                 {useAzureOpenai ? (
-                  <>
+                  <Fragment>
                     {
                       <div className="space-y-1">
                         {envKeyMap["azure_openai_endpoint"] ? (
@@ -607,7 +606,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                             Azure endpoint set by admin.
                           </Label>
                         ) : (
-                          <>
+                          <Fragment>
                             <Label>Azure Endpoint</Label>
 
                             <Input
@@ -617,7 +616,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                                 setAzureOpenaiEndpoint(e.target.value)
                               }
                             />
-                          </>
+                          </Fragment>
                         )}
                       </div>
                     }
@@ -629,7 +628,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                             Azure GPT-3.5 Turbo deployment name set by admin.
                           </Label>
                         ) : (
-                          <>
+                          <Fragment>
                             <Label>Azure GPT-3.5 Turbo Deployment Name</Label>
 
                             <Input
@@ -639,7 +638,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                                 setAzureOpenai35TurboID(e.target.value)
                               }
                             />
-                          </>
+                          </Fragment>
                         )}
                       </div>
                     }
@@ -651,7 +650,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                             Azure GPT-4.5 Turbo deployment name set by admin.
                           </Label>
                         ) : (
-                          <>
+                          <Fragment>
                             <Label>Azure GPT-4.5 Turbo Deployment Name</Label>
 
                             <Input
@@ -661,7 +660,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                                 setAzureOpenai45TurboID(e.target.value)
                               }
                             />
-                          </>
+                          </Fragment>
                         )}
                       </div>
                     }
@@ -673,7 +672,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                             Azure GPT-4.5 Vision deployment name set by admin.
                           </Label>
                         ) : (
-                          <>
+                          <Fragment>
                             <Label>Azure GPT-4.5 Vision Deployment Name</Label>
 
                             <Input
@@ -683,7 +682,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                                 setAzureOpenai45VisionID(e.target.value)
                               }
                             />
-                          </>
+                          </Fragment>
                         )}
                       </div>
                     }
@@ -695,7 +694,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                             Azure Embeddings deployment name set by admin.
                           </Label>
                         ) : (
-                          <>
+                          <Fragment>
                             <Label>Azure Embeddings Deployment Name</Label>
 
                             <Input
@@ -705,20 +704,20 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                                 setAzureEmbeddingsID(e.target.value)
                               }
                             />
-                          </>
+                          </Fragment>
                         )}
                       </div>
                     }
-                  </>
+                  </Fragment>
                 ) : (
-                  <>
+                  <Fragment>
                     <div className="space-y-1">
                       {envKeyMap["openai_organization_id"] ? (
                         <Label className="text-xs">
                           OpenAI Organization ID set by admin.
                         </Label>
                       ) : (
-                        <>
+                        <Fragment>
                           <Label>OpenAI Organization ID</Label>
 
                           <Input
@@ -730,10 +729,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                             value={openaiOrgID}
                             onChange={e => setOpenaiOrgID(e.target.value)}
                           />
-                        </>
+                        </Fragment>
                       )}
                     </div>
-                  </>
+                  </Fragment>
                 )}
               </div>
 
@@ -741,7 +740,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 {envKeyMap["anthropic"] ? (
                   <Label>Anthropic API key set by admin.</Label>
                 ) : (
-                  <>
+                  <Fragment>
                     <Label>Anthropic API Key</Label>
                     <Input
                       placeholder="Anthropic API Key"
@@ -749,7 +748,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       value={anthropicAPIKey}
                       onChange={e => setAnthropicAPIKey(e.target.value)}
                     />
-                  </>
+                  </Fragment>
                 )}
               </div>
 
@@ -757,7 +756,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 {envKeyMap["google"] ? (
                   <Label>Google Gemini API key set by admin.</Label>
                 ) : (
-                  <>
+                  <Fragment>
                     <Label>Google Gemini API Key</Label>
                     <Input
                       placeholder="Google Gemini API Key"
@@ -765,7 +764,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       value={googleGeminiAPIKey}
                       onChange={e => setGoogleGeminiAPIKey(e.target.value)}
                     />
-                  </>
+                  </Fragment>
                 )}
               </div>
 
@@ -773,7 +772,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 {envKeyMap["mistral"] ? (
                   <Label>Mistral API key set by admin.</Label>
                 ) : (
-                  <>
+                  <Fragment>
                     <Label>Mistral API Key</Label>
                     <Input
                       placeholder="Mistral API Key"
@@ -781,7 +780,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       value={mistralAPIKey}
                       onChange={e => setMistralAPIKey(e.target.value)}
                     />
-                  </>
+                  </Fragment>
                 )}
               </div>
 
@@ -789,7 +788,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 {envKeyMap["groq"] ? (
                   <Label>Groq API key set by admin.</Label>
                 ) : (
-                  <>
+                  <Fragment>
                     <Label>Groq API Key</Label>
                     <Input
                       placeholder="Groq API Key"
@@ -797,7 +796,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       value={groqAPIKey}
                       onChange={e => setGroqAPIKey(e.target.value)}
                     />
-                  </>
+                  </Fragment>
                 )}
               </div>
 
@@ -805,7 +804,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 {envKeyMap["perplexity"] ? (
                   <Label>Perplexity API key set by admin.</Label>
                 ) : (
-                  <>
+                  <Fragment>
                     <Label>Perplexity API Key</Label>
                     <Input
                       placeholder="Perplexity API Key"
@@ -813,7 +812,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       value={perplexityAPIKey}
                       onChange={e => setPerplexityAPIKey(e.target.value)}
                     />
-                  </>
+                  </Fragment>
                 )}
               </div>
 
@@ -821,7 +820,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 {envKeyMap["openrouter"] ? (
                   <Label>OpenRouter API key set by admin.</Label>
                 ) : (
-                  <>
+                  <Fragment>
                     <Label>OpenRouter API Key</Label>
                     <Input
                       placeholder="OpenRouter API Key"
@@ -829,7 +828,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       value={openrouterAPIKey}
                       onChange={e => setOpenrouterAPIKey(e.target.value)}
                     />
-                  </>
+                  </Fragment>
                 )}
               </div>
             </TabsContent>
@@ -889,7 +888,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                   variant={"secondary"}
                   onClick={resetToDefaults}
                 >
-                  {t("Reset to defaults")}
+                  {translate("Reset to defaults")}
                 </Button>
               </div>
             </TabsContent>

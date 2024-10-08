@@ -125,7 +125,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
         includeProfileContext: assistant.include_profile_context,
         includeWorkspaceInstructions: assistant.include_workspace_instructions,
         embeddingsProvider: assistant.embeddings_provider as
-          | "cohere"
+          | "jina"
           | "openai"
           | "local"
       })
@@ -344,7 +344,7 @@ ${content}
       includeProfileContext: chat.include_profile_context,
       includeWorkspaceInstructions: chat.include_workspace_instructions,
       embeddingsProvider: chat.embeddings_provider as
-        | "cohere"
+        | "jina"
         | "openai"
         | "local"
     })
