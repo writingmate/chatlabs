@@ -1,6 +1,13 @@
 "use client"
 
-import { FC, useState, useContext, useEffect, useCallback } from "react"
+import {
+  FC,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  useMemo
+} from "react"
 import {
   Select,
   SelectContent,
@@ -20,7 +27,7 @@ import { Description } from "../ui/description"
 import { RadioGroupItem, RadioGroup } from "../ui/radio-group"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { IconPlus } from "@tabler/icons-react"
+import { IconPlus, IconRefresh } from "@tabler/icons-react"
 import {
   Callout,
   CalloutIcon,
@@ -106,6 +113,23 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
   const handleCreateTool = useCallback(() => {
     setIsCreatingTool(true)
   }, [])
+
+  // Determine if tools or models have changed
+  const hasChanges = useMemo(() => {
+    const toolsChanged = !(
+      application.tools.length === localApplication.tools.length &&
+      application.tools.every(
+        (tool, index) => tool.id === localApplication.tools[index].id
+      )
+    )
+    const modelsChanged = !(
+      application.models.length === localApplication.models.length &&
+      application.models.every(
+        (modelId, index) => modelId === localApplication.models[index]
+      )
+    )
+    return toolsChanged || modelsChanged
+  }, [application, localApplication])
 
   return (
     <div className={cn("space-y-3", className)}>
@@ -268,15 +292,16 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
         </div>
       )}
 
-      {!isCreating && application.id && (
-        <Callout variant="warning">
-          <CalloutIcon>
-            <IconAlertTriangle className="size-4" />
-          </CalloutIcon>
-          <CalloutTitle>Important</CalloutTitle>
-          <CalloutDescription>
-            Changing tools or models for an existing application requires an app
-            update.
+      {!isCreating && application.id && hasChanges && (
+        <Callout>
+          <CalloutDescription className="flex items-center justify-between space-x-2">
+            <div className="flex items-center">
+              Sync model and tools changes with application code.
+            </div>
+            <Button size="sm" variant="outline">
+              <IconRefresh className="mr-2 size-4" />
+              Update app
+            </Button>
           </CalloutDescription>
         </Callout>
       )}

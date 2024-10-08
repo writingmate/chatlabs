@@ -108,7 +108,7 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   useEffect(() => {
     if (isGenerating) {
       setExecute(false)
-    } else if (!execute) {
+    } else if (!execute && codeBlock.language === "html") {
       setExecute(true)
     }
   }, [isGenerating])
