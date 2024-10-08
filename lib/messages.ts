@@ -14,9 +14,9 @@ export const parseCodeBlocksAndContent = (
     completeBlockRegex,
     (_, lang, filename, code) => {
       blocks.push({
-        language: lang || "text",
+        language: lang || "",
         code: code.trim(),
-        filename: filename,
+        filename: filename || undefined,
         sequenceNo: blocks.length,
         messageId: messageId
       })
@@ -27,64 +27,33 @@ export const parseCodeBlocksAndContent = (
   const FILENAME_PREFIX = "#filename="
 
   // Check for an unfinished code block at the end
-
-  // this is not working
-
-  // I want to be able to capture unfinished tags like "#filename=test#"
-  const unfinishedBlockRegex = /```(\w+)?\s*(#(?:(?!#).)*?#)?\n([\s\S]*?)$/
+  const unfinishedBlockRegex = /```(\w+)?\s*(#(?:(?!#).)*?#)?\n?([\s\S]*)$/
   const unfinishedMatch = remainingContent.match(unfinishedBlockRegex)
   if (unfinishedMatch) {
     const [fullMatch, lang, filenameTag, code] = unfinishedMatch
 
-    console.log("unfinishedMatch", filenameTag)
-    console.log("code", code)
-
-    if (!code) {
-      return {
-        parsedContent: remainingContent,
-        codeBlocks: blocks
+    if (code.trim()) {
+      let filename = undefined
+      if (filenameTag) {
+        const filenameMatch = filenameTag.match(`${FILENAME_PREFIX}(.+?)#`)
+        if (filenameMatch) {
+          filename = filenameMatch[1]
+        }
       }
+
+      blocks.push({
+        language: lang || "",
+        code: code.trim(),
+        filename: filename,
+        sequenceNo: blocks.length,
+        messageId: messageId
+      })
+
+      remainingContent = remainingContent.replace(
+        fullMatch,
+        `[CODE_BLOCK_${blocks.length - 1}]`
+      )
     }
-
-    remainingContent = remainingContent.replace(fullMatch, "")
-
-    if (!filenameTag && FILENAME_PREFIX.startsWith(code)) {
-      return {
-        parsedContent: remainingContent,
-        codeBlocks: blocks
-      }
-    }
-
-    if (typeof filenameTag === "undefined") {
-      return {
-        parsedContent: remainingContent,
-        codeBlocks: blocks
-      }
-    }
-
-    let filename = undefined
-    const filenameMatch = filenameTag.match(`${FILENAME_PREFIX}(.+?)#`)
-    if (!filenameMatch) {
-      return {
-        parsedContent: remainingContent,
-        codeBlocks: blocks
-      }
-    }
-
-    filename = filenameMatch[1]
-
-    blocks.push({
-      language: lang || "text",
-      code: code.trim(),
-      filename: filename,
-      sequenceNo: blocks.length,
-      messageId: messageId
-    })
-
-    remainingContent = [
-      remainingContent,
-      `[CODE_BLOCK_${blocks.length - 1}]`
-    ].join("")
   }
 
   return { parsedContent: remainingContent, codeBlocks: blocks }
