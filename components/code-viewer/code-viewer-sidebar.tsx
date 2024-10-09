@@ -53,38 +53,6 @@ const CodeViewerSidebar: FC<CodeViewerSidebarProps> = ({
   //   updateSystemPromptWithTools()
   // }, [selectedPlugins])
 
-  const updateSystemPromptWithTools = () => {
-    const toolsInfo = selectedPlugins.map(tool => {
-      const schema = JSON.parse(tool.schema as string)
-      schema.servers = [
-        {
-          url: "/api/tools/" + tool.id
-        }
-      ]
-      return {
-        name: tool.name,
-        description: tool.description,
-        schema: schema
-      }
-    })
-
-    const toolsPrompt = `
-You have access to the following tools:
-${toolsInfo
-  .map(
-    tool => `
-- ${tool.name}: ${tool.description}
-  Schema: ${JSON.stringify(tool.schema)}
-`
-  )
-  .join("")}`
-
-    setChatSettings(prevSettings => ({
-      ...prevSettings,
-      prompt: prevSettings.prompt + "\n\n" + toolsPrompt
-    }))
-  }
-
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetContent className="flex flex-col justify-between" side="right">

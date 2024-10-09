@@ -10,7 +10,6 @@ import { LLMID } from "@/types"
 import { IconChevronDown, IconRobotFace } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
 import {
@@ -29,8 +28,6 @@ import { AssistantIcon } from "@/components/assistants/assistant-icon"
 interface QuickSettingsProps {}
 
 export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
-  const { t } = useTranslation()
-
   useHotkey("p", () => setIsOpen(prevState => !prevState))
 
   const {
@@ -185,7 +182,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
         }}
       >
         <DropdownMenuTrigger asChild className="max-w-1/2" disabled={loading}>
-          <Button variant="ghost" className="hidden space-x-3 text-lg md:flex">
+          <Button variant="ghost" className="text-md hidden space-x-3 md:flex">
             {selectedPreset && (
               <ModelIcon
                 provider={modelDetails?.provider || "custom"}
@@ -206,10 +203,13 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
                 <div className="overflow-hidden text-ellipsis">
                   {selectedPreset?.name ||
                     selectedAssistant?.name ||
-                    t("Assistants")}
+                    "Assistants"}
                 </div>
 
-                <IconChevronDown className="ml-1" />
+                <IconChevronDown
+                  stroke={1.5}
+                  className="ml-1 size-5 opacity-50"
+                />
               </>
             )}
           </Button>
@@ -296,7 +296,6 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
       presets,
       assistants,
       search,
-      t,
       assistantImages,
       handleSelectQuickSetting,
       inputRef,

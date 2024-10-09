@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/browser-client"
-import { TablesInsert, TablesUpdate } from "@/supabase/types"
+import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 
 export const getAssistantById = async (
@@ -8,7 +8,7 @@ export const getAssistantById = async (
 ) => {
   const { data: assistant, error } = await client
     .from("assistants")
-    .select("*")
+    .select("*, messages (count)")
     .eq("id", assistantId)
     .single()
 
@@ -37,9 +37,10 @@ export const getAssistantByHashId = async (
 }
 
 export const getAssistantWorkspacesByWorkspaceId = async (
-  workspaceId: string
+  workspaceId: string,
+  client: SupabaseClient = supabase
 ) => {
-  const { data: workspace, error } = await supabase
+  const { data: workspace, error } = await client
     .from("workspaces")
     .select(
       `
@@ -55,20 +56,59 @@ export const getAssistantWorkspacesByWorkspaceId = async (
     throw new Error(error.message)
   }
 
-  return workspace
+  return workspace.assistants as Tables<"assistants">[]
 }
 
-export const getPublicAssistants = async () => {
-  const { data: assistants, error } = await supabase
+export const getPrivatePopularAssistantsByUserId = async (
+  userId: string,
+  client: SupabaseClient = supabase
+) => {
+  const { data: assistants, error } = await client
     .from("assistants")
-    .select("*")
-    .eq("sharing", "public")
+    .select("*, chats!inner(count)", { count: "exact" })
+    .eq("chats.user_id", userId)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return assistants.sort((a, b) => b.chats[0].count - a.chats[0].count)
+}
+
+export const getPopularAssistants = async (
+  workspaceId: string,
+  userId: string,
+  client: SupabaseClient = supabase
+) => {
+  const { data: assistants, error } = await client.rpc(
+    "get_assistants_for_user",
+    {
+      p_workspace_id: workspaceId,
+      p_user_id: userId
+    }
+  )
 
   if (error) {
     throw new Error(error.message)
   }
 
   return assistants
+}
+
+export const getPublicAssistantsOrderedByMessageCountDesc = async (
+  client: SupabaseClient = supabase
+) => {
+  const { data: assistants, error } = await client
+    .from("assistants")
+    .select("*, chats (count)", { count: "exact" })
+    .eq("sharing", "public")
+    .order("count", { ascending: false, referencedTable: "chats" })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return assistants.sort((a, b) => b.chats[0].count - a.chats[0].count)
 }
 
 export const getAssistantWorkspacesByAssistantId = async (

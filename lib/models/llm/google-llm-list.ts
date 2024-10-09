@@ -1,4 +1,5 @@
 import { LLM } from "@/types"
+import { CATEGORIES } from "../categories"
 
 const GOOGLE_PLATORM_LINK = "https://ai.google.dev/"
 
@@ -12,7 +13,16 @@ const GEMINI_PRO: LLM = {
   hostedId: "gemini-pro",
   platformLink: GOOGLE_PLATORM_LINK,
   imageInput: false,
-  paid: true
+  tier: "pro",
+  categories: [
+    CATEGORIES.TECHNOLOGY,
+    CATEGORIES.SCIENCE,
+    CATEGORIES.ACADEMIA,
+    CATEGORIES.PROGRAMMING,
+    CATEGORIES.PROGRAMMING_SCRIPTING
+  ],
+  description:
+    "Google's flagship text generation model. Designed to handle natural language tasks, multiturn text and code chat, and code generation."
 }
 
 // Gemini Pro Vision (UPDATED 12/22/23)
@@ -23,7 +33,16 @@ const GEMINI_PRO_VISION: LLM = {
   hostedId: "gemini-pro-vision",
   platformLink: GOOGLE_PLATORM_LINK,
   imageInput: true,
-  paid: true
+  tier: "pro",
+  categories: [
+    CATEGORIES.TECHNOLOGY,
+    CATEGORIES.SCIENCE,
+    CATEGORIES.ACADEMIA,
+    CATEGORIES.TECHNOLOGY_WEB,
+    CATEGORIES.PROGRAMMING
+  ],
+  description:
+    "Google's flagship multimodal model, supporting image and video in text or chat prompts for a text or code response."
 }
 
 const GEMINI_PRO_15: LLM = {
@@ -33,7 +52,18 @@ const GEMINI_PRO_15: LLM = {
   hostedId: "gemini-1.5-pro-latest",
   platformLink: GOOGLE_PLATORM_LINK,
   imageInput: true,
-  paid: true
+  tier: "pro",
+  categories: [
+    CATEGORIES.TECHNOLOGY,
+    CATEGORIES.SCIENCE,
+    CATEGORIES.ACADEMIA,
+    CATEGORIES.LEGAL,
+    CATEGORIES.FINANCE,
+    CATEGORIES.PROGRAMMING,
+    CATEGORIES.PROGRAMMING_SCRIPTING
+  ],
+  description:
+    "Google's latest multimodal model, supporting image and video in text or chat prompts. Optimized for various language tasks including code generation, text generation, problem solving, and AI agents."
 }
 
 const GEMINI_15_FLASH: LLM = {
@@ -43,7 +73,13 @@ const GEMINI_15_FLASH: LLM = {
   hostedId: "gemini-1.5-flash-latest",
   platformLink: GOOGLE_PLATORM_LINK,
   imageInput: true,
-  paid: false
+  categories: [
+    CATEGORIES.TECHNOLOGY,
+    CATEGORIES.SCIENCE,
+    CATEGORIES.PROGRAMMING
+  ],
+  description:
+    "Gemini 1.5 Flash is designed for high-volume, high-frequency tasks where cost and latency matter. It's well-suited for applications like chat assistants and on-demand content generation where speed and scale are important."
 }
 
 export const GOOGLE_LLM_LIST: LLM[] = [

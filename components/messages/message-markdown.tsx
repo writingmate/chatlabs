@@ -1,4 +1,4 @@
-import React, { FC, useState, useMemo } from "react"
+import React, { FC, useState, useMemo, useCallback } from "react"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import { MessageMarkdownMemoized } from "./message-markdown-memoized"
@@ -27,7 +27,7 @@ const CodeBlockButton: FC<
     variant={"outline"}
     size={"lg"}
     className={
-      "text-foreground flex h-auto w-[260px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:shadow"
+      "text-foreground hover:opacity-1 flex h-auto max-w-[300px] items-center justify-start space-x-1 overflow-hidden rounded-lg p-3 text-left font-sans hover:bg-transparent hover:shadow-md"
     }
     onClick={onClick}
   >
@@ -39,7 +39,9 @@ const CodeBlockButton: FC<
       )}
     </div>
     <div className={"flex flex-col overflow-hidden"}>
-      <div>{filename}</div>
+      <div title={filename} className={"truncate"}>
+        {filename}
+      </div>
       <span className="text-foreground/60 line-clamp-1 text-ellipsis whitespace-pre-wrap text-xs font-normal">
         Click to view file
       </span>
@@ -61,11 +63,14 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
   onSelectCodeBlock,
   experimental_code_editor
 }) => {
-  const handleCodeBlockClick = (block: CodeBlock) => {
-    if (experimental_code_editor) {
-      onSelectCodeBlock?.(block)
-    }
-  }
+  const handleCodeBlockClick = useCallback(
+    (block: CodeBlock) => {
+      if (experimental_code_editor) {
+        onSelectCodeBlock?.(block)
+      }
+    },
+    [experimental_code_editor, onSelectCodeBlock]
+  )
 
   const contentParts = useMemo(() => {
     const parts = content.split(/(\[CODE_BLOCK_\d+\])/)

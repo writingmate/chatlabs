@@ -98,7 +98,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
         setIsOpen(isOpen)
       }}
     >
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button
           ref={triggerRef}
           className={cn(
@@ -108,7 +108,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
           )}
           variant="ghost"
         >
-          <IconPuzzle stroke={1.5} />
+          <IconPuzzle size={24} stroke={1.5} />
           <div
             className={
               "bg-foreground text-background absolute bottom-1 right-2 size-4 rounded-full text-xs font-semibold"

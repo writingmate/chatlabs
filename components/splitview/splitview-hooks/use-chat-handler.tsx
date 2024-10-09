@@ -5,7 +5,6 @@ import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { updateChat } from "@/db/chats"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
-import { buildFinalMessages } from "@/lib/build-prompt"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
 import { useRouter } from "next/navigation"
@@ -263,7 +262,10 @@ export const useChatHandler = () => {
           b64Images,
           isRegeneration,
           setChatMessages,
-          selectedAssistant
+          selectedAssistant,
+          selectedHtmlElements.length > 0
+            ? [{ selected_html_elements: selectedHtmlElements }]
+            : []
         )
 
       let payload: ChatPayload = {
@@ -374,8 +376,8 @@ export const useChatHandler = () => {
         setChatFileItems,
         setChatImages,
         selectedAssistant,
-        data,
-        isGenerating
+        {},
+        data
       )
 
       setIsGenerating(false)

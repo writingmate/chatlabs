@@ -1,83 +1,49 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState, useContext } from "react"
 import {
-  IconChevronDown,
-  IconChevronUp,
   IconClick,
-  IconBulb,
   IconX,
-  IconTerminal2
+  IconTerminal2,
+  IconAlertTriangle
 } from "@tabler/icons-react"
-import { cn, generateRandomString } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { MessageHtmlElement } from "@/types/html"
 import { UITheme } from "./theme-configurator"
-import { daisyui } from "@/lib/daisyui"
+import { updateHtml } from "@/lib/code-viewer"
+import { CodeBlock } from "@/types"
+import { ChatbotUIChatContext } from "@/context/chat"
 
 interface PreviewProps2 {
-  value: string
-  language: string
+  codeBlock: CodeBlock
   inspectMode: boolean
-  theme: { name: string; theme: UITheme }
+  showFooter?: boolean
+  theme?: string
   setInspectMode: (inspectMode: boolean) => void
   onElementClick: (element: MessageHtmlElement) => void
-  handleFixError: (error: string) => void // New prop for handling error fixes
-}
-
-function addTailwindTheme(doc: Document, theme: UITheme) {
-  const daisyuiLinkElement = doc.createElement("link")
-  daisyuiLinkElement.href =
-    "https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
-  daisyuiLinkElement.rel = "stylesheet"
-  daisyuiLinkElement.type = "text/css"
-  doc.head.appendChild(daisyuiLinkElement)
-
-  const tailwindScriptElement = doc.createElement("script")
-  tailwindScriptElement.src = "https://cdn.tailwindcss.com"
-  doc.head.appendChild(tailwindScriptElement)
-
-  //   const scriptElement = doc.createElement("script")
-  //   scriptElement.textContent = `
-  // document.addEventListener("DOMContentLoaded", function() {
-  //   document.body.setAttribute("data-theme", "custom");
-  // });
-  // `
-
-  const styleElement = doc.createElement("style")
-  styleElement.textContent = `
-    body, html {
-      width: 100%;
-      height: 100%;
-    }
-    `
-  // styleElement.textContent = `
-  //   [data-theme="custom"] {
-  //     --webkit-font-smoothing: antialiased;
-  //     --moz-osx-font-smoothing: grayscale;
-  //     ${daisyui.convertThemeToCSS(theme)}
-  //   }
-  //   body {
-  //     width: 100%;
-  //     height: 100%;
-  //   }
-  //   ${theme.fontSize ? `html { font-size: ${theme.fontSize}; }` : ""}
-
-  doc.head.appendChild(styleElement)
-  // doc.head.appendChild(scriptElement)
+  handleFixError: (error: string) => void
 }
 
 const CodeViewerPreview2: React.FC<PreviewProps2> = ({
-  value: fullHtmlContent,
+  codeBlock,
   inspectMode,
+  showFooter = true,
   theme,
   setInspectMode,
   onElementClick,
   handleFixError
 }) => {
+  const { chatMessages } = useContext(ChatbotUIChatContext)
+  const chatId = chatMessages[0]?.message?.chat_id || "default"
+
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const consoleEndRef = useRef<HTMLDivElement | null>(null)
   const renderRef = useRef<string>("")
   const [consoleMessages, setConsoleMessages] = useState<string[]>([])
   const [isConsoleExpanded, setIsConsoleExpanded] = useState<boolean>(false)
+  const [errors, setErrors] = useState<string[]>([])
+  const [ignoredErrors, setIgnoredErrors] = useState<Record<string, string[]>>(
+    {}
+  )
 
   // Scroll to the bottom of the console whenever a new message is added
   useEffect(() => {
@@ -94,21 +60,34 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
     const iframe = iframeRef.current
     if (!iframe) return
 
-    const doc = iframe.contentDocument || iframe.contentWindow?.document
     const iframeWindow = iframe.contentWindow
-    if (!doc) return
     if (!iframeWindow) return
-    if (renderRef.current === fullHtmlContent) return
 
-    doc.open()
-    doc.write(fullHtmlContent)
-    doc.close()
-
-    renderRef.current = fullHtmlContent
-
-    if (theme) {
-      addTailwindTheme(doc, theme.theme)
+    theme = theme || ""
+    if (renderRef.current === codeBlock.code + theme) {
+      console.info("Skipping render")
+      return
     }
+
+    renderRef.current = codeBlock.code + theme
+
+    const dom = new DOMParser().parseFromString(codeBlock.code, "text/html")
+
+    const styleElement = dom.createElement("style")
+    styleElement.textContent = `
+            .highlighted {
+              outline: dashed 1px blue;
+            }
+          `
+
+    if (theme) dom.documentElement.setAttribute("data-theme", theme)
+
+    dom.head.appendChild(styleElement)
+
+    updateHtml(dom)
+
+    iframe.srcdoc = dom.documentElement.outerHTML
+
     const captureConsole = (methodName: keyof Console, messageType: string) => {
       const originalMethod = iframeWindow.console[methodName]
       iframeWindow.console[methodName] = (...args: any[]) => {
@@ -117,37 +96,53 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
           `[${messageType}] ${args.join(" ")}`
         ])
         originalMethod.apply(iframeWindow.console, args)
+        if (methodName === "error") {
+          setErrors(prevErrors => [...prevErrors, `[ERROR] ${args.join(" ")}`])
+        }
       }
     }
 
-    // Capture different types of console messages
-    captureConsole("log", "LOG")
-    captureConsole("warn", "WARN")
-    captureConsole("error", "ERROR")
-    captureConsole("info", "INFO")
+    iframe.onload = () => {
+      // Capture different types of console messages
+      captureConsole("log", "LOG")
+      captureConsole("warn", "WARN")
+      captureConsole("error", "ERROR")
+      captureConsole("info", "INFO")
 
-    // Capture unhandled errors
-    // @ts-ignore
-    iframeWindow.onerror = (
-      message: string,
-      source: string,
-      lineno: number,
-      colno: number,
-      error: Error
-    ) => {
-      setConsoleMessages(prevMessages => [
-        ...prevMessages,
-        `[ERROR] ${message} at ${source}:${lineno}:${colno}`
-      ])
+      const originalFetch = iframeWindow.fetch
+
+      iframeWindow.fetch = async (...args) => {
+        const response = await originalFetch(...args).catch(error => {
+          let appendixErrorMessage = ""
+          setErrors(prevErrors => [
+            ...prevErrors,
+            `[ERROR] Failed to fetch: ${error}. ${appendixErrorMessage}`
+          ])
+          return Promise.reject(error)
+        })
+
+        return response
+      }
+
+      // Capture unhandled errors
+      // @ts-ignore
+      iframeWindow.onerror = (
+        message: string,
+        source: string,
+        lineno: number,
+        colno: number,
+        error: Error
+      ) => {
+        setErrors(prevErrors => [
+          ...prevErrors,
+          `[ERROR] ${message} at ${source}:${lineno}:${colno}`
+        ])
+        setConsoleMessages(prevMessages => [
+          ...prevMessages,
+          `[ERROR] ${message} at ${source}:${lineno}:${colno}`
+        ])
+      }
     }
-
-    const styleElement = doc.createElement("style")
-    styleElement.textContent = `
-            .highlighted {
-              outline: dashed 1px blue;
-            }
-          `
-    doc.head.appendChild(styleElement)
 
     return () => {
       // Reset console methods to original
@@ -158,7 +153,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
         }
       })
     }
-  }, [fullHtmlContent, inspectMode, theme])
+  }, [codeBlock, inspectMode, theme])
 
   useEffect(() => {
     const iframe = iframeRef.current
@@ -242,19 +237,66 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
     }
   }, [inspectMode, onElementClick])
 
+  useEffect(() => {
+    // Load ignored errors from local storage
+    const storedIgnoredErrors = localStorage.getItem("ignoredErrors")
+    if (storedIgnoredErrors) {
+      setIgnoredErrors(JSON.parse(storedIgnoredErrors))
+    }
+  }, [])
+
+  const handleIgnoreError = (error: string) => {
+    const updatedIgnoredErrors = {
+      ...ignoredErrors,
+      [chatId]: [...(ignoredErrors[chatId] || []), error]
+    }
+    setIgnoredErrors(updatedIgnoredErrors)
+    localStorage.setItem("ignoredErrors", JSON.stringify(updatedIgnoredErrors))
+    setErrors(prevErrors => prevErrors.filter(e => e !== error))
+  }
+
+  const activeErrors = errors.filter(
+    error => !ignoredErrors[chatId]?.includes(error)
+  )
+
   return (
-    <div className="flex h-full min-h-[400px] flex-col">
-      <iframe
-        ref={iframeRef}
-        title="Full HTML Renderer"
-        className="flex-1 bg-white"
-      />
+    <div className="relative flex h-full min-h-[400px] flex-col">
+      <iframe ref={iframeRef} className="flex-1 bg-white" />
+
+      {activeErrors.length > 0 && (
+        <div className="absolute bottom-16 right-4 flex items-center space-x-2 rounded-md bg-red-100 p-2 text-red-800">
+          <IconAlertTriangle size={20} />
+          <span className="text-sm font-medium">
+            Looks like you have encountered an error
+          </span>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() =>
+              handleFixError(activeErrors[activeErrors.length - 1])
+            }
+          >
+            Try fixing it
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-red-500 text-red-500"
+            onClick={() =>
+              handleIgnoreError(activeErrors[activeErrors.length - 1])
+            }
+          >
+            Ignore it
+          </Button>
+        </div>
+      )}
+
       <div
         className={`bg-accent text-foreground overflow-auto border-t font-mono text-xs transition-all duration-300 ${
-          isConsoleExpanded ? "h-48 p-4" : "h-0 p-0"
+          isConsoleExpanded ? "h-48 px-4 pb-4" : "h-0 p-0"
         }`}
       >
-        <div className="flex items-center justify-between">
+        <div className="bg-accent sticky top-0 flex items-center justify-between py-2">
           <span>Console</span>
           <Button
             size={"icon"}
@@ -272,30 +314,32 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
         ))}
         <div ref={consoleEndRef} />
       </div>
-      <div className="bg-accent text-foreground flex items-center justify-end space-x-3 p-3 px-4">
-        <Button
-          size={"icon"}
-          variant={"link"}
-          className={cn(
-            "size-5 hover:opacity-50 active:opacity-75",
-            inspectMode && "text-violet-500"
-          )}
-          onClick={() => setInspectMode(!inspectMode)}
-        >
-          <IconClick size={16} stroke={1.5} />
-        </Button>
-        <Button
-          variant="link"
-          size={"icon"}
-          className={cn(
-            "console-toggle size-5 hover:opacity-50 active:opacity-75",
-            isConsoleExpanded && "text-violet-500"
-          )}
-          onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
-        >
-          <IconTerminal2 size={16} stroke={1.5} />
-        </Button>
-      </div>
+      {showFooter && (
+        <div className="bg-accent text-foreground flex items-center justify-end space-x-3 p-3 px-4">
+          <Button
+            size={"icon"}
+            variant={"link"}
+            className={cn(
+              "size-5 hover:opacity-50 active:opacity-75",
+              inspectMode && "text-violet-500"
+            )}
+            onClick={() => setInspectMode(!inspectMode)}
+          >
+            <IconClick size={16} stroke={1.5} />
+          </Button>
+          <Button
+            variant="link"
+            size={"icon"}
+            className={cn(
+              "console-toggle size-5 hover:opacity-50 active:opacity-75",
+              isConsoleExpanded && "text-violet-500"
+            )}
+            onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
+          >
+            <IconTerminal2 size={16} stroke={1.5} />
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

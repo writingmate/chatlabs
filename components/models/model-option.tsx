@@ -15,6 +15,7 @@ import { WithTooltip } from "@/components/ui/with-tooltip"
 import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
 import { Badge } from "@/components/ui/badge"
+import { PLAN_FREE } from "@/lib/stripe/config"
 import { ImageIcon, WrenchIcon } from "lucide-react"
 
 interface ModelOptionProps {
@@ -69,7 +70,7 @@ export const ModelOption: FC<ModelOptionProps> = ({
           >
             {model.modelName}
           </div>
-          {model.paid && (
+          {model.tier && (
             <Badge variant="outline" className="relative overflow-hidden">
               <span className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-600 opacity-10"></span>
               <span className="relative bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">

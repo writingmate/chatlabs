@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/sidebar/sidebar"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { ContentType } from "@/types"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { FC, useState, useContext, useMemo } from "react"
+import { FC, useState, useContext, useMemo, useEffect } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
 import { PlanPicker } from "@/components/upgrade/plan-picker"
@@ -132,6 +132,6 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
         </div>
       </div>
     ),
-    [showSidebar, contentType]
+    [showSidebar, contentType, isDragging, children]
   )
 }

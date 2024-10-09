@@ -15,6 +15,7 @@ import { csharp } from "@replit/codemirror-lang-csharp"
 import { php } from "@codemirror/lang-php"
 import { CodeBlock } from "@/types"
 import { debounce } from "@/lib/debounce"
+import { vscodeDark } from "@uiw/codemirror-theme-vscode"
 
 interface CodeViewerProps {
   codeBlock: CodeBlock
@@ -37,10 +38,11 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
   }, [initialValue])
 
   const getLanguageExtension = (lang: string) => {
+    console.log("lang", lang)
     switch (lang.toLowerCase()) {
       case "javascript":
       case "typescript":
-        return javascript()
+        return javascript({ jsx: true, typescript: true })
       case "html":
         return html()
       case "css":
@@ -58,7 +60,7 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
       case "java":
         return java()
       default:
-        return javascript() // Default to JavaScript for unknown languages
+        return javascript({ jsx: true, typescript: true }) // Default to JavaScript for unknown languages
     }
   }
 
@@ -76,23 +78,24 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
 
   useEffect(() => {
     if (autoScroll && ref.current?.view) {
-      ref.current?.view?.dispatch({
-        effects: EditorView.scrollIntoView(
-          ref.current?.view?.state.doc.length,
-          {
-            y: "end"
-          }
-        )
+      const view = ref.current.view
+      const doc = view.state.doc
+      const lastLine = doc.line(doc.lines)
+
+      view.dispatch({
+        effects: EditorView.scrollIntoView(lastLine.from, {
+          y: "end"
+        })
       })
     }
   }, [code, ref, autoScroll])
 
   return (
     <CodeMirror
+      theme={vscodeDark}
       ref={ref}
       value={code}
       height="100%"
-      theme={oneDark}
       extensions={[getLanguageExtension(language)]}
       editable={isEditable}
       onChange={handleChange}

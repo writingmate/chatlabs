@@ -7,6 +7,7 @@ import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
 import { useContext } from "react"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { toast } from "sonner"
 
 export const usePromptAndCommand = () => {
   const {
@@ -198,51 +199,58 @@ export const usePromptAndCommand = () => {
   }
 
   const handleSelectAssistant = async (assistant: Tables<"assistants">) => {
-    setIsAssistantPickerOpen(false)
-    setUserInput(userInput.replace(/@[^ ]*$/, ""))
-    setSelectedAssistant(assistant)
+    try {
+      setIsAssistantPickerOpen(false)
+      setUserInput(userInput.replace(/@[^ ]*$/, ""))
+      setSelectedAssistant(assistant)
 
-    setChatSettings({
-      model: assistant.model as LLMID,
-      prompt: assistant.prompt,
-      temperature: assistant.temperature,
-      contextLength: assistant.context_length,
-      includeProfileContext: assistant.include_profile_context,
-      includeWorkspaceInstructions: assistant.include_workspace_instructions,
-      embeddingsProvider: assistant.embeddings_provider as
-        | "jina"
-        | "openai"
-        | "local"
-    })
+      setChatSettings({
+        model: assistant.model as LLMID,
+        prompt: assistant.prompt,
+        temperature: assistant.temperature,
+        contextLength: assistant.context_length,
+        includeProfileContext: assistant.include_profile_context,
+        includeWorkspaceInstructions: assistant.include_workspace_instructions,
+        embeddingsProvider: assistant.embeddings_provider as
+          | "jina"
+          | "openai"
+          | "local"
+      })
 
-    let allFiles = []
+      let allFiles = []
 
-    const assistantFiles = (await getAssistantFilesByAssistantId(assistant.id))
-      .files
-    allFiles = [...assistantFiles]
-    const assistantCollections = (
-      await getAssistantCollectionsByAssistantId(assistant.id)
-    ).collections
-    for (const collection of assistantCollections) {
-      const collectionFiles = (
-        await getCollectionFilesByCollectionId(collection.id)
+      const assistantFiles = (
+        await getAssistantFilesByAssistantId(assistant.id)
       ).files
-      allFiles = [...allFiles, ...collectionFiles]
+      allFiles = [...assistantFiles]
+      const assistantCollections = (
+        await getAssistantCollectionsByAssistantId(assistant.id)
+      ).collections
+      for (const collection of assistantCollections) {
+        const collectionFiles = (
+          await getCollectionFilesByCollectionId(collection.id)
+        ).files
+        allFiles = [...allFiles, ...collectionFiles]
+      }
+      const assistantTools = (
+        await getAssistantToolsByAssistantId(assistant.id)
+      ).tools
+
+      setSelectedTools(assistantTools)
+      setChatFiles(
+        allFiles.map(file => ({
+          id: file.id,
+          name: file.name,
+          type: file.type,
+          file: null
+        }))
+      )
+
+      if (allFiles.length > 0) setShowFilesDisplay(true)
+    } catch (error) {
+      console.error(error)
+      toast.error("Something went wrong. Please try again.")
     }
-    const assistantTools = (await getAssistantToolsByAssistantId(assistant.id))
-      .tools
-
-    setSelectedTools(assistantTools)
-    setChatFiles(
-      allFiles.map(file => ({
-        id: file.id,
-        name: file.name,
-        type: file.type,
-        file: null
-      }))
-    )
-
-    if (allFiles.length > 0) setShowFilesDisplay(true)
   }
 
   return {

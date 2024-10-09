@@ -1,5 +1,3 @@
-// Only used in use-chat-handler.tsx to keep it clean
-
 import { createChatFiles } from "@/db/chat-files"
 import { createChat } from "@/db/chats"
 import { createMessageFileItems } from "@/db/message-file-items"
@@ -25,18 +23,15 @@ import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { SubscriptionRequiredError } from "@/lib/errors"
-import {
-  validatePlanForAssistant,
-  validatePlanForModel,
-  validatePlanForTools,
-  validateProPlan
-} from "@/lib/subscription"
+import { validatePlanForModel, validatePlanForTools } from "@/lib/subscription"
 import { encode } from "gpt-tokenizer"
 import {
   parseChatMessageCodeBlocksAndContent,
   reconstructContentWithCodeBlocks,
   reconstructContentWithCodeBlocksInChatMessage
 } from "@/lib/messages"
+import { threadId } from "node:worker_threads"
+import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
 
 export const validateChatSettings = (
   chatSettings: ChatSettings | null,
@@ -60,8 +55,9 @@ export const validateChatSettings = (
   }
 
   if (!validatePlanForModel(profile, modelData.modelId)) {
+    const requiredPlan = modelData.tier === "ultimate" ? "Ultimate" : "Pro"
     throw new SubscriptionRequiredError(
-      "Subscription required to use this model"
+      `${requiredPlan} plan required to use this model`
     )
   }
 
@@ -106,7 +102,7 @@ export const createTempMessages = (
   isRegeneration: boolean,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   selectedAssistant: Tables<"assistants"> | null,
-  data = {}
+  userAnnotation: any = {}
 ) => {
   let tempUserChatMessage: ChatMessage = {
     message: {
@@ -121,7 +117,7 @@ export const createTempMessages = (
       sequence_number: chatMessages.length,
       updated_at: "",
       user_id: "",
-      annotation: {},
+      annotation: userAnnotation,
       word_count: 0
     },
     fileItems: []
@@ -160,8 +156,6 @@ export const createTempMessages = (
       tempAssistantChatMessage
     ]
   }
-
-  console.log("newMessages", newMessages)
 
   setChatMessages(newMessages.map(parseChatMessageCodeBlocksAndContent))
 
@@ -361,72 +355,88 @@ export const fetchChatResponse = async (
   controller: AbortController,
   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setPaywallOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setPaywallOpen?: React.Dispatch<React.SetStateAction<boolean>>,
+  maxRetries = 3,
+  retryDelay = 1000
 ) => {
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify(body),
-      signal: controller.signal
-    })
+  let errorMessage = "Error fetching chat response"
+  let errorLogLevel = toast.error
 
-    if (!response.ok) {
-      console.error("Error fetching chat response:", response)
+  const fetchWithRetry = async (retriesLeft: number): Promise<Response> => {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(body),
+        signal: controller.signal
+      })
 
-      let errorMessage = null
-      let errorLogLevel = toast.error
+      if (!response.ok) {
+        console.error("Error fetching chat response:", response)
 
-      const statusToMessage = {
-        404: "Model not found.",
-        429: "You are sending too many messages. Please try again in a few minutes.",
-        402: "You have reached the limit of free messages. Please upgrade to a paid plan.",
-        413: "Message is too long or image is too large. Please shorten it."
-      }
-
-      const statusToErrorLogLevel = {
-        404: toast.error,
-        429: toast.warning,
-        402: toast.warning,
-        413: toast.error
-      }
-
-      if (response.status in statusToErrorLogLevel) {
-        errorLogLevel =
-          statusToErrorLogLevel[
-            response.status as keyof typeof statusToErrorLogLevel
-          ]
-      }
-
-      if (response.status in statusToMessage) {
-        errorMessage =
-          statusToMessage[response.status as keyof typeof statusToMessage]
-      }
-
-      if (!errorMessage) {
-        try {
-          const errorData = await response.json()
-          errorMessage = errorData.message
-        } catch (error) {
-          errorMessage = "Failed to send the message. Please try again."
+        const statusToError = {
+          404: { message: "Model not found.", logLevel: toast.error },
+          429: {
+            message:
+              "You are sending too many messages. Please try again in a few minutes.",
+            logLevel: toast.warning
+          },
+          402: {
+            message:
+              "You have reached the limit of free messages. Please upgrade to a paid plan.",
+            logLevel: toast.warning
+          },
+          413: {
+            message:
+              "Message is too long or image is too large. Please shorten it.",
+            logLevel: toast.error
+          }
         }
+
+        const errorInfo =
+          statusToError[response.status as keyof typeof statusToError]
+
+        if (errorInfo) {
+          errorMessage = errorInfo.message
+          errorLogLevel = errorInfo.logLevel
+        } else {
+          try {
+            const errorData = await response.json()
+            errorMessage = errorData.message || errorMessage
+          } catch {
+            errorMessage = "Failed to send the message. Please try again."
+          }
+        }
+
+        if (response.status === 402) {
+          setPaywallOpen?.(true)
+        }
+
+        if (response.status === 504 && retriesLeft > 0) {
+          console.log("Retrying...", retriesLeft)
+          await new Promise(resolve => setTimeout(resolve, retryDelay))
+          return fetchWithRetry(retriesLeft - 1)
+        }
+
+        throw new Error(errorMessage)
       }
 
-      errorLogLevel(errorMessage)
-
-      if (response.status === 402) {
-        setPaywallOpen?.(true)
+      return response
+    } catch (error: any) {
+      if (retriesLeft > 0) {
+        await new Promise(resolve => setTimeout(resolve, retryDelay))
+        return fetchWithRetry(retriesLeft - 1)
       }
-
-      setIsGenerating(false)
-      setChatMessages(prevMessages => prevMessages.slice(0, -2))
+      throw error
     }
+  }
 
-    return response
-  } catch (error) {
+  try {
+    return await fetchWithRetry(maxRetries)
+  } catch (error: any) {
     console.error("Error fetching chat response:", error)
     setIsGenerating(false)
     setChatMessages(prevMessages => prevMessages.slice(0, -2))
-    toast.error("Error fetching chat response")
+    errorLogLevel(error?.message || errorMessage)
     throw error
   }
 }
@@ -618,6 +628,51 @@ export const handleCreateChat = async (
   return createdChat
 }
 
+const handleRegeneration = async (
+  chatMessages: ChatMessage[],
+  generatedText: string,
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
+): Promise<void> => {
+  const lastUserMessageIndex = chatMessages.length - 2
+  const lastAssistantMessageIndex = chatMessages.length - 1
+
+  const lastUserMessage = chatMessages[lastUserMessageIndex].message
+  const lastAssistantMessage = chatMessages[lastAssistantMessageIndex].message
+
+  // Update the assistant message with the new generated content
+  const updatedAssistantMessage = await updateMessage(lastAssistantMessage.id, {
+    ...lastAssistantMessage,
+    content: generatedText.trim()
+  })
+
+  // Update the chat messages state
+  const updatedMessages = [...chatMessages]
+  updatedMessages[lastAssistantMessageIndex].message = updatedAssistantMessage
+
+  setChatMessages(updatedMessages)
+}
+
+const createMessageObject = (
+  chatId: string,
+  userId: string,
+  content: string,
+  modelId: string,
+  role: string,
+  sequenceNumber: number,
+  annotation: any = {},
+  selectedAssistant: Tables<"assistants"> | null = null
+): TablesInsert<"messages"> => ({
+  chat_id: chatId,
+  assistant_id: selectedAssistant?.id || null,
+  user_id: userId,
+  content,
+  model: modelId,
+  role,
+  sequence_number: sequenceNumber,
+  image_paths: [],
+  annotation
+})
+
 export const handleCreateMessages = async (
   chatMessages: ChatMessage[],
   currentChat: Tables<"chats">,
@@ -634,157 +689,152 @@ export const handleCreateMessages = async (
   >,
   setChatImages: React.Dispatch<React.SetStateAction<MessageImage[]>>,
   selectedAssistant: Tables<"assistants"> | null,
-  data: any,
-  updateState = true
-) => {
-  const notCreatedPriorMessages = chatMessages
-    .filter(message => message.message.id === "")
-    .map(reconstructContentWithCodeBlocksInChatMessage)
-
-  const finalUserMessage: TablesInsert<"messages"> = {
-    chat_id: currentChat.id,
-    assistant_id: null,
-    user_id: profile.user_id,
-    content: messageContent, // This doesn't need reconstruction as it's the original user input
-    model: modelData.modelId,
-    role: "user",
-    sequence_number: chatMessages.length,
-    image_paths: [],
-    annotation: {}
-  }
-
-  const reconstructedAssistantContent =
-    chatMessages.length > 0
-      ? reconstructContentWithCodeBlocks(
-          generatedText,
-          chatMessages[chatMessages.length - 1].codeBlocks || []
-        )
-      : generatedText
-
-  const finalAssistantMessage: TablesInsert<"messages"> = {
-    chat_id: currentChat.id,
-    assistant_id: selectedAssistant?.id || null,
-    user_id: profile.user_id,
-    content: reconstructedAssistantContent, // Use the reconstructed content here
-    model: modelData.modelId,
-    role: "assistant",
-    sequence_number: chatMessages.length + 1,
-    image_paths: [],
-    annotation: data
-  }
-
-  const cleanGeneratedText = generatedText.trim()
-
-  if (isRegeneration && cleanGeneratedText) {
-    const lastStartingMessage = chatMessages[chatMessages.length - 1].message
-
-    const updatedMessage = await updateMessage(lastStartingMessage.id, {
-      ...lastStartingMessage,
-      // @ts-ignore
-      file_items: undefined,
-      content: cleanGeneratedText
-    })
-
-    chatMessages[chatMessages.length - 1].message = updatedMessage
-
-    setChatMessages([...chatMessages])
-  } else {
-    const createdMessages: Tables<"messages">[] = []
-    if (notCreatedPriorMessages.length > 0) {
-      const inserts = notCreatedPriorMessages.map((message, index) => {
-        return {
-          chat_id: currentChat.id,
-          assistant_id: selectedAssistant?.id || null,
-          user_id: profile.user_id,
-          content: message.message.content,
-          model: modelData.modelId,
-          role: "assistant",
-          sequence_number: index + 1,
-          image_paths: [],
-          annotation: data
-        } as TablesInsert<"messages">
-      })
-      createdMessages.push(...((await createMessages(inserts)) || []))
+  userAnnotations: any = {},
+  assistantAnnotations: any = {}
+): Promise<void> => {
+  try {
+    if (isRegeneration && generatedText.trim()) {
+      // Handle regeneration: update the last two messages
+      await handleRegeneration(chatMessages, generatedText, setChatMessages)
+      return
     }
-    cleanGeneratedText
-      ? createdMessages.push(
-          ...((await createMessages([
-            finalUserMessage,
-            finalAssistantMessage
-          ])) || [])
-        )
-      : createdMessages.push(
-          ...((await createMessages([finalUserMessage])) || [])
-        )
 
-    const uploadPromises = newMessageImages
-      .filter(obj => obj.file !== null)
-      .map(obj => {
-        const filePath = `${profile.user_id}/${currentChat.id}/${createdMessages[0].id}/${uuidv4()}`
-        return uploadMessageImage(filePath, obj.file as File).catch(error => {
-          console.error(`Failed to upload image at ${filePath}:`, error)
-          return null
-        })
+    // Identify messages that need to be created
+    const notCreatedPriorMessages = chatMessages
+      .filter(message => message.message.id === "")
+      .map(reconstructContentWithCodeBlocksInChatMessage)
+
+    // Prepare new user and assistant messages
+    const newUserMessage = createMessageObject(
+      currentChat.id,
+      profile.user_id,
+      messageContent,
+      modelData.modelId,
+      "user",
+      chatMessages.length,
+      userAnnotations,
+      selectedAssistant
+    )
+
+    const assistantContent = reconstructContentWithCodeBlocks(
+      generatedText,
+      chatMessages[chatMessages.length - 1]?.codeBlocks || []
+    )
+
+    const newAssistantMessage = createMessageObject(
+      currentChat.id,
+      profile.user_id,
+      assistantContent,
+      modelData.modelId,
+      "assistant",
+      chatMessages.length + 1,
+      assistantAnnotations,
+      selectedAssistant
+    )
+
+    // Combine all messages that need to be processed
+    const allMessagesToProcess = [
+      ...notCreatedPriorMessages.map(msg =>
+        createMessageObject(
+          currentChat.id,
+          profile.user_id,
+          msg.message.content,
+          modelData.modelId,
+          msg.message.role,
+          msg.message.sequence_number,
+          msg.message.annotation,
+          selectedAssistant
+        )
+      ),
+      newUserMessage,
+      newAssistantMessage
+    ]
+
+    // Persist all messages to the database
+    const createdMessages = await createMessages(allMessagesToProcess)
+
+    if (!createdMessages) {
+      return
+    }
+
+    // Extract the newly created user and assistant messages
+    const createdUserMessage = createdMessages[createdMessages.length - 2]
+    const createdAssistantMessage = createdMessages[createdMessages.length - 1]
+
+    // Handle image uploads for the user message
+    const uploadPromises = newMessageImages.map(obj => {
+      const filePath = `${profile.user_id}/${currentChat.id}/${createdUserMessage.id}/${uuidv4()}`
+      return uploadMessageImage(filePath, obj.file as File).catch(error => {
+        console.error(`Failed to upload image at ${filePath}:`, error)
+        return null
       })
+    })
 
     const paths = (await Promise.all(uploadPromises)).filter(
       Boolean
     ) as string[]
 
+    // Update user message with image paths
+    await updateMessage(createdUserMessage.id, {
+      ...createdUserMessage,
+      image_paths: paths
+    })
+
+    console.log(
+      "paths",
+      paths,
+      newMessageImages,
+      createdUserMessage,
+      createdUserMessage.id
+    )
+
+    // Update chat images state
     setChatImages(prevImages => [
       ...prevImages,
       ...newMessageImages.map((obj, index) => ({
         ...obj,
-        messageId: createdMessages[0].id,
+        messageId: createdUserMessage.id,
         path: paths[index]
       }))
     ])
 
-    const updatedMessage = await updateMessage(createdMessages[0].id, {
-      ...createdMessages[0],
-      image_paths: paths
-    })
+    // Create message file items for the assistant message
+    await createMessageFileItems(
+      retrievedFileItems.map(fileItem => ({
+        user_id: profile.user_id,
+        message_id: createdAssistantMessage.id,
+        file_item_id: fileItem.id
+      }))
+    )
 
-    if (cleanGeneratedText) {
-      await createMessageFileItems(
-        retrievedFileItems.map(fileItem => {
-          return {
-            user_id: profile.user_id,
-            message_id: createdMessages[1].id,
-            file_item_id: fileItem.id
-          }
-        })
-      )
-    }
+    // Filter out messages that had no IDs before updating the state
+    const filteredChatMessages = chatMessages.filter(
+      message => message.message.id !== ""
+    )
 
+    // Update chat state with all newly created/updated messages
     const finalChatMessages = [
-      ...chatMessages,
-      {
-        message: updatedMessage,
-        fileItems: []
-      },
-      ...(cleanGeneratedText
-        ? [
-            {
-              message: createdMessages[1],
-              fileItems: retrievedFileItems.map(fileItem => fileItem.id)
-            }
-          ]
-        : [])
+      ...filteredChatMessages,
+      ...createdMessages.map((msg, index) => ({
+        message: msg,
+        fileItems:
+          index === createdMessages.length - 1
+            ? retrievedFileItems.map(item => item.id)
+            : []
+      }))
     ]
 
-    setChatFileItems(prevFileItems => {
-      const newFileItems = retrievedFileItems.filter(
-        fileItem => !prevFileItems.some(prevItem => prevItem.id === fileItem.id)
+    setChatFileItems(prevItems => [
+      ...prevItems,
+      ...retrievedFileItems.filter(
+        item => !prevItems.some(prev => prev.id === item.id)
       )
+    ])
 
-      return [...prevFileItems, ...newFileItems]
-    })
-
-    if (updateState) {
-      setChatMessages(
-        finalChatMessages.map(parseChatMessageCodeBlocksAndContent)
-      )
-    }
+    setChatMessages(finalChatMessages.map(parseChatMessageCodeBlocksAndContent))
+  } catch (error) {
+    console.error("Error in handleCreateMessages:", error)
+    throw error
+    // Optionally, you could add user-facing error handling here, such as displaying a toast notification
   }
 }

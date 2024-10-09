@@ -1,18 +1,32 @@
 import { Session, User } from "@supabase/supabase-js"
 import { useContext, useState, useEffect, createContext } from "react"
 import { supabase } from "@/lib/supabase/browser-client"
+import { Tables } from "@/supabase/types"
+import { usePathname, useRouter } from "next/navigation"
 
 // create a context for authentication
 const AuthContext = createContext<{
   session: Session | null | undefined
   user: User | null | undefined
+  profile: Tables<"profiles"> | null | undefined
   signOut: () => void
-}>({ session: null, user: null, signOut: () => {} })
+}>({ session: null, user: null, profile: null, signOut: () => {} })
 
-export const AuthProvider = ({ children }: any) => {
+interface AuthProviderProps {
+  children: React.ReactNode
+  forceLogin?: boolean
+}
+
+export const AuthProvider = ({
+  children,
+  forceLogin = false
+}: AuthProviderProps) => {
   const [user, setUser] = useState<User>()
+  const [profile, setProfile] = useState<Tables<"profiles">>()
   const [session, setSession] = useState<Session | null>()
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     const setData = async () => {
@@ -21,9 +35,22 @@ export const AuthProvider = ({ children }: any) => {
         error
       } = await supabase.auth.getSession()
       if (error) throw error
+
       setSession(session)
       setUser(session?.user)
-      setLoading(false)
+
+      if (session?.user) {
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session?.user?.id as string)
+          .single()
+
+        if (profileData) setProfile(profileData)
+      } else {
+        if (pathname !== "/" && forceLogin)
+          router.push("/login?next=" + pathname)
+      }
     }
 
     const { data: listener } = supabase.auth.onAuthStateChange(
@@ -44,6 +71,7 @@ export const AuthProvider = ({ children }: any) => {
   const value = {
     session,
     user,
+    profile,
     signOut: () => supabase.auth.signOut()
   }
 

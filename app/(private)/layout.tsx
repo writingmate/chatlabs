@@ -8,6 +8,7 @@ import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
+import Transition from "@/components/ui/transition"
 
 const font = DM_Sans({ subsets: ["latin"] })
 const APP_NAME = "ImogenAI"
@@ -69,6 +70,17 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning className={"h-full"}>
+      <head>
+        <link
+          rel="preconnect dns-prefetch"
+          href="https://fonts.googleapis.com"
+        />
+        <link rel="preconnect dns-prefetch" href="https://fonts.gstatic.com" />
+        <link
+          rel="preconnect dns-prefetch"
+          href={process.env.NEXT_PUBLIC_SUPABASE_URL}
+        />
+      </head>
       <body className={font.className + " h-full antialiased"}>
         <Providers attribute="class" defaultTheme="light">
           <Toaster richColors position="top-center" duration={3000} />

@@ -28,13 +28,22 @@ import { toast } from "sonner"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatSelectedHtmlElements } from "@/components/chat/chat-selected-html-elements"
+import { ChatMessage } from "@/types"
 import { useTranslation } from "react-i18next"
 
 interface ChatInputProps {
   showAssistant: boolean
+  handleSendMessage?: (
+    message: string,
+    chatMessages: ChatMessage[],
+    isUserMessage: boolean
+  ) => void
 }
 
-export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
+export const ChatInput: FC<ChatInputProps> = ({
+  showAssistant = true,
+  handleSendMessage
+}) => {
   useHotkey("l", () => {
     handleFocusChatInput()
   })
@@ -77,10 +86,18 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
 
   const {
     chatInputRef,
-    handleSendMessage,
+    handleSendMessage: handleSendMessageInternal,
     handleStopMessage,
     handleFocusChatInput
   } = useChatHandler()
+
+  if (!handleSendMessage) {
+    handleSendMessage = handleSendMessageInternal
+  }
+
+  if (!handleSendMessage) {
+    handleSendMessage = handleSendMessageInternal
+  }
 
   const { handleInputChange: promptHandleInputChange, handleSelectAssistant } =
     usePromptAndCommand()
@@ -188,7 +205,7 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
       setIsPromptPickerOpen(false)
       setTranscript("")
       setUserInputBeforeRecording("")
-      handleSendMessage(userInput, chatMessages, false)
+      handleSendMessage!(userInput, chatMessages, false)
     }
 
     if (
@@ -372,19 +389,16 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
           <div className="flex cursor-pointer items-end justify-end space-x-2">
             <div className="flex flex-nowrap items-end overflow-hidden">
               {recognition && (
-                <button
-                  onClick={listening ? stopListening : restartListening}
-                  className="focus:outline-none"
-                >
+                <button onClick={listening ? stopListening : restartListening}>
                   {listening ? (
                     <IconPlayerRecordFilled
                       stroke={1.5}
-                      className="animate-pulse text-red-500"
+                      className={"animate-pulse text-red-500"}
                       size={24}
                     />
                   ) : (
                     <IconMicrophone
-                      className="m-1 cursor-pointer p-0.5 hover:opacity-50"
+                      className={"m-1 cursor-pointer p-0.5 hover:opacity-50"}
                       stroke={1.5}
                       size={24}
                     />
@@ -407,7 +421,7 @@ export const ChatInput: FC<ChatInputProps> = ({ showAssistant = true }) => {
                   )}
                   onClick={() => {
                     if (!userInput || isUploading) return
-                    handleSendMessage(userInput, chatMessages, false)
+                    handleSendMessage!(userInput, chatMessages, false)
                     setTranscript("")
                     setUserInputBeforeRecording("")
                   }}

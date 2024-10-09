@@ -21,6 +21,8 @@ export type OpenAILLMID =
   | "gpt-4o" // GPT-4o
   | "gpt-4o-mini" // GPT-4 Vision
   | "gpt-4o-2024-08-06" // GPT-4o (updated 8/6/24)
+  | "o1-mini" // O1 Mini
+  | "o1-preview" // O1 Mini Latest
 
 // Google Models
 export type GoogleLLMID =
@@ -70,6 +72,14 @@ export type PerplexityLLMID =
   | "llama-3-sonar-large-32k-chat" // Sonar Medium Chat
   | "llama-3-sonar-large-32k-online" // Sonar Medium Online
 
+// Add this new type definition
+export type Category = {
+  category: string
+  description?: string
+  color?: string
+}
+
+// Update the LLM interface to include categories
 export type OpenRouterLLMID =
   | "openai/o1-mini"
   | "openai/o1-preview"
@@ -99,10 +109,10 @@ export interface LLM {
   hostedId: string
   platformLink: string
   imageInput: boolean
-  paid?: boolean
   tools?: boolean
   supportsStreaming?: boolean
   description?: string
+  tags?: string[]
   pricing?: {
     currency: string
     unit: string
@@ -110,6 +120,8 @@ export interface LLM {
     outputCost?: number
   }
   new?: boolean
+  tier?: "free" | "pro" | "ultimate" | undefined
+  categories?: Category[]
 }
 
 export interface OpenRouterLLM extends LLM {

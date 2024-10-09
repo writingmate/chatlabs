@@ -9,11 +9,10 @@ import {
 } from "@/components/ui/card"
 import { FC, useRef } from "react"
 
-export const SETUP_STEP_COUNT = 3
-
 interface StepContainerProps {
   stepDescription: string
   stepNum: number
+  totalSteps: number
   stepTitle: string
   onShouldProceed: (shouldProceed: boolean) => void
   children?: React.ReactNode
@@ -24,6 +23,7 @@ interface StepContainerProps {
 export const StepContainer: FC<StepContainerProps> = ({
   stepDescription,
   stepNum,
+  totalSteps,
   stepTitle,
   onShouldProceed,
   children,
@@ -42,15 +42,15 @@ export const StepContainer: FC<StepContainerProps> = ({
 
   return (
     <Card
-      className="mx-3 max-h-[calc(100vh-60px)] w-full overflow-auto sm:w-[600px]"
+      className="w-full overflow-auto sm:mx-3 sm:w-[600px]"
       onKeyDown={handleKeyDown}
     >
-      <CardHeader>
+      <CardHeader className="pb-3">
         <CardTitle className="flex justify-between text-lg sm:text-2xl">
           <div>{stepTitle}</div>
 
           <div className="text-sm">
-            {stepNum} / {SETUP_STEP_COUNT}
+            {stepNum} / {totalSteps}
           </div>
         </CardTitle>
 

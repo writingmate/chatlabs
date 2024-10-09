@@ -5,6 +5,9 @@ import { IconCheck, IconX } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { Badge } from "@/components/ui/badge"
+import { CATEGORIES } from "@/lib/models/categories"
+import Markdown from "react-markdown"
+import { WithTooltip } from "../ui/with-tooltip"
 import { useTranslation } from "react-i18next"
 
 export function ModelDetails({
@@ -17,7 +20,7 @@ export function ModelDetails({
   selectedTools?: Tables<"tools">[]
 }) {
   let contextLength =
-    CHAT_SETTING_LIMITS[model.modelId]?.MAX_CONTEXT_LENGTH || 0
+    CHAT_SETTING_LIMITS[model?.modelId]?.MAX_CONTEXT_LENGTH || 0
 
   if ("maxContext" in model) {
     contextLength = model.maxContext as number
@@ -45,7 +48,7 @@ export function ModelDetails({
   const { t } = useTranslation()
 
   return (
-    <div className={cn("flex w-[320px] flex-col", className)}>
+    <div className={cn("flex w-[320px] flex-col space-y-2", className)}>
       <div className={"flex items-center space-x-2"}>
         <ModelIcon
           provider={model?.provider}
@@ -57,7 +60,30 @@ export function ModelDetails({
         <span>/</span>
         <span className={"font-semibold"}>{model.modelName}</span>
       </div>
-      <div className="grid grid-cols-1 divide-y pt-4 text-xs">
+      <div className="flex flex-wrap gap-2">
+        {model.categories?.map(category => (
+          <WithTooltip
+            side="top"
+            key={category.category}
+            display={category.description}
+            trigger={
+              <Badge
+                variant="outline"
+                className={`text-nowrap py-0.5`}
+                key={category.category}
+              >
+                {category.category}
+              </Badge>
+            }
+          />
+        ))}
+        {model.description && (
+          <Markdown className="text-muted-foreground line-clamp-6 text-xs hover:line-clamp-none">
+            {model.description}
+          </Markdown>
+        )}
+      </div>
+      <div className="grid grid-cols-1 divide-y text-xs">
         <Row label={t("Context")} value={formattedContextLength + " tokens"} />
         {model.pricing && (
           <>

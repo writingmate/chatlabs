@@ -1,4 +1,5 @@
 import { UUID } from "crypto"
+import { JSONSchema } from "openai/lib/jsonschema.mjs"
 
 export interface ToolFunction {
   id: string
@@ -7,6 +8,7 @@ export interface ToolFunction {
   // a parameter that tells whether to send the results of the tool back to LLM or return as is to the client
   resultProcessingMode?: "send_to_llm" | "render_markdown" | "render_html"
   parameters: Parameter[]
+  responseSchema?: JSONSchema
 }
 
 export interface Parameter {
@@ -18,6 +20,7 @@ export interface Parameter {
 
 export interface Schema {
   type: string
+  enum?: Array<string>
 }
 
 export interface PlatformTool {

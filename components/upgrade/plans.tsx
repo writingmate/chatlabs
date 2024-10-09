@@ -1,5 +1,4 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { WithTooltip } from "@/components/ui/with-tooltip"
 import {
   IconX,
   IconSparkles,
@@ -8,23 +7,26 @@ import {
   IconLayout2,
   IconBooks,
   IconFileDescription,
+  IconCircleDashed,
   IconGlobe,
   IconPhoto,
   IconShield
 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { PlanFeature } from "@/components/upgrade/plan-picker"
-import { useContext, useState } from "react"
+import { useContext, useState, useRef, useEffect, useCallback } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { supabase } from "@/lib/supabase/browser-client"
 import { createCheckoutSession } from "@/actions/stripe"
-import { router } from "next/client"
 import { Badge } from "@/components/ui/badge"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
+import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 const BYOK_PLAN_PREFIX = "byok"
 const PRO_PLAN_PREFIX = "pro"
+const ULTIMATE_PLAN_PREFIX = "ultimate"
 const BILLING_CYCLE_YEARLY = "yearly"
 const BILLING_CYCLE_MONTHLY = "monthly"
 
@@ -52,20 +54,29 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
 
   const [loading, setLoading] = useState("")
   const [isDialogVisible, setIsDialogVisible] = useState(true)
+  const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false)
 
   const formAction = async (data: FormData): Promise<void> => {
-    const user = (await supabase.auth.getUser()).data.user
+    try {
+      const user = (await supabase.auth.getUser()).data.user
 
-    if (!user) {
-      return window.location.assign("/login")
+      if (!user) {
+        return window.location.assign("/login")
+      }
+
+      data.set("email", user?.email as string)
+      data.set("userId", user?.id)
+
+      const { url } = await createCheckoutSession(data)
+
+      window.location.assign(url as string)
+    } catch (error) {
+      setLoading("")
+      toast.error(
+        "Failed to upgrade plan. Something went wrong. Please try again."
+      )
+      console.error(error)
     }
-
-    data.set("email", user?.email as string)
-    data.set("userId", user?.id)
-
-    const { url } = await createCheckoutSession(data)
-
-    window.location.assign(url as string)
   }
 
   function createFormAction(plan_prefix: string) {
@@ -77,28 +88,37 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
     }
   }
 
-  const handleClick = (plan: string) => {
-    const event = `click_${plan}_${billingCycle}`
-    window.gtag?.("event", event)
-    window.dataLayer?.push({ event })
-    setLoading(plan)
-  }
+  const handleClick = useCallback(
+    (plan: string) => {
+      const event = `click_${plan}_${billingCycle}`
+      window.gtag?.("event", event)
+      window.dataLayer?.push({ event })
+      setLoading(plan)
+    },
+    [billingCycle]
+  )
 
-  const closeDialog = () => {
+  const closeDialog = useCallback(() => {
     setIsDialogVisible(false)
     onClose()
-  }
+  }, [onClose])
+
+  const toggleCollapsible = useCallback(() => {
+    setIsCollapsibleOpen(prev => !prev)
+  }, [])
 
   const FeatureGroup = ({
     icon,
+    className,
     title,
     children
   }: {
     icon: React.ReactNode
+    className?: string
     title: string
     children: React.ReactNode
   }) => (
-    <div className="mb-2">
+    <div className={cn("mb-2", className)}>
       <div className="mb-2 flex items-center">
         {icon}
         <span className="ml-2 font-semibold">{title}</span>
@@ -282,7 +302,9 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
                     formAction={createFormAction(PRO_PLAN_PREFIX)}
                     onClick={() => handleClick(PRO_PLAN_PREFIX)}
                     data-testid="select-plan-button-Pro-create"
-                    className={"bg-violet-700 text-white"}
+                    className={
+                      "bg-violet-700 text-white hover:bg-white hover:text-violet-700 hover:outline hover:outline-violet-700"
+                    }
                   >
                     {t("Upgrade NOW")}
                   </Button>

@@ -6,6 +6,7 @@ import {
   ToolsCallResult,
   WebScraperResult
 } from "@/types/platformTools"
+import { MessageHtmlElement } from "./html"
 
 export type Annotation = {
   imageGenerator__generateImage?: ImageGeneratorResult
@@ -13,6 +14,7 @@ export type Annotation = {
   webScraper__googleSearch?: GoogleSearchResult
   webScraper__webScraper?: WebScraperResult
   toolCalls?: ToolsCallResult
+  selected_html_elements?: MessageHtmlElement[]
 }
 
 interface ToolResult<T> extends ToolResultBase {

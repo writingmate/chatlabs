@@ -99,13 +99,13 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
   // PASSIVE CHAT STORE
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatSettings, setChatSettings] = useState<ChatSettings>(() => {
-    if (typeof window !== "undefined") {
-      const storedSettings = window?.localStorage?.getItem(chatSettingsKey)
+    // if (typeof window !== "undefined") {
+    //   const storedSettings = window?.localStorage?.getItem(chatSettingsKey)
 
-      if (storedSettings) {
-        return JSON.parse(storedSettings)
-      }
-    }
+    //   if (storedSettings) {
+    //     return JSON.parse(storedSettings)
+    //   }
+    // }
 
     return {
       model: "gpt-4o-mini",
@@ -140,11 +140,11 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
     MessageHtmlElement[]
   >([])
 
-  useEffect(() => {
-    if (chatSettings) {
-      localStorage.setItem(chatSettingsKey, JSON.stringify(chatSettings))
-    }
-  }, [chatSettings, chatSettingsKey])
+  // useEffect(() => {
+  //   if (chatSettings) {
+  //     localStorage.setItem(chatSettingsKey, JSON.stringify(chatSettings))
+  //   }
+  // }, [chatSettings])
 
   return (
     <ChatbotUIChatContext.Provider

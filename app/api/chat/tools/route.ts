@@ -43,7 +43,9 @@ export async function GET() {
 }
 
 function getProviderCaller(model: string, profile: Tables<"profiles">) {
-  const provider = LLM_LIST.find(llm => llm.modelId === model)?.provider
+  const provider = LLM_LIST.find(
+    llm => llm.modelId === model || llm.hostedId === model
+  )?.provider
   if (provider === "openai") {
     checkApiKey(profile.openai_api_key, "OpenAI")
 

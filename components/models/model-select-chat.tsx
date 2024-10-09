@@ -3,10 +3,19 @@ import { LLM, LLMID, ModelProvider } from "@/types"
 import {
   IconCheck,
   IconChevronDown,
+  IconKey,
   IconSquarePlus,
   IconX
 } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import {
+  FC,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useCallback
+} from "react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -44,8 +53,14 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   detailsLocation = "left",
   showModelSettings = true
 }) => {
-  const { profile, availableLocalModels, allModels, setIsPaywallOpen } =
-    useContext(ChatbotUIContext)
+  const {
+    profile,
+    availableLocalModels,
+    allModels,
+    setIsPaywallOpen,
+    isProfileSettingsOpen,
+    setIsProfileSettingsOpen
+  } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -67,14 +82,17 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
     }
   }, [isOpen])
 
-  const handleSelectModel = (modelId: LLMID) => {
-    if (!validatePlanForModel(profile, modelId)) {
-      setIsPaywallOpen(true)
-      return
-    }
-    onSelectModel(modelId)
-    setIsOpen(false)
-  }
+  const handleSelectModel = useCallback(
+    (modelId: LLMID) => {
+      if (!validatePlanForModel(profile, modelId)) {
+        setIsPaywallOpen(true)
+        return
+      }
+      onSelectModel(modelId)
+      setIsOpen(false)
+    },
+    [profile, onSelectModel, setIsPaywallOpen]
+  )
 
   // useEffect(() => {
   //   getMostRecentModels().then(result => {
@@ -82,31 +100,68 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   //   })
   // }, [])
 
-  const selectedModel = allModels.find(
-    model => model.modelId === selectedModelId
+  const selectedModel = useMemo(
+    () => allModels.find(model => model.modelId === selectedModelId),
+    [allModels, selectedModelId]
   )
+
+  const mergedModelVisibility = useMemo(
+    () => ({
+      ...DEFAULT_MODEL_VISIBILITY,
+      ...((profile?.model_visibility as object) || {})
+    }),
+    [profile]
+  )
+
+  const filteredModels = useMemo(
+    () =>
+      allModels
+        .filter(model => {
+          if (tab === "hosted") return model.provider !== "ollama"
+          if (tab === "local") return model.provider === "ollama"
+          if (tab === "openrouter") return model.provider === "openrouter"
+        })
+        .filter(
+          model =>
+            (mergedModelVisibility as Record<LLMID, boolean>)?.[
+              model.modelId
+            ] ?? false
+        )
+        .filter(model =>
+          model.modelName.toLowerCase().includes(search.toLowerCase())
+        )
+        .sort((a, b) => a.provider.localeCompare(b.provider)),
+    [allModels, tab, profile, search]
+  )
+
+  const modelForDetails = useMemo(
+    () => hoveredModel || filteredModels?.[0],
+    [hoveredModel, filteredModels]
+  )
+
+  // Debounce search input
+  const handleSearchChange = useCallback((e: any) => {
+    const value = e.target.value
+    setSearch(value)
+  }, [])
 
   // if (!profile) return null
 
-  const filteredModels = allModels
-    .filter(model => {
-      if (tab === "hosted") return model.provider !== "ollama"
-      if (tab === "local") return model.provider === "ollama"
-      if (tab === "openrouter") return model.provider === "openrouter"
-    })
-    .filter(
-      model =>
-        (
-          (profile?.model_visibility || DEFAULT_MODEL_VISIBILITY) as Record<
-            LLMID,
-            boolean
-          >
-        )?.[model.modelId] ?? false
+  if (allModels.length === 0 && profile?.plan.startsWith("byok_")) {
+    return (
+      <Button
+        className="text-md items-end"
+        onClick={e => {
+          e.stopPropagation()
+          setIsProfileSettingsOpen("keys")
+        }}
+        variant="ghost"
+      >
+        <IconKey className="mr-1" size={20} stroke={1.5} />
+        Enter API keys.
+      </Button>
     )
-    .filter(model =>
-      model.modelName.toLowerCase().includes(search.toLowerCase())
-    )
-    .sort((a, b) => a.provider.localeCompare(b.provider))
+  }
 
   return (
     <DropdownMenu
@@ -121,37 +176,30 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
         asChild
         disabled={allModels.length === 0}
       >
-        {allModels.length === 0 && profile?.plan.startsWith("byok_") ? (
-          <div className="rounded text-sm font-bold">
-            Unlock models by entering API keys in your profile settings.
+        <Button
+          ref={triggerRef}
+          className="text-md flex items-center justify-between space-x-1"
+          variant="ghost"
+        >
+          <div className="flex items-center">
+            {selectedModel ? (
+              <>
+                <ModelIcon
+                  provider={selectedModel?.provider}
+                  modelId={selectedModel?.modelId}
+                  width={26}
+                  height={26}
+                />
+                <div className="ml-2 flex items-center">
+                  {selectedModel?.modelName}
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center">Select a model</div>
+            )}
           </div>
-        ) : (
-          <Button
-            ref={triggerRef}
-            className="flex items-center justify-between space-x-1"
-            variant="ghost"
-          >
-            <div className="flex items-center">
-              {selectedModel ? (
-                <>
-                  <ModelIcon
-                    provider={selectedModel?.provider}
-                    modelId={selectedModel?.modelId}
-                    width={26}
-                    height={26}
-                  />
-                  <div className="ml-2 flex items-center text-lg">
-                    {selectedModel?.modelName}
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center">Select a model</div>
-              )}
-            </div>
-
-            <IconChevronDown />
-          </Button>
-        )}
+          <IconChevronDown stroke={1.5} className="ml-1 size-5 opacity-50" />
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
@@ -160,13 +208,15 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
           detailsLocation === "left" ? "flex-row" : "flex-row-reverse"
         )}
       >
-        <DropdownMenuSubContent2
-          className={
-            "relative mr-2 hidden h-auto flex-col justify-between border-r p-4 lg:flex"
-          }
-        >
-          <ModelDetails model={hoveredModel || filteredModels[0]} />
-        </DropdownMenuSubContent2>
+        {modelForDetails && (
+          <DropdownMenuSubContent2
+            className={
+              "relative mr-2 hidden h-auto flex-col justify-between border-r p-4 lg:flex"
+            }
+          >
+            <ModelDetails model={modelForDetails} />
+          </DropdownMenuSubContent2>
+        )}
         <DropdownMenuSubContent2 className="relative mr-2 flex w-[340px] flex-col space-y-2 overflow-auto p-2">
           {availableLocalModels.length > 0 && (
             <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
@@ -182,7 +232,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
             className="w-full"
             placeholder="Search models..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={handleSearchChange}
           />
 
           <div className="max-h-[300px] overflow-auto">

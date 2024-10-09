@@ -13,13 +13,17 @@ export async function consumeReadableStream(
   const reader = stream.getReader()
   const decoder = new TextDecoder()
 
+  let isReaderClosed = false
+
   signal.addEventListener(
     "abort",
     () => {
-      try {
-        reader.cancel()
-      } catch (error) {
-        console.error("Error canceling stream reader:", error)
+      if (!isReaderClosed) {
+        try {
+          reader.cancel()
+        } catch (error) {
+          console.warn("Error canceling stream reader:", error)
+        }
       }
     },
     { once: true }
@@ -39,11 +43,12 @@ export async function consumeReadableStream(
     }
   } catch (error) {
     if (signal.aborted) {
-      console.error("Stream reading was aborted:", error)
+      console.warn("Stream reading was aborted:", error)
     } else {
       console.error("Error consuming stream:", error)
     }
   } finally {
+    isReaderClosed = true
     reader.releaseLock()
   }
 }

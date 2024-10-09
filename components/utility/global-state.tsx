@@ -30,12 +30,12 @@ import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
 import { isMobileScreen } from "@/lib/mobile"
-import { getPublicAssistants } from "@/db/assistants"
+import { getPopularAssistants } from "@/db/assistants"
 import { getPublicTools } from "@/db/tools"
 import { getPlatformTools } from "@/db/platform-tools"
 import { onlyUniqueById } from "@/lib/utils"
 import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
-import Loading from "@/components/ui/loading"
+import { Loading } from "@/components/ui/loading"
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -90,10 +90,14 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatSettings, setChatSettings] = useState<ChatSettings>(() => {
     if (typeof window !== "undefined") {
-      const storedSettings = window?.localStorage?.getItem("chatSettings")
+      try {
+        const storedSettings = window?.localStorage?.getItem("chatSettings")
 
-      if (storedSettings) {
-        return JSON.parse(storedSettings)
+        if (storedSettings) {
+          return JSON.parse(storedSettings)
+        }
+      } catch (error) {
+        console.error("Error getting chat settings:", error)
       }
     }
 
@@ -159,6 +163,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   const [isPaywallOpen, setIsPaywallOpen] = useState<boolean>(false)
 
+  // PROFILE SETTINGS
+  const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState<string>("")
+
   // SIDEBAR
   const [showSidebar, setShowSidebar] = useState<boolean>(
     () => !isMobileScreen()
@@ -166,55 +173,64 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   useEffect(() => {
     ;(async () => {
-      const profile = await fetchStartingData()
-      const hostedModelRes = await fetchHostedModels(profile)
-      if (!hostedModelRes) return
+      try {
+        const profile = await fetchStartingData()
+        const hostedModelRes = await fetchHostedModels(profile)
+        if (!hostedModelRes) return
 
-      const allModels = []
+        const allModels = []
 
-      setEnvKeyMap(hostedModelRes.envKeyMap)
-      setAvailableHostedModels(hostedModelRes.hostedModels)
+        setEnvKeyMap(hostedModelRes.envKeyMap)
+        setAvailableHostedModels(hostedModelRes.hostedModels)
 
-      allModels.push(...hostedModelRes.hostedModels)
+        allModels.push(...hostedModelRes.hostedModels)
 
-      if (profile) {
-        if (
-          profile["openrouter_api_key"] ||
-          hostedModelRes.envKeyMap["openrouter"]
-        ) {
-          const openRouterModels = await fetchOpenRouterModels()
-          if (!openRouterModels) return
-          allModels.push(...openRouterModels)
-          setAvailableOpenRouterModels(openRouterModels)
+        if (profile) {
+          if (
+            profile["openrouter_api_key"] ||
+            hostedModelRes.envKeyMap["openrouter"]
+          ) {
+            const openRouterModels = await fetchOpenRouterModels()
+            if (!openRouterModels) return
+            allModels.push(...openRouterModels)
+            setAvailableOpenRouterModels(openRouterModels)
+          }
         }
-      }
 
-      if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
-        const localModels = await fetchOllamaModels()
-        if (!localModels) return
-        allModels.push(...localModels)
-        setAvailableLocalModels(localModels)
-      }
+        if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
+          const localModels = await fetchOllamaModels()
+          if (!localModels) return
+          allModels.push(...localModels)
+          setAvailableLocalModels(localModels)
+        }
 
-      setAllModels([
-        ...models.map(model => ({
-          modelId: model.model_id as LLMID,
-          modelName: model.name,
-          provider: "custom" as ModelProvider,
-          hostedId: model.id,
-          platformLink: "",
-          imageInput: false,
-          paid: "paid" in model ? !!model.paid : false,
-          maxContext: null
-        })),
-        ...allModels
-      ])
+        setAllModels([
+          ...models.map(model => ({
+            modelId: model.model_id as LLMID,
+            modelName: model.name,
+            provider: "custom" as ModelProvider,
+            hostedId: model.id,
+            platformLink: "",
+            imageInput: false,
+            paid: "paid" in model ? !!model.paid : false,
+            maxContext: null
+          })),
+          ...allModels
+        ])
+      } catch (error) {
+        setLoading(false)
+        console.error("Error fetching models:", error)
+      }
     })()
   }, [])
 
   useEffect(() => {
     if (chatSettings) {
-      localStorage.setItem("chatSettings", JSON.stringify(chatSettings))
+      try {
+        localStorage.setItem("chatSettings", JSON.stringify(chatSettings))
+      } catch (error) {
+        console.error("Error setting chat settings:", error)
+      }
     }
   }, [chatSettings])
 
@@ -262,7 +278,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       }
     }
 
-    await fetchWorkspaceData(workspaces.find(w => w.is_home)?.id as string)
+    await fetchWorkspaceData(
+      workspaces.find(w => w.is_home)?.id as string,
+      profile?.user_id as string
+    )
     setUserInput("")
     setChatMessages([])
     setSelectedChat(null)
@@ -279,7 +298,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     return profile
   }
 
-  const fetchWorkspaceData = async (workspaceId: string) => {
+  const fetchWorkspaceData = async (workspaceId: string, userId: string) => {
     setLoading(true)
 
     try {
@@ -290,16 +309,14 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       }
       setSelectedWorkspace(workspace)
 
-      const [publicAssistantData, publicToolData, platformToolData] =
+      const [popularAssistants, publicToolData, platformToolData] =
         await Promise.all([
-          getPublicAssistants(),
+          getPopularAssistants(workspaceId, userId),
           getPublicTools(),
           getPlatformTools()
         ])
 
-      setAssistants(
-        [...workspace.assistants, ...publicAssistantData].filter(onlyUniqueById)
-      )
+      setAssistants(popularAssistants)
       setChats(workspace.chats)
       setFolders(workspace.folders)
       setFiles(workspace.files)
@@ -317,40 +334,37 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         return Promise.all(promises)
       }
 
-      await parallelize(
-        [...workspace.assistants, ...publicAssistantData],
-        async (assistant: any) => {
-          let url = assistant.image_path
-            ? getAssistantPublicImageUrl(assistant.image_path)
-            : ""
+      await parallelize(popularAssistants, async (assistant: any) => {
+        let url = assistant.image_path
+          ? getAssistantPublicImageUrl(assistant.image_path)
+          : ""
 
-          if (url) {
-            // const response = await fetch(url)
-            // const blob = await response.blob()
-            // const base64 = await convertBlobToBase64(blob)
+        if (url) {
+          // const response = await fetch(url)
+          // const blob = await response.blob()
+          // const base64 = await convertBlobToBase64(blob)
 
-            setAssistantImages(prev => [
-              ...prev,
-              {
-                assistantId: assistant.id,
-                path: assistant.image_path,
-                base64: "",
-                url
-              }
-            ])
-          } else {
-            setAssistantImages(prev => [
-              ...prev,
-              {
-                assistantId: assistant.id,
-                path: assistant.image_path,
-                base64: "",
-                url
-              }
-            ])
-          }
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: assistant.id,
+              path: assistant.image_path,
+              base64: "",
+              url
+            }
+          ])
+        } else {
+          setAssistantImages(prev => [
+            ...prev,
+            {
+              assistantId: assistant.id,
+              path: assistant.image_path,
+              base64: "",
+              url
+            }
+          ])
         }
-      )
+      })
 
       setChatSettings({
         model: (chatSettings?.model ||
@@ -387,7 +401,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }
 
   if (loading) {
-    return <Loading />
+    return <Loading withMessage={true} />
   }
 
   return (
@@ -533,7 +547,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setShowSidebar,
 
         allModels,
-        setAllModels
+        setAllModels,
+
+        // PROFILE SETTINGS
+        isProfileSettingsOpen,
+        setIsProfileSettingsOpen
       }}
     >
       {children}

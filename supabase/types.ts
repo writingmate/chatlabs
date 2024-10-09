@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -109,6 +109,45 @@ export interface Database {
           }
         ]
       }
+      application_platform_tools: {
+        Row: {
+          application_id: string
+          created_at: string
+          platform_tool_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          platform_tool_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          platform_tool_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_platform_tools_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "application_platform_tools_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       application_tools: {
         Row: {
           application_id: string
@@ -157,39 +196,55 @@ export interface Database {
       }
       applications: {
         Row: {
+          application_type: string
+          chat_id: string | null
           created_at: string
           description: string
           folder_id: string | null
           id: string
           name: string
           sharing: string
+          theme: string
           updated_at: string | null
           user_id: string
           workspace_id: string
         }
         Insert: {
+          application_type: string
+          chat_id?: string | null
           created_at?: string
           description: string
           folder_id?: string | null
           id?: string
           name: string
           sharing?: string
+          theme: string
           updated_at?: string | null
           user_id: string
           workspace_id: string
         }
         Update: {
+          application_type?: string
+          chat_id?: string | null
           created_at?: string
           description?: string
           folder_id?: string | null
           id?: string
           name?: string
           sharing?: string
+          theme?: string
           updated_at?: string | null
           user_id?: string
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "applications_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "applications_folder_id_fkey"
             columns: ["folder_id"]
@@ -2047,6 +2102,32 @@ export interface Database {
         }
         Returns: Record<string, unknown>
       }
+      get_assistants_for_user: {
+        Args: {
+          p_user_id: string
+          p_workspace_id: string
+        }
+        Returns: {
+          context_length: number
+          conversation_starters: string[]
+          created_at: string
+          description: string
+          embeddings_provider: string
+          folder_id: string | null
+          hashid: string
+          id: string
+          image_path: string
+          include_profile_context: boolean
+          include_workspace_instructions: boolean
+          model: string
+          name: string
+          prompt: string
+          sharing: string
+          temperature: number
+          updated_at: string | null
+          user_id: string
+        }[]
+      }
       hash_encode: {
         Args: {
           "": number
@@ -2057,7 +2138,7 @@ export interface Database {
         Args: {
           "": string
         }
-        Returns: unknown
+        Returns: number[]
       }
       id_decode_once: {
         Args: {
@@ -2143,6 +2224,36 @@ export interface Database {
           p_name: string
         }
         Returns: boolean
+      }
+      search_chats_and_messages: {
+        Args: {
+          p_workspace_id: string
+          p_query: string
+        }
+        Returns: {
+          assistant_id: string | null
+          context_length: number
+          created_at: string
+          embeddings_provider: string
+          folder_id: string | null
+          hashid: string
+          id: string
+          include_profile_context: boolean
+          include_workspace_instructions: boolean
+          last_chat_message_id: string | null
+          last_shared_message_id: string | null
+          model: string
+          name: string
+          pinned: boolean | null
+          prompt: string
+          shared_at: string | null
+          shared_by: string | null
+          sharing: string
+          temperature: number
+          updated_at: string | null
+          user_id: string
+          workspace_id: string
+        }[]
       }
       unaccent: {
         Args: {
@@ -2279,102 +2390,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "buckets"
             referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          id: string
-          in_progress_size: number
-          key: string
-          owner_id: string | null
-          upload_signature: string
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          id: string
-          in_progress_size?: number
-          key: string
-          owner_id?: string | null
-          upload_signature: string
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          id?: string
-          in_progress_size?: number
-          key?: string
-          owner_id?: string | null
-          upload_signature?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads_parts: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          etag: string
-          id: string
-          key: string
-          owner_id: string | null
-          part_number: number
-          size: number
-          upload_id: string
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          etag: string
-          id?: string
-          key: string
-          owner_id?: string | null
-          part_number: number
-          size?: number
-          upload_id: string
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          etag?: string
-          id?: string
-          key?: string
-          owner_id?: string | null
-          part_number?: number
-          size?: number
-          upload_id?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
-            columns: ["upload_id"]
-            isOneToOne: false
-            referencedRelation: "s3_multipart_uploads"
-            referencedColumns: ["id"]
-          },
+          }
         ]
       }
     }
@@ -2407,7 +2423,7 @@ export interface Database {
         Args: {
           name: string
         }
-        Returns: unknown
+        Returns: string[]
       }
       get_size_by_bucket: {
         Args: Record<PropertyKey, never>
@@ -2486,7 +2502,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never = never
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -2510,7 +2526,7 @@ export type TablesInsert<
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never = never
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
@@ -2531,7 +2547,7 @@ export type TablesUpdate<
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never = never
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
@@ -2552,10 +2568,9 @@ export type Enums<
     | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never = never
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
     : never
-

@@ -12,7 +12,7 @@ import { Input } from "../ui/input"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { ModelIcon } from "./model-icon"
 import { ModelOption } from "./model-option"
-import { validateProPlan } from "@/lib/subscription"
+import { validatePlanForModel } from "@/lib/subscription"
 
 interface ModelSelectProps {
   selectedModelId: string
@@ -49,10 +49,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   }, [isOpen])
 
   const handleSelectModel = (modelId: LLMID) => {
-    if (
-      !validateProPlan(profile) &&
-      allModels?.find(x => x.modelId == modelId)?.paid == true
-    ) {
+    if (!validatePlanForModel(profile, modelId)) {
       setIsPaywallOpen(true)
     } else {
       onSelectModel(modelId)
@@ -119,7 +116,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
               )}
             </div>
 
-            <IconChevronDown />
+            <IconChevronDown stroke={1.5} />
           </Button>
         )}
       </DropdownMenuTrigger>

@@ -71,7 +71,9 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
     })
   }
 
-  const selectedModel = allModels.find(x => x.modelId == chatSettings.model)
+  const selectedModel = allModels.find(
+    x => x.modelId == chatSettings.model || x.hostedId == chatSettings.model
+  )
 
   return (
     <div className={cn("flex items-center space-x-1", className)}>

@@ -9,7 +9,6 @@ import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { cn, generateRandomString, programmingLanguages } from "@/lib/utils"
 import { CodeBlock } from "@/types"
-import { useRouter } from "next/navigation"
 import {
   FC,
   useCallback,
@@ -18,11 +17,10 @@ import {
   useMemo,
   useState
 } from "react"
-import CodeViewerSidebar from "./code-viewer-sidebar"
-import { DEFAULT_THEME, THEMES } from "./theme-config"
-import { updateMessage } from "@/db/messages" // Add this import
+import { ChatMessages } from "../chat/chat-messages"
 
 interface CodeViewerProps {
+  theme?: string
   isGenerating?: boolean
   codeBlock: CodeBlock
   className?: string
@@ -36,6 +34,7 @@ interface CodeViewerProps {
 export const CodeViewer: FC<CodeViewerProps> = ({
   codeBlock,
   className,
+  theme,
   onClose,
   isGenerating,
   showCloseButton = false,
@@ -44,17 +43,26 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   onCodeChange
 }) => {
   const { user } = useAuth()
-  const router = useRouter()
-  const { selectedWorkspace, chatSettings, profile } =
+  const { selectedWorkspace, profile, selectedAssistant } =
     useContext(ChatbotUIContext)
-  const { setSelectedHtmlElements } = useContext(ChatbotUIChatContext)
+  const { setSelectedHtmlElements, chatSettings, chatMessages } =
+    useContext(ChatbotUIChatContext)
+  const { handleSendMessage } = useChatHandler()
   const [sharing, setSharing] = useState(false)
   const [execute, setExecute] = useState(false)
   const [inspectMode, setInspectMode] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [theme, setTheme] = useState<{ name: string; theme: UITheme }>(
-    THEMES[0]
+
+  const handleFixError = useCallback(
+    (error: string) => {
+      handleSendMessage(
+        `We have experienced an error: ${error}. Please fix the error`,
+        chatMessages,
+        false
+      )
+    },
+    [handleSendMessage]
   )
 
   const downloadAsFile = useCallback(() => {
@@ -75,17 +83,35 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   }, [codeBlock.language, codeBlock.code])
 
   const onFork = useCallback(() => {
-    window.open(
-      `/chat?forkMessageId=${codeBlock.messageId}&forkSequenceNo=${codeBlock.sequenceNo}`,
-      "_blank"
-    )
-  }, [codeBlock.messageId, codeBlock.sequenceNo])
+    const queryParams = new URLSearchParams()
+    queryParams.append("forkMessageId", codeBlock.messageId)
+    queryParams.append("forkSequenceNo", codeBlock.sequenceNo.toString())
+    queryParams.append("model", chatSettings?.model || "")
+    if (selectedAssistant) {
+      queryParams.append("assistant", selectedAssistant?.id)
+    }
+
+    window.open(`/chat?${queryParams.toString()}`, "_blank")
+  }, [
+    codeBlock.messageId,
+    codeBlock.sequenceNo,
+    chatSettings?.model,
+    selectedAssistant
+  ])
 
   useEffect(() => {
     if (codeBlock.language !== "html") {
       setExecute(false)
     }
-  }, [codeBlock.language])
+  }, [codeBlock, isGenerating])
+
+  useEffect(() => {
+    if (isGenerating) {
+      setExecute(false)
+    } else if (!execute && codeBlock.language === "html") {
+      setExecute(true)
+    }
+  }, [isGenerating])
 
   return useMemo(
     () => (
@@ -108,24 +134,27 @@ export const CodeViewer: FC<CodeViewerProps> = ({
           showCloseButton={showCloseButton}
           downloadAsFile={downloadAsFile}
           copyValue={codeBlock.code}
-          showShareButton={true}
+          showShareButton={!!profile}
           onThemeChange={() => {}}
           onFork={onFork}
-          showSidebarButton={!!user?.email?.endsWith("0nam.facebook@gmail.com")}
-          showForkButton={!!codeBlock.messageId && codeBlock.sequenceNo > -1}
+          showSidebarButton={false}
+          // showSidebarButton={false}
+          showForkButton={
+            !!codeBlock.messageId && codeBlock.sequenceNo > -1 && !!profile
+          }
         />
         <div className="relative w-full flex-1 overflow-auto bg-zinc-950">
           {execute ? (
             <CodeViewerPreview2
+              showFooter={!!profile}
               theme={theme}
-              value={codeBlock.code}
-              language={codeBlock.language}
+              codeBlock={codeBlock}
               inspectMode={inspectMode}
               setInspectMode={setInspectMode}
               onElementClick={element => {
                 setSelectedHtmlElements([element])
               }}
-              handleFixError={() => {}}
+              handleFixError={handleFixError}
             />
           ) : (
             <CodeViewerCode
@@ -136,12 +165,6 @@ export const CodeViewer: FC<CodeViewerProps> = ({
             />
           )}
         </div>
-        <CodeViewerSidebar
-          theme={theme}
-          setTheme={setTheme}
-          isOpen={isSidebarOpen}
-          setIsOpen={setIsSidebarOpen}
-        />
         <MessageSharingDialog
           open={sharing}
           setOpen={setSharing}
@@ -154,8 +177,7 @@ export const CodeViewer: FC<CodeViewerProps> = ({
       </div>
     ),
     [
-      codeBlock.language,
-      codeBlock.code,
+      codeBlock,
       execute,
       inspectMode,
       error,
@@ -163,7 +185,9 @@ export const CodeViewer: FC<CodeViewerProps> = ({
       isGenerating,
       isSidebarOpen,
       theme,
-      isEditable
+      isEditable,
+      chatSettings?.model,
+      selectedAssistant
     ]
   )
 }

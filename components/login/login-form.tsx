@@ -63,62 +63,76 @@ export default function LoginForm({
   }
 
   const handleOAuthLogin = async (provider: "azure" | "google") => {
-    setDisabled(true)
+    try {
+      setDisabled(true)
 
-    let authPopup: Window | null = null
-    if (popup) {
-      // Open the popup immediately with a loading page if popup is true
-      authPopup = openAuthPopup()
-    }
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        scopes: "email",
-        redirectTo: `${window.location.origin}/auth/callback?${callbackRedirectSearchParams.toString()}`,
-        skipBrowserRedirect: popup
+      let authPopup: Window | null = null
+      if (popup) {
+        // Open the popup immediately with a loading page if popup is true
+        authPopup = openAuthPopup()
       }
-    })
 
-    setDisabled(false)
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          scopes: "email",
+          redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL || window.location.origin}/auth/callback?${callbackRedirectSearchParams.toString()}`,
+          skipBrowserRedirect: popup
+        }
+      })
 
-    if (error) {
-      authPopup?.close()
-      return router.push(
-        `/login?message=${error.message}&${callbackRedirectSearchParams.toString()}`
-      )
-    }
+      setDisabled(false)
 
-    if (popup && data.url) {
-      // Update the popup URL after OAuth process is initiated
-      const popupUrl = new URL(data.url)
-      popupUrl.searchParams.append("popup", "true")
-      authPopup?.location.replace(popupUrl.toString())
+      if (error) {
+        authPopup?.close()
+        return router.push(
+          `/login?message=${error.message}&${callbackRedirectSearchParams.toString()}`
+        )
+      }
+
+      if (popup && data.url) {
+        // Update the popup URL after OAuth process is initiated
+        const popupUrl = new URL(data.url)
+        popupUrl.searchParams.append("popup", "true")
+        authPopup?.location.replace(popupUrl.toString())
+      }
+    } catch (error) {
+      toast.error("Error logging in with OAuth")
+      console.error(error)
+    } finally {
+      setDisabled(false)
     }
   }
 
   async function handleEmailLogin(
     e: React.FormEvent<HTMLButtonElement | HTMLFormElement>
   ) {
-    e.preventDefault()
-    e.stopPropagation()
-    setDisabled(true)
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email,
-      options: {
-        emailRedirectTo: encodeURIComponent(
-          `${window.location.origin}/auth/confirm?${callbackRedirectSearchParams.toString()}`
-        )
+    try {
+      e.preventDefault()
+      e.stopPropagation()
+      setDisabled(true)
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email,
+        options: {
+          emailRedirectTo: encodeURIComponent(
+            `${window.location.origin}/auth/confirm?${callbackRedirectSearchParams.toString()}`
+          )
+        }
+      })
+
+      setDisabled(false)
+
+      if (error) {
+        return router.push(`/login?message=${error.message}`)
       }
-    })
 
-    setDisabled(false)
-
-    if (error) {
-      return router.push(`/login?message=${error.message}`)
+      return router.push("/login?message=Check your email for a login link")
+    } catch (error) {
+      toast.error("Error logging in with email")
+      console.error(error)
+    } finally {
+      setDisabled(false)
     }
-
-    return router.push("/login?message=Check your email for a login link")
   }
 
   return (

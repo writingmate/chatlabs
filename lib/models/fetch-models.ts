@@ -2,6 +2,7 @@ import { Tables } from "@/supabase/types"
 import { LLM, LLMID, OpenRouterLLM } from "@/types"
 import { toast } from "sonner"
 import { LLM_LIST_MAP } from "./llm/llm-list"
+import { CATEGORIES } from "./categories"
 import { OPENROUTER_LLM_LIST } from "./llm/openrouter-llm-list"
 
 const KNOWN_MODEL_NAMES: {
@@ -26,7 +27,12 @@ const KNOWN_MODEL_NAMES: {
   "deepseek/deepseek-chat": {
     provider: "deepseek",
     modelName: "DeepSeek Chat V2.5",
-    new: true
+    categories: [CATEGORIES.PROGRAMMING]
+  },
+  "gryphe/mythomax-l2-13b": {
+    provider: "gryphe" as any,
+    modelName: "Mythomax 13B",
+    categories: [CATEGORIES.ROLEPLAY]
   }
   ///"google/gemini-pro-1.5": {
   //provider: "google",
@@ -251,7 +257,7 @@ export const fetchOpenRouterModels = async () => {
           tools: knownModel?.tools ?? false,
           supportsStreaming: true,
           new: knownModel?.new ?? false,
-          paid: knownModel?.paid ?? true
+          tier: knownModel?.tier ?? "pro"
         }
       })
 

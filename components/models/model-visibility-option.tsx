@@ -35,7 +35,7 @@ export const ModelVisibilityOption: FC<ModelVisibilityOption> = ({
             {model.modelName}
           </span>
           <div className="flex items-center space-x-1">
-            {model.paid && (
+            {model.tier && (
               <Badge variant="outline" className="relative overflow-hidden">
                 <span className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-600 opacity-10"></span>
                 <span className="relative bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">

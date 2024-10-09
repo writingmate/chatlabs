@@ -1,3 +1,4 @@
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { ChatSettings } from "@/types"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import { ServerRuntime } from "next"
@@ -20,16 +21,24 @@ export async function POST(request: Request) {
       baseURL: process.env.OPENAI_BASE_URL || undefined
     })
 
+    const supportsStreaming = LLM_LIST.find(model =>
+      [model.modelId, model.hostedId].includes(chatSettings.model)
+    )?.supportsStreaming
+
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: messages as ChatCompletionCreateParamsBase["messages"],
-      temperature: chatSettings.temperature,
-      max_tokens: 16384, // 16k tokens,
+      // temperature: chatSettings.temperature,
+      // max_tokens: 16384, // 16k tokens,
       response_format: response_format as any,
-      stream: true
+      stream: supportsStreaming || false
     })
 
-    const stream = OpenAIStream(response)
+    if (!supportsStreaming) {
+      return new Response((response as any).choices[0].message.content || "")
+    }
+
+    const stream = OpenAIStream(response as any)
 
     return new StreamingTextResponse(stream)
   } catch (error: any) {

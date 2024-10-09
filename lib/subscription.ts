@@ -1,7 +1,7 @@
 import { Tables } from "@/supabase/types"
-import { LLMID } from "@/types"
+import { LLMID } from "@/types/llms"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { PLAN_FREE } from "@/lib/stripe/config"
+import { PLAN_FREE, PLAN_PRO, PLAN_ULTIMATE } from "@/lib/stripe/config"
 import { getEnvInt } from "@/lib/env"
 
 export const FREE_MESSAGE_DAILY_LIMIT = getEnvInt(
@@ -14,22 +14,20 @@ export const CATCHALL_MESSAGE_DAILY_LIMIT = getEnvInt(
   300
 )
 
+export const PRO_ULTIMATE_MESSAGE_DAILY_LIMIT = getEnvInt(
+  "PRO_ULTIMATE_MESSAGE_DAILY_LIMIT",
+  5
+)
+
+export const ULTIMATE_MESSAGE_DAILY_LIMIT = getEnvInt(
+  "ULTIMATE_MESSAGE_DAILY_LIMIT",
+  50
+)
+
 export const ALLOWED_USERS =
   process.env.NEXT_PUBLIC_ALLOWED_USERS?.split(",") || []
 export const ALLOWED_MODELS =
   process.env.NEXT_PUBLIC_ALLOWED_MODELS?.split(",") || []
-
-export function validateProPlan(profile: Tables<"profiles"> | null) {
-  if (!profile) {
-    return false
-  }
-
-  if (ALLOWED_USERS.includes(profile?.user_id)) {
-    return true
-  }
-
-  return profile?.plan !== PLAN_FREE && profile?.plan?.indexOf("premium") === -1
-}
 
 export function validatePlanForModel(
   profile: Tables<"profiles"> | null,
@@ -39,14 +37,29 @@ export function validatePlanForModel(
     return false
   }
 
-  const paidLLMS = LLM_LIST.filter(x => x.paid).map(x => x.modelId)
+  // openrouter models are always allowed
+  if (model.includes("/")) {
+    return true
+  }
+
+  if (profile?.plan.startsWith("byok")) {
+    return true
+  }
+
+  const modelData = LLM_LIST.find(
+    x => x.modelId === model || x.hostedId === model
+  )
+
+  if (!modelData) {
+    return false
+  }
 
   if (ALLOWED_MODELS.includes(model)) {
     console.log("ALLOWED MODELS. Skipping plan check.", model)
     return true
   }
 
-  if (!paidLLMS.includes(model)) {
+  if (modelData.tier === "free" || modelData.tier === undefined) {
     return true
   }
 
@@ -54,9 +67,11 @@ export function validatePlanForModel(
     return false
   }
 
-  if (validateProPlan(profile)) {
-    return true
-  }
+  const userPlan = profile.plan.split("_")[0]
+
+  if (userPlan === PLAN_ULTIMATE || userPlan === PLAN_PRO) return true
+
+  return false
 }
 
 export function validatePlanForAssistant(
@@ -74,5 +89,5 @@ export function validatePlanForTools(
   if (model && validatePlanForModel(profile, model)) {
     return true
   }
-  return validateProPlan(profile)
+  return false
 }

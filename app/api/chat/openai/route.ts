@@ -13,6 +13,10 @@ import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 
 export const runtime: ServerRuntime = "edge"
 
+function dropSystemMessage(messages: any[]) {
+  return messages.filter((message: any) => message.role !== "system")
+}
+
 export async function POST(request: Request) {
   const json = await request.json()
   const { chatSettings, messages } = json as {
@@ -38,16 +42,29 @@ export async function POST(request: Request) {
         [x.modelId, x.hostedId].includes(chatSettings.model)
       )?.imageInput || false
 
+    const isO1 = ["o1-mini", "o1-preview"].includes(chatSettings.model)
+    const cleanedMessages = isO1 ? dropSystemMessage(messages) : messages
+    const temperature = isO1 ? 1 : chatSettings.temperature
+
+    const maxTokensProperty = isO1 ? "max_completion_tokens" : "max_tokens"
+    const supportsStream = isO1 ? false : true
+
     const response = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
-      messages: messages as ChatCompletionCreateParamsBase["messages"],
-      temperature: chatSettings.temperature,
-      max_tokens: supportsVision
+      messages: cleanedMessages as ChatCompletionCreateParamsBase["messages"],
+      temperature: temperature,
+      [maxTokensProperty]: supportsVision
         ? CHAT_SETTING_LIMITS[chatSettings.model].MAX_TOKEN_OUTPUT_LENGTH
         : null,
-      stream: true
+      stream: supportsStream
     })
 
+    if (!supportsStream) {
+      // @ts-ignore
+      return new Response(response.choices[0].message.content)
+    }
+
+    // @ts-ignore
     const stream = OpenAIStream(response)
 
     return new StreamingTextResponse(stream)

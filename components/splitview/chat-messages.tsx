@@ -8,10 +8,25 @@ import { parseChatMessageCodeBlocksAndContent } from "@/lib/messages"
 interface ChatMessagesProps {}
 
 const ChatMessages = forwardRef<ChatMessagesProps>(({}, ref) => {
-  const { chatMessages, chatFileItems, isGenerating, firstTokenReceived } =
-    useContext(ChatbotUIChatContext)
+  const {
+    chatMessages,
+    chatFileItems,
+    isGenerating,
+    firstTokenReceived,
+    setIsGenerating
+  } = useContext(ChatbotUIChatContext)
 
-  const { handleSendEdit } = useChatHandler()
+  const { handleSendEdit, handleSendMessage } = useChatHandler()
+
+  async function handleRegenerate(editedMessage?: string) {
+    setIsGenerating(true)
+
+    await handleSendMessage(
+      editedMessage || chatMessages[chatMessages.length - 2].message.content,
+      chatMessages,
+      false
+    )
+  }
 
   const [editingMessage, setEditingMessage] = useState<Tables<"messages">>()
 
@@ -38,8 +53,10 @@ const ChatMessages = forwardRef<ChatMessagesProps>(({}, ref) => {
             isLast={index === array.length - 1}
             onStartEdit={setEditingMessage}
             onCancelEdit={() => setEditingMessage(undefined)}
+            onRegenerate={handleRegenerate}
             onSubmitEdit={handleSendEdit}
             isExperimentalCodeEditor={false}
+            showResponseTime={true}
           />
         )
       })

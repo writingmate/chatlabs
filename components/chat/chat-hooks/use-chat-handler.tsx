@@ -23,9 +23,19 @@ import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
-import { createApplication } from "@/db/applications"
+import { toast } from "sonner"
+import { t } from "i18next"
+import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
 
-export const useChatHandler = () => {
+interface UseChatHandlerProps {
+  onChatCreate?: (chat: Tables<"chats">) => void
+  onChatUpdate?: (chat: Tables<"chats">) => void
+}
+
+export const useChatHandler = ({
+  onChatCreate,
+  onChatUpdate
+}: UseChatHandlerProps = {}) => {
   const router = useRouter()
 
   const {
@@ -93,90 +103,99 @@ export const useChatHandler = () => {
     redirectTo = "",
     chatMessages: ChatMessage[] = []
   ) => {
-    if (!selectedWorkspace) return
+    try {
+      if (!selectedWorkspace) return
 
-    setUserInput("")
-    setChatMessages(chatMessages)
-    setSelectedChat(null)
-    setChatFileItems([])
+      setUserInput("")
+      setChatMessages(chatMessages)
+      setSelectedChat(null)
+      setChatFileItems([])
 
-    setIsGenerating(false)
-    setFirstTokenReceived(false)
+      setIsGenerating(false)
+      setFirstTokenReceived(false)
 
-    setChatFiles([])
-    setChatImages([])
-    setNewMessageFiles([])
-    setNewMessageImages([])
-    setShowFilesDisplay(false)
-    setIsPromptPickerOpen(false)
-    setIsFilePickerOpen(false)
-    setSelectedHtmlElements([])
+      setChatFiles([])
+      setChatImages([])
+      setNewMessageFiles([])
+      setNewMessageImages([])
+      setShowFilesDisplay(false)
+      setIsPromptPickerOpen(false)
+      setIsFilePickerOpen(false)
+      setSelectedHtmlElements([])
 
-    // setSelectedTools([])
-    setToolInUse("none")
+      // setSelectedTools([])
+      setToolInUse("none")
 
-    if (selectedAssistant) {
-      setChatSettings({
-        model: selectedAssistant.model as LLMID,
-        prompt: selectedAssistant.prompt,
-        temperature: selectedAssistant.temperature,
-        contextLength: selectedAssistant.context_length,
-        includeProfileContext: selectedAssistant.include_profile_context,
-        includeWorkspaceInstructions:
-          selectedAssistant.include_workspace_instructions,
-        embeddingsProvider: selectedAssistant.embeddings_provider as
-          | "jina"
-          | "openai"
-          | "local"
-      })
+      if (selectedAssistant) {
+        setChatSettings({
+          model: selectedAssistant.model as LLMID,
+          prompt: selectedAssistant.prompt,
+          temperature: selectedAssistant.temperature,
+          contextLength: selectedAssistant.context_length,
+          includeProfileContext: selectedAssistant.include_profile_context,
+          includeWorkspaceInstructions:
+            selectedAssistant.include_workspace_instructions,
+          embeddingsProvider: selectedAssistant.embeddings_provider as
+            | "jina"
+            | "openai"
+            | "local"
+        })
 
-      let allFiles = []
+        let allFiles = []
 
-      const assistantFiles = (
-        await getAssistantFilesByAssistantId(selectedAssistant.id)
-      ).files
-      allFiles = [...assistantFiles]
-      const assistantCollections = (
-        await getAssistantCollectionsByAssistantId(selectedAssistant.id)
-      ).collections
-      for (const collection of assistantCollections) {
-        const collectionFiles = (
-          await getCollectionFilesByCollectionId(collection.id)
+        const assistantFiles = (
+          await getAssistantFilesByAssistantId(selectedAssistant.id)
         ).files
-        allFiles = [...allFiles, ...collectionFiles]
+        allFiles = [...assistantFiles]
+        const assistantCollections = (
+          await getAssistantCollectionsByAssistantId(selectedAssistant.id)
+        ).collections
+        for (const collection of assistantCollections) {
+          const collectionFiles = (
+            await getCollectionFilesByCollectionId(collection.id)
+          ).files
+          allFiles = [...allFiles, ...collectionFiles]
+        }
+        const assistantTools = (
+          await getAssistantToolsByAssistantId(selectedAssistant.id)
+        ).tools
+
+        setSelectedTools(assistantTools)
+        setChatFiles(
+          allFiles.map(file => ({
+            id: file.id,
+            name: file.name,
+            type: file.type,
+            file: null
+          }))
+        )
+
+        if (allFiles.length > 0) setShowFilesDisplay(true)
+      } else if (selectedPreset) {
+        setChatSettings({
+          model: selectedPreset.model as LLMID,
+          prompt: selectedPreset.prompt,
+          temperature: selectedPreset.temperature,
+          contextLength: selectedPreset.context_length,
+          includeProfileContext: selectedPreset.include_profile_context,
+          includeWorkspaceInstructions:
+            selectedPreset.include_workspace_instructions,
+          embeddingsProvider: selectedPreset.embeddings_provider as
+            | "jina"
+            | "openai"
+            | "local"
+        })
       }
-      const assistantTools = (
-        await getAssistantToolsByAssistantId(selectedAssistant.id)
-      ).tools
 
-      setSelectedTools(assistantTools)
-      setChatFiles(
-        allFiles.map(file => ({
-          id: file.id,
-          name: file.name,
-          type: file.type,
-          file: null
-        }))
-      )
-
-      if (allFiles.length > 0) setShowFilesDisplay(true)
-    } else if (selectedPreset) {
-      setChatSettings({
-        model: selectedPreset.model as LLMID,
-        prompt: selectedPreset.prompt,
-        temperature: selectedPreset.temperature,
-        contextLength: selectedPreset.context_length,
-        includeProfileContext: selectedPreset.include_profile_context,
-        includeWorkspaceInstructions:
-          selectedPreset.include_workspace_instructions,
-        embeddingsProvider: selectedPreset.embeddings_provider as
-          | "jina"
-          | "openai"
-          | "local"
-      })
+      if (redirectTo) {
+        return router.push(redirectTo)
+      } else {
+        router.push(`/chat`)
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error(t("Something went wrong. Please try again."))
     }
-
-    return router.push(redirectTo || `/chat`)
   }
 
   const handleFocusChatInput = () => {
@@ -248,6 +267,12 @@ export const useChatHandler = () => {
         )
       }
 
+      const userAnnotations =
+        selectedHtmlElements?.length > 0
+          ? [{ selected_html_elements: selectedHtmlElements }]
+          : []
+      let assistantAnnotations = {}
+
       const { tempUserChatMessage, tempAssistantChatMessage } =
         createTempMessages(
           messageContent,
@@ -256,7 +281,8 @@ export const useChatHandler = () => {
           b64Images,
           isRegeneration,
           setChatMessages,
-          selectedAssistant
+          selectedAssistant,
+          userAnnotations
         )
 
       let payload: ChatPayload = {
@@ -272,10 +298,9 @@ export const useChatHandler = () => {
       }
 
       let generatedText = ""
-      let data = null
 
       if (selectedTools.length > 0 && modelData!.tools) {
-        ;({ generatedText, data } = await handleToolsChat(
+        ;({ generatedText, data: assistantAnnotations } = await handleToolsChat(
           payload,
           profile!,
           tempAssistantChatMessage,
@@ -291,18 +316,19 @@ export const useChatHandler = () => {
         ))
       } else {
         if (modelData!.provider === "ollama") {
-          ;({ generatedText, data } = await handleLocalChat(
-            payload,
-            profile!,
-            chatSettings!,
-            tempAssistantChatMessage,
-            isRegeneration,
-            newAbortController,
-            setIsGenerating,
-            setFirstTokenReceived,
-            setChatMessages,
-            setToolInUse
-          ))
+          ;({ generatedText, data: assistantAnnotations } =
+            await handleLocalChat(
+              payload,
+              profile!,
+              chatSettings!,
+              tempAssistantChatMessage,
+              isRegeneration,
+              newAbortController,
+              setIsGenerating,
+              setFirstTokenReceived,
+              setChatMessages,
+              setToolInUse
+            ))
         } else {
           ;({ generatedText } = await handleHostedChat(
             payload,
@@ -336,7 +362,13 @@ export const useChatHandler = () => {
           setSelectedTools
         )
 
-        window.history.pushState({}, "", `/chat/${currentChat.id}`)
+        if (!onChatCreate) {
+          window.history.pushState({}, "", `/chat/${currentChat.id}`)
+        }
+
+        if (onChatCreate) {
+          onChatCreate(currentChat)
+        }
       } else {
         const updatedChat = await updateChat(currentChat.id, {
           updated_at: new Date().toISOString()
@@ -349,6 +381,10 @@ export const useChatHandler = () => {
 
           return updatedChats
         })
+
+        if (onChatUpdate) {
+          onChatUpdate(updatedChat)
+        }
       }
 
       await handleCreateMessages(
@@ -365,17 +401,18 @@ export const useChatHandler = () => {
         setChatFileItems,
         setChatImages,
         selectedAssistant,
-        data,
-        isGenerating
+        userAnnotations,
+        assistantAnnotations
       )
 
       setIsGenerating(false)
       setFirstTokenReceived(false)
       // setUserInput("")
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof SubscriptionRequiredError) {
         setIsPaywallOpen(true)
       }
+      toast.error(`Something went wrong. Please try again. ${error?.message}`)
       console.error(error)
       setIsGenerating(false)
       setFirstTokenReceived(false)
@@ -404,6 +441,13 @@ export const useChatHandler = () => {
     handleSendMessage(editedContent, filteredMessages, false)
   }
 
+  const {
+    selectedCodeBlock,
+    handleSelectCodeBlock,
+    handleCodeChange,
+    isEditable
+  } = useCodeBlockManager(chatMessages)
+
   return {
     chatInputRef,
     // prompt,
@@ -411,6 +455,10 @@ export const useChatHandler = () => {
     handleSendMessage,
     handleFocusChatInput,
     handleStopMessage,
-    handleSendEdit
+    handleSendEdit,
+    selectedCodeBlock,
+    handleSelectCodeBlock,
+    handleCodeChange,
+    isEditable
   }
 }

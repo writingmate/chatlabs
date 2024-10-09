@@ -6,7 +6,13 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { IconChevronDown, IconCircleCheckFilled } from "@tabler/icons-react"
+import {
+  IconCheck,
+  IconChevronDown,
+  IconCircleCheckFilled
+} from "@tabler/icons-react"
+import React from "react"
+import { IconCircleCheck } from "@tabler/icons-react"
 
 interface MultiSelectProps<T> {
   options: T[]
@@ -19,6 +25,7 @@ interface MultiSelectProps<T> {
   ) => JSX.Element
   placeholder?: string
   searchPlaceholder?: string
+  footer?: React.ReactNode
 }
 
 interface ModelOption {
@@ -26,18 +33,18 @@ interface ModelOption {
   label: string
 }
 
-const defaultRenderOption = (
+export const defaultRenderOption = (
   option: ModelOption,
   selected: boolean,
   onSelect: () => void
 ) => (
   <div
     key={option.value}
-    className={`hover:bg-primary/5 flex cursor-pointer items-center justify-between p-1`}
+    className={`hover:bg-primary/5 flex cursor-pointer items-center justify-between p-1 px-3`}
     onClick={onSelect}
   >
     <span>{option.label}</span>
-    {selected && <IconCircleCheckFilled className="text-primary" size={20} />}
+    {selected && <IconCheck className="text-primary" size={20} />}
   </div>
 )
 
@@ -47,12 +54,15 @@ export const MultiSelect: FC<MultiSelectProps<ModelOption>> = ({
   onChange,
   renderOption = defaultRenderOption,
   placeholder = "Select options",
-  searchPlaceholder = "Search..."
+  searchPlaceholder = "Search...",
+  footer = null
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const [internalSelectedOptions, setInternalSelectedOptions] =
+    useState<ModelOption[]>(selectedOptions)
 
   useEffect(() => {
     if (isOpen) {
@@ -63,10 +73,14 @@ export const MultiSelect: FC<MultiSelectProps<ModelOption>> = ({
   }, [isOpen])
 
   const handleSelect = (option: ModelOption) => {
-    if (selectedOptions.some(selected => selected.value === option.value)) {
-      onChange(selectedOptions.filter(item => item.value !== option.value))
+    if (
+      internalSelectedOptions.some(selected => selected.value === option.value)
+    ) {
+      setInternalSelectedOptions(
+        internalSelectedOptions.filter(item => item.value !== option.value)
+      )
     } else {
-      onChange([...selectedOptions, option])
+      setInternalSelectedOptions([...internalSelectedOptions, option])
     }
   }
 
@@ -76,6 +90,9 @@ export const MultiSelect: FC<MultiSelectProps<ModelOption>> = ({
       onOpenChange={isOpen => {
         setIsOpen(isOpen)
         setSearch("")
+        if (!isOpen) {
+          onChange(internalSelectedOptions)
+        }
       }}
     >
       <DropdownMenuTrigger
@@ -92,34 +109,47 @@ export const MultiSelect: FC<MultiSelectProps<ModelOption>> = ({
               ? `${selectedOptions.length} selected`
               : placeholder}
           </div>
-          <IconChevronDown size={18} className="size-4 opacity-50" />
+          <IconChevronDown
+            size={18}
+            stroke={1.5}
+            className="size-4 opacity-50"
+          />
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
         style={{ width: triggerRef.current?.offsetWidth }}
-        className="space-y-2 overflow-auto p-2"
+        className="overflow-auto p-0 text-sm"
         align="start"
       >
-        <Input
-          ref={inputRef}
-          placeholder={searchPlaceholder}
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          onKeyDown={e => e.stopPropagation()}
-        />
+        <div className={`py-2 ${footer ? "pb-0" : ""}`}>
+          <div className="mb-2 px-2">
+            <Input
+              ref={inputRef}
+              placeholder={searchPlaceholder}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              onKeyDown={e => e.stopPropagation()}
+            />
+          </div>
+          <div className="max-h-[200px] overflow-y-auto">
+            {options
+              .filter(option =>
+                option.value?.toLowerCase().includes(search.toLowerCase())
+              )
+              .map(option =>
+                renderOption(
+                  option,
+                  internalSelectedOptions.some(
+                    selected => selected.value === option.value
+                  ),
+                  () => handleSelect(option)
+                )
+              )}
+          </div>
+        </div>
 
-        {options
-          .filter(option =>
-            option.value?.toLowerCase().includes(search.toLowerCase())
-          )
-          .map(option =>
-            renderOption(
-              option,
-              selectedOptions.some(selected => selected.value === option.value),
-              () => handleSelect(option)
-            )
-          )}
+        {footer && <div className="sticky bottom-0 border-t">{footer}</div>}
       </DropdownMenuContent>
     </DropdownMenu>
   )

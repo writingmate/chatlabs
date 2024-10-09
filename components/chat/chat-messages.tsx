@@ -8,10 +8,14 @@ import { CodeBlock } from "@/types/chat-message"
 import { isMobileScreen } from "@/lib/mobile"
 
 interface ChatMessagesProps {
-  onSelectCodeBlock: (codeBlock: CodeBlock | null) => void
+  onSelectCodeBlock?: (codeBlock: CodeBlock | null) => void
+  isExperimentalCodeEditor: boolean
 }
 
-export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
+export const ChatMessages: FC<ChatMessagesProps> = ({
+  onSelectCodeBlock,
+  isExperimentalCodeEditor
+}) => {
   const {
     chatMessages,
     chatFileItems,
@@ -21,7 +25,6 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
   } = useContext(ChatbotUIChatContext)
 
   const { handleSendEdit, handleSendMessage } = useChatHandler()
-  const { profile } = useContext(ChatbotUIContext)
 
   async function handleRegenerate(editedMessage?: string) {
     setIsGenerating(true)
@@ -64,9 +67,8 @@ export const ChatMessages: FC<ChatMessagesProps> = ({ onSelectCodeBlock }) => {
               onSubmitEdit={handleSendEdit}
               onSelectCodeBlock={onSelectCodeBlock}
               onRegenerate={handleRegenerate}
-              isExperimentalCodeEditor={
-                !!profile?.experimental_code_editor && !isMobile
-              }
+              showResponseTime={false}
+              isExperimentalCodeEditor={isExperimentalCodeEditor}
             />
           )
         }),

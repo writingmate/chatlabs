@@ -2,7 +2,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLMID, ModelProvider } from "@/types"
-import { FC, useContext, useEffect, useRef } from "react"
+import React, { FC, useContext, useEffect, useRef } from "react"
 import { ModelSelectChat } from "@/components/models/model-select-chat"
 import { ToolSelect } from "@/components/tools/tool-select"
 import { ModelSettings } from "@/components/models/model-settings"
@@ -21,6 +21,8 @@ export const ChatSettings: FC<ChatSettingsProps> = ({
 }) => {
   useHotkey("i", () => handleClick())
 
+  const { allModels } = useContext(ChatbotUIContext)
+
   const { chatSettings, setChatSettings, selectedTools, setSelectedTools } =
     useContext(ChatbotUIChatContext)
 
@@ -31,6 +33,10 @@ export const ChatSettings: FC<ChatSettingsProps> = ({
       buttonRef.current.click()
     }
   }
+
+  const selectedModel = allModels.find(
+    x => x.modelId === chatSettings?.model || x.hostedId === chatSettings?.model
+  )
 
   useEffect(() => {
     if (!chatSettings) return
@@ -80,11 +86,13 @@ export const ChatSettings: FC<ChatSettingsProps> = ({
           detailsLocation={detailsLocation}
         />
       </div>
-      <ToolSelect
-        selectedModelId={chatSettings.model}
-        selectedTools={selectedTools}
-        onSelectTools={setSelectedTools}
-      />
+      {selectedModel?.tools && (
+        <ToolSelect
+          selectedModelId={chatSettings.model}
+          selectedTools={selectedTools}
+          onSelectTools={setSelectedTools}
+        />
+      )}
     </div>
   )
 }

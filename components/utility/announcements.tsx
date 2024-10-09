@@ -49,7 +49,14 @@ export const Announcements: FC<AnnouncementsProps> = () => {
 
     // Update state and local storage
     setAnnouncements(updatedAnnouncements)
-    localStorage.setItem("announcements", JSON.stringify(updatedAnnouncements))
+    try {
+      localStorage.setItem(
+        "announcements",
+        JSON.stringify(updatedAnnouncements)
+      )
+    } catch (error) {
+      console.error("Error setting announcements:", error)
+    }
   }, [])
 
   const unreadCount = announcements.filter(a => !a.read).length
@@ -60,21 +67,42 @@ export const Announcements: FC<AnnouncementsProps> = () => {
       a.id === id ? { ...a, read: true } : a
     )
     setAnnouncements(updatedAnnouncements)
-    localStorage.setItem("announcements", JSON.stringify(updatedAnnouncements))
+    try {
+      localStorage.setItem(
+        "announcements",
+        JSON.stringify(updatedAnnouncements)
+      )
+    } catch (error) {
+      console.error("Error setting announcements:", error)
+    }
   }
 
   const markAllAsRead = () => {
     // Mark all announcements as read in local storage and state
     const updatedAnnouncements = announcements.map(a => ({ ...a, read: true }))
     setAnnouncements(updatedAnnouncements)
-    localStorage.setItem("announcements", JSON.stringify(updatedAnnouncements))
+    try {
+      localStorage.setItem(
+        "announcements",
+        JSON.stringify(updatedAnnouncements)
+      )
+    } catch (error) {
+      console.error("Error setting announcements:", error)
+    }
   }
 
   const markAllAsUnread = () => {
     // Mark all announcements as unread in local storage and state
     const updatedAnnouncements = announcements.map(a => ({ ...a, read: false }))
     setAnnouncements(updatedAnnouncements)
-    localStorage.setItem("announcements", JSON.stringify(updatedAnnouncements))
+    try {
+      localStorage.setItem(
+        "announcements",
+        JSON.stringify(updatedAnnouncements)
+      )
+    } catch (error) {
+      console.error("Error setting announcements:", error)
+    }
   }
 
   return (

@@ -11,7 +11,7 @@ const O1_MINI: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  paid: true,
+  tier: "free",
   new: true
 }
 
@@ -24,7 +24,7 @@ const O1_PREVIEW: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  paid: true,
+  tier: "free",
   new: true
 }
 
@@ -36,7 +36,7 @@ const GPT_4O: LLM = {
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
   tools: true,
-  paid: false,
+  tier: "free",
   supportsStreaming: true,
   pricing: {
     currency: "USD",
@@ -54,7 +54,7 @@ const GPT_4O_MINI: LLM = {
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
   tools: true,
-  paid: false,
+  tier: "free",
   supportsStreaming: true,
   new: false,
   pricing: {
@@ -72,7 +72,7 @@ const GPT_4_VISION: LLM = {
   hostedId: "gpt-4-vision-preview",
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
-  paid: true,
+  tier: "free",
   tools: false,
   supportsStreaming: true,
   pricing: {
@@ -92,7 +92,7 @@ const GEMINI_PRO_15: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  paid: true
+  tier: "free"
 }
 
 const GEMINI_PRO_15_EXP: LLM = {
@@ -104,7 +104,7 @@ const GEMINI_PRO_15_EXP: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  paid: true
+  tier: "free"
 }
 
 const GEMINI_FLASH_15_EXP: LLM = {
@@ -116,7 +116,7 @@ const GEMINI_FLASH_15_EXP: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  paid: false
+  tier: "free"
 }
 
 ///anthropic
@@ -129,7 +129,7 @@ const CLAUDE_3_HAIKU: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  paid: false
+  tier: "free"
 }
 
 const CLAUDE_35_SONNET: LLM = {
@@ -141,7 +141,7 @@ const CLAUDE_35_SONNET: LLM = {
   imageInput: true,
   tools: true,
   supportsStreaming: true,
-  paid: true
+  tier: "free"
 }
 
 ///other
@@ -154,7 +154,7 @@ const LLAVA_YI_34b: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  paid: false
+  tier: "free"
 }
 
 const FIRELLAVA_13b: LLM = {
@@ -166,7 +166,7 @@ const FIRELLAVA_13b: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  paid: false
+  tier: "free"
 }
 
 const META_LLAMA_3_1_405B: LLM = {
@@ -178,7 +178,7 @@ const META_LLAMA_3_1_405B: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  paid: false
+  tier: "free"
 }
 
 const LLAMA_3_1_SONAR_HUGE_128K_ONLINE: LLM = {
@@ -190,7 +190,7 @@ const LLAMA_3_1_SONAR_HUGE_128K_ONLINE: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  paid: false
+  tier: "free"
 }
 
 const REFLECTION_70B: LLM = {
@@ -202,7 +202,7 @@ const REFLECTION_70B: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  paid: true,
+  tier: "free",
   new: true
 }
 
@@ -215,7 +215,7 @@ const DEEPSEEK_CHAT: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  paid: false
+  tier: "free"
 }
 
 export const OPENROUTER_LLM_LIST: LLM[] = [

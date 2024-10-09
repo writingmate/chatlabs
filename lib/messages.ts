@@ -14,9 +14,9 @@ export const parseCodeBlocksAndContent = (
     completeBlockRegex,
     (_, lang, filename, code) => {
       blocks.push({
-        language: lang || "text",
+        language: lang || "",
         code: code.trim(),
-        filename: filename,
+        filename: filename || undefined,
         sequenceNo: blocks.length,
         messageId: messageId
       })
@@ -24,22 +24,36 @@ export const parseCodeBlocksAndContent = (
     }
   )
 
+  const FILENAME_PREFIX = "#filename="
+
   // Check for an unfinished code block at the end
-  const unfinishedBlockRegex = /```(\w+)?\s*(?:#filename=(.+?)#)?\n([\s\S]*?)$/
+  const unfinishedBlockRegex = /```(\w+)?\s*(#(?:(?!#).)*?#)?\n?([\s\S]*)$/
   const unfinishedMatch = remainingContent.match(unfinishedBlockRegex)
   if (unfinishedMatch) {
-    const [fullMatch, lang, filename, code] = unfinishedMatch
-    blocks.push({
-      language: lang || "text",
-      code: code.trim(),
-      filename: filename,
-      sequenceNo: blocks.length,
-      messageId: messageId
-    })
-    remainingContent = remainingContent.replace(
-      fullMatch,
-      `[CODE_BLOCK_${blocks.length - 1}]`
-    )
+    const [fullMatch, lang, filenameTag, code] = unfinishedMatch
+
+    if (code.trim()) {
+      let filename = undefined
+      if (filenameTag) {
+        const filenameMatch = filenameTag.match(`${FILENAME_PREFIX}(.+?)#`)
+        if (filenameMatch) {
+          filename = filenameMatch[1]
+        }
+      }
+
+      blocks.push({
+        language: lang || "",
+        code: code.trim(),
+        filename: filename,
+        sequenceNo: blocks.length,
+        messageId: messageId
+      })
+
+      remainingContent = remainingContent.replace(
+        fullMatch,
+        `[CODE_BLOCK_${blocks.length - 1}]`
+      )
+    }
   }
 
   return { parsedContent: remainingContent, codeBlocks: blocks }
@@ -49,6 +63,10 @@ export function parseChatMessageCodeBlocksAndContent(
   message: ChatMessage
 ): ChatMessage {
   if (message.codeBlocks && message.codeBlocks.length > 0) {
+    // update message ID
+    message.codeBlocks.forEach(block => {
+      block.messageId = message.message.id
+    })
     return message
   }
 

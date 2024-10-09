@@ -259,7 +259,7 @@ export const Message: FC<MessageProps> = ({
             {message.role === "system" ? (
               <div className="flex items-center space-x-4">
                 <IconBulb
-                  className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
+                  className="border-primary bg-primary text-secondary rounded border p-1"
                   size={ICON_SIZE}
                 />
                 <div className="text-lg font-semibold">Prompt</div>
@@ -316,7 +316,7 @@ export const Message: FC<MessageProps> = ({
                       : selectedAssistant
                         ? selectedAssistant?.name
                         : MODEL_DATA?.modelName
-                    : profile?.display_name ?? profile?.username}
+                    : (profile?.display_name ?? profile?.username)}
                 </div>
                 <div className={"absolute right-0"}>
                   <MessageActions
