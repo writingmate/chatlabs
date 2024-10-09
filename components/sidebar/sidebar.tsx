@@ -12,20 +12,13 @@ import { SidebarItem } from "./sidebar-item"
 import { SlidingSubmenu } from "./sliding-submenu"
 import { SidebarCreateButtons } from "./sidebar-create-buttons"
 import {
-  IconMessage,
   IconPuzzle,
   IconFolder,
-  IconTool,
-  IconApps,
   IconChevronRight,
   IconChevronLeft,
   IconMessagePlus,
   IconRobot,
-  IconX,
-  IconMenu2,
-  IconMessage2Plus,
   IconLayoutColumns,
-  IconPuzzle2,
   IconBulb,
   IconLayoutSidebar,
   IconSparkles
@@ -57,6 +50,8 @@ export const Sidebar: FC = () => {
     showSidebar,
     setShowSidebar,
     isPaywallOpen,
+    chats,
+    setChats,
     setIsPaywallOpen // Use context's state
   } = useContext(ChatbotUIContext)
   const { handleNewChat } = useChatHandler()
@@ -86,7 +81,6 @@ export const Sidebar: FC = () => {
   const [searchLoading, setSearchLoading] = useState(false)
 
   const [chatOffset, setChatOffset] = useState(0)
-  const [chats, setChats] = useState<Tables<"chats">[]>([])
 
   const [reachedEnd, setReachedEnd] = useState(false)
 

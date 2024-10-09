@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { ChatbotUIContext } from "@/context/context"
 import { deleteChat } from "@/db/chats"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { Tables } from "@/supabase/types"
@@ -31,9 +30,6 @@ export const DeleteChat: FC<DeleteChatProps> = ({
   handleNewChat
 }) => {
   useHotkey("Backspace", () => setShowChatDialog(true))
-
-  // const { setChats } = useContext(ChatbotUIContext)
-  // const { handleNewChat } = useChatHandler()
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
