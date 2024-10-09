@@ -21,7 +21,8 @@ import {
   IconLayoutColumns,
   IconBulb,
   IconLayoutSidebar,
-  IconSparkles
+  IconSparkles,
+  IconApps
 } from "@tabler/icons-react"
 import { ChatbotUIContext } from "@/context/context"
 import { Button } from "../ui/button"
@@ -37,6 +38,7 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { searchChatsByName } from "@/db/chats"
 import { debounce } from "@/lib/debounce"
 import { Tables } from "@/supabase/types"
+import { useFeatureFlag } from "@/lib/amplitude"
 
 export const Sidebar: FC = () => {
   const {
@@ -60,6 +62,8 @@ export const Sidebar: FC = () => {
     const storedCollapsedState = localStorage.getItem("sidebarCollapsed")
     return storedCollapsedState === "true"
   })
+
+  const appsEnabled = useFeatureFlag("apps_enabled", false)
   const [isLoaded, setIsLoaded] = useState(false)
   const sidebarRef = useRef<HTMLDivElement>(null)
 
@@ -269,7 +273,7 @@ export const Sidebar: FC = () => {
         >
           <div
             className={cn(
-              "flex items-start border-b p-2",
+              "flex border-b p-2",
               isCollapsed ? "flex-col" : "justify-between"
             )}
           >
@@ -290,7 +294,7 @@ export const Sidebar: FC = () => {
               side="right"
             />
             {!isCollapsed && (
-              <div className="align-center flex h-0 items-center justify-center">
+              <div className="align-center flex items-center justify-center">
                 {activeSubmenu && getSubmenuTitle(activeSubmenu)}
               </div>
             )}
@@ -353,14 +357,16 @@ export const Sidebar: FC = () => {
                   isCollapsed={isCollapsed}
                 />
               </Link>
-              {/*<Link href="/applications" passHref>*/}
-              {/*  <SidebarItem*/}
-              {/*    icon={<IconApps {...iconProps} />}*/}
-              {/*    label="Applications"*/}
-              {/*    onClick={() => {}} // This onClick is now optional*/}
-              {/*    isCollapsed={isCollapsed}*/}
-              {/*  />*/}
-              {/*</Link>*/}
+              {appsEnabled && (
+                <Link href="/applications" passHref>
+                  <SidebarItem
+                    icon={<IconApps {...iconProps} />}
+                    label="Applications"
+                    onClick={() => {}} // This onClick is now optional
+                    isCollapsed={isCollapsed}
+                  />
+                </Link>
+              )}
             </div>
 
             <div

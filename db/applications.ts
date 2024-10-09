@@ -134,7 +134,6 @@ export const updateApplication = async (
 
   // Update tools
   if (tools.length > 0 || platformTools.length > 0) {
-    console.log("Updating tools", tools, platformTools)
     await updateApplicationTools(
       tools.map(toolId => ({
         user_id: application.user_id!,
@@ -152,7 +151,7 @@ export const updateApplication = async (
   // Update models
   await updateApplicationModels(applicationId, models)
 
-  return updatedApplication
+  return getApplicationById(applicationId)
 }
 
 const updateApplicationTools = async (
@@ -166,19 +165,17 @@ const updateApplicationTools = async (
     throw new Error("Application ID is required")
   }
 
-  // Remove existing tools
+  const { error: toolsDeleteError } = await supabase
+    .from("application_tools")
+    .delete()
+    .eq("application_id", applicationId)
+
+  if (toolsDeleteError) {
+    throw new Error(toolsDeleteError.message)
+  }
 
   // Add new tools
   if (tools.length > 0) {
-    const { error: toolsDeleteError } = await supabase
-      .from("application_tools")
-      .delete()
-      .eq("application_id", applicationId)
-
-    if (toolsDeleteError) {
-      throw new Error(toolsDeleteError.message)
-    }
-
     const { error: toolsError } = await supabase
       .from("application_tools")
       .insert(tools)
@@ -188,17 +185,17 @@ const updateApplicationTools = async (
     }
   }
 
+  const { error: platformToolsDeleteError } = await supabase
+    .from("application_platform_tools")
+    .delete()
+    .eq("application_id", applicationId)
+
+  if (platformToolsDeleteError) {
+    throw new Error(platformToolsDeleteError.message)
+  }
+
   // Add new platform tools
   if (platformTools.length > 0) {
-    const { error: platformToolsDeleteError } = await supabase
-      .from("application_platform_tools")
-      .delete()
-      .eq("application_id", applicationId)
-
-    if (platformToolsDeleteError) {
-      throw new Error(platformToolsDeleteError.message)
-    }
-
     const { error: platformToolsError } = await supabase
       .from("application_platform_tools")
       .insert(platformTools)

@@ -77,6 +77,15 @@ export async function POST(request: NextRequest) {
         ? addCacheControlToUserMessages(messages.slice(1))
         : messages.slice(1)
 
+    let headers = {
+      "anthropic-version": "2023-06-01",
+      "anthropic-beta": "max-tokens-3-5-sonnet-2024-07-15"
+    }
+
+    if (modelsSupportingCacheControl.includes(chatSettings.model)) {
+      headers["anthropic-beta"] = "prompt-caching-2024-07-31"
+    }
+
     const anthropic = new Anthropic({
       apiKey: profile.anthropic_api_key || "",
       baseURL: process.env.ANTHROPIC_BASE_URL || undefined
@@ -102,11 +111,7 @@ export async function POST(request: NextRequest) {
         stream: true
       },
       {
-        headers: {
-          "anthropic-version": "2023-06-01",
-          "anthropic-beta":
-            "prompt-caching-2024-07-31,max-tokens-3-5-sonnet-2024-07-15"
-        }
+        headers
       }
     )
 

@@ -4,6 +4,8 @@ import { Tables } from "@/supabase/types"
 import OpenAI from "openai"
 import { openapiToFunctions } from "@/lib/openapi-conversion"
 import { getApplicationTools } from "@/db/applications"
+import { logger } from "@/lib/logger"
+import { LogitsProcessor } from "@xenova/transformers/types/utils/generation"
 
 export const TOOLS_SYSTEM_PROMPT = `
 Today is ${new Date().toLocaleDateString()}.
@@ -26,6 +28,8 @@ export async function executeTool(
   applicationId?: string
 ) {
   const functionName = functionCall.name
+  logger.debug(`Executing tool function: ${functionName}`)
+
   const resultProcessingMode = "send_to_llm"
 
   let parsedArgs = functionCall.arguments as any
@@ -39,31 +43,40 @@ export async function executeTool(
   )
 
   if (!schemaDetail) {
+    logger.error(`Function ${functionName} not found in any schema`)
     throw new Error(`Function ${functionName} not found in any schema`)
   }
 
   // Reroute to local executor for local tools
   if (schemaDetail.url === "local://executor") {
+    logger.debug(`Rerouting to local executor for function: ${functionName}`)
     const toolFunctionSpec = platformToolFunctionSpec(functionName)
     if (!toolFunctionSpec) {
+      logger.error(`Function ${functionName} not found`)
       throw new Error(`Function ${functionName} not found`)
     }
 
     if (applicationId) {
-      // Fetch application-specific tools
+      logger.debug(
+        `Checking application-specific tools for application ID: ${applicationId}`
+      )
       const applicationTools = await getApplicationTools(applicationId)
       const applicationToolIds = applicationTools.map(tool => tool?.id)
 
-      // Check if the called function is allowed for this application
       if (!applicationToolIds.includes(toolFunctionSpec.id)) {
+        logger.error(
+          `Function ${functionName} is not allowed for this application`
+        )
         throw new Error(
           `Function ${functionName} is not allowed for this application`
         )
       }
     }
 
+    const result = await toolFunctionSpec.toolFunction(parsedArgs)
+    logger.debug(`Local tool function executed successfully: ${functionName}`)
     return {
-      result: await toolFunctionSpec.toolFunction(parsedArgs),
+      result,
       resultProcessingMode: toolFunctionSpec.resultProcessingMode
     }
   }
@@ -73,12 +86,16 @@ export async function executeTool(
   )
 
   if (!pathTemplate) {
+    logger.error(`Path for function ${functionName} not found`)
     throw new Error(`Path for function ${functionName} not found`)
   }
 
   const path = pathTemplate.replace(/:(\w+)/g, (_, paramName) => {
     const value = parsedArgs.parameters[paramName]
     if (!value) {
+      logger.error(
+        `Parameter ${paramName} not found for function ${functionName}`
+      )
       throw new Error(
         `Parameter ${paramName} not found for function ${functionName}`
       )
@@ -87,22 +104,25 @@ export async function executeTool(
   })
 
   if (!path) {
+    logger.error(`Path for function ${functionName} not found`)
     throw new Error(`Path for function ${functionName} not found`)
   }
+
+  logger.debug(`Constructed path for function ${functionName}: ${path}`)
 
   // Determine if the request should be in the body or as a query
   const isRequestInBody = schemaDetail.requestInBodyMap[path]
   let data = {}
 
+  logger.debug({ schemaDetail }, `Schema detail for function: ${functionName}`)
+
   if (isRequestInBody) {
-    // If the type is set to body
+    logger.debug(`Sending request in body for function: ${functionName}`)
     let headers = {
       "Content-Type": "application/json"
     }
 
-    // Check if custom headers are set
-    const customHeaders = schemaDetail.headers // Moved this line up to the loop
-    // Check if custom headers are set and are of type string
+    const customHeaders = schemaDetail.headers
     if (customHeaders && typeof customHeaders === "string") {
       let parsedCustomHeaders = JSON.parse(customHeaders) as Record<
         string,
@@ -116,37 +136,41 @@ export async function executeTool(
     }
 
     const fullUrl = schemaDetail.url + path
-
     const bodyContent = parsedArgs.requestBody || parsedArgs
 
     const requestInit = {
       method: "POST",
       headers,
-      body: JSON.stringify(bodyContent) // Use the extracted requestBody or the entire parsedArgs
+      body: JSON.stringify(bodyContent)
     }
 
     const response = await fetch(fullUrl, requestInit)
 
     if (!response.ok) {
+      logger.error(`Error in response: ${response.statusText}`)
       data = {
         error: response.statusText
       }
     } else {
       data = await response.json()
+      logger.debug(
+        `Response received successfully for function: ${functionName}`
+      )
     }
   } else {
-    // If the type is set to query
+    logger.debug(`Sending request as query for function: ${functionName}`)
     const queryParams = new URLSearchParams(parsedArgs.parameters).toString()
     const fullUrl =
       schemaDetail.url + path + (queryParams ? "?" + queryParams : "")
 
     let headers = {}
 
-    // Check if custom headers are set
     const customHeaders = schemaDetail.headers
     if (customHeaders && typeof customHeaders === "string") {
       headers = JSON.parse(customHeaders)
     }
+
+    logger.debug({ fullUrl, headers }, `Fetching URL: ${functionName}`)
 
     const response = await fetch(fullUrl, {
       method: "GET",
@@ -154,10 +178,13 @@ export async function executeTool(
     })
 
     if (!response.ok) {
-      console.error("Error:", response.statusText, response.status)
+      logger.error(`Error in response: ${response.statusText}`)
       throw new Error(`Error: ${response.statusText}`)
     } else {
       data = await response.json()
+      logger.debug(
+        `Response received successfully for function: ${functionName}`
+      )
     }
   }
 
@@ -208,4 +235,45 @@ export async function buildSchemaDetails(selectedTools: Tables<"tools">[]) {
     }
   }
   return { schemaDetails, allTools, allRouteMaps }
+}
+
+export function matchRoute(
+  path: string,
+  route: string
+): { route: string; params: Record<string, string> } | null {
+  const pathParts = path.split("/").filter(Boolean)
+  const routeParts = route.split("/").filter(Boolean)
+
+  if (pathParts.length !== routeParts.length) {
+    return null
+  }
+
+  const params: Record<string, string> = {}
+
+  for (let i = 0; i < routeParts.length; i++) {
+    const routePart = routeParts[i]
+    const pathPart = pathParts[i]
+
+    if (routePart.startsWith("{") && routePart.endsWith("}")) {
+      const paramName = routePart.slice(1, -1)
+      params[paramName] = pathPart
+    } else if (routePart !== pathPart) {
+      return null
+    }
+  }
+
+  return { route, params }
+}
+
+export function findFirstMatchingRoute(
+  path: string,
+  routes: string[]
+): { route: string; params: Record<string, string> } | null {
+  for (const route of routes) {
+    const match = matchRoute(path, route)
+    if (match) {
+      return match
+    }
+  }
+  return null
 }

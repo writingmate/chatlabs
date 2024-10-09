@@ -15,6 +15,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState
 } from "react"
 import { ChatMessages } from "../chat/chat-messages"
