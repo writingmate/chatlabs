@@ -41,13 +41,12 @@ import { SidebarDataList } from "./sidebar-data-list"
 import { ContentType } from "@/types"
 import Link from "next/link"
 import { WithTooltip } from "../ui/with-tooltip"
-import { searchChatsAndMessages } from "@/db/chats"
+import { searchChatsByName } from "@/db/chats"
 import { debounce } from "@/lib/debounce"
 import { Tables } from "@/supabase/types"
 
 export const Sidebar: FC = () => {
   const {
-    chats,
     prompts,
     files,
     tools,
@@ -83,11 +82,48 @@ export const Sidebar: FC = () => {
     tools: ""
   })
 
-  const [chatSearchResults, setChatSearchResults] = useState<Tables<"chats">[]>(
-    []
-  )
   const [expandDelay, setExpandDelay] = useState(false)
   const [searchLoading, setSearchLoading] = useState(false)
+
+  const [chatOffset, setChatOffset] = useState(0)
+  const [chats, setChats] = useState<Tables<"chats">[]>([])
+
+  const [reachedEnd, setReachedEnd] = useState(false)
+
+  const loadMoreChats = useCallback(async () => {
+    console.log("loadMoreChats")
+    if (searchLoading) return
+    if (reachedEnd) return
+    const lastChatCreatedAt = chats?.[chats.length - 1]?.created_at
+    handleSearchChange(searchQueries.chats, chatOffset + 40, lastChatCreatedAt)
+  }, [searchQueries.chats, chatOffset, chats, reachedEnd, searchLoading])
+
+  const handleSearchChange = useCallback(
+    debounce(async (query: string, offset: number, lastCreatedAt?: string) => {
+      if (!selectedWorkspace) return
+      setSearchLoading(true)
+      const newChats = await searchChatsByName(
+        selectedWorkspace.id,
+        query,
+        lastCreatedAt,
+        offset,
+        40
+      )
+      if (offset === 0) {
+        setChats(newChats)
+      } else {
+        setChats(prevChats => [...prevChats, ...newChats])
+      }
+      setChatOffset(offset) // Update offset for pagination
+      setSearchLoading(false)
+      setReachedEnd(newChats.length < 40)
+    }, 300), // Debounce delay of 300ms
+    [selectedWorkspace, reachedEnd]
+  )
+
+  useEffect(() => {
+    handleSearchChange(searchQueries.chats, 0)
+  }, [searchQueries.chats])
 
   useEffect(() => {
     setIsLoaded(true)
@@ -129,9 +165,7 @@ export const Sidebar: FC = () => {
 
   const dataMap = useMemo(
     () => ({
-      chats: chats.filter(chat =>
-        chat.name.toLowerCase().includes(searchQueries.chats.toLowerCase())
-      ),
+      chats,
       prompts: prompts.filter(prompt =>
         prompt.name.toLowerCase().includes(searchQueries.prompts.toLowerCase())
       ),
@@ -147,7 +181,7 @@ export const Sidebar: FC = () => {
         tool.name.toLowerCase().includes(searchQueries.tools.toLowerCase())
       )
     }),
-    [chatSearchResults, prompts, assistants, files, tools, searchQueries]
+    [prompts, assistants, files, tools, searchQueries, chats]
   )
 
   const foldersMap = useMemo(
@@ -158,7 +192,7 @@ export const Sidebar: FC = () => {
       files: folders.filter(folder => folder.type === "files"),
       tools: folders.filter(folder => folder.type === "tools")
     }),
-    [folders, chatSearchResults]
+    [folders]
   )
 
   function getSubmenuTitle(contentType: ContentType) {
@@ -215,7 +249,7 @@ export const Sidebar: FC = () => {
           />
         )}
 
-        <>{/* Sidebar */}</>
+        {/* Sidebar */}
         <motion.div
           ref={sidebarRef}
           className={cn(
@@ -354,6 +388,7 @@ export const Sidebar: FC = () => {
                   contentType="chats"
                   data={dataMap.chats}
                   folders={foldersMap.chats}
+                  onLoadMore={loadMoreChats} // Pass loadMoreChats only for chats
                 />
               </div>
             </div>
@@ -447,7 +482,9 @@ export const Sidebar: FC = () => {
       showSidebar,
       searchQueries,
       profile,
-      isPaywallOpen // Use context's state
+      isPaywallOpen, // Use context's state
+      loadMoreChats, // Add loadMoreChats to dependencies
+      searchLoading // Add searchLoading to dependencies
     ]
   )
 }

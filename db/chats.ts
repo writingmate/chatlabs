@@ -94,3 +94,39 @@ export const searchChatsAndMessages = async (
     p_query: query
   })
 }
+
+export const searchChatsByName = async (
+  workspaceId: string,
+  searchTerm: string,
+  beforeCreatedAt?: string,
+  offset: number = 0,
+  limit: number = 40
+): Promise<Tables<"chats">[]> => {
+  // Start building the query
+  let query = supabase
+    .from("chats")
+    .select("*")
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+
+  // Add search term condition if provided
+  if (searchTerm) {
+    query = query.ilike("name", `%${searchTerm}%`)
+  }
+
+  // Add condition to fetch chats before a specific created_at timestamp
+  if (!!beforeCreatedAt) {
+    query = query.lte("created_at", beforeCreatedAt)
+  }
+
+  // Apply range for pagination
+  query = query.range(offset, offset + limit - 1)
+
+  const { data: chats, error } = await query
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return chats
+}
