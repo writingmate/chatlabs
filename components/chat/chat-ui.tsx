@@ -438,7 +438,7 @@ ${content}
                 </div>
               </>
             )}
-            <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
+            <div className="sticky bottom-0 mx-2 items-end bg-transparent pb-2 backdrop-blur-sm">
               {chatMessages?.length === 0 && (
                 <ConversationStarters
                   values={selectedAssistant?.conversation_starters}
@@ -466,40 +466,32 @@ interface EmptyChatViewProps {
   theme: string | undefined
 }
 
-const EmptyChatView: React.FC<EmptyChatViewProps> = memo(
-  ({ selectedAssistant, model, theme }) => (
-    <div className="center flex w-full flex-1 flex-col items-center justify-center transition-[height]">
-      {!selectedAssistant && !!model && (
-        <>
-          <ModelIcon
-            className="size-[100px] overflow-hidden rounded-2xl"
-            modelId={model.modelId}
-            provider={model.provider}
-            height={100}
-            width={100}
-          />
-          <div className="text-foreground mt-4 text-center text-2xl">
-            How can I help you today?
-          </div>
-        </>
-      )}
-      {selectedAssistant && (
-        <>
-          <AssistantIcon
-            className="size-[100px] rounded-full"
-            assistant={selectedAssistant!}
-            size={100}
-          />
-          <div className="text-foreground mt-4 text-center text-2xl font-semibold">
-            {selectedAssistant!.name}
-          </div>
-          <div className="text-foreground mt-2 text-center text-sm">
-            {selectedAssistant!.description}
-          </div>
-        </>
-      )}
-    </div>
-  )
-)
+interface EmptyChatViewProps {
+  selectedAssistant: Tables<"assistants"> | null
+  theme: string | undefined
+}
 
-EmptyChatView.displayName = "EmptyChatView"
+const EmptyChatView: React.FC<EmptyChatViewProps> = ({
+  selectedAssistant,
+  theme
+}) => (
+  <div className="center flex w-full flex-1 flex-col items-center justify-center transition-[height]">
+    {!selectedAssistant ? (
+      <Brand theme={theme === "dark" ? "dark" : "light"} />
+    ) : (
+      <>
+        <AssistantIcon
+          className="size-[100px] rounded-xl"
+          assistant={selectedAssistant}
+          size={100}
+        />
+        <div className="text-foreground mt-4 text-center text-2xl font-bold">
+          {selectedAssistant.name}
+        </div>
+        <div className="text-foreground mt-2 text-center text-sm">
+          {selectedAssistant.description}
+        </div>
+      </>
+    )}
+  </div>
+)

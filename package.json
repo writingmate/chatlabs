@@ -8,7 +8,7 @@
     "update": "git pull origin main && npm run db-migrate && npm run db-types",
     "prepare": "husky install",
     "clean": "npm run lint:fix && npm run format:write",
-    "dev": "NODE_OPTIONS='-r newrelic' next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "NODE_OPTIONS='-r newrelic' next start",
     "lint": "next lint",

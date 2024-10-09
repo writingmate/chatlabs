@@ -35,7 +35,7 @@ import { getPublicTools } from "@/db/tools"
 import { getPlatformTools } from "@/db/platform-tools"
 import { onlyUniqueById } from "@/lib/utils"
 import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
-import { Loading } from "@/components/ui/loading"
+import Loading from "@/components/ui/loading"
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -401,7 +401,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }
 
   if (loading) {
-    return <Loading withMessage={true} />
+    return <Loading />
   }
 
   return (
