@@ -12,6 +12,7 @@ import { UITheme } from "./theme-configurator"
 import { updateHtml } from "@/lib/code-viewer"
 import { CodeBlock } from "@/types"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { ButtonWithTooltip } from "../ui/button-with-tooltip"
 
 interface PreviewProps2 {
   codeBlock: CodeBlock
@@ -316,9 +317,10 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
       </div>
       {showFooter && (
         <div className="bg-accent text-foreground flex items-center justify-end space-x-3 p-3 px-4">
-          <Button
+          <ButtonWithTooltip
+            tooltip="Highlight elements to chat about them"
+            variant="link"
             size={"icon"}
-            variant={"link"}
             className={cn(
               "size-6 hover:opacity-50 active:opacity-75",
               inspectMode && "bg-violet-500/20 text-violet-500"
@@ -326,8 +328,9 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
             onClick={() => setInspectMode(!inspectMode)}
           >
             <IconClick size={16} stroke={1.5} />
-          </Button>
-          <Button
+          </ButtonWithTooltip>
+          <ButtonWithTooltip
+            tooltip="Toggle Console"
             variant="link"
             size={"icon"}
             className={cn(
@@ -337,7 +340,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
             onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
           >
             <IconTerminal2 size={16} stroke={1.5} />
-          </Button>
+          </ButtonWithTooltip>
         </div>
       )}
     </div>
