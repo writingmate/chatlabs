@@ -14,6 +14,7 @@ export const ButtonWithTooltip = forwardRef<
   return (
     <WithTooltip
       side={tooltipSide}
+      asChild={true}
       display={<div>{tooltip}</div>}
       trigger={
         <Button ref={ref} {...buttonProps}>
