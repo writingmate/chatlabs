@@ -30,7 +30,11 @@ interface CodeViewerProps {
   showCloseButton?: boolean
   autoScroll?: boolean
   isEditable: boolean
-  onCodeChange: (updatedCode: string) => void
+  onCodeChange: (
+    updatedCode: string,
+    messageId: string,
+    sequenceNo: number
+  ) => void
 }
 
 export const CodeViewer: FC<CodeViewerProps> = ({

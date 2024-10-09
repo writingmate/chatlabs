@@ -85,7 +85,6 @@ async function handleRequest(
     let pathObject: OpenAPIV3.PathItemObject | undefined
     let match: { route: string; params: Record<string, string> } | null = null
     for (const [schemaPath, pathItem] of Object.entries(schema.paths)) {
-      console.log({ schemaPath, path })
       match = matchRoute(path, schemaPath)
       if (match && pathItem) {
         pathObject = pathItem

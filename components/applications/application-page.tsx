@@ -239,7 +239,6 @@ You also have access to the following API endpoints for tools:
 
 const generateToolsSchema = (tools: Tables<"tools">[]) => {
   const toolsInfo = tools.map(tool => {
-    console.log("tool", tool)
     const schema = JSON.parse(tool.schema as string)
     schema.servers = [
       {

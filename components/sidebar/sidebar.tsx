@@ -89,7 +89,6 @@ export const Sidebar: FC = () => {
   const [reachedEnd, setReachedEnd] = useState(false)
 
   const loadMoreChats = useCallback(async () => {
-    console.log("loadMoreChats")
     if (searchLoading) return
     if (reachedEnd) return
     const lastChatCreatedAt = chats?.[chats.length - 1]?.created_at
