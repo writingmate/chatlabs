@@ -35,7 +35,7 @@ export function AmplitudeProvider({ children }: { children: ReactNode }) {
 
     amplitude.init(
       process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY ||
-        "959de43582eb3458ab34b08a446e036c"
+        "6e7e3c67016ad90aa9cb58b96ee1bcf7"
     )
     const experiment = Experiment.initializeWithAmplitudeAnalytics(
       process.env.NEXT_PUBLIC_AMPLITUDE_DEPLOYMENT_KEY ||
