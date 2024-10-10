@@ -63,7 +63,7 @@ export const Sidebar: FC = () => {
     return storedCollapsedState === "true"
   })
 
-  const appsEnabled = useFeatureFlag("apps_enabled", false)
+  const { flagValue: appsEnabled } = useFeatureFlag("apps_enabled", false)
   const [isLoaded, setIsLoaded] = useState(false)
   const sidebarRef = useRef<HTMLDivElement>(null)
 
