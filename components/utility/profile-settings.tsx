@@ -524,17 +524,17 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                   <IconKey className="mr-1 size-4" stroke={1.5} /> API Keys
                 </CalloutTitle>
                 <CalloutDescription>
-                  <p>There are two ways to use API keys in ChatLabs:</p>
+                  <p>There are two ways to use API keys in ImogenAI:</p>
                   <ol className="mt-2 list-inside list-decimal">
                     <li className="mb-2">
-                      <strong>Paid ChatLabs accounts:</strong> By default,
-                      ChatLabs provides API keys with usage limits based on your
-                      subscription plan. These keys are managed by ChatLabs and
+                      <strong>Paid ImogenAI accounts:</strong> By default,
+                      ImogenAI provides API keys with usage limits based on your
+                      subscription plan. These keys are managed by ImogenAI and
                       ensure a seamless experience.
                     </li>
                     <li>
                       <strong>Your own API keys:</strong> If you provide your
-                      own API keys here, ChatLabs will use them instead. This
+                      own API keys here, ImogenAI will use them instead. This
                       option lifts the plan-based limitations but requires you
                       to manage your own API usage and billing with the
                       respective providers.

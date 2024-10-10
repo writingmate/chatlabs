@@ -1,9 +1,9 @@
 "use strict"
 exports.config = {
   app_name: [
-    "chatlabs-" + (process.env.NODE_ENV === "production" ? "production" : "dev")
+    "imogenai.app-" + (process.env.NODE_ENV === "production" ? "production" : "dev")
   ],
-  license_key: "55d6b1b49b413c59d46c7c0980dbf017FFFFNRAL",
+  license_key: "3a9ee49b6e0cf9015d700b09ab96e77cFFFFNRAL",
   logging: {
     level: "info"
   },
