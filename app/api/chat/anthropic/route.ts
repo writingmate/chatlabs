@@ -91,6 +91,14 @@ export async function POST(request: NextRequest) {
       baseURL: process.env.ANTHROPIC_BASE_URL || undefined
     })
 
+    const cacheControl = modelsSupportingCacheControl.includes(
+      chatSettings.model
+    )
+      ? {
+          type: "ephemeral"
+        }
+      : undefined
+
     const response = await anthropic.messages.create(
       {
         model: chatSettings.model,
@@ -101,9 +109,7 @@ export async function POST(request: NextRequest) {
             type: "text",
             text: messages[0].content,
             // @ts-ignore
-            cache_control: {
-              type: "ephemeral"
-            }
+            cache_control: cacheControl
           }
         ],
         max_tokens:

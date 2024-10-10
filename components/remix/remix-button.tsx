@@ -2,14 +2,8 @@
 
 import { FC, useState } from "react"
 import { Button } from "@/components/ui/button"
-import {
-  IconArrowFork,
-  IconArrowsShuffle,
-  IconCopy,
-  IconInfoCircle
-} from "@tabler/icons-react"
+import { IconArrowFork } from "@tabler/icons-react"
 import { AuthProvider, useAuth } from "@/context/auth"
-import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
 
 interface RemixButtonProps {
   fileId: string
