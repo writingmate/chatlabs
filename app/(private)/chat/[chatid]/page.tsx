@@ -19,7 +19,7 @@ export default function ChatIDPage() {
   } = useCodeBlockManager(chatMessages)
 
   const params = useParams()
-  const chatId = params.chatid as string
+  const chatId = params?.chatid as string
 
   return (
     <>
