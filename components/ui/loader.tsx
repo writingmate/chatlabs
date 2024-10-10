@@ -1,8 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-;("use client")
-
 import { LoadingSVG } from "@/components/icons/loading-svg"
 import { FC } from "react"
 
@@ -59,4 +57,17 @@ export const Loader: FC<LoaderProps> = ({ withMessage = false }) => {
       </div>
     )
   }
+
+  return (
+    <div className="flex size-full flex-col items-center justify-center">
+      <LoadingSVG className="mb-4 size-12" />
+      <div
+        className={`duration- text-center transition-opacity${FADE_DURATION} ${
+          isVisible ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        {message}
+      </div>
+    </div>
+  )
 }
