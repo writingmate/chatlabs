@@ -408,7 +408,6 @@ export const fetchChatResponse = async (
         }
 
         if (response.status === 504 && retriesLeft > 0) {
-          console.log("Retrying...", retriesLeft)
           await new Promise(resolve => setTimeout(resolve, retryDelay))
           return fetchWithRetry(retriesLeft - 1)
         }

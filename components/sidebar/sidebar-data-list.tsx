@@ -10,7 +10,15 @@ import { updateTool } from "@/db/tools"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, DataListType } from "@/types"
-import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
+import {
+  FC,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback
+} from "react"
 import { Separator } from "../ui/separator"
 import { AssistantItem } from "./items/assistants/assistant-item"
 import { ChatItem } from "./items/chat/chat-item"
@@ -21,19 +29,22 @@ import { ModelItem } from "./items/models/model-item"
 import { PresetItem } from "./items/presets/preset-item"
 import { PromptItem } from "./items/prompts/prompt-item"
 import { ToolItem } from "./items/tools/tool-item"
-import { VList } from "virtua"
+import { Virtualizer, VList, VListHandle } from "virtua"
 import { EmptyState } from "./empty-state"
+import { useScrollBase } from "../chat/chat-hooks/use-scroll"
 
 interface SidebarDataListProps {
   contentType: ContentType
   data: DataListType
   folders: Tables<"folders">[]
+  onLoadMore?: () => Promise<void> // Make onLoadMore optional
 }
 
 export const SidebarDataList: FC<SidebarDataListProps> = ({
   contentType,
   data,
-  folders
+  folders,
+  onLoadMore
 }) => {
   const {
     setChats,
@@ -51,6 +62,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   const [isOverflowing, setIsOverflowing] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
+
+  const vlistRef = useRef<VListHandle>(null)
 
   const DataListComponent = ({
     contentType,
@@ -229,6 +242,17 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     setIsDragOver(false)
   }
 
+  const [loadingMore, setLoadingMore] = useState(false)
+
+  const { scrollRef, handleScroll, isAtBottom } = useScrollBase()
+
+  useEffect(() => {
+    if (isAtBottom && !loadingMore) {
+      setLoadingMore(true)
+      onLoadMore?.().finally(() => setLoadingMore(false))
+    }
+  }, [isAtBottom, onLoadMore, loadingMore])
+
   useEffect(() => {
     if (divRef.current) {
       setIsOverflowing(
@@ -300,7 +324,11 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
   return useMemo(
     () => (
-      <div className="flex w-full flex-1 grow flex-col" onDrop={handleDrop}>
+      <div
+        className="flex w-full flex-1 grow flex-col"
+        onDrop={handleDrop}
+        ref={divRef}
+      >
         <div className="mt-2 flex size-full flex-col overflow-auto">
           {data.length === 0 && (
             <div className="flex shrink-0 grow flex-col items-center justify-center">
@@ -309,8 +337,13 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
           )}
 
           {(dataWithFolders.length > 0 || dataWithoutFolders.length > 0) && (
-            <VList
-              className={`h-full ${
+            <div
+              ref={scrollRef}
+              onScroll={handleScroll}
+              style={{
+                contain: "strict"
+              }}
+              className={`h-full overflow-y-auto ${
                 isOverflowing ? "w-[calc(100%-8px)]" : "w-full"
               } space-y-2 ${isOverflowing ? "mr-2" : ""}`}
             >
@@ -421,7 +454,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                   })}
                 </div>
               )}
-            </VList>
+            </div>
           )}
         </div>
 

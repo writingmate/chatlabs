@@ -95,41 +95,19 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
 }) => {
   const { tools, allModels } = useContext(ChatbotUIContext)
 
-  const [localApplication, setLocalApplication] = useState(application)
   const [isCreatingTool, setIsCreatingTool] = useState(false)
-
-  useEffect(() => {
-    setLocalApplication(application)
-  }, [application])
 
   const handleChange = useCallback(
     (field: string, value: any) => {
       const updatedApplication = { ...application, [field]: value }
       onUpdateApplication(updatedApplication)
     },
-    [onUpdateApplication]
+    [onUpdateApplication, application]
   )
 
   const handleCreateTool = useCallback(() => {
     setIsCreatingTool(true)
   }, [])
-
-  // Determine if tools or models have changed
-  const hasChanges = useMemo(() => {
-    const toolsChanged = !(
-      application.tools.length === localApplication.tools.length &&
-      application.tools.every(
-        (tool, index) => tool.id === localApplication.tools[index].id
-      )
-    )
-    const modelsChanged = !(
-      application.models.length === localApplication.models.length &&
-      application.models.every(
-        (modelId, index) => modelId === localApplication.models[index]
-      )
-    )
-    return toolsChanged || modelsChanged
-  }, [application, localApplication])
 
   return (
     <div className={cn("space-y-3", className)}>
@@ -137,7 +115,7 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
         <Label>Type</Label>
         <RadioGroup
           orientation="horizontal"
-          value={localApplication.application_type || "web_app"}
+          value={application.application_type || "web_app"}
           onValueChange={value => handleChange("application_type", value)}
           className="flex space-x-2"
         >
@@ -161,7 +139,7 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
         <Label htmlFor="name">Name</Label>
         <Input
           id="name"
-          value={localApplication.name}
+          value={application.name}
           onChange={e => handleChange("name", e.target.value)}
           placeholder="Enter application name"
           required
@@ -175,7 +153,7 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
         <Label htmlFor="description">Description</Label>
         <Textarea
           id="description"
-          value={localApplication.description}
+          value={application.description}
           onChange={e => handleChange("description", e.target.value)}
           placeholder="Enter application description"
         />
@@ -188,7 +166,7 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
       <div>
         <Label htmlFor="sharing">Sharing</Label>
         <Select
-          value={localApplication.sharing || "private"}
+          value={application.sharing || "private"}
           onValueChange={value => handleChange("sharing", value)}
         >
           <SelectTrigger>
@@ -209,7 +187,7 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
         <div>
           <Label>Tools</Label>
           <MultiSelect
-            selectedOptions={localApplication.tools.map(tool => ({
+            selectedOptions={application.tools.map(tool => ({
               value: tool.id,
               label: tool.name
             }))}
@@ -242,7 +220,7 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
         <div>
           <Label htmlFor="models">Models</Label>
           <MultiSelect
-            selectedOptions={localApplication.models.map(modelId => {
+            selectedOptions={application.models.map(modelId => {
               const model = allModels.find(m => m.modelId === modelId)
               return {
                 value: modelId,
@@ -267,11 +245,11 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
         </div>
       </div>
 
-      {localApplication.application_type === "web_app" && (
+      {application.application_type === "web_app" && (
         <div>
           <Label htmlFor="theme">Theme</Label>
           <Select
-            value={localApplication.theme || "light"}
+            value={application.theme || "light"}
             onValueChange={value => handleChange("theme", value)}
           >
             <SelectTrigger className="capitalize">
@@ -290,20 +268,6 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
             type applications.
           </Description>
         </div>
-      )}
-
-      {!isCreating && application.id && hasChanges && (
-        <Callout>
-          <CalloutDescription className="flex items-center justify-between space-x-2">
-            <div className="flex items-center">
-              Sync model and tools changes with application code.
-            </div>
-            <Button size="sm" variant="outline">
-              <IconRefresh className="mr-2 size-4" />
-              Update app
-            </Button>
-          </CalloutDescription>
-        </Callout>
       )}
 
       {isCreatingTool && (

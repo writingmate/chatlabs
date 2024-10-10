@@ -15,9 +15,11 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState
 } from "react"
 import { ChatMessages } from "../chat/chat-messages"
+import { IconMaximize, IconMinimize } from "@tabler/icons-react" // Import icons for fullscreen
 
 interface CodeViewerProps {
   theme?: string
@@ -28,7 +30,11 @@ interface CodeViewerProps {
   showCloseButton?: boolean
   autoScroll?: boolean
   isEditable: boolean
-  onCodeChange: (updatedCode: string) => void
+  onCodeChange: (
+    updatedCode: string,
+    messageId: string,
+    sequenceNo: number
+  ) => void
 }
 
 export const CodeViewer: FC<CodeViewerProps> = ({
@@ -53,6 +59,7 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   const [inspectMode, setInspectMode] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false) // Add state for fullscreen
 
   const handleFixError = useCallback(
     (error: string) => {
@@ -113,12 +120,30 @@ export const CodeViewer: FC<CodeViewerProps> = ({
     }
   }, [isGenerating])
 
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen(prev => !prev)
+  }, [])
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isFullscreen) {
+        setIsFullscreen(false)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [isFullscreen])
+
   return useMemo(
     () => (
       <div
         className={cn(
           `codeblock relative flex w-full flex-col overflow-hidden rounded-xl font-sans shadow-lg`,
-          className
+          className,
+          { "absolute top-0 left-0 w-full h-full z-50": isFullscreen } // Add class for fullscreen styling
         )}
       >
         <CodeViewerNavbar
@@ -141,6 +166,12 @@ export const CodeViewer: FC<CodeViewerProps> = ({
           // showSidebarButton={false}
           showForkButton={
             !!codeBlock.messageId && codeBlock.sequenceNo > -1 && !!profile
+          }
+          isFullscreen={isFullscreen}
+          toggleFullscreen={toggleFullscreen}
+          showFullscreenButton={
+            codeBlock.language.toLowerCase() === "html" &&
+            !!profile?.experimental_code_editor
           }
         />
         <div className="relative w-full flex-1 overflow-auto bg-zinc-950">
@@ -187,9 +218,21 @@ export const CodeViewer: FC<CodeViewerProps> = ({
       theme,
       isEditable,
       chatSettings?.model,
-      selectedAssistant
+      selectedAssistant,
+      isFullscreen // Add dependency for fullscreen
     ]
   )
 }
 
 CodeViewer.displayName = "CodeViewer"
+
+// Add CSS for fullscreen mode
+// .fullscreen-class {
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   z-index: 9999;
+//   background-color: #000; // Optional: to cover the entire screen
+// }

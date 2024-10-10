@@ -9,38 +9,29 @@ import {
 } from "react"
 import { ChatbotUIChatContext } from "@/context/chat"
 
-export const useScroll = (scrollParams: any = {}) => {
-  const { isGenerating, chatMessages } = useContext(ChatbotUIChatContext)
-
-  const messagesStartRef = useRef<HTMLDivElement>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
+// Base hook for scroll management, without any chat-specific logic
+export const useScrollBase = (
+  scrollParams: any = {
+    ref: null
+  }
+) => {
+  const startRef = useRef<HTMLDivElement>(null)
+  const endRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(scrollParams.ref)
   const isAutoScrolling = useRef(false)
 
   const [isAtTop, setIsAtTop] = useState(false)
-  const [isAtBottom, setIsAtBottom] = useState(true)
+  const [isAtBottom, setIsAtBottom] = useState(false)
   const [userScrolled, setUserScrolled] = useState(false)
   const [isOverflowing, setIsOverflowing] = useState(false)
 
-  useEffect(() => {
-    setUserScrolled(false)
-
-    if (!isGenerating && userScrolled) {
-      setUserScrolled(false)
-    }
-  }, [isGenerating])
-
-  useEffect(() => {
-    if (isGenerating && !userScrolled) {
-      scrollToBottom()
-    }
-  }, [chatMessages])
-
   const handleScroll: UIEventHandler<HTMLDivElement> = useCallback(e => {
     const target = e.target as HTMLDivElement
+
     const bottom =
-      Math.round(target.scrollHeight) - Math.round(target.scrollTop) ===
-      Math.round(target.clientHeight)
+      Math.ceil(target.scrollTop + target.clientHeight) >=
+      target.scrollHeight - 60
+
     setIsAtBottom(bottom)
 
     const top = target.scrollTop === 0
@@ -57,15 +48,15 @@ export const useScroll = (scrollParams: any = {}) => {
   }, [])
 
   function scrollIntoView() {
-    if (messagesEndRef.current) {
+    if (endRef.current) {
       if (window.self !== window.top) {
         if (scrollRef.current) {
-          scrollRef.current.scrollTop = messagesEndRef.current?.offsetTop
+          scrollRef.current.scrollTop = endRef.current?.offsetTop
           return
         }
         return
       }
-      messagesEndRef.current.scrollIntoView({
+      endRef.current.scrollIntoView({
         behavior: "instant",
         ...scrollParams
       })
@@ -73,7 +64,6 @@ export const useScroll = (scrollParams: any = {}) => {
   }
 
   const scrollToTop = useCallback(() => {
-    // if the window is inside an iframe, we can't scroll to the top
     scrollIntoView()
   }, [])
 
@@ -86,6 +76,55 @@ export const useScroll = (scrollParams: any = {}) => {
       isAutoScrolling.current = false
     }, 0)
   }, [])
+
+  return {
+    scrollRef,
+    startRef,
+    endRef,
+    isAtTop,
+    isAtBottom,
+    userScrolled,
+    isOverflowing,
+    handleScroll,
+    scrollToTop,
+    scrollToBottom,
+    setIsAtBottom,
+    setUserScrolled // Add this line to expose setUserScrolled
+  }
+}
+
+// Hook for scroll management, with chat-specific logic
+export const useScroll = (scrollParams: any = {}) => {
+  const { isGenerating, chatMessages } = useContext(ChatbotUIChatContext)
+
+  const {
+    scrollRef,
+    startRef: messagesStartRef,
+    endRef: messagesEndRef,
+    isAtTop,
+    isAtBottom,
+    userScrolled,
+    isOverflowing,
+    handleScroll,
+    scrollToTop,
+    scrollToBottom,
+    setIsAtBottom,
+    setUserScrolled // Destructure setUserScrolled here
+  } = useScrollBase(scrollParams)
+
+  useEffect(() => {
+    setUserScrolled(false)
+
+    if (!isGenerating && userScrolled) {
+      setUserScrolled(false)
+    }
+  }, [isGenerating])
+
+  useEffect(() => {
+    if (isGenerating && !userScrolled) {
+      scrollToBottom()
+    }
+  }, [chatMessages])
 
   return {
     scrollRef,

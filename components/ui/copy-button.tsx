@@ -2,6 +2,7 @@ import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { IconCheck, IconClipboard } from "@tabler/icons-react"
+import { ButtonWithTooltip } from "./button-with-tooltip"
 
 export function CopyButton({
   value,
@@ -16,7 +17,8 @@ export function CopyButton({
 }) {
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
   return (
-    <Button
+    <ButtonWithTooltip
+      tooltip={title}
       size={"icon"}
       className={cn("size-4 text-red-800 hover:opacity-50", className)}
       variant={variant}
@@ -30,6 +32,6 @@ export function CopyButton({
       ) : (
         <IconClipboard stroke={1.5} size={16} />
       )}
-    </Button>
+    </ButtonWithTooltip>
   )
 }

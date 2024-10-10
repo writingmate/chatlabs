@@ -10,7 +10,11 @@ interface ChatPreviewContentProps {
   selectedCodeBlock: CodeBlock | null
   onSelectCodeBlock: (codeBlock: CodeBlock | null) => void
   isEditable: boolean
-  onCodeChange: (updatedCode: string) => void
+  onCodeChange: (
+    updatedCode: string,
+    messageId: string,
+    sequenceNo: number
+  ) => void
 }
 
 export const ChatPreviewContent: FC<ChatPreviewContentProps> = memo(

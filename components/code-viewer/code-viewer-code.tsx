@@ -20,12 +20,16 @@ import { vscodeDark } from "@uiw/codemirror-theme-vscode"
 interface CodeViewerProps {
   codeBlock: CodeBlock
   autoScroll?: boolean
-  onCodeChange: (updatedCode: string) => void
+  onCodeChange: (
+    updatedCode: string,
+    messageId: string,
+    sequenceNo: number
+  ) => void
   isEditable: boolean
 }
 
 export const CodeViewerCode: FC<CodeViewerProps> = ({
-  codeBlock: { language, code: initialValue },
+  codeBlock: { language, code: initialValue, messageId, sequenceNo },
   autoScroll,
   onCodeChange,
   isEditable = false
@@ -38,7 +42,6 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
   }, [initialValue])
 
   const getLanguageExtension = (lang: string) => {
-    console.log("lang", lang)
     switch (lang.toLowerCase()) {
       case "javascript":
       case "typescript":
@@ -65,15 +68,15 @@ export const CodeViewerCode: FC<CodeViewerProps> = ({
   }
 
   const debouncedOnCodeChange = useCallback(
-    debounce((value: string) => {
-      onCodeChange(value)
+    debounce((value: string, messageId: string, sequenceNo: number) => {
+      onCodeChange(value, messageId, sequenceNo)
     }, 1000),
     [onCodeChange]
   )
 
   const handleChange = (value: string) => {
     setCode(value)
-    debouncedOnCodeChange(value)
+    debouncedOnCodeChange(value, messageId, sequenceNo)
   }
 
   useEffect(() => {

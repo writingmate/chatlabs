@@ -9,7 +9,9 @@ import {
   IconArrowFork,
   IconLayoutSidebar,
   IconLockAccess,
-  IconLock
+  IconLock,
+  IconMinimize,
+  IconMaximize
 } from "@tabler/icons-react"
 
 import { CopyButton } from "@/components/ui/copy-button"
@@ -24,6 +26,8 @@ interface NavbarProps {
   showSidebarButton: boolean
   language: string
   isGenerating?: boolean
+  isFullscreen?: boolean
+  toggleFullscreen: () => void
   isEditable: boolean
   execute: boolean
   setExecute: (execute: boolean) => void
@@ -38,6 +42,7 @@ interface NavbarProps {
   filename: string
   showShareButton?: any
   copyValue: string // Add prop for the value to be copied
+  showFullscreenButton?: boolean
 }
 
 export const CodeViewerNavbar: FC<NavbarProps> = ({
@@ -57,13 +62,30 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
   onThemeChange,
   copyValue, // Use the new prop
   showShareButton = true,
-  onFork
+  onFork,
+  isFullscreen,
+  toggleFullscreen,
+  showFullscreenButton
 }) => {
   const downloadButtonRef = useRef<HTMLButtonElement>(null)
 
   return (
     <div className="bg-accent text-foreground z-5 flex w-full items-center justify-between border-b px-4">
       <div className="flex items-center space-x-2">
+        {showFullscreenButton && (
+          <NavbarButton
+            icon={
+              isFullscreen ? (
+                <IconMinimize size={16} />
+              ) : (
+                <IconMaximize size={16} />
+              )
+            }
+            title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+            onClick={toggleFullscreen}
+            disabled={isGenerating}
+          />
+        )}
         {!isEditable && (
           <WithTooltip
             display={"This code is not editable"}
@@ -103,7 +125,7 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
                 value={"code"}
                 className={`text-muted-foreground data-[state=on]:text-foreground space-x-1 rounded-r-none border border-r-0 text-xs font-medium`}
               >
-                <IconCode size={16} stroke={1.5} />
+                <IconCode size={16} />
                 <span>Code</span>
               </ToggleGroupItem>
               <ToggleGroupItem
@@ -111,7 +133,7 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
                 value={"execute"}
                 className={`text-muted-foreground data-[state=on]:text-foreground space-x-1 rounded-l-none border text-xs font-medium`}
               >
-                <IconEye size={16} stroke={1.5} />
+                <IconEye size={16} />
                 <span>Preview</span>
               </ToggleGroupItem>
             </ToggleGroup>
