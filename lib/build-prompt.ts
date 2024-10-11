@@ -195,7 +195,7 @@ export async function buildFinalMessages(
                 }
               }
             } catch (error) {
-              console.log(error)
+              console.error(error)
             }
           }
 
