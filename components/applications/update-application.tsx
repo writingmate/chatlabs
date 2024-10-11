@@ -182,7 +182,6 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
             Select tools to enhance your application{"'"}s capabilities.
           </Description>
         </div>
-
         <div>
           <Label htmlFor="models">Models</Label>
           <MultiSelect
