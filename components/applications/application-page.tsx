@@ -379,7 +379,7 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="mx-auto flex h-full grow flex-col pt-2"
+          className="mx-auto flex h-full max-w-[50%] grow flex-col pt-2"
         >
           <TabsList className="mx-auto">
             <TabsTrigger value="chat">Chat</TabsTrigger>

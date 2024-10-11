@@ -55,7 +55,7 @@ export function validatePlanForModel(
   }
 
   if (ALLOWED_MODELS.includes(model)) {
-    console.log("ALLOWED MODELS. Skipping plan check.", model)
+    console.debug("ALLOWED MODELS. Skipping plan check.", model)
     return true
   }
 

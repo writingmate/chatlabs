@@ -10,6 +10,7 @@ import {
   updateProfileByUserId
 } from "@/db/profile"
 import { createErrorResponse } from "@/lib/response"
+import { logger } from "@/lib/logger"
 
 const supabaseAdmin = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -31,11 +32,11 @@ export async function POST(req: Request) {
     )
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error"
-    console.error(`❌ Error parsing webhook: ${errorMessage}`)
+    logger.error(`❌ Error parsing webhook: ${errorMessage}`)
     return createErrorResponse(`Webhook Error: ${errorMessage}`, 400)
   }
 
-  console.log(`[${event.id}][${event.type}]: Event received`)
+  logger.info(`[${event.id}][${event.type}]: Event received`)
 
   const permittedEvents = [
     "customer.subscription.deleted",
@@ -82,11 +83,11 @@ export async function POST(req: Request) {
       plan
     })
 
-    console.log(
+    logger.info(
       `[${event.id}][${event.type}]: Profile updated with plan ${plan}`
     )
   } catch (error) {
-    console.error(
+    logger.error(
       `[${event.id}][${event.type}]: Error processing webhook:`,
       error
     )

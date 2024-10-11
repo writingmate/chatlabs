@@ -72,82 +72,80 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
     [experimental_code_editor, onSelectCodeBlock, codeBlocks]
   )
 
-  const contentParts = useMemo(() => {
-    const parts = content.split(/(\[CODE_BLOCK_\d+\])/)
-    return parts.filter(Boolean).map((part, index) => {
-      const match = part.match(/\[CODE_BLOCK_(\d+)\]/)
-      if (match) {
-        const blockIndex = parseInt(match[1])
-        const block = codeBlocks?.[blockIndex]
-        if (!block) {
-          return null
-        }
-        if (experimental_code_editor && !!block.filename) {
-          return (
-            <CodeBlockButton
-              loading={!!isGenerating}
-              key={`code-block-${index}`}
-              {...block}
-              onClick={() => handleCodeBlockClick(block)}
-            />
-          )
-        } else {
-          return (
-            <CodeViewer
-              isEditable={false}
-              onCodeChange={() => {}}
-              key={`code-block-${index}`}
-              codeBlock={block}
-              isGenerating={isGenerating}
-              autoScroll={false}
-            />
-          )
-        }
+  const parts = content.split(/(\[CODE_BLOCK_\d+\])/)
+  const contentParts = parts.filter(Boolean).map((part, index) => {
+    const match = part.match(/\[CODE_BLOCK_(\d+)\]/)
+    if (match) {
+      const blockIndex = parseInt(match[1])
+      const block = codeBlocks?.[blockIndex]
+      if (!block) {
+        return null
       }
-      return (
-        <MessageMarkdownMemoized
-          key={`markdown-${index}`}
-          className={cn(
-            "prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 min-h-[40px] min-w-full space-y-6 break-words",
-            isGenerating ? "generating" : ""
-          )}
-          remarkPlugins={[
-            remarkGfm,
-            [remarkMath, { singleDollarTextMath: false }]
-          ]}
-          rehypePlugins={[rehypeMathjax]}
-          urlTransform={urlTransform}
-          components={{
-            a({ children, ...props }) {
-              if (typeof children === "string" && /^\d+$/.test(children)) {
-                return (
-                  <a
-                    {...props}
-                    title={props.href}
-                    target={"_blank"}
-                    className="bg-foreground/20 ml-1 inline-flex size-[16px] items-center justify-center rounded-full text-[10px] no-underline"
-                  >
-                    {children}
-                  </a>
-                )
-              }
-              return <a {...props}>{children}</a>
-            },
-            p({ children }) {
+      if (experimental_code_editor && !!block.filename) {
+        return (
+          <CodeBlockButton
+            loading={!!isGenerating}
+            key={`code-block-${index}`}
+            {...block}
+            onClick={() => handleCodeBlockClick(block)}
+          />
+        )
+      } else {
+        return (
+          <CodeViewer
+            isEditable={false}
+            onCodeChange={() => {}}
+            key={`code-block-${index}`}
+            codeBlock={block}
+            isGenerating={isGenerating}
+            autoScroll={false}
+          />
+        )
+      }
+    }
+    return (
+      <MessageMarkdownMemoized
+        key={`markdown-${index}`}
+        className={cn(
+          "prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 min-h-[40px] min-w-full space-y-6 break-words",
+          isGenerating ? "generating" : ""
+        )}
+        remarkPlugins={[
+          remarkGfm,
+          [remarkMath, { singleDollarTextMath: false }]
+        ]}
+        rehypePlugins={[rehypeMathjax]}
+        urlTransform={urlTransform}
+        components={{
+          a({ children, ...props }) {
+            if (typeof children === "string" && /^\d+$/.test(children)) {
               return (
-                <p className="mb-2 whitespace-pre-wrap last:mb-0">{children}</p>
+                <a
+                  {...props}
+                  title={props.href}
+                  target={"_blank"}
+                  className="bg-foreground/20 ml-1 inline-flex size-[16px] items-center justify-center rounded-full text-[10px] no-underline"
+                >
+                  {children}
+                </a>
               )
-            },
-            img({ node, src, ...props }) {
-              return <ImageWithPreview src={src!} alt={props.alt || "image"} />
             }
-          }}
-        >
-          {part}
-        </MessageMarkdownMemoized>
-      )
-    })
-  }, [content, codeBlocks, isGenerating, experimental_code_editor])
+            return <a {...props}>{children}</a>
+          },
+          p({ children }) {
+            return (
+              <p className="mb-2 whitespace-pre-wrap last:mb-0">{children}</p>
+            )
+          },
+          img({ node, src, ...props }) {
+            return <ImageWithPreview src={src!} alt={props.alt || "image"} />
+          }
+        }}
+      >
+        {part}
+      </MessageMarkdownMemoized>
+    )
+  })
 
   return <>{contentParts}</>
 }

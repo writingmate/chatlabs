@@ -141,9 +141,9 @@ export const CodeViewer: FC<CodeViewerProps> = ({
     () => (
       <div
         className={cn(
-          `codeblock relative flex w-full flex-col overflow-hidden rounded-xl font-sans shadow-lg`,
+          `codeblock relative flex w-full flex-col overflow-hidden rounded-xl font-sans shadow-lg`, // Add transition classes
           className,
-          { "absolute top-0 left-0 w-full h-full z-50": isFullscreen } // Add class for fullscreen styling
+          { "absolute top-0 left-0 w-full h-full z-50": isFullscreen } // Very high z-index
         )}
       >
         <CodeViewerNavbar
@@ -163,7 +163,6 @@ export const CodeViewer: FC<CodeViewerProps> = ({
           onThemeChange={() => {}}
           onFork={onFork}
           showSidebarButton={false}
-          // showSidebarButton={false}
           showForkButton={
             !!codeBlock.messageId && codeBlock.sequenceNo > -1 && !!profile
           }

@@ -29,16 +29,13 @@ export function useCodeBlockManager(ignore: ChatMessage[]) {
     }, [])
 
     const handleCodeChange = useCallback((updatedCode: string, messageId: string, sequenceNo: number): void => {
-        console.log("handleCodeChange", messageId, sequenceNo)
 
         const updatedMessage = chatMessages.find(
             message => message.message?.id === messageId
         )
 
-        console.log("updatedMessage", updatedMessage)
         const codeBlock = updatedMessage?.codeBlocks?.[sequenceNo]
 
-        console.log("codeBlock", codeBlock)
         if (updatedMessage && updatedMessage.codeBlocks && codeBlock) {
             const updatedCodeBlock = {
                 ...codeBlock,
@@ -52,6 +49,7 @@ export function useCodeBlockManager(ignore: ChatMessage[]) {
                 const index = updatedMessages.findIndex(
                     message => message.message?.id === updatedMessage.message?.id
                 )
+
                 if (index !== -1) {
                     updatedMessages[index] = updatedMessage
                 }

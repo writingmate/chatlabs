@@ -220,7 +220,7 @@ export const Sidebar: FC = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed left-2 top-2 z-50 md:hidden"
+          className="fixed left-2 top-2 z-30 md:hidden"
           onClick={() => {
             setShowSidebar(true)
             setIsCollapsed(false)
@@ -232,7 +232,7 @@ export const Sidebar: FC = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed left-12 top-2 z-50 md:hidden"
+          className="fixed left-12 top-2 z-30 md:hidden"
           onClick={() => handleCreateChat()}
         >
           <IconMessagePlus {...iconProps} />
@@ -250,7 +250,7 @@ export const Sidebar: FC = () => {
         <motion.div
           ref={sidebarRef}
           className={cn(
-            "bg-background fixed inset-y-0 left-0 z-50 flex h-full flex-col border-r md:relative",
+            "bg-background fixed inset-y-0 left-0 z-30 flex h-full flex-col border-r md:relative", // Removed inset-y-0
             !isLoaded && "invisible",
             showSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           )}

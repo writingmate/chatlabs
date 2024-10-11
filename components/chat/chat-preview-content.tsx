@@ -29,7 +29,7 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = memo(
   }) => (
     <div
       className={cn(
-        "max-w-[50%] shrink-0 overflow-hidden transition-[width] duration-200",
+        "max-w-[50%] shrink-0 overflow-hidden border-l transition-[width] duration-200",
         open ? "w-full" : "w-0"
       )}
     >
