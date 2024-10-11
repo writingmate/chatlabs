@@ -56,8 +56,12 @@ export function ModelDetails({
           width={26}
           height={26}
         />
-        <span className={"capitalize"}>{model.provider}</span>
-        <span>/</span>
+        {model.provider !== "openrouter" && (
+          <>
+            <span className={"capitalize"}>{model.provider}</span>
+            <span>/</span>
+          </>
+        )}
         <span className={"font-semibold"}>{model.modelName}</span>
       </div>
       <div className="flex flex-wrap gap-2">

@@ -451,7 +451,6 @@ ${content}
                 showAssistant={showAssistantSelector && !selectedAssistant}
                 handleSendMessage={handleSendMessage}
               />
-              <ChatMessageCounter />
             </div>
           </div>
         )}

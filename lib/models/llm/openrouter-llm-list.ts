@@ -1,4 +1,6 @@
 import { LLM } from "@/types"
+import { CATEGORIES } from "../categories"
+import { LLMTier } from "@/types"
 
 const OPENROUTER_PLATFORM_LINK = "https://openrouter.ai/api/v1"
 
@@ -11,8 +13,9 @@ const O1_MINI: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  tier: "free",
-  new: true
+  tier: "pro" as LLMTier,
+  new: true,
+  categories: [CATEGORIES.TECHNOLOGY]
 }
 
 const O1_PREVIEW: LLM = {
@@ -24,7 +27,7 @@ const O1_PREVIEW: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  tier: "free",
+  tier: "pro" as LLMTier,
   new: true
 }
 
@@ -36,7 +39,7 @@ const GPT_4O: LLM = {
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
   tools: true,
-  tier: "free",
+  tier: "pro" as LLMTier,
   supportsStreaming: true,
   pricing: {
     currency: "USD",
@@ -54,7 +57,7 @@ const GPT_4O_MINI: LLM = {
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
   tools: true,
-  tier: "free",
+  tier: "free" as LLMTier,
   supportsStreaming: true,
   new: false,
   pricing: {
@@ -72,7 +75,7 @@ const GPT_4_VISION: LLM = {
   hostedId: "gpt-4-vision-preview",
   platformLink: OPENROUTER_PLATFORM_LINK,
   imageInput: true,
-  tier: "free",
+  tier: "pro" as LLMTier,
   tools: false,
   supportsStreaming: true,
   pricing: {
@@ -92,7 +95,7 @@ const GEMINI_PRO_15: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  tier: "free"
+  tier: "pro" as LLMTier
 }
 
 const GEMINI_PRO_15_EXP: LLM = {
@@ -104,7 +107,7 @@ const GEMINI_PRO_15_EXP: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  tier: "free"
+  tier: "pro" as LLMTier
 }
 
 const GEMINI_FLASH_15_EXP: LLM = {
@@ -116,7 +119,7 @@ const GEMINI_FLASH_15_EXP: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  tier: "free"
+  tier: "free" as LLMTier
 }
 
 ///anthropic
@@ -129,7 +132,7 @@ const CLAUDE_3_HAIKU: LLM = {
   imageInput: true,
   tools: false,
   supportsStreaming: true,
-  tier: "free"
+  tier: "free" as LLMTier
 }
 
 const CLAUDE_35_SONNET: LLM = {
@@ -141,32 +144,43 @@ const CLAUDE_35_SONNET: LLM = {
   imageInput: true,
   tools: true,
   supportsStreaming: true,
-  tier: "free"
+  tier: "pro" as LLMTier
 }
 
 ///other
-const LLAVA_YI_34b: LLM = {
-  modelId: "liuhaotian/llava-yi-34b",
-  modelName: "Llava-yi-34b",
+const DBRX_INSTRUCT: LLM = {
+  modelId: "databricks/dbrx-instruct",
+  modelName: "DBRX Instruct",
   provider: "openrouter",
-  hostedId: "llava-yi-34b",
+  hostedId: "dbrx-instruct",
   platformLink: OPENROUTER_PLATFORM_LINK,
-  imageInput: true,
+  imageInput: false,
   tools: false,
   supportsStreaming: true,
-  tier: "free"
+  tier: "free" as LLMTier
 }
 
-const FIRELLAVA_13b: LLM = {
-  modelId: "fireworks/firellava-13b",
-  modelName: "Firellava-13b",
+const MIXTRAL_8X22B: LLM = {
+  modelId: "mistralai/mixtral-8x22b-instruct",
+  modelName: "Mixtral 8x22B",
   provider: "openrouter",
-  hostedId: "firellava-13b",
+  hostedId: "mixtral-8x22b-instruct",
   platformLink: OPENROUTER_PLATFORM_LINK,
-  imageInput: true,
+  imageInput: false,
   tools: false,
   supportsStreaming: true,
-  tier: "free"
+  tier: "free" as LLMTier
+}
+const WIZARDLM_2_8X22B: LLM = {
+  modelId: "microsoft/wizardlm-2-8x22b",
+  modelName: "WizardLM 2 8x22B",
+  provider: "openrouter",
+  hostedId: "wizardlm-2-8x22b",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  tier: "free" as LLMTier
 }
 
 const META_LLAMA_3_1_405B: LLM = {
@@ -178,7 +192,7 @@ const META_LLAMA_3_1_405B: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  tier: "free"
+  tier: "free" as LLMTier
 }
 
 const LLAMA_3_1_SONAR_HUGE_128K_ONLINE: LLM = {
@@ -190,20 +204,7 @@ const LLAMA_3_1_SONAR_HUGE_128K_ONLINE: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  tier: "free"
-}
-
-const REFLECTION_70B: LLM = {
-  modelId: "mattshumer/reflection-70b",
-  modelName: "Reflection 70B",
-  provider: "openrouter",
-  hostedId: "reflection-70b",
-  platformLink: OPENROUTER_PLATFORM_LINK,
-  imageInput: false,
-  tools: false,
-  supportsStreaming: true,
-  tier: "free",
-  new: true
+  tier: "pro" as LLMTier
 }
 
 const DEEPSEEK_CHAT: LLM = {
@@ -215,7 +216,103 @@ const DEEPSEEK_CHAT: LLM = {
   imageInput: false,
   tools: false,
   supportsStreaming: true,
-  tier: "free"
+  tier: "free" as LLMTier
+}
+
+const LLAMA_32_90B_VISION: LLM = {
+  modelId: "meta-llama/llama-3.2-90b-vision-instruct",
+  modelName: "Llama 3.2 90B Vision",
+  provider: "openrouter",
+  hostedId: "llama-3.2-90b-vision-instruct",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: true,
+  tools: false,
+  supportsStreaming: true,
+  tier: "pro" as LLMTier
+}
+
+const LLAMA_32_11B_VISION: LLM = {
+  modelId: "meta-llama/llama-3.2-11b-vision-instruct",
+  modelName: "Llama 3.2 11B Vision",
+  provider: "openrouter",
+  hostedId: "llama-3.2-11b-vision-instruct",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: true,
+  tools: false,
+  supportsStreaming: true,
+  tier: "free" as LLMTier
+}
+
+const QWEN_25_72B: LLM = {
+  modelId: "qwen/qwen-2.5-72b-instruct",
+  modelName: "Qwen 2.5 72B",
+  provider: "openrouter",
+  hostedId: "qwen-2.5-72b-instruct",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  tier: "pro" as LLMTier
+}
+
+const QWEN_2_VL_72B: LLM = {
+  modelId: "qwen/qwen-2-vl-72b-instruct",
+  modelName: "Qwen 2 VL 72B",
+  provider: "openrouter",
+  hostedId: "qwen-2-vl-72b-instruct",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: true,
+  tools: false,
+  supportsStreaming: true,
+  tier: "pro" as LLMTier
+}
+
+const COHERE_COMMAND_R_PLUS: LLM = {
+  modelId: "cohere/command-r-plus-08-2024",
+  modelName: "Command-R Plus (08/2024)",
+  provider: "openrouter",
+  hostedId: "command-r-plus-08-2024",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  tier: "pro" as LLMTier
+}
+
+const COHERE_COMMAND_R: LLM = {
+  modelId: "cohere/command-r-08-2024",
+  modelName: "Command-R (08/2024)",
+  provider: "openrouter",
+  hostedId: "command-r-08-2024",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  tier: "free" as LLMTier
+}
+
+const GEMINI_FLASH_15_8B: LLM = {
+  modelId: "google/gemini-flash-1.5-8b",
+  modelName: "Gemini Flash 1.5 8B",
+  provider: "openrouter",
+  hostedId: "gemini-flash-1.5-8b",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  tier: "free" as LLMTier
+}
+
+const MYTHOMAX_13B: LLM = {
+  modelId: "mythic/mythomax-13b",
+  modelName: "Mythomax 13B",
+  provider: "openrouter",
+  hostedId: "mythomax-13b",
+  platformLink: OPENROUTER_PLATFORM_LINK,
+  imageInput: false,
+  tools: false,
+  supportsStreaming: true,
+  tier: "free" as LLMTier
 }
 
 export const OPENROUTER_LLM_LIST: LLM[] = [
@@ -227,14 +324,22 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
   GEMINI_PRO_15,
   GEMINI_PRO_15_EXP,
   GEMINI_FLASH_15_EXP,
+  GEMINI_FLASH_15_8B,
   CLAUDE_3_HAIKU,
   CLAUDE_35_SONNET,
-  LLAVA_YI_34b,
-  FIRELLAVA_13b,
   LLAMA_3_1_SONAR_HUGE_128K_ONLINE,
   META_LLAMA_3_1_405B,
-  REFLECTION_70B,
-  DEEPSEEK_CHAT
+  LLAMA_32_90B_VISION,
+  LLAMA_32_11B_VISION,
+  DEEPSEEK_CHAT,
+  QWEN_25_72B,
+  QWEN_2_VL_72B,
+  COHERE_COMMAND_R_PLUS,
+  COHERE_COMMAND_R,
+  DBRX_INSTRUCT,
+  MIXTRAL_8X22B,
+  WIZARDLM_2_8X22B,
+  MYTHOMAX_13B
 ]
 
 //- openai/gpt-4o-2024-08-06
@@ -244,8 +349,6 @@ export const OPENROUTER_LLM_LIST: LLM[] = [
 //- google/gemini-pro-1.5-exp
 //- google/gemini-flash-1.5-exp
 //- google/gemini-pro-vision
-//- liuhaotian/llava-yi-34b
-//- fireworks/firellava-13b
 //- anthropic/claude-3-haiku
 //- anthropic/claude-3.5-sonnet
 //- meta-llama/llama-3.1-405b-instruct

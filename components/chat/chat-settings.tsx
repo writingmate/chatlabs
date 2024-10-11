@@ -8,9 +8,9 @@ import { ToolSelect } from "@/components/tools/tool-select"
 import { cn } from "@/lib/utils"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ShareChatButton } from "@/components/chat/chat-share-button"
-import LanguageSwitcher from "../languageswitcher/LanguageSwitcher"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { ChatMessageCounter } from "./chat-message-counter"
 
 interface ChatSettingsProps {
   className?: string
@@ -77,7 +77,7 @@ export const ChatSettings: FC<ChatSettingsProps> = ({ className }) => {
 
   return (
     <div className={cn("flex items-center space-x-1", className)}>
-      <LanguageSwitcher />
+      <ChatMessageCounter />
 
       {/* New Text to Image Button */}
       {/* <button

@@ -11,6 +11,7 @@ import { ChatbotUIChatContext } from "@/context/chat"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { tr } from "date-fns/locale"
 import { useTranslation } from "react-i18next"
+import { Zap } from "lucide-react"
 
 interface ChatMessageCounterProps {}
 
@@ -87,39 +88,29 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
   }
 
   return (
-    <div className={"text-foreground/80 w-full p-2 text-center text-xs"}>
-      {limit - messageCount}/{limit} messages left today.
-      {userPlan === "free" && (
-        <>
-          {" "}
-          All generated images and web search results are public.{" "}
-          <Button
-            size={"xs"}
-            className={"px-0 text-xs"}
-            variant={"link"}
-            onClick={() => setIsPaywallOpen(true)}
-          >
-            Upgrade to Pro
-          </Button>
-        </>
-      )}
-      {userPlan === "pro" && (
-        <>
-          {" "}
-          To increase your message limit,{" "}
-          <Button
-            size={"xs"}
-            className={"px-0 text-xs"}
-            variant={"link"}
-            onClick={() => setIsPaywallOpen(true)}
-          >
-            upgrade to Ultimate
-          </Button>
-          .
-        </>
-      )}
+    <div className="variant-outline flex justify-end p-2">
+      <button
+        className="relative flex h-8 w-auto items-center justify-center rounded-full border border-purple-400 bg-gradient-to-r from-purple-500 to-blue-500 px-1.5 transition-all hover:border-pink-200 hover:from-purple-100 hover:to-pink-100"
+        onClick={() => setIsPaywallOpen(true)}
+      >
+        <span className="mr-1 font-light text-black">
+          <span className="text-xs">{limit - messageCount}</span>
+          <span className="text-[10px]">/{limit}</span>
+        </span>
+        <Zap
+          className="h-6 w-4 text-yellow-400"
+          fill="currentColor"
+          strokeWidth={0}
+        />
+      </button>
     </div>
   )
 }
 
 export { ChatMessageCounter }
+///<Badge variant="outline" className="relative overflow-hidden">
+//<span className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-600 opacity-10"></span>
+//<span className="relative bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+//{model.tier}
+///</span>
+///</Badge>

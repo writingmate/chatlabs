@@ -79,6 +79,7 @@ export type Category = {
   color?: string
 }
 
+export type LLMTier = "free" | "pro" | "ultimate"
 // Update the LLM interface to include categories
 export type OpenRouterLLMID =
   | "openai/o1-mini"
@@ -90,17 +91,22 @@ export type OpenRouterLLMID =
   | "google/gemini-pro-vision"
   | "google/gemini-flash-1.5-exp"
   | "google/gemini-pro-1.5-exp"
+  | "google/gemini-flash-1.5-8b"
   | "anthropic/claude-3-haiku"
   | "anthropic/claude-3.5-sonnet"
   | "databricks/dbrx-instruct"
   | "mistralai/mixtral-8x22b-instruct"
   | "microsoft/wizardlm-2-8x22b"
   | "meta-llama/llama-3.1-405b-instruct"
-  | "liuhaotian/llava-yi-34b"
-  | "fireworks/firellava-13b"
+  | "meta-llama/llama-3.2-90b-vision-instruct"
+  | "meta-llama/llama-3.2-11b-vision-instruct"
   | "perplexity/llama-3.1-sonar-huge-128k-online"
-  | "mattshumer/reflection-70b"
   | "deepseek/deepseek-chat"
+  | "qwen/qwen-2.5-72b-instruct"
+  | "qwen/qwen-2-vl-72b-instruct"
+  | "cohere/command-r-plus-08-2024"
+  | "cohere/command-r-08-2024"
+  | "mythic/mythomax-13b"
 
 export interface LLM {
   modelId: LLMID
@@ -131,5 +137,9 @@ export interface OpenRouterLLM extends LLM {
   tools: boolean
   supportsStreaming: boolean
   imageInput: boolean
+  description?: string
+  tags?: string[]
   new?: boolean
+  tier?: "free" | "pro" | "ultimate" | undefined
+  categories?: Category[]
 }

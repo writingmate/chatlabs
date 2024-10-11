@@ -38,9 +38,9 @@ export function validatePlanForModel(
   }
 
   // openrouter models are always allowed
-  if (model.includes("/")) {
-    return true
-  }
+  ///if (model.includes("/")) {
+  ///return false
+  ///}
 
   if (profile?.plan.startsWith("byok")) {
     return true

@@ -57,6 +57,7 @@ import { Callout, CalloutDescription, CalloutTitle } from "../ui/callout"
 import { Loader } from "lucide-react"
 import { ButtonWithTooltip } from "../ui/button-with-tooltip"
 import useTranslate from "@/lib/hooks/use-translate"
+import LanguageSwitcher from "../languageswitcher/LanguageSwitcher"
 
 interface ProfileSettingsProps {
   isCollapsed: boolean
@@ -454,6 +455,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                     onCheckedChange={setExperimentalCodeEditor}
                   />
                 </div>
+                <LanguageSwitcher />
               </form>
             </TabsContent>
 
