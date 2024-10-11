@@ -70,7 +70,7 @@ export const CodeViewerNavbar: FC<NavbarProps> = ({
   const downloadButtonRef = useRef<HTMLButtonElement>(null)
 
   return (
-    <div className="bg-accent text-foreground z-5 flex w-full items-center justify-between border-b px-4">
+    <div className="bg-accent text-foreground z-5 flex w-full items-center justify-between border-b p-1 px-4">
       <div className="flex items-center space-x-2">
         {showFullscreenButton && (
           <NavbarButton
