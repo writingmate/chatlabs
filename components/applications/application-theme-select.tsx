@@ -54,21 +54,21 @@ function ThemeSelectItem({ theme }: { theme: string }) {
       value={theme}
       className="flex w-full items-center justify-between p-0.5 text-sm capitalize"
     >
-      {/* @ts-ignore */}
       <div
         className="flex w-full items-center justify-between"
         style={{
-          fontFamily: daisyuiThemes[theme as DaisyUITheme]["font-sans"]
+          // @ts-ignore
+          fontFamily: daisyuiThemes[theme]["font-sans"]
         }}
       >
         <div>{theme}</div>
         <div className="flex items-center gap-1">
           {["bg-primary", "bg-secondary", "bg-accent", "bg-neutral"].map(
             color => (
-              // @ts-ignore
               <div
                 key={color}
                 className={cn("size-7 rounded-full")}
+                // @ts-ignore
                 style={{ backgroundColor: daisyuiThemes[theme][color] }}
               ></div>
             )
