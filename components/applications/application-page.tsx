@@ -13,6 +13,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { toast } from "sonner"
 import { updateChat } from "@/db/chats"
 import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
+import { Button } from "@/components/ui/button"
 
 interface ApplicationPageProps {
   application: Tables<"applications"> & {
@@ -282,14 +283,16 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState("chat")
   const [application, setApplication] = useState(defaultApplication)
-  const { allModels, tools } = useContext(ChatbotUIContext)
-  const { chatMessages, isGenerating } = useContext(ChatbotUIChatContext)
+  const { tools, chats, setChats } = useContext(ChatbotUIContext)
+  const { chatMessages, isGenerating, setChatSettings } =
+    useContext(ChatbotUIChatContext)
   const {
     selectedCodeBlock,
     handleSelectCodeBlock,
     handleCodeChange,
     isEditable
   } = useCodeBlockManager(chatMessages)
+  const [isSaving, setIsSaving] = useState(false) // Add state for save button loading
 
   const handleUpdateApplication = useCallback(
     (
@@ -298,55 +301,65 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
         models: LLMID[]
       }
     ) => {
-      ;(async () => {
-        try {
-          // split tools into platform and custom
-          const platformTools = tools.filter(
-            tool => tool.sharing === "platform"
-          )
-
-          const filteredSelectedTools = application.tools.filter(
-            tool =>
-              !platformTools.find(platformTool => platformTool.id === tool.id)
-          )
-
-          const selectedPlatformTools = tools.filter(tool =>
-            platformTools.find(platformTool => platformTool.id === tool.id)
-          )
-
-          await updateApplication(
-            updatedApplication.id,
-            {
-              name: updatedApplication.name,
-              description: updatedApplication.description,
-              theme: updatedApplication.theme,
-              sharing: updatedApplication.sharing,
-              user_id: updatedApplication.user_id,
-              workspace_id: updatedApplication.workspace_id
-            },
-            filteredSelectedTools.map(tool => tool.id),
-            selectedPlatformTools.map(tool => tool.id),
-            updatedApplication.models
-          )
-
-          const prompt = buildChatPrompt(updatedApplication)
-
-          setApplication(updatedApplication)
-          if (application.chat_id) {
-            await updateChat(application.chat_id, {
-              model: "gpt-4o",
-              prompt: prompt
-            })
-          }
-          toast.success("Application updated successfully")
-        } catch (error) {
-          toast.error("Failed to update application")
-          console.error("Failed to update application:", error)
-        }
-      })()
+      setApplication(updatedApplication)
     },
-    [allModels, application, application.models, application.tools]
+    []
   )
+
+  const handleSaveApplication = useCallback(async () => {
+    setIsSaving(true) // Set loading state
+    try {
+      // split tools into platform and custom
+      const platformTools = tools.filter(tool => tool.sharing === "platform")
+
+      const filteredSelectedTools = application.tools.filter(
+        tool => !platformTools.find(platformTool => platformTool.id === tool.id)
+      )
+
+      const selectedPlatformTools = application.tools.filter(tool =>
+        platformTools.find(platformTool => platformTool.id === tool.id)
+      )
+
+      const updatedApplication = await updateApplication(
+        application.id,
+        {
+          name: application.name,
+          description: application.description,
+          theme: application.theme,
+          sharing: application.sharing,
+          user_id: application.user_id,
+          workspace_id: application.workspace_id
+        },
+        filteredSelectedTools.map(tool => tool.id),
+        selectedPlatformTools.map(tool => tool.id),
+        application.models
+      )
+
+      setApplication(updatedApplication)
+
+      const prompt = buildChatPrompt(application)
+
+      if (application.chat_id) {
+        await updateChat(application.chat_id, {
+          model: "gpt-4o",
+          prompt: prompt
+        })
+        setChats(prev =>
+          prev.map(chat =>
+            chat.id === application.chat_id
+              ? { ...chat, model: "gpt-4o", prompt }
+              : chat
+          )
+        )
+      }
+      toast.success("Application saved successfully")
+    } catch (error) {
+      toast.error("Failed to save application")
+      console.error("Failed to save application:", error)
+    } finally {
+      setIsSaving(false) // Reset loading state
+    }
+  }, [application, tools])
 
   const handleChatCreate = useCallback(
     async (chat: Tables<"chats">) => {
@@ -366,7 +379,7 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="mx-auto flex h-full grow flex-col p-4"
+          className="mx-auto flex h-full grow flex-col pt-2"
         >
           <TabsList className="mx-auto">
             <TabsTrigger value="chat">Chat</TabsTrigger>
@@ -387,9 +400,14 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
             <UpdateApplication
               className="mx-auto max-w-[600px]"
               application={application}
-              //@ts-ignore
+              // @ts-ignore
               onUpdateApplication={handleUpdateApplication}
             />
+            <div className="mx-auto mt-4 max-w-[600px]">
+              <Button loading={isSaving} onClick={handleSaveApplication}>
+                Save
+              </Button>
+            </div>
           </TabsContent>
         </Tabs>
         <ChatPreviewContent
@@ -411,7 +429,8 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
       handleSelectCodeBlock,
       handleCodeChange,
       isEditable,
-      application.theme
+      application.theme,
+      isSaving // Add isSaving to dependencies
     ]
   )
 }

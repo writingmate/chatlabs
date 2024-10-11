@@ -69,7 +69,7 @@ export const MessageMarkdown: FC<MessageMarkdownProps> = ({
         onSelectCodeBlock?.(block)
       }
     },
-    [experimental_code_editor, onSelectCodeBlock]
+    [experimental_code_editor, onSelectCodeBlock, codeBlocks]
   )
 
   const contentParts = useMemo(() => {

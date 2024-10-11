@@ -40,46 +40,34 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
 
   const isMobile = isMobileScreen()
 
-  return useMemo(
-    () =>
-      chatMessages
-        .sort((a, b) => a.message.sequence_number - b.message.sequence_number)
-        .map((chatMessage, index, array) => {
-          const messageFileItems = chatFileItems.filter(
-            (chatFileItem, _, self) =>
-              chatMessage.fileItems.includes(chatFileItem.id) &&
-              self.findIndex(item => item.id === chatFileItem.id) === _
-          )
+  return chatMessages
+    .sort((a, b) => a.message.sequence_number - b.message.sequence_number)
+    .map((chatMessage, index, array) => {
+      const messageFileItems = chatFileItems.filter(
+        (chatFileItem, _, self) =>
+          chatMessage.fileItems.includes(chatFileItem.id) &&
+          self.findIndex(item => item.id === chatFileItem.id) === _
+      )
 
-          return (
-            <Message
-              isGenerating={isGenerating}
-              setIsGenerating={setIsGenerating}
-              firstTokenReceived={firstTokenReceived}
-              key={index}
-              codeBlocks={chatMessage.codeBlocks}
-              message={chatMessage.message}
-              fileItems={messageFileItems}
-              isEditing={editingMessage?.id === chatMessage.message.id}
-              isLast={index === array.length - 1}
-              onStartEdit={setEditingMessage}
-              onCancelEdit={() => setEditingMessage(undefined)}
-              onSubmitEdit={handleSendEdit}
-              onSelectCodeBlock={onSelectCodeBlock}
-              onRegenerate={handleRegenerate}
-              showResponseTime={false}
-              isExperimentalCodeEditor={isExperimentalCodeEditor}
-            />
-          )
-        }),
-    [
-      chatMessages,
-      chatFileItems,
-      editingMessage,
-      isGenerating,
-      firstTokenReceived,
-      onSelectCodeBlock,
-      isMobile
-    ]
-  )
+      return (
+        <Message
+          isGenerating={isGenerating}
+          setIsGenerating={setIsGenerating}
+          firstTokenReceived={firstTokenReceived}
+          key={index}
+          codeBlocks={chatMessage.codeBlocks}
+          message={chatMessage.message}
+          fileItems={messageFileItems}
+          isEditing={editingMessage?.id === chatMessage.message.id}
+          isLast={index === array.length - 1}
+          onStartEdit={setEditingMessage}
+          onCancelEdit={() => setEditingMessage(undefined)}
+          onSubmitEdit={handleSendEdit}
+          onSelectCodeBlock={onSelectCodeBlock}
+          onRegenerate={handleRegenerate}
+          showResponseTime={false}
+          isExperimentalCodeEditor={isExperimentalCodeEditor}
+        />
+      )
+    })
 }

@@ -60,7 +60,6 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
       React.SetStateAction<Tables<"files">[]>
     >
   ) => {
-    console.log("files", files)
     setSelectedAssistantFiles(files)
   }
 
@@ -70,7 +69,6 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
       React.SetStateAction<Tables<"collections">[]>
     >
   ) => {
-    console.log("collections", collections)
     setSelectedAssistantCollections(collections)
   }
 
@@ -80,7 +78,6 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
       React.SetStateAction<Tables<"tools">[]>
     >
   ) => {
-    console.log(tools)
     // tools is an array of tools currently selected
     // prevState is an array of tools previously selected
     setSelectedAssistantTools(tools)

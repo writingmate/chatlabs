@@ -1,12 +1,9 @@
 import { ModelIcon } from "@/components/models/model-icon"
-import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ChatbotUIContext } from "@/context/context"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { LLM } from "@/types"
-import { IconRobotFace } from "@tabler/icons-react"
-import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
 import { FC, useContext, useMemo, useRef } from "react"
 import { DeleteChat } from "./delete-chat"
@@ -56,10 +53,6 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     ...availableLocalModels,
     ...availableOpenRouterModels
   ].find(llm => llm.modelId === chat.model) as LLM
-
-  const assistantImage = assistantImages.find(
-    image => image.assistantId === chat.assistant_id
-  )?.base64
 
   const assistant = chat.assistant_id
     ? assistants.find(a => a.id === chat.assistant_id)

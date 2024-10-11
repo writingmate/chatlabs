@@ -1,9 +1,15 @@
+import { cn } from "@/lib/utils"
 import React from "react"
 
 interface DescriptionProps {
   children: React.ReactNode
+  className?: string
 }
 
-export function Description({ children }: DescriptionProps) {
-  return <p className="mt-1 text-xs text-gray-500">{children}</p>
+export function Description({ children, className }: DescriptionProps) {
+  return (
+    <p className={cn("text-muted-foreground mt-1 text-xs", className)}>
+      {children}
+    </p>
+  )
 }

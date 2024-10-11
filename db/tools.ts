@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
 import { platformToolDefinitionById } from "./platform-tools"
+import { SupabaseClient } from "@supabase/supabase-js"
 
 export const getToolOrPlatformToolById = async (toolId: string) => {
   try {
@@ -10,15 +11,18 @@ export const getToolOrPlatformToolById = async (toolId: string) => {
   }
 }
 
-export const getToolById = async (toolId: string) => {
-  const { data: tool, error } = await supabase
+export const getToolById = async (
+  toolId: string,
+  client: SupabaseClient = supabase
+) => {
+  const { data: tool, error } = await client
     .from("tools")
     .select("*")
     .eq("id", toolId)
     .single()
 
   if (!tool) {
-    throw new Error(error.message)
+    throw new Error(error?.message || "Tool not found")
   }
 
   return tool

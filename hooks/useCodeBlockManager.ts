@@ -5,10 +5,9 @@ import { ChatMessage } from "@/types"
 import { updateMessage } from "@/db/messages"
 import { reconstructContentWithCodeBlocks } from "@/lib/messages"
 
-export function useCodeBlockManager(chatMessages: ChatMessage[]) {
+export function useCodeBlockManager(ignore: ChatMessage[]) {
     const [selectedCodeBlock, setSelectedCodeBlock] = useState<CodeBlock | null>(null)
-    const { isGenerating, setChatMessages } = useContext(ChatbotUIChatContext)
-
+    const { isGenerating, chatMessages, setChatMessages } = useContext(ChatbotUIChatContext)
 
 
     const isEditable = useMemo(() => {
@@ -29,47 +28,44 @@ export function useCodeBlockManager(chatMessages: ChatMessage[]) {
         setSelectedCodeBlock(codeBlock)
     }, [])
 
-    const handleCodeChange = useCallback((updatedCode: string): void => {
-        if (selectedCodeBlock && isEditable) {
-            const updatedMessage = chatMessages.find(
-                message => message.message?.id === selectedCodeBlock.messageId
-            )
-            if (
-                updatedMessage &&
-                updatedMessage.codeBlocks &&
-                updatedMessage.codeBlocks.length > 0
-            ) {
-                const updatedCodeBlock = {
-                    ...updatedMessage.codeBlocks[updatedMessage.codeBlocks.length - 1],
-                    code: updatedCode
-                }
-                updatedMessage.codeBlocks[updatedMessage.codeBlocks.length - 1] = updatedCodeBlock
+    const handleCodeChange = useCallback((updatedCode: string, messageId: string, sequenceNo: number): void => {
+        console.log("handleCodeChange", messageId, sequenceNo)
 
-                setChatMessages(prev => {
-                    const updatedMessages = [...prev]
-                    const index = updatedMessages.findIndex(
-                        message => message.message?.id === selectedCodeBlock.messageId
-                    )
-                    if (index !== -1) {
-                        updatedMessages[index] = updatedMessage
-                    }
-                    return updatedMessages
-                })
-                handleSelectCodeBlock(updatedCodeBlock)
-                updateMessage(updatedMessage.message!.id, {
-                    content: reconstructContentWithCodeBlocks(
-                        updatedMessage.message?.content || "",
-                        updatedMessage.codeBlocks
-                    )
-                })
+        const updatedMessage = chatMessages.find(
+            message => message.message?.id === messageId
+        )
+
+        console.log("updatedMessage", updatedMessage)
+        const codeBlock = updatedMessage?.codeBlocks?.[sequenceNo]
+
+        console.log("codeBlock", codeBlock)
+        if (updatedMessage && updatedMessage.codeBlocks && codeBlock) {
+            const updatedCodeBlock = {
+                ...codeBlock,
+                code: updatedCode
             }
+
+            updatedMessage.codeBlocks[sequenceNo] = updatedCodeBlock
+
+            setChatMessages(prev => {
+                const updatedMessages = [...prev]
+                const index = updatedMessages.findIndex(
+                    message => message.message?.id === updatedMessage.message?.id
+                )
+                if (index !== -1) {
+                    updatedMessages[index] = updatedMessage
+                }
+                return updatedMessages
+            })
+            handleSelectCodeBlock(updatedCodeBlock)
+            updateMessage(updatedMessage.message!.id, {
+                content: reconstructContentWithCodeBlocks(
+                    updatedMessage.message?.content || "",
+                    updatedMessage.codeBlocks
+                )
+            })
         }
-    }, [selectedCodeBlock, isEditable, chatMessages, setChatMessages])
-
-
-    // set is editable only if the codeBlock is the latest code block of the latest message
-
-
+    }, [chatMessages, setChatMessages])
 
     useEffect(() => {
         if (chatMessages.length === 0) {

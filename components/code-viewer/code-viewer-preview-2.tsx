@@ -12,6 +12,7 @@ import { UITheme } from "./theme-configurator"
 import { updateHtml } from "@/lib/code-viewer"
 import { CodeBlock } from "@/types"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { ButtonWithTooltip } from "../ui/button-with-tooltip"
 
 interface PreviewProps2 {
   codeBlock: CodeBlock
@@ -316,28 +317,30 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
       </div>
       {showFooter && (
         <div className="bg-accent text-foreground flex items-center justify-end space-x-3 p-3 px-4">
-          <Button
+          <ButtonWithTooltip
+            tooltip="Highlight elements to chat about them"
+            variant="link"
             size={"icon"}
-            variant={"link"}
             className={cn(
-              "size-5 hover:opacity-50 active:opacity-75",
-              inspectMode && "text-violet-500"
+              "size-6 hover:opacity-50 active:opacity-75",
+              inspectMode && "bg-violet-500/20 text-violet-500"
             )}
             onClick={() => setInspectMode(!inspectMode)}
           >
             <IconClick size={16} stroke={1.5} />
-          </Button>
-          <Button
+          </ButtonWithTooltip>
+          <ButtonWithTooltip
+            tooltip="Toggle Console"
             variant="link"
             size={"icon"}
             className={cn(
-              "console-toggle size-5 hover:opacity-50 active:opacity-75",
-              isConsoleExpanded && "text-violet-500"
+              "console-toggle size-6 hover:opacity-50 active:border-violet-500 active:opacity-75",
+              isConsoleExpanded && "bg-violet-500/20 text-violet-500"
             )}
             onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
           >
             <IconTerminal2 size={16} stroke={1.5} />
-          </Button>
+          </ButtonWithTooltip>
         </div>
       )}
     </div>

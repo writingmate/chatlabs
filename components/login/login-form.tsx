@@ -11,6 +11,11 @@ import { Input } from "@/components/ui/input"
 import { IconMail } from "@tabler/icons-react"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
+import { Description } from "../ui/description"
+import { cn } from "@/lib/utils"
+// @ts-ignore
+import disposableEmail from "disposable-email"
+import { DISPOSABLE_EMAILS } from "@/lib/disposable-emails"
 
 export default function LoginForm({
   redirectTo,
@@ -23,6 +28,19 @@ export default function LoginForm({
   const [email, setEmail] = useState("")
   const [disabled, setDisabled] = useState(false)
   const params = useSearchParams()
+  const [validEmail, setValidEmail] = useState(true)
+
+  function validateEmail(email: string) {
+    const domain = email.split("@")?.[1]
+    if (!domain) {
+      return false
+    }
+    // additional disposable emails
+    if (DISPOSABLE_EMAILS.includes(domain)) {
+      return false
+    }
+    return disposableEmail.validate(email)
+  }
 
   redirectTo = params.get("next") || redirectTo
 
@@ -111,6 +129,11 @@ export default function LoginForm({
       e.preventDefault()
       e.stopPropagation()
       setDisabled(true)
+      if (!validateEmail(email)) {
+        setValidEmail(false)
+        return
+      }
+      setValidEmail(true)
       const { error } = await supabase.auth.signInWithOtp({
         email: email,
         options: {
@@ -161,9 +184,14 @@ export default function LoginForm({
           type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className="rounded-lg"
+          className={cn("rounded-lg", !validEmail && "border-red-500")}
           placeholder={"Enter your company email"}
         />
+        {!validEmail && (
+          <Description className="text-center text-red-500">
+            Invalid email. Disposable email providers are not supported.
+          </Description>
+        )}
         <Button
           disabled={disabled}
           variant={"outline"}
@@ -173,6 +201,11 @@ export default function LoginForm({
           <IconMail height={20} width={20} stroke={1.5} className="mr-2" />
           Continue with email
         </Button>
+        <Description className="text-center">
+          Disposable email providers are not supported.
+          <br />
+          We will send you a login link to your email.
+        </Description>
       </form>
     </div>
   )
