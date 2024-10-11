@@ -36,41 +36,7 @@ import {
 } from "../ui/callout"
 import { IconAlertTriangle } from "@tabler/icons-react"
 import { CreateTool } from "../sidebar/items/tools/create-tool"
-
-const themes = [
-  "light",
-  "dark",
-  "cupcake",
-  "bumblebee",
-  "emerald",
-  "corporate",
-  "synthwave",
-  "retro",
-  "cyberpunk",
-  "valentine",
-  "halloween",
-  "garden",
-  "forest",
-  "aqua",
-  "lofi",
-  "pastel",
-  "fantasy",
-  "wireframe",
-  "black",
-  "luxury",
-  "dracula",
-  "cmyk",
-  "autumn",
-  "business",
-  "acid",
-  "lemonade",
-  "night",
-  "coffee",
-  "winter",
-  "dim",
-  "nord",
-  "sunset"
-]
+import { ApplicationThemeSelect } from "./application-theme-select"
 
 interface UpdateApplicationProps {
   className?: string
@@ -248,21 +214,10 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
       {application.application_type === "web_app" && (
         <div>
           <Label htmlFor="theme">Theme</Label>
-          <Select
-            value={application.theme || "light"}
-            onValueChange={value => handleChange("theme", value)}
-          >
-            <SelectTrigger className="capitalize">
-              <SelectValue placeholder="Select theme" />
-            </SelectTrigger>
-            <SelectContent>
-              {themes.map(t => (
-                <SelectItem key={t} value={t} className="capitalize">
-                  {t}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <ApplicationThemeSelect
+            application={application as Tables<"applications">}
+            handleChange={handleChange}
+          />
           <Description>
             Select a visual theme for your web app. Only available for Web App
             type applications.

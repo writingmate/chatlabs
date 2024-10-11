@@ -162,6 +162,7 @@
     "@types/xmldom": "^0.1.34",
     "autoprefixer": "^10.4.16",
     "clsx": "^2.0.0",
+    "daisyui": "^4.12.13",
     "eslint": "^8",
     "eslint-config-next": "^14.0.2",
     "eslint-config-prettier": "^9.1.0",

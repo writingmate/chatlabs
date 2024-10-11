@@ -216,7 +216,7 @@ export abstract class BaseImageGenerator extends BaseTool {
   protected getToolFunctions(): ToolFunction[] {
     return [
       {
-        id: `imageGenerationVia${this.constructor.name}`,
+        id: `imageGenerationVia${this.toolName}`,
         toolFunction: this.generate.bind(this),
         resultProcessingMode: "render_markdown",
         description: `Generate images using ${this.name} based on a text description. 
