@@ -11,7 +11,7 @@ import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completion
 import { OPENAI_LLM_LIST } from "@/lib/models/llm/openai-llm-list"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 
-export const runtime: ServerRuntime = "edge"
+export const maxDuration = 300
 
 function dropSystemMessage(messages: any[]) {
   return messages.filter((message: any) => message.role !== "system")
