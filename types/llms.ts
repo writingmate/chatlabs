@@ -55,19 +55,11 @@ export type GroqLLMID =
 // Perplexity Models (UPDATED 1/31/24)
 
 export type PerplexityLLMID =
-  | "pplx-7b-online" // Perplexity Online 7B
-  | "pplx-70b-online" // Perplexity Online 70B
-  | "pplx-7b-chat" // Perplexity Chat 7B
-  | "pplx-70b-chat" // Perplexity Chat 70B
-  | "mixtral-8x7b-instruct" // Mixtral 8x7B Instruct
-  | "mistral-7b-instruct" // Mistral 7B Instruct
-  | "llama-2-70b-chat" // Llama2 70B Chat
-  | "codellama-34b-instruct" // CodeLlama 34B Instruct
-  | "codellama-70b-instruct" // CodeLlama 70B Instruct
-  | "llama-3-sonar-small-32k-chat" // Sonar Small Chat
-  | "llama-3-sonar-small-32k-online" // Sonar Small Online
-  | "llama-3-sonar-large-32k-chat" // Sonar Medium Chat
-  | "llama-3-sonar-large-32k-online" // Sonar Medium Online
+  | "llama-3.1-sonar-small-128k-online" // Sonar Small Chat
+  | "llama-3.1-sonar-large-128k-online" // Sonar Small Online
+  | "llama-3.1-sonar-huge-128k-online" // Sonar Medium Chat
+  | "llama-3.1-sonar-small-128k-chat" // Sonar Medium Online
+  | "llama-3.1-sonar-large-128k-chat" // Sonar Large Online
 
 // Add this new type definition
 export type Category = {
