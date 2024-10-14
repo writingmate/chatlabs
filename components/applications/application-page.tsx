@@ -242,7 +242,10 @@ const generateToolsSchema = (tools: Tables<"tools">[]) => {
     const schema = JSON.parse(tool.schema as string)
     schema.servers = [
       {
-        url: "/api/tools/" + tool.id
+        url:
+          tool.sharing === "platform"
+            ? "/api/tools/" + tool.id
+            : "/api/proxy/" + tool.id
       }
     ]
     return {
@@ -306,60 +309,65 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
     []
   )
 
-  const handleSaveApplication = useCallback(async () => {
-    setIsSaving(true) // Set loading state
-    try {
-      // split tools into platform and custom
-      const platformTools = tools.filter(tool => tool.sharing === "platform")
+  const handleSaveApplication = useCallback(
+    async (activeTab: "chat" | "edit") => {
+      setIsSaving(true) // Set loading state
+      try {
+        // split tools into platform and custom
+        const platformTools = tools.filter(tool => tool.sharing === "platform")
 
-      const filteredSelectedTools = application.tools.filter(
-        tool => !platformTools.find(platformTool => platformTool.id === tool.id)
-      )
-
-      const selectedPlatformTools = application.tools.filter(tool =>
-        platformTools.find(platformTool => platformTool.id === tool.id)
-      )
-
-      const updatedApplication = await updateApplication(
-        application.id,
-        {
-          name: application.name,
-          description: application.description,
-          theme: application.theme,
-          sharing: application.sharing,
-          user_id: application.user_id,
-          workspace_id: application.workspace_id
-        },
-        filteredSelectedTools.map(tool => tool.id),
-        selectedPlatformTools.map(tool => tool.id),
-        application.models
-      )
-
-      setApplication(updatedApplication)
-
-      const prompt = buildChatPrompt(application)
-
-      if (application.chat_id) {
-        await updateChat(application.chat_id, {
-          model: "gpt-4o",
-          prompt: prompt
-        })
-        setChats(prev =>
-          prev.map(chat =>
-            chat.id === application.chat_id
-              ? { ...chat, model: "gpt-4o", prompt }
-              : chat
-          )
+        const filteredSelectedTools = application.tools.filter(
+          tool =>
+            !platformTools.find(platformTool => platformTool.id === tool.id)
         )
+
+        const selectedPlatformTools = application.tools.filter(tool =>
+          platformTools.find(platformTool => platformTool.id === tool.id)
+        )
+
+        const updatedApplication = await updateApplication(
+          application.id,
+          {
+            name: application.name,
+            description: application.description,
+            theme: application.theme,
+            sharing: application.sharing,
+            user_id: application.user_id,
+            workspace_id: application.workspace_id
+          },
+          filteredSelectedTools.map(tool => tool.id),
+          selectedPlatformTools.map(tool => tool.id),
+          application.models
+        )
+
+        setApplication(updatedApplication)
+
+        const prompt = buildChatPrompt(application)
+
+        if (application.chat_id) {
+          await updateChat(application.chat_id, {
+            model: "gpt-4o",
+            prompt: prompt
+          })
+          setChats(prev =>
+            prev.map(chat =>
+              chat.id === application.chat_id
+                ? { ...chat, model: "gpt-4o", prompt }
+                : chat
+            )
+          )
+        }
+        setActiveTab(activeTab)
+        toast.success("Application saved successfully")
+      } catch (error) {
+        toast.error("Failed to save application")
+        console.error("Failed to save application:", error)
+      } finally {
+        setIsSaving(false) // Reset loading state
       }
-      toast.success("Application saved successfully")
-    } catch (error) {
-      toast.error("Failed to save application")
-      console.error("Failed to save application:", error)
-    } finally {
-      setIsSaving(false) // Reset loading state
-    }
-  }, [application, tools])
+    },
+    [application, tools]
+  )
 
   const handleChatCreate = useCallback(
     async (chat: Tables<"chats">) => {
@@ -403,9 +411,19 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
               // @ts-ignore
               onUpdateApplication={handleUpdateApplication}
             />
-            <div className="mx-auto mt-4 max-w-[600px]">
-              <Button loading={isSaving} onClick={handleSaveApplication}>
+            <div className="mx-auto mt-4 flex max-w-[600px] gap-2">
+              <Button
+                loading={isSaving}
+                onClick={() => handleSaveApplication("edit")}
+              >
                 Save
+              </Button>
+              <Button
+                variant="outline"
+                loading={isSaving}
+                onClick={() => handleSaveApplication("chat")}
+              >
+                Save and Chat
               </Button>
             </div>
           </TabsContent>

@@ -56,9 +56,28 @@ async function handleRequest(
 
     const supabase = createClient(cookies())
 
-    const headers = Object.fromEntries(request.headers)
-    const body =
-      method !== "GET" && method !== "HEAD" ? await request.json() : undefined
+    let headers: Record<string, string> = Object.fromEntries(request.headers)
+    let body: any
+
+    // Handle different content types for POST requests
+    if (method === "POST") {
+      const contentType = request.headers.get("content-type")
+      if (
+        contentType &&
+        contentType.includes("application/x-www-form-urlencoded")
+      ) {
+        const formData = await request.formData()
+        body = Object.fromEntries(formData)
+      } else if (contentType && contentType.includes("multipart/form-data")) {
+        body = await request.formData()
+      } else {
+        // Assume JSON for other content types
+        body = await request.json()
+      }
+    } else if (method !== "GET" && method !== "HEAD") {
+      body = await request.json()
+    }
+
     const path = `/${pathSegments?.join("/") || ""}`
 
     // 1. Grab tool by id
@@ -151,7 +170,12 @@ async function handleRequest(
       logger.debug({ schema }, `Invoking regular tool function: ${operationId}`)
       const schemaDetail = {
         url: schema?.servers?.[0]?.url || tool.url,
-        headers: tool.custom_headers,
+        headers: {
+          ...headers,
+          ...(tool.custom_headers
+            ? JSON.parse(tool.custom_headers as string)
+            : {})
+        },
         routeMap: { [path]: operationId },
         requestInBodyMap: { [path]: method !== "GET" && method !== "HEAD" }
       }
@@ -171,7 +195,7 @@ async function handleRequest(
       return NextResponse.json(result)
     }
   } catch (error: any) {
-    logger.error(`Error handling tool request: ${error.message}`)
+    logger.error(`Error handling tool request: ${error.message}:${error.stack}`)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
