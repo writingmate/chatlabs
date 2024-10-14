@@ -101,9 +101,9 @@ async function handleRequest(
     }
 
     // 6. Prepare request for proxying or execution
-    // @ts-ignore
     const targetUrl = new URL(
       matchedRoute.route,
+      // @ts-ignore
       schema?.servers?.[0]?.url || tool.url
     )
 
