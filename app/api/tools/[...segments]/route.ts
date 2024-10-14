@@ -45,7 +45,7 @@ export async function DELETE(
   return handleRequest(request, params.segments, "DELETE")
 }
 
-export async function handleRequest(
+async function handleRequest(
   request: NextRequest,
   segments: string[],
   method: string

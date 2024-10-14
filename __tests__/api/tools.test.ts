@@ -7,7 +7,7 @@ jest.mock('next/headers', () => ({
 jest.mock('../../lib/platformTools/utils/platformToolsUtils')
 
 import { NextRequest, NextResponse } from 'next/server'
-import { handleRequest } from '../../app/api/tools/[...segments]/route'
+import { GET, POST, PUT, PATCH, DELETE } from '../../app/api/tools/[...segments]/route'
 import { createClient } from '../../lib/supabase/server'
 import { getToolById } from '../../db/tools'
 import { platformToolDefinitions, platformToolFunctionSpec } from '../../lib/platformTools/utils/platformToolsUtils'
@@ -61,7 +61,7 @@ describe('Proxy API', () => {
             method: 'GET',
         } as unknown as NextRequest;
 
-        const response = await handleRequest(mockNextRequest, ['test-tool', 'test'], 'GET');
+        const response = await GET(mockNextRequest, { params: { segments: ['test-tool', 'test'] } });
 
         expect(getToolById).toHaveBeenCalledWith('test-tool', expect.anything());
         expect(global.fetch).toHaveBeenCalledWith("https://api.example.com/test", {
@@ -109,7 +109,7 @@ describe('Proxy API', () => {
             headers: new Headers(),
         } as unknown as NextRequest;
 
-        const response = await handleRequest(mockRequest, ['platform-tool', 'test'], 'GET');
+        const response = await GET(mockRequest, { params: { segments: ['platform-tool', 'test'] } });
 
         expect(getToolById).toHaveBeenCalledWith('platform-tool', expect.anything());
         expect(platformToolDefinitions).toHaveBeenCalled();
@@ -155,7 +155,7 @@ describe('Proxy API', () => {
             formData: () => Promise.resolve(formData),
         } as unknown as NextRequest;
 
-        const response = await handleRequest(mockRequest, ['form-tool', 'form'], 'POST');
+        const response = await POST(mockRequest, { params: { segments: ['form-tool', 'form'] } });
 
         expect(getToolById).toHaveBeenCalledWith('form-tool', expect.anything());
         expect(global.fetch).toHaveBeenCalledWith(
