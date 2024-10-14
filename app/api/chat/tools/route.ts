@@ -10,12 +10,7 @@ import {
 } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
-import {
-  AnthropicStream,
-  experimental_StreamData,
-  OpenAIStream,
-  StreamingTextResponse
-} from "ai"
+import { experimental_StreamData, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import Anthropic from "@anthropic-ai/sdk"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"

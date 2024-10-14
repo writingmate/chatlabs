@@ -13,6 +13,7 @@ import { updateHtml } from "@/lib/code-viewer"
 import { CodeBlock } from "@/types"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ButtonWithTooltip } from "../ui/button-with-tooltip"
+import { logger } from "@/lib/logger"
 
 interface PreviewProps2 {
   codeBlock: CodeBlock
@@ -113,14 +114,20 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
       const originalFetch = iframeWindow.fetch
 
       iframeWindow.fetch = async (...args) => {
-        const response = await originalFetch(...args).catch(error => {
-          let appendixErrorMessage = ""
-          setErrors(prevErrors => [
-            ...prevErrors,
-            `[ERROR] Failed to fetch: ${error}. ${appendixErrorMessage}`
-          ])
-          return Promise.reject(error)
-        })
+        const response = await originalFetch(...args)
+          .then(response => {
+            if (response.status >= 400) {
+              return Promise.reject(response)
+            }
+            return response
+          })
+          .catch(error => {
+            setErrors(prevErrors => [
+              ...prevErrors,
+              `[ERROR] Failed to fetch: ${JSON.stringify(error)}. ${JSON.stringify(args)}`
+            ])
+            return Promise.reject(error)
+          })
 
         return response
       }
