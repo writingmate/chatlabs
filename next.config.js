@@ -21,7 +21,8 @@ const newrelicConfig = {
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    // unoptimized: true,
+    loader: 'custom',
+    loaderFile: './imageLoader.js',
     remotePatterns: [
       {
         protocol: "http",

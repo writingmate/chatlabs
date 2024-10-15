@@ -1,4 +1,4 @@
-import { getFileByHashId } from "@/db/files"
+import { getFileByHashId, getFileById } from "@/db/files"
 import { notFound } from "next/navigation"
 import {
   IconExternalLink,
@@ -14,6 +14,7 @@ import { REGEX_FILENAME } from "@/lib/preview"
 import { updateHtml } from "@/lib/code-viewer"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { getFileByAppSlug } from "@/db/applications"
 
 interface SharePageProps {
   params: {
@@ -27,7 +28,7 @@ interface SharePageProps {
 export async function generateMetadata({
   params: { file_id }
 }: SharePageProps) {
-  const file = await getFileByHashId(file_id)
+  const file = await getFileByIdOrHashIdOrAppSlug(file_id)
 
   return {
     title: `${file?.name} - Created with ChatLabs`,
@@ -45,6 +46,24 @@ function parseBoolean(value: string | boolean | undefined) {
   return !!value
 }
 
+async function getFileByIdOrHashIdOrAppSlug(idOrHashIdOrAppSlug: string) {
+  try {
+    const file = await getFileByHashId(idOrHashIdOrAppSlug)
+    if (file) {
+      return file
+    }
+  } catch (error) {
+    try {
+      const file = await getFileById(idOrHashIdOrAppSlug)
+      if (file) {
+        return file
+      }
+    } catch (error) {
+      return await getFileByAppSlug(idOrHashIdOrAppSlug)
+    }
+  }
+}
+
 const SharePage = async ({
   params: { file_id },
   searchParams: { __show_banner = true }
@@ -52,7 +71,7 @@ const SharePage = async ({
   const showBanner = parseBoolean(__show_banner)
   let file
   try {
-    file = await getFileByHashId(file_id)
+    file = await getFileByIdOrHashIdOrAppSlug(file_id)
 
     if (
       !file ||

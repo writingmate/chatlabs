@@ -8,12 +8,13 @@ import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
 import { Tables } from "@/supabase/types"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { updateApplication, updateApplicationChatId } from "@/db/applications"
-import { LLMID } from "@/types"
+import { CodeBlock, LLMID } from "@/types"
 import { ChatbotUIContext } from "@/context/context"
 import { toast } from "sonner"
 import { updateChat } from "@/db/chats"
 import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
 import { Button } from "@/components/ui/button"
+import { el } from "date-fns/locale"
 
 interface ApplicationPageProps {
   application: Tables<"applications"> & {
@@ -306,6 +307,20 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
     []
   )
 
+  const localHandleSelectCodeBlock = useCallback(
+    (codeBlock: CodeBlock | null) => {
+      if (codeBlock) {
+        handleSelectCodeBlock({
+          ...codeBlock,
+          applicationId: application.id
+        })
+      } else {
+        handleSelectCodeBlock(null)
+      }
+    },
+    [handleSelectCodeBlock, application]
+  )
+
   const handleSaveApplication = useCallback(
     async (activeTab: "chat" | "edit") => {
       setIsSaving(true) // Set loading state
@@ -396,7 +411,7 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
               showModelSelector={false}
               showChatSettings={false}
               showAssistantSelector={false}
-              onSelectCodeBlock={handleSelectCodeBlock}
+              onSelectCodeBlock={localHandleSelectCodeBlock}
               onChatCreate={handleChatCreate}
               experimentalCodeEditor={true}
             />

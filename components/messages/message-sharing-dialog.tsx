@@ -14,10 +14,12 @@ import { IconExternalLink, IconShare3, IconWorld } from "@tabler/icons-react"
 import Link from "next/link"
 
 import { CopyButton } from "@/components/ui/copy-button"
+import { CodeBlock } from "@/types"
+import { createApplicationFiles } from "@/db/applications"
 
 interface MessageSharingDialogProps {
   user: any
-  fileContent: string
+  codeBlock: CodeBlock
   selectedWorkspace: any
   chatSettings: any
   defaultFilename: string
@@ -27,7 +29,7 @@ interface MessageSharingDialogProps {
 
 export function MessageSharingDialog({
   user,
-  fileContent,
+  codeBlock,
   selectedWorkspace,
   chatSettings,
   defaultFilename,
@@ -41,7 +43,7 @@ export function MessageSharingDialog({
   useEffect(() => {
     setFilename(defaultFilename)
     setUrl("")
-  }, [fileContent])
+  }, [codeBlock])
 
   const handleShare = () => {
     if (!selectedWorkspace || !chatSettings || !user) {
@@ -51,9 +53,13 @@ export function MessageSharingDialog({
 
     setLoading(true)
 
-    const htmlFile: File = new File([fileContent], filename || "index.html", {
-      type: "text/html"
-    })
+    const htmlFile: File = new File(
+      [codeBlock.code],
+      filename || "index.html",
+      {
+        type: "text/html"
+      }
+    )
 
     createFile(
       htmlFile,
@@ -72,6 +78,15 @@ export function MessageSharingDialog({
     )
       .then(result => {
         setUrl(window.location.origin + `/share/${result.hashid}`)
+        if (codeBlock.applicationId) {
+          return createApplicationFiles([
+            {
+              application_id: codeBlock.applicationId,
+              file_id: result.id,
+              user_id: user.id
+            }
+          ])
+        }
       })
       .catch(error => {
         console.error(error)
