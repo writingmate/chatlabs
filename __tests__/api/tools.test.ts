@@ -170,4 +170,107 @@ describe('Proxy API', () => {
         );
         expect(await response.json()).toEqual({ result: 'form success' });
     })
-})
+
+    it('should handle route with path parameters', async () => {
+        const mockTool = {
+            id: 'param-tool',
+            schema: JSON.stringify({
+                paths: {
+                    '/users/{userId}/posts/{postId}': {
+                        get: {
+                            operationId: 'getUserPost'
+                        }
+                    }
+                },
+                servers: [{ url: 'https://api.example.com/' }]
+            }),
+            custom_headers: JSON.stringify({})
+        };
+
+        (getToolById as jest.Mock).mockResolvedValue(mockTool);
+        (createClient as jest.Mock).mockReturnValue({});
+
+        (global.fetch as jest.Mock).mockResolvedValue({
+            status: 200,
+            statusText: 'OK',
+            headers: new Headers(),
+            text: jest.fn().mockResolvedValue('{"userId": "123", "postId": "456", "content": "Test post"}')
+        });
+
+        const mockRequest = {
+            url: 'http://localhost/api/proxy/param-tool/users/123/posts/456',
+            method: 'GET',
+            headers: new Headers(),
+        } as unknown as NextRequest;
+
+        const response = await GET(mockRequest, { params: { segments: ['param-tool', 'users', '123', 'posts', '456'] } });
+
+        expect(getToolById).toHaveBeenCalledWith('param-tool', expect.anything());
+        expect(global.fetch).toHaveBeenCalledWith(
+            'https://api.example.com/users/123/posts/456',
+            expect.objectContaining({
+                method: 'GET',
+                headers: expect.any(Object),
+                body: null
+            })
+        );
+
+        expect(response.status).toBe(200);
+        expect(await response.json()).toEqual({
+            userId: '123',
+            postId: '456',
+            content: 'Test post'
+        });
+    });
+
+    it('should handle route with path parameters and query parameters', async () => {
+        const mockTool = {
+            id: 'param-query-tool',
+            schema: JSON.stringify({
+                paths: {
+                    '/users/{userId}/posts': {
+                        get: {
+                            operationId: 'getUserPosts'
+                        }
+                    }
+                },
+                servers: [{ url: 'https://api.example.com/' }]
+            }),
+            custom_headers: JSON.stringify({})
+        };
+
+        (getToolById as jest.Mock).mockResolvedValue(mockTool);
+        (createClient as jest.Mock).mockReturnValue({});
+
+        (global.fetch as jest.Mock).mockResolvedValue({
+            status: 200,
+            statusText: 'OK',
+            headers: new Headers(),
+            text: jest.fn().mockResolvedValue('{"userId": "123", "posts": [{"id": "1", "title": "Test post"}]}')
+        });
+
+        const mockRequest = {
+            url: 'http://localhost/api/proxy/param-query-tool/users/123/posts?limit=10&offset=0',
+            method: 'GET',
+            headers: new Headers(),
+        } as unknown as NextRequest;
+
+        const response = await GET(mockRequest, { params: { segments: ['param-query-tool', 'users', '123', 'posts'] } });
+
+        expect(getToolById).toHaveBeenCalledWith('param-query-tool', expect.anything());
+        expect(global.fetch).toHaveBeenCalledWith(
+            'https://api.example.com/users/123/posts?limit=10&offset=0',
+            expect.objectContaining({
+                method: 'GET',
+                headers: expect.any(Object),
+                body: null
+            })
+        );
+
+        expect(response.status).toBe(200);
+        expect(await response.json()).toEqual({
+            userId: '123',
+            posts: [{ id: '1', title: 'Test post' }]
+        });
+    });
+});
