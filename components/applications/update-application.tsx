@@ -75,6 +75,10 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
     setIsCreatingTool(true)
   }, [])
 
+  const areToolsPublic = application.tools.every(tool =>
+    ["platform", "public", "link"].includes(tool.sharing)
+  )
+
   return (
     <div className={cn("space-y-3", className)}>
       <div>
@@ -136,17 +140,25 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
           onValueChange={value => handleChange("sharing", value)}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select sharing" />
+            <SelectValue placeholder="Select a sharing option" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="private">Private</SelectItem>
-            <SelectItem value="public">Public</SelectItem>
+            <SelectItem value="private">
+              <span>Private</span>{" "}
+              <span className="text-muted-foreground">Visible to only you</span>
+            </SelectItem>
+            <SelectItem value="public">
+              <span>Public</span>{" "}
+              <span className="text-muted-foreground">Visible to everyone</span>
+            </SelectItem>
+            <SelectItem value="link">
+              <span>Link</span>{" "}
+              <span className="text-muted-foreground">
+                Visible to anyone with the link
+              </span>
+            </SelectItem>
           </SelectContent>
         </Select>
-        <Description>
-          Choose who can access your application. Private: Only you. Public:
-          Anyone with the link.
-        </Description>
       </div>
 
       <div className="flex space-x-4">
@@ -222,6 +234,16 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
             type applications.
           </Description>
         </div>
+      )}
+
+      {!areToolsPublic && (
+        <Callout variant="warning">
+          <CalloutTitle>Warning</CalloutTitle>
+          <CalloutDescription>
+            Your one of the tools is private. You need to set all tools to
+            public or link to publish your application.
+          </CalloutDescription>
+        </Callout>
       )}
 
       {isCreatingTool && (

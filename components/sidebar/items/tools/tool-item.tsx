@@ -11,6 +11,14 @@ import {
   SIDEBAR_ITEM_ICON_STROKE,
   SidebarItem
 } from "../all/sidebar-display-item"
+import {
+  SelectItem,
+  SelectValue,
+  Select,
+  SelectContent,
+  SelectTrigger
+} from "@/components/ui/select"
+import { Description } from "@/components/ui/description"
 
 interface ToolItemProps {
   tool: Tables<"tools">
@@ -21,6 +29,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(tool.description)
   const [url, setUrl] = useState(tool.url)
+  const [sharing, setSharing] = useState(tool.sharing)
   const [customHeaders, setCustomHeaders] = useState(
     tool.custom_headers as string
   )
@@ -44,6 +53,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
         name,
         description,
         url,
+        sharing,
         custom_headers: customHeaders,
         schema
       }}
@@ -53,7 +63,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
             <Label>Name</Label>
 
             <Input
-              placeholder="Tool name..."
+              placeholder="Plugin name..."
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={TOOL_NAME_MAX}
@@ -64,42 +74,46 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
             <Label>Description</Label>
 
             <Input
-              placeholder="Tool description..."
+              placeholder="Plugin description..."
               value={description}
               onChange={e => setDescription(e.target.value)}
               maxLength={TOOL_DESCRIPTION_MAX}
             />
           </div>
 
-          {/* <div className="space-y-1">
-            <Label>URL</Label>
+          <div className="space-y-1">
+            <Label>Sharing</Label>
 
-            <Input
-              placeholder="Tool url..."
-              value={url}
-              onChange={e => setUrl(e.target.value)}
-            />
-          </div> */}
-
-          {/* <div className="space-y-3 pt-4 pb-3">
-            <div className="space-x-2 flex items-center">
-              <Checkbox />
-
-              <Label>Web Browsing</Label>
-            </div>
-
-            <div className="space-x-2 flex items-center">
-              <Checkbox />
-
-              <Label>Image Generation</Label>
-            </div>
-
-            <div className="space-x-2 flex items-center">
-              <Checkbox />
-
-              <Label>Code Interpreter</Label>
-            </div>
-          </div> */}
+            <Select onValueChange={value => setSharing(value)} value={sharing}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a sharing option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="private">
+                  <span>Private</span>{" "}
+                  <span className="text-muted-foreground">
+                    Visible to only you
+                  </span>
+                </SelectItem>
+                <SelectItem value="public">
+                  <span>Public</span>{" "}
+                  <span className="text-muted-foreground">
+                    Visible to everyone
+                  </span>
+                </SelectItem>
+                <SelectItem value="link">
+                  <span>Link</span>{" "}
+                  <span className="text-muted-foreground">
+                    Visible to anyone with the link
+                  </span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <Description>
+              Select who can see this plugin. Link or Public plugins is required
+              if you want to publish an app.
+            </Description>
+          </div>
 
           <div className="space-y-1">
             <Label>Custom Headers</Label>
