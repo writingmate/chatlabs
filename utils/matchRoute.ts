@@ -3,6 +3,7 @@ export interface RouteMatch {
     params: Record<string, string>;
     method: string;
     queryParams: Record<string, string>;
+    operationId: string;
 }
 
 export function matchRoute(
@@ -24,17 +25,22 @@ export function matchRoute(
                 for (const [key, value] of query.entries()) {
                     queryParams[key] = value;
                 }
-                return { ...match, method, queryParams };
+                return { ...match, method, queryParams, operationId: routeMethods[method.toLowerCase()].operationId as string };
             }
         }
     }
     return null;
 }
 
-function matchPathToRoute(
+export type MatchPathToRouteResult = {
+    route: string;
+    params: Record<string, string>;
+} | null
+
+export function matchPathToRoute(
     path: string,
     route: string
-): { route: string; params: Record<string, string> } | null {
+): MatchPathToRouteResult {
     const pathParts = path.split("/").filter(Boolean);
     const routeParts = route.split("/").filter(Boolean);
 

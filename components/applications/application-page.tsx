@@ -242,10 +242,7 @@ const generateToolsSchema = (tools: Tables<"tools">[]) => {
     const schema = JSON.parse(tool.schema as string)
     schema.servers = [
       {
-        url:
-          tool.sharing === "platform"
-            ? "/api/tools/" + tool.id
-            : "/api/proxy/" + tool.id
+        url: "/api/tools/" + tool.id
       }
     ]
     return {
