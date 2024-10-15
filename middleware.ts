@@ -100,7 +100,21 @@ type Middleware = (
   request: NextRequest
 ) => Promise<NextResponse | void>
 
+async function routeSubdomainMiddleware(
+  supabase: SupabaseClient,
+  request: NextRequest
+) {
+  const host = request.headers.get('host')
+  const subdomain = host?.split('.')[0]
+
+  if (host && host.includes('toolzflow.app') && subdomain !== 'www' && subdomain !== 'toolzflow') {
+    const newUrl = new URL(`/share/${subdomain}`, request.url)
+    return NextResponse.rewrite(newUrl)
+  }
+}
+
 const middlewares: Middleware[] = [
+  routeSubdomainMiddleware,
   rateLimitMiddleware,
   redirectToSetupMiddleware,
   redirectToChat
@@ -120,5 +134,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/(chat|/api/chat)?"
+  matcher: [
+    '/(chat|/api/chat)?'
+  ]
 }
