@@ -202,7 +202,7 @@ export const CodeViewer: FC<CodeViewerProps> = ({
           selectedWorkspace={selectedWorkspace}
           chatSettings={chatSettings}
           defaultFilename={codeBlock.filename || "Untitled"}
-          fileContent={codeBlock.code}
+          codeBlock={codeBlock}
         />
       </div>
     ),

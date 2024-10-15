@@ -2,6 +2,7 @@ import { Json, Tables } from "@/supabase/types"
 
 export interface CodeBlock {
   sequenceNo: number
+  applicationId?: string
   messageId: string
   language: string
   code: string

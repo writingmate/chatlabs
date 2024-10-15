@@ -40,6 +40,7 @@ export const getFileByHashId = async (hashId: string) => {
     .from("files")
     .select("*, file_items (*)")
     .eq("hashid", hashId)
+
     .single()
 
   if (!file) {

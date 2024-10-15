@@ -4,6 +4,25 @@ import { LLM, LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { getPlatformTools, platformToolDefinitionById } from "./platform-tools"
 
+export const getFileByAppSlug = async (appSlug: string) => {
+  const { data: application, error } = await supabase
+    .from("applications")
+    .select("*, files(*, file_items(*))")
+    .eq("slug", appSlug)
+    .order("created_at", { referencedTable: "files", ascending: false })
+    .single()
+
+  if (!application) {
+    throw new Error(error.message)
+  }
+
+  if (application.files.length === 0) {
+    return null
+  }
+
+  return application.files?.[0]
+}
+
 export const getApplicationById = async (
   applicationId: string,
   client: SupabaseClient<Database> = supabase
