@@ -96,21 +96,26 @@ async function handleRequest(
       url.searchParams
     )
 
+    logger.debug({ matchedRoute }, "Matched route")
+
     if (!matchedRoute) {
       return NextResponse.json({ error: "Route not found" }, { status: 404 })
     }
 
     // 6. Prepare request for proxying or execution
+
+    let pathname = matchedRoute.route
+    // Add path parameters to the target URL
+    Object.entries(matchedRoute.params).forEach(([key, value]) => {
+      logger.debug(`Replacing ${key} with ${value}`)
+      pathname = pathname.replace(`{${key}}`, value)
+    })
+
     const targetUrl = new URL(
-      matchedRoute.route,
+      pathname,
       // @ts-ignore
       schema?.servers?.[0]?.url || tool.url
     )
-
-    // Add path parameters to the target URL
-    Object.entries(matchedRoute.params).forEach(([key, value]) => {
-      targetUrl.pathname = targetUrl.pathname.replace(`{${key}}`, value)
-    })
 
     // Add query parameters to the target URL
     Object.entries(matchedRoute.queryParams).forEach(([key, value]) => {
