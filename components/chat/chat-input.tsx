@@ -27,6 +27,8 @@ import { AssistantIcon } from "@/components/assistants/assistant-icon"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatSelectedHtmlElements } from "@/components/chat/chat-selected-html-elements"
 import { ChatMessage } from "@/types"
+import { useAtom } from "jotai"
+import { userInputAtom } from "@/atoms/chatAtoms"
 
 interface ChatInputProps {
   showAssistant: boolean
@@ -74,7 +76,7 @@ export const ChatInput: FC<ChatInputProps> = ({
     selectedWorkspace
   } = useContext(ChatbotUIContext)
 
-  const { userInput, setUserInput, chatMessages, isGenerating, chatSettings } =
+  const { chatMessages, isGenerating, chatSettings } =
     useContext(ChatbotUIChatContext)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -99,6 +101,8 @@ export const ChatInput: FC<ChatInputProps> = ({
     setNewMessageContentToNextUserMessage,
     setNewMessageContentToPreviousUserMessage
   } = useChatHistoryHandler()
+
+  const [userInput, setUserInput] = useAtom(userInputAtom)
 
   useEffect(() => {
     console.log("Initializing speech recognition...")

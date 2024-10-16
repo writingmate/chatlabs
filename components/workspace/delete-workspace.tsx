@@ -14,7 +14,7 @@ import { deleteWorkspace } from "@/db/workspaces"
 import { Tables } from "@/supabase/types"
 import { FC, useContext, useRef, useState } from "react"
 import { Input } from "../ui/input"
-import { useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 
 interface DeleteWorkspaceProps {
   workspace: Tables<"workspaces">

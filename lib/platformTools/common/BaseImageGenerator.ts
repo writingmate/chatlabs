@@ -159,7 +159,7 @@ export abstract class BaseImageGenerator extends BaseTool {
       })
 
     if (error) {
-      logger.error({ error: error.message }, "Supabase upload error")
+      logger.error({ err: error.message }, "Supabase upload error")
       throw new Error("Supabase upload error: " + error.message)
     }
 
@@ -208,7 +208,7 @@ export abstract class BaseImageGenerator extends BaseTool {
 
       return generateMarkdownResponse(prompt, imageUrl)
     } catch (error: any) {
-      logger.error({ error: error.message }, "Error generating image")
+      logger.error({ err: error.message }, "Error generating image")
       throw new Error("Error: " + error.message)
     }
   }

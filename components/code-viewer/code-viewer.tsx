@@ -62,9 +62,11 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false) // Add state for fullscreen
 
   const handleFixError = useCallback(
-    (error: string) => {
+    (errors: string[], consoleMessages: string[]) => {
       handleSendMessage(
-        `We have experienced an error: ${error}. Please fix the error`,
+        `We have experienced an error: ${errors.join("\n")}
+Browser console messages: ${consoleMessages.join("\n")}
+Please fix the error`,
         chatMessages,
         false
       )

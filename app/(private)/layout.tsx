@@ -8,7 +8,7 @@ import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
-import Transition from "@/components/ui/transition"
+import NextTopLoader from "nextjs-toploader"
 
 const font = DM_Sans({ subsets: ["latin"] })
 const APP_NAME = "ChatLabs"
@@ -82,6 +82,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         />
       </head>
       <body className={font.className + " h-full antialiased"}>
+        <NextTopLoader
+          color={"gray"}
+          height={1}
+          shadow={false}
+          showSpinner={false}
+        />
         <Providers attribute="class" defaultTheme="light">
           <Toaster richColors position="top-center" duration={3000} />
           <div className="bg-background text-foreground flex size-full flex-col items-center sm:h-screen">

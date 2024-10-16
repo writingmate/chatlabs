@@ -75,6 +75,8 @@ export const UpdateApplication: FC<UpdateApplicationProps> = ({
     setIsCreatingTool(true)
   }, [])
 
+  console.log("application", application.tools)
+
   const areToolsPublic = application.tools.every(tool =>
     ["platform", "public", "link"].includes(tool.sharing)
   )

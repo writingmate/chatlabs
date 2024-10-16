@@ -10,11 +10,10 @@ import {
   useEffect
 } from "react"
 import { MessageHtmlElement } from "@/types/html"
+import { userInputAtom } from "@/atoms/chatAtoms"
 
 interface ChatbotUIChatContext {
   // PASSIVE CHAT STORE
-  userInput: string
-  setUserInput: Dispatch<SetStateAction<string>>
   chatMessages: ChatMessage[]
   setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>
   chatSettings: ChatSettings | null
@@ -50,14 +49,12 @@ interface ChatbotUIChatContext {
 
 export const ChatbotUIChatContext = createContext<ChatbotUIChatContext>({
   // PASSIVE CHAT STORE
-  userInput: "",
-  setUserInput: () => {},
-  selectedChat: null,
-  setSelectedChat: () => {},
   chatMessages: [],
   setChatMessages: () => {},
   chatSettings: null,
   setChatSettings: () => {},
+  selectedChat: null,
+  setSelectedChat: () => {},
   chatFileItems: [],
   setChatFileItems: () => {},
 
@@ -94,19 +91,8 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
   id,
   children
 }) => {
-  const chatSettingsKey = `chatSettings-${id}`
-
-  // PASSIVE CHAT STORE
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatSettings, setChatSettings] = useState<ChatSettings>(() => {
-    // if (typeof window !== "undefined") {
-    //   const storedSettings = window?.localStorage?.getItem(chatSettingsKey)
-
-    //   if (storedSettings) {
-    //     return JSON.parse(storedSettings)
-    //   }
-    // }
-
     return {
       model: "gpt-4o-mini",
       prompt: "You are a helpful AI assistant.",
@@ -118,7 +104,6 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
     }
   })
 
-  const [userInput, setUserInput] = useState<string>("")
   const [selectedChat, setSelectedChat] = useState<Tables<"chats"> | null>(null)
   const [chatFileItems, setChatFileItems] = useState<Tables<"file_items">[]>([])
 
@@ -140,18 +125,10 @@ export const ChatbotUIChatProvider: FC<ChatbotUIChatProviderProps> = ({
     MessageHtmlElement[]
   >([])
 
-  // useEffect(() => {
-  //   if (chatSettings) {
-  //     localStorage.setItem(chatSettingsKey, JSON.stringify(chatSettings))
-  //   }
-  // }, [chatSettings])
-
   return (
     <ChatbotUIChatContext.Provider
       value={{
         // PASSIVE CHAT STORE
-        userInput,
-        setUserInput,
         chatMessages,
         setChatMessages,
         chatSettings,

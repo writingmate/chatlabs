@@ -102,7 +102,10 @@ async function getAllSupabaseUsers(): Promise<SupabaseUser[]> {
     })
 
     if (error) {
-      logger.error(`Error fetching Supabase users: ${error.message}`)
+      logger.error(
+        { err: error },
+        `Error fetching Supabase users: ${error.message}`
+      )
       throw new Error(`Error fetching Supabase users: ${error.message}`)
     }
 
@@ -133,7 +136,7 @@ async function getAllProfiles(): Promise<ProfileData[]> {
       .range(page * perPage, (page + 1) * perPage - 1)
 
     if (error) {
-      logger.error(`Error fetching profiles: ${error.message}`)
+      logger.error({ err: error }, "Error fetching profiles")
       throw new Error(`Error fetching profiles: ${error.message}`)
     }
 
@@ -185,7 +188,7 @@ async function sendTelegramMessage(message: string) {
   } catch (error) {
     logger.error(
       {
-        error: error instanceof Error ? error.message : String(error)
+        err: error instanceof Error ? error.message : String(error)
       },
       "Error sending Telegram message"
     )
@@ -409,8 +412,10 @@ export async function GET(req: Request) {
               )
             } catch (error) {
               logger.error(
-                `Failed to send Telegram message batch ${Math.floor(i / batchSize) + 1}:`,
-                error
+                {
+                  err: error
+                },
+                `Failed to send Telegram message batch ${Math.floor(i / batchSize) + 1}`
               )
               controller.enqueue(
                 `Failed to send Telegram message batch ${Math.floor(i / batchSize) + 1}\n`
@@ -427,7 +432,7 @@ export async function GET(req: Request) {
             await sendTelegramMessage("No mismatched users found")
             controller.enqueue("Telegram message sent\n")
           } catch (error) {
-            logger.error("Failed to send Telegram message:", error)
+            logger.error({ err: error }, "Failed to send Telegram message")
             controller.enqueue("Failed to send Telegram message\n")
           }
         }
@@ -437,7 +442,7 @@ export async function GET(req: Request) {
       } catch (error: any) {
         const errorMessage =
           error.response?.data || error.message || String(error)
-        logger.error("Error checking subscriptions:", errorMessage)
+        logger.error({ err: error }, "Error checking subscriptions")
         controller.enqueue(`Error checking subscriptions: ${errorMessage}\n`)
         controller.error(error)
       } finally {

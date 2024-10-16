@@ -48,6 +48,9 @@ import { Button } from "../ui/button"
 import { motion, AnimatePresence } from "framer-motion" // Add this import
 import { cn } from "@/lib/utils"
 import { ModelIcon } from "../models/model-icon"
+import { Virtualizer } from "virtua"
+import { useAtom } from "jotai"
+import { userInputAtom } from "@/atoms/chatAtoms"
 
 interface ChatUIProps {
   chatId?: string
@@ -418,37 +421,36 @@ ${content}
                   isExperimentalCodeEditor={isExperimentalCodeEditor}
                 />
                 <div ref={messagesEndRef} className="min-h-20 flex-1" />
-
-                <div className="sticky bottom-16 mx-auto flex min-h-8">
-                  {!isAtBottom && (
-                    <Button
-                      size={"icon"}
-                      variant={"outline"}
-                      className={cn(
-                        "bg-background/80 size-8 rounded-full transition-colors duration-200"
-                      )}
-                      onClick={scrollToBottom}
-                    >
-                      <IconArrowDown size={20} stroke={2} />
-                    </Button>
-                  )}
-                </div>
               </>
             )}
-            <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
-              {chatMessages?.length === 0 && (
-                <ConversationStarters
-                  values={selectedAssistant?.conversation_starters}
-                  onSelect={(value: string) =>
-                    handleSendMessage(value, chatMessages, false)
+            <div className="sticky bottom-0 flex flex-col justify-center">
+              {!isAtBottom && (
+                <Button
+                  size={"icon"}
+                  variant={"outline"}
+                  className={
+                    "bg-background/80 mx-auto mb-2 size-8 rounded-full transition-colors duration-200"
                   }
-                />
+                  onClick={scrollToBottom}
+                >
+                  <IconArrowDown size={20} stroke={2} />
+                </Button>
               )}
-              <ChatInput
-                showAssistant={showAssistantSelector && !selectedAssistant}
-                handleSendMessage={handleSendMessage}
-              />
-              <ChatMessageCounter />
+              <div className="bg-background mx-2 pb-2">
+                {chatMessages?.length === 0 && (
+                  <ConversationStarters
+                    values={selectedAssistant?.conversation_starters}
+                    onSelect={(value: string) =>
+                      handleSendMessage(value, chatMessages, false)
+                    }
+                  />
+                )}
+                <ChatInput
+                  showAssistant={showAssistantSelector && !selectedAssistant}
+                  handleSendMessage={handleSendMessage}
+                />
+                <ChatMessageCounter />
+              </div>
             </div>
           </div>
         )}

@@ -24,6 +24,8 @@ import { ToolSelect } from "@/components/tools/tool-select"
 import { ChatFilesDisplay } from "@/components/chat/chat-files-display"
 import { PromptCatalog } from "@/components/splitview/prompt-catalog"
 import { reconstructContentWithCodeBlocks } from "@/lib/messages"
+import { useAtom } from "jotai"
+import { userInputAtom } from "@/atoms/chatAtoms"
 
 interface ChatInputProps {
   isGenerating: boolean
@@ -56,14 +58,8 @@ export const ChatInput: FC<ChatInputProps> = ({
 
   const [isTyping, setIsTyping] = useState<boolean>(false)
 
-  const {
-    setIsPromptPickerOpen,
-    selectedTools,
-    setSelectedTools,
-    profile,
-    userInput,
-    setUserInput
-  } = useContext(ChatbotUIContext)
+  const { setIsPromptPickerOpen, selectedTools, setSelectedTools, profile } =
+    useContext(ChatbotUIContext)
 
   // const {
   //   chatInputRef,
@@ -184,6 +180,8 @@ export const ChatInput: FC<ChatInputProps> = ({
       }
     }
   }
+
+  const [userInput, setUserInput] = useAtom(userInputAtom)
 
   return (
     <>

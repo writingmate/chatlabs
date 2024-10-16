@@ -80,8 +80,12 @@ async function handleRequest(
     // 2 & 3. Read headers and schema properties
     let { custom_headers: headers, schema } = tool
 
-    schema = JSON.parse(schema as string)
-    headers = JSON.parse((headers as string) || "{}")
+    try {
+      schema = typeof schema === "string" ? JSON.parse(schema) : schema
+      headers = typeof headers === "string" ? JSON.parse(headers) : headers
+    } catch (error) {
+      logger.error({ error }, "Error parsing schema or headers")
+    }
 
     if (!schema || typeof schema !== "object" || !("paths" in schema)) {
       return NextResponse.json({ error: "Invalid schema" }, { status: 500 })
@@ -123,7 +127,7 @@ async function handleRequest(
     })
 
     // Prepare headers
-    const proxyHeaders = new Headers(headers as Record<string, string>)
+    const proxyHeaders = new Headers((headers || {}) as Record<string, string>)
 
     // Prepare body
     let body: any = null
@@ -211,7 +215,8 @@ async function handleRequest(
       })
     }
   } catch (error) {
-    logger.error({ error }, "Proxy error")
+    console.log("error", error)
+    logger.error({ err: error }, "Proxy error ")
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

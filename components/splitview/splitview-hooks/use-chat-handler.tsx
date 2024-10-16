@@ -7,7 +7,7 @@ import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
-import { useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import React, { useContext, useEffect, useRef } from "react"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import {
@@ -26,6 +26,8 @@ import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { encode } from "gpt-tokenizer"
+import { useAtom } from "jotai"
+import { userInputAtom } from "@/atoms/chatAtoms"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -58,9 +60,7 @@ export const useChatHandler = () => {
     isPromptPickerOpen,
     isFilePickerOpen,
     isToolPickerOpen,
-    setIsPaywallOpen,
-    userInput,
-    setUserInput
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const {
@@ -87,6 +87,8 @@ export const useChatHandler = () => {
   } = useContext(ChatbotUIChatContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
+
+  const [userInput, setUserInput] = useAtom(userInputAtom)
 
   useEffect(() => {
     if (!isPromptPickerOpen || !isFilePickerOpen || !isToolPickerOpen) {

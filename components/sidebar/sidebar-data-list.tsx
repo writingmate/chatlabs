@@ -242,14 +242,14 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     setIsDragOver(false)
   }
 
-  const [loadingMore, setLoadingMore] = useState(false)
+  const loadingMore = useRef(false)
 
   const { scrollRef, handleScroll, isAtBottom } = useScrollBase()
 
   useEffect(() => {
-    if (isAtBottom && !loadingMore) {
-      setLoadingMore(true)
-      onLoadMore?.().finally(() => setLoadingMore(false))
+    if (isAtBottom && !loadingMore.current) {
+      loadingMore.current = true
+      onLoadMore?.().finally(() => (loadingMore.current = false))
     }
   }, [isAtBottom, onLoadMore, loadingMore])
 

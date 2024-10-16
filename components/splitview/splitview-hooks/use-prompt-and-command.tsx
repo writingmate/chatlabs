@@ -7,6 +7,8 @@ import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
 import { useContext } from "react"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { userInputAtom } from "@/atoms/chatAtoms"
+import { useAtom } from "jotai"
 
 export const usePromptAndCommand = () => {
   const {
@@ -29,11 +31,9 @@ export const usePromptAndCommand = () => {
     setChatFiles,
     setPromptVariables,
     setShowPromptVariables,
-    profile,
-    userInput,
-    setUserInput
+    profile
   } = useContext(ChatbotUIContext)
-
+  const [userInput, setUserInput] = useAtom(userInputAtom)
   const { setChatSettings } = useContext(ChatbotUIChatContext)
 
   const handleInputChange = (value: string) => {

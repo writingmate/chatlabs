@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from "react"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
+import { useAtom } from "jotai"
+import { userInputAtom } from "@/atoms/chatAtoms"
 
 /**
  * Custom hook for handling chat history in the chat component.
@@ -11,9 +13,9 @@ import { ChatbotUIContext } from "@/context/context"
  *   - setNewMessageContentToNextUserMessage: Sets the new message content to the next user message in the chat history.
  */
 export const useChatHistoryHandler = () => {
-  const { setUserInput } = useContext(ChatbotUIContext)
   const { chatMessages, isGenerating } = useContext(ChatbotUIChatContext)
   const userRoleString = "user"
+  const [userInput, setUserInput] = useAtom(userInputAtom)
 
   const [messageHistoryIndex, setMessageHistoryIndex] = useState<number>(
     chatMessages.length

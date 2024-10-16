@@ -150,7 +150,7 @@ async function* fixGroqStream(response: AsyncIterable<any>) {
 
         continue
       } catch (e) {
-        logger.error({ error: e }, "Error fixing Groq stream")
+        logger.error({ err: e }, "Error fixing Groq stream")
       }
     }
     yield chunk
@@ -310,7 +310,7 @@ export async function POST(request: Request) {
             stream: true
           })
         } catch (error: any) {
-          logger.error({ error: error.message }, "Error in tool call callback")
+          logger.error({ err: error }, "Error in tool call callback")
           return error.message || "An unexpected error occurred"
         }
       }
@@ -327,10 +327,10 @@ export async function POST(request: Request) {
     logger.debug("Returning streaming response")
     return new StreamingTextResponse(stream, {}, streamData)
   } catch (error: any) {
-    logger.error({ error }, "Error in POST handler")
+    logger.error({ err: error }, "Error in POST handler")
     const errorMessage = error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
-    logger.error("Returning error response", { errorMessage, errorCode })
+    logger.error({ errorMessage, errorCode }, "Returning error response")
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode
     })

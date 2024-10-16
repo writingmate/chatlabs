@@ -8,6 +8,8 @@ import { LLMID } from "@/types"
 import { useContext } from "react"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { toast } from "sonner"
+import { useAtom } from "jotai"
+import { userInputAtom } from "@/atoms/chatAtoms"
 
 export const usePromptAndCommand = () => {
   const {
@@ -31,13 +33,10 @@ export const usePromptAndCommand = () => {
     profile
   } = useContext(ChatbotUIContext)
 
-  const {
-    userInput,
-    setUserInput,
-    selectedTools,
-    setSelectedTools,
-    setChatSettings
-  } = useContext(ChatbotUIChatContext)
+  const { selectedTools, setSelectedTools, setChatSettings } =
+    useContext(ChatbotUIChatContext)
+
+  const [userInput, setUserInput] = useAtom(userInputAtom)
 
   const handleInputChange = (value: string) => {
     const assistantTextRegex = new RegExp(

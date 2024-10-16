@@ -15,7 +15,15 @@ import {
   IconBulb
 } from "@tabler/icons-react"
 import Image from "next/image"
-import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react"
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
 import { FileIcon } from "../ui/file-icon"
@@ -104,7 +112,7 @@ export const Message: FC<MessageProps> = ({
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const handleCopy = () => {
+  const handleCopy = useCallback(() => {
     const content = reconstructContentWithCodeBlocks(
       message.content,
       codeBlocks ?? []
@@ -120,7 +128,7 @@ export const Message: FC<MessageProps> = ({
       document.execCommand("copy")
       document.body.removeChild(textArea)
     }
-  }
+  }, [message, codeBlocks])
 
   function cleanupMessageForSpeech(message: string) {
     const codeBlockRegex = /```[\s\S]*?```|(?:(?:^|\n)( {4}|\t).*)+/g
@@ -131,7 +139,7 @@ export const Message: FC<MessageProps> = ({
     )
   }
 
-  const handleSpeakMessage = async () => {
+  const handleSpeakMessage = useCallback(async () => {
     if (isVoiceToTextPlaying) {
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel()
@@ -160,40 +168,43 @@ export const Message: FC<MessageProps> = ({
     } else {
       console.error("Speech synthesis is not supported in this browser.")
     }
-  }
+  }, [profile, isVoiceToTextPlaying])
 
-  const handleOpenAISpeech = async (text: string) => {
-    try {
-      setIsVoiceToTextPlaying(true)
-      const response = await fetch("/api/text-to-speech", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ text })
-      })
+  const handleOpenAISpeech = useCallback(
+    async (text: string) => {
+      try {
+        setIsVoiceToTextPlaying(true)
+        const response = await fetch("/api/text-to-speech", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ text })
+        })
 
-      if (!response.ok) {
-        throw new Error("Failed to generate speech")
-      }
+        if (!response.ok) {
+          throw new Error("Failed to generate speech")
+        }
 
-      const audioBlob = await response.blob()
-      const audioUrl = URL.createObjectURL(audioBlob)
+        const audioBlob = await response.blob()
+        const audioUrl = URL.createObjectURL(audioBlob)
 
-      if (audioRef.current) {
-        audioRef.current.pause()
-      }
-      audioRef.current = new Audio(audioUrl)
-      audioRef.current.onended = () => {
+        if (audioRef.current) {
+          audioRef.current.pause()
+        }
+        audioRef.current = new Audio(audioUrl)
+        audioRef.current.onended = () => {
+          setIsVoiceToTextPlaying(false)
+        }
+        audioRef.current.play()
+      } catch (error) {
+        console.error("Error in OpenAI text-to-speech:", error)
+        toast.error("Failed to generate speech")
         setIsVoiceToTextPlaying(false)
       }
-      audioRef.current.play()
-    } catch (error) {
-      console.error("Error in OpenAI text-to-speech:", error)
-      toast.error("Failed to generate speech")
-      setIsVoiceToTextPlaying(false)
-    }
-  }
+    },
+    [profile]
+  )
 
   useEffect(() => {
     return () => {
@@ -226,7 +237,7 @@ export const Message: FC<MessageProps> = ({
     }
   }, [isVoiceToTextPlaying])
 
-  const speakMessage = () => {
+  const speakMessage = useCallback(() => {
     if ("speechSynthesis" in window) {
       const utterance = new SpeechSynthesisUtterance(
         cleanupMessageForSpeech(message.content)
@@ -251,33 +262,36 @@ export const Message: FC<MessageProps> = ({
     } else {
       console.error("Speech synthesis is not supported in this browser.")
     }
-  }
+  }, [profile, message])
 
-  const handlePauseSpeech = () => {
+  const handlePauseSpeech = useCallback(() => {
     if (window.speechSynthesis) {
       window.speechSynthesis.pause()
     }
-  }
+  }, [])
 
-  const handleSendEdit = () => {
+  const handleSendEdit = useCallback(() => {
     onSubmitEdit?.(editedMessage, message.sequence_number)
     onCancelEdit?.()
-  }
+  }, [onSubmitEdit, onCancelEdit, editedMessage, message])
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (isEditing && event.key === "Enter" && event.metaKey) {
-      handleSendEdit()
-    }
-  }
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (isEditing && event.key === "Enter" && event.metaKey) {
+        handleSendEdit()
+      }
+    },
+    [isEditing, handleSendEdit]
+  )
 
-  const handleRegenerate = async () => {
+  const handleRegenerate = useCallback(async () => {
     setIsGenerating?.(true)
     onRegenerate?.(editedMessage)
-  }
+  }, [onRegenerate, editedMessage])
 
-  const handleStartEdit = () => {
+  const handleStartEdit = useCallback(() => {
     onStartEdit?.(message)
-  }
+  }, [onStartEdit, message])
 
   useEffect(() => {
     setEditedMessage(message.content)
@@ -301,7 +315,10 @@ export const Message: FC<MessageProps> = ({
     }
   }, [message])
 
-  const MODEL_DATA = allModels.find(llm => llm.modelId === message.model) as LLM
+  const MODEL_DATA = useMemo(
+    () => allModels.find(llm => llm.modelId === message.model) as LLM,
+    [allModels, message]
+  )
 
   const fileAccumulator: Record<
     string,
@@ -314,23 +331,27 @@ export const Message: FC<MessageProps> = ({
     }
   > = {}
 
-  const fileSummary = fileItems.reduce((acc, fileItem) => {
-    const parentFile = files.find(file => file.id === fileItem.file_id)
-    if (parentFile) {
-      if (!acc[parentFile.id]) {
-        acc[parentFile.id] = {
-          id: parentFile.id,
-          name: parentFile.name,
-          count: 1,
-          type: parentFile.type,
-          description: parentFile.description
+  const fileSummary = useMemo(
+    () =>
+      fileItems.reduce((acc, fileItem) => {
+        const parentFile = files.find(file => file.id === fileItem.file_id)
+        if (parentFile) {
+          if (!acc[parentFile.id]) {
+            acc[parentFile.id] = {
+              id: parentFile.id,
+              name: parentFile.name,
+              count: 1,
+              type: parentFile.type,
+              description: parentFile.description
+            }
+          } else {
+            acc[parentFile.id].count += 1
+          }
         }
-      } else {
-        acc[parentFile.id].count += 1
-      }
-    }
-    return acc
-  }, fileAccumulator)
+        return acc
+      }, fileAccumulator),
+    [fileItems, files]
+  )
 
   function Annotations({ annotation }: { annotation: Annotation }) {
     if (!annotation) {

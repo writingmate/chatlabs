@@ -24,6 +24,7 @@ export default function ChatPage() {
         experimentalCodeEditor={!!profile?.experimental_code_editor}
       />
       <ChatPreviewContent
+        showClose={false}
         open={!!selectedCodeBlock}
         isGenerating={isGenerating}
         selectedCodeBlock={selectedCodeBlock}

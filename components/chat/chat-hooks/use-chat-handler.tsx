@@ -7,7 +7,7 @@ import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID } from "@/types"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import { useContext, useEffect, useRef } from "react"
 import {
   createTempMessages,
@@ -26,6 +26,8 @@ import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
 import { toast } from "sonner"
 import { t } from "i18next"
 import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
+import { userInputAtom } from "@/atoms/chatAtoms"
+import { useAtom } from "jotai"
 
 interface UseChatHandlerProps {
   onChatCreate?: (chat: Tables<"chats">) => void
@@ -67,8 +69,6 @@ export const useChatHandler = ({
   } = useContext(ChatbotUIContext)
 
   const {
-    userInput,
-    setUserInput,
     isGenerating,
     setIsGenerating,
     setChatMessages,
@@ -87,6 +87,8 @@ export const useChatHandler = ({
     selectedHtmlElements,
     setSelectedHtmlElements
   } = useContext(ChatbotUIChatContext)
+
+  const [, setUserInput] = useAtom(userInputAtom)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -256,7 +258,7 @@ export const useChatHandler = ({
         setToolInUse("retrieval")
 
         retrievedFileItems = await handleRetrieval(
-          userInput,
+          messageContent,
           newMessageFiles,
           chatFiles,
           chatSettings!.embeddingsProvider,
