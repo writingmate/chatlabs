@@ -1,4 +1,3 @@
-import Replicate from "replicate"
 import {
   ImageGenerationUserSettings,
   BaseImageGenerator
@@ -36,6 +35,7 @@ class Flux1ProGenerator extends BaseImageGenerator {
       safety_tolerance: 2
     }
 
+    const Replicate = (await import("replicate")).default
     const replicate = new Replicate({
       auth: await this.getApiKey()
     })

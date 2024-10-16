@@ -7,6 +7,7 @@ interface ChatPreviewContentProps {
   open: boolean
   theme?: string
   isGenerating: boolean
+  showClose?: boolean
   selectedCodeBlock: CodeBlock | null
   onSelectCodeBlock: (codeBlock: CodeBlock | null) => void
   isEditable: boolean
@@ -22,6 +23,7 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = memo(
     open,
     theme = "light",
     isGenerating,
+    showClose = true,
     selectedCodeBlock,
     onSelectCodeBlock,
     isEditable,
@@ -40,7 +42,7 @@ export const ChatPreviewContent: FC<ChatPreviewContentProps> = memo(
           onClose={() => onSelectCodeBlock(null)}
           className={"h-full rounded-none"}
           codeBlock={selectedCodeBlock}
-          showCloseButton={true}
+          showCloseButton={showClose}
           autoScroll={isGenerating}
           isEditable={isEditable}
           onCodeChange={onCodeChange}

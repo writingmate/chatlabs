@@ -12,8 +12,11 @@ const newrelicConfig = {
   experimental: {
     serverComponentsExternalPackages: ["sharp", "onnxruntime-node", "newrelic"]
   },
-  webpack: config => {
+  webpack: (config, { isServer }) => {
     nrExternals(config)
+    if (isServer) {
+      config.externals.push('replicate');
+    }
     return config
   }
 }
@@ -21,8 +24,6 @@ const newrelicConfig = {
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    // loader: 'custom',
-    // loaderFile: './imageLoader.js',
     remotePatterns: [
       {
         protocol: "http",
@@ -40,7 +41,7 @@ const nextConfig = {
   }
 }
 
-module.exports = {
+const config = {
   ...withBundleAnalyzer(
     process.env.NODE_ENV === "production" ? withPWA(nextConfig) : nextConfig
   ),
@@ -50,7 +51,7 @@ module.exports = {
 
 const { withSentryConfig } = require("@sentry/nextjs")
 
-module.exports = withSentryConfig(module.exports, {
+module.exports = withSentryConfig(config, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 

@@ -1,6 +1,12 @@
 "use client"
 
-import React, { useState, useContext, useCallback, useMemo } from "react"
+import React, {
+  useState,
+  useContext,
+  useCallback,
+  useMemo,
+  useEffect
+} from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChatUI } from "@/components/chat/chat-ui"
 import { UpdateApplication } from "@/components/applications/update-application"
@@ -307,6 +313,14 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
     []
   )
 
+  useEffect(() => {
+    if (!selectedCodeBlock) {
+      handleSelectCodeBlock(
+        chatMessages?.[chatMessages.length - 1]?.codeBlocks?.pop() || null
+      )
+    }
+  }, [selectedCodeBlock, chatMessages])
+
   const localHandleSelectCodeBlock = useCallback(
     (codeBlock: CodeBlock | null) => {
       if (codeBlock) {
@@ -441,8 +455,9 @@ export const ApplicationPage: React.FC<ApplicationPageProps> = ({
           </TabsContent>
         </Tabs>
         <ChatPreviewContent
+          showClose={false}
           theme={application.theme}
-          open={!!selectedCodeBlock}
+          open={true}
           isGenerating={isGenerating}
           selectedCodeBlock={selectedCodeBlock}
           onSelectCodeBlock={handleSelectCodeBlock}

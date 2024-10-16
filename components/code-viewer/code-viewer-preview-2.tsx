@@ -1,4 +1,11 @@
-import React, { useEffect, useRef, useState, useContext } from "react"
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useContext,
+  useMemo,
+  useCallback
+} from "react"
 import {
   IconClick,
   IconX,
@@ -13,7 +20,6 @@ import { updateHtml } from "@/lib/code-viewer"
 import { CodeBlock } from "@/types"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ButtonWithTooltip } from "../ui/button-with-tooltip"
-import { logger } from "@/lib/logger"
 
 interface PreviewProps2 {
   codeBlock: CodeBlock
@@ -253,104 +259,129 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
     }
   }, [])
 
-  const handleIgnoreError = (error: string) => {
-    const updatedIgnoredErrors = {
-      ...ignoredErrors,
-      [chatId]: [...(ignoredErrors[chatId] || []), error]
-    }
-    setIgnoredErrors(updatedIgnoredErrors)
-    localStorage.setItem("ignoredErrors", JSON.stringify(updatedIgnoredErrors))
-    setErrors(prevErrors => prevErrors.filter(e => e !== error))
-  }
+  const handleIgnoreError = useCallback(
+    (error: string) => {
+      const updatedIgnoredErrors = {
+        ...ignoredErrors,
+        [chatId]: [...(ignoredErrors[chatId] || []), error]
+      }
+      setIgnoredErrors(updatedIgnoredErrors)
+      localStorage.setItem(
+        "ignoredErrors",
+        JSON.stringify(updatedIgnoredErrors)
+      )
+      setErrors(prevErrors => prevErrors.filter(e => e !== error))
+    },
+    [ignoredErrors, chatId, errors, setIgnoredErrors, setErrors, localStorage]
+  )
 
   const activeErrors = errors.filter(
     error => !ignoredErrors[chatId]?.includes(error)
   )
 
-  return (
-    <div className="relative flex h-full min-h-[400px] flex-col">
-      <iframe ref={iframeRef} className="flex-1 bg-white" />
+  return useMemo(
+    () => (
+      <div className="relative flex h-full min-h-[400px] flex-col">
+        <iframe ref={iframeRef} className="flex-1 bg-white" />
 
-      {activeErrors.length > 0 && (
-        <div className="absolute bottom-16 right-4 flex items-center space-x-2 rounded-md bg-red-100 p-2 text-red-800">
-          <IconAlertTriangle size={20} />
-          <span className="text-sm font-medium">
-            Looks like you have encountered an error
-          </span>
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={() =>
-              handleFixError(activeErrors[activeErrors.length - 1])
-            }
-          >
-            Try fixing it
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="border-red-500 text-red-500"
-            onClick={() =>
-              handleIgnoreError(activeErrors[activeErrors.length - 1])
-            }
-          >
-            Ignore it
-          </Button>
-        </div>
-      )}
-
-      <div
-        className={`bg-accent text-foreground overflow-auto border-t font-mono text-xs transition-all duration-300 ${
-          isConsoleExpanded ? "h-48 px-4 pb-4" : "h-0 p-0"
-        }`}
-      >
-        <div className="bg-accent sticky top-0 flex items-center justify-between py-2">
-          <span>Console</span>
-          <Button
-            size={"icon"}
-            variant={"link"}
-            className="text-foreground size-5 hover:opacity-50 active:opacity-75"
-            onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
-          >
-            <IconX />
-          </Button>
-        </div>
-        {consoleMessages.map((msg, index) => (
-          <div className={"text-nowrap"} key={index}>
-            {msg}
+        {activeErrors.length > 0 && (
+          <div className="absolute bottom-16 right-4 flex items-center space-x-2 rounded-md bg-red-100 p-2 text-red-800">
+            <IconAlertTriangle size={20} />
+            <span className="text-sm font-medium">
+              Looks like you have encountered an error
+            </span>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() =>
+                handleFixError(activeErrors[activeErrors.length - 1])
+              }
+            >
+              Try fixing it
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-red-500 text-red-500"
+              onClick={() =>
+                handleIgnoreError(activeErrors[activeErrors.length - 1])
+              }
+            >
+              Ignore it
+            </Button>
           </div>
-        ))}
-        <div ref={consoleEndRef} />
-      </div>
-      {showFooter && (
-        <div className="bg-accent text-foreground flex items-center justify-end space-x-3 p-3 px-4">
-          <ButtonWithTooltip
-            tooltip="Highlight elements to chat about them"
-            variant="link"
-            size={"icon"}
-            className={cn(
-              "size-6 hover:opacity-50 active:opacity-75",
-              inspectMode && "bg-violet-500/20 text-violet-500"
-            )}
-            onClick={() => setInspectMode(!inspectMode)}
-          >
-            <IconClick size={16} stroke={1.5} />
-          </ButtonWithTooltip>
-          <ButtonWithTooltip
-            tooltip="Toggle Console"
-            variant="link"
-            size={"icon"}
-            className={cn(
-              "console-toggle size-6 hover:opacity-50 active:border-violet-500 active:opacity-75",
-              isConsoleExpanded && "bg-violet-500/20 text-violet-500"
-            )}
-            onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
-          >
-            <IconTerminal2 size={16} stroke={1.5} />
-          </ButtonWithTooltip>
+        )}
+
+        <div
+          className={`bg-accent text-foreground overflow-auto border-t font-mono text-xs transition-all duration-300 ${
+            isConsoleExpanded ? "h-48 px-4 pb-4" : "h-0 p-0"
+          }`}
+        >
+          <div className="bg-accent sticky top-0 flex items-center justify-between py-2">
+            <span>Console</span>
+            <Button
+              size={"icon"}
+              variant={"link"}
+              className="text-foreground size-5 hover:opacity-50 active:opacity-75"
+              onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
+            >
+              <IconX />
+            </Button>
+          </div>
+          {consoleMessages.map((msg, index) => (
+            <div className={"text-nowrap"} key={index}>
+              {msg}
+            </div>
+          ))}
+          <div ref={consoleEndRef} />
         </div>
-      )}
-    </div>
+        {showFooter && (
+          <div className="bg-accent text-foreground flex items-center justify-end space-x-3 p-3 px-4">
+            <ButtonWithTooltip
+              tooltip="Highlight elements to chat about them"
+              variant="link"
+              size={"icon"}
+              className={cn(
+                "size-6 hover:opacity-50 active:opacity-75",
+                inspectMode && "bg-violet-500/20 text-violet-500"
+              )}
+              onClick={() => setInspectMode(!inspectMode)}
+            >
+              <IconClick size={16} stroke={1.5} />
+            </ButtonWithTooltip>
+            <ButtonWithTooltip
+              tooltip="Toggle Console"
+              variant="link"
+              size={"icon"}
+              className={cn(
+                "console-toggle size-6 hover:opacity-50 active:border-violet-500 active:opacity-75",
+                isConsoleExpanded && "bg-violet-500/20 text-violet-500"
+              )}
+              onClick={() => setIsConsoleExpanded(!isConsoleExpanded)}
+            >
+              <IconTerminal2 size={16} stroke={1.5} />
+            </ButtonWithTooltip>
+          </div>
+        )}
+      </div>
+    ),
+    [
+      activeErrors,
+      errors,
+      ignoredErrors,
+      isConsoleExpanded,
+      consoleMessages,
+      consoleEndRef,
+      iframeRef,
+      inspectMode,
+      isConsoleExpanded,
+      onElementClick,
+      setInspectMode,
+      showFooter,
+      theme,
+      handleIgnoreError,
+      handleFixError
+    ]
   )
 }
 

@@ -44,9 +44,9 @@ const ImageWithPreview = forwardRef<
   }
 
   return (
-    <div
+    <span
       className={cn(
-        "relative w-1/2 cursor-pointer overflow-hidden rounded-lg border"
+        "relative flex w-1/2 cursor-pointer overflow-hidden rounded-lg border"
       )}
     >
       <img
@@ -82,7 +82,7 @@ const ImageWithPreview = forwardRef<
           }}
         />
       )}
-    </div>
+    </span>
   )
 })
 
