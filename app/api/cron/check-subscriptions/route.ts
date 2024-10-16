@@ -36,14 +36,26 @@ interface SupabaseUser {
   email: string
 }
 
-// Update the validateApiKey function
-function validateCronSecret(request: Request): boolean {
-  const authHeader = request.headers.get("Authorization")
+interface ProfileData {
+  user_id: string
+  plan: string
+  stripe_customer_id: string
+}
+
+// Add this function to validate the CRON_SECRET
+function validateRequest(req: Request): boolean {
+  const authHeader = req.headers.get("Authorization")
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return false
   }
   const token = authHeader.split(" ")[1]
   return token === cronSecret
+}
+
+// Add this function to check if the request is from localhost
+function isLocalhost(req: Request): boolean {
+  const host = req.headers.get("host")
+  return host?.includes("localhost") || host?.includes("127.0.0.1") || false
 }
 
 async function getAllStripeSubscriptions(): Promise<StripeSubscription[]> {
@@ -116,14 +128,7 @@ async function getAllProfiles(): Promise<ProfileData[]> {
   while (true) {
     const { data, error, count } = await supabase
       .from("profiles")
-      .select(
-        `
-                user_id, 
-                plan, 
-                stripe_customer_id,
-                auth.users!inner(email)
-            `
-      )
+      .select("user_id, plan, stripe_customer_id")
       .neq("plan", "free")
       .range(page * perPage, (page + 1) * perPage - 1)
 
@@ -132,14 +137,7 @@ async function getAllProfiles(): Promise<ProfileData[]> {
       throw new Error(`Error fetching profiles: ${error.message}`)
     }
 
-    allProfiles = allProfiles.concat(
-      data.map(profile => ({
-        user_id: profile.user_id,
-        plan: profile.plan,
-        stripe_customer_id: profile.stripe_customer_id,
-        email: profile.auth.users.email
-      }))
-    )
+    allProfiles = allProfiles.concat(data as ProfileData[])
 
     if (!count || data.length < perPage) {
       break
@@ -235,57 +233,9 @@ function formatAsciTable(headers: string[], rows: string[][]): string {
   return [headerRow, separator, ...formattedRows].join("\n")
 }
 
-async function syncUserSubscription(email: string): Promise<string> {
-  // Find the Stripe customer
-  const customers = await stripe.customers.list({ email: email, limit: 1 })
-  if (customers.data.length === 0) {
-    return `No Stripe customer found for email: ${email}`
-  }
-  const customer = customers.data[0]
-
-  // Get the active subscription for the customer
-  const subscriptions = await stripe.subscriptions.list({
-    customer: customer.id,
-    status: "active",
-    limit: 1
-  })
-
-  let stripePlan = "free"
-  if (subscriptions.data.length > 0) {
-    stripePlan = subscriptions.data[0].items.data[0].price.lookup_key as string
-  }
-
-  // Find the Supabase user in auth.users table
-  const { data: user, error: authError } =
-    await supabase.auth.admin.getUserById(email)
-
-  if (authError) {
-    return `Error fetching Supabase user: ${authError.message}`
-  }
-
-  if (!user) {
-    return `No Supabase user found for email: ${email}`
-  }
-
-  // Update profile with Stripe information
-  const { error: updateError } = await supabase
-    .from("profiles")
-    .update({
-      plan: stripePlan,
-      stripe_customer_id: customer.id
-    })
-    .eq("user_id", user.user.id)
-
-  if (updateError) {
-    return `Error updating profile: ${updateError.message}`
-  }
-
-  return `Successfully synced user ${email}. Plan set to ${stripePlan}.`
-}
-
 export async function GET(req: Request) {
-  // Update this check at the beginning of the GET function
-  if (!validateCronSecret(req)) {
+  // Add this check at the beginning of the GET function
+  if (!isLocalhost(req) && !validateRequest(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -452,7 +402,6 @@ export async function GET(req: Request) {
             const tableContent = formatAsciTable(headers, formattedRows)
 
             const message = `<pre>${tableContent}</pre>`
-
             try {
               await sendTelegramMessage(message)
               controller.enqueue(
@@ -500,29 +449,4 @@ export async function GET(req: Request) {
   return new Response(stream, {
     headers: { "Content-Type": "text/plain; charset=utf-8" }
   })
-}
-
-export async function POST(req: Request) {
-  // Update this check at the beginning of the POST function
-  if (!validateCronSecret(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  try {
-    const { email } = await req.json()
-
-    if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 })
-    }
-
-    const result = await syncUserSubscription(email)
-
-    return NextResponse.json({ message: result })
-  } catch (error) {
-    logger.error("Error in POST method:", error)
-    return NextResponse.json(
-      { error: "An unexpected error occurred" },
-      { status: 500 }
-    )
-  }
 }

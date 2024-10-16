@@ -1,3 +1,5 @@
+import { Tables } from "@/supabase/types"
+
 const Stripe = require("stripe").default
 const { createClient } = require("@supabase/supabase-js")
 const readline = require("readline")
@@ -100,8 +102,8 @@ async function getAllSupabaseUsers(): Promise<SupabaseUser[]> {
   return allUsers
 }
 
-async function getAllProfiles(): Promise<ProfileData[]> {
-  let allProfiles: ProfileData[] = []
+async function getAllProfiles(): Promise<Tables<"profiles">[]> {
+  let allProfiles: Tables<"profiles">[] = []
   let page = 0
   const perPage = 1000
 
@@ -115,7 +117,7 @@ async function getAllProfiles(): Promise<ProfileData[]> {
       throw new Error(`Error fetching profiles: ${error.message}`)
     }
 
-    allProfiles = allProfiles.concat(data as ProfileData[])
+    allProfiles = allProfiles.concat(data)
 
     if (!count || data.length < perPage) {
       break
