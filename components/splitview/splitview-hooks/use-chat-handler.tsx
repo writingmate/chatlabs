@@ -7,7 +7,7 @@ import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
-import { useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import React, { useContext, useEffect, useRef } from "react"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import {

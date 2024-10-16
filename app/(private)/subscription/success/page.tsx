@@ -1,6 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import { useContext, useEffect, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import confetti from "canvas-confetti"

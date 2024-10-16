@@ -8,7 +8,7 @@ import { createApplication } from "@/db/applications"
 import { UpdateApplication } from "./update-application"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
-import { useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import { IconPlus } from "@tabler/icons-react"
 
 export const CreateApplicationPage: React.FC = () => {

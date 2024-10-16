@@ -2,7 +2,8 @@
 
 import { Brand } from "@/components/ui/brand"
 import { Button } from "@/components/ui/button"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import { supabase } from "@/lib/supabase/browser-client"
 import { GoogleSVG } from "@/components/icons/google-svg"
 import { useState, useEffect } from "react"

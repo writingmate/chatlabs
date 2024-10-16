@@ -1,7 +1,7 @@
 "use client"
 
 import { FC, useState, useEffect, useContext } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import { ChatbotUIContext } from "@/context/context"
 import { Button } from "../ui/button"
 import {

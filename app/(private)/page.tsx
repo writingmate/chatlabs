@@ -1,5 +1,5 @@
 "use client"
-import { useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase/browser-client"
 import { getWorkspacesByUserId } from "@/db/workspaces"

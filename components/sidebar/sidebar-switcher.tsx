@@ -22,7 +22,7 @@ import { ProfileSettings } from "../utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
 import { ChatbotUIContext } from "@/context/context"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import { PLAN_FREE } from "@/lib/stripe/config"
 
 export const SIDEBAR_ICON_SIZE = 28

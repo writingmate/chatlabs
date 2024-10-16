@@ -7,7 +7,7 @@ import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID } from "@/types"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import { useContext, useEffect, useRef } from "react"
 import {
   createTempMessages,

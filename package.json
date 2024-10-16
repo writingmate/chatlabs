@@ -122,6 +122,7 @@
     "next": "^14.2.3",
     "next-pwa": "5.6.0",
     "next-themes": "^0.2.1",
+    "nextjs-toploader": "^3.7.15",
     "nodemailer": "^6.9.15",
     "openai": "^4.67.3",
     "openapi-schema-validator": "^12.1.3",

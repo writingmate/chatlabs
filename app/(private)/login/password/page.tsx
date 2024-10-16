@@ -2,7 +2,7 @@
 
 import { ChangePassword } from "@/components/utility/change-password"
 import { supabase } from "@/lib/supabase/browser-client"
-import { useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import { useEffect, useState } from "react"
 
 export default function ChangePasswordPage() {

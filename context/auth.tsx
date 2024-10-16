@@ -2,7 +2,8 @@ import { Session, User } from "@supabase/supabase-js"
 import { useContext, useState, useEffect, createContext } from "react"
 import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 
 // create a context for authentication
 const AuthContext = createContext<{

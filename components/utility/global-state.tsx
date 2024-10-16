@@ -27,7 +27,7 @@ import {
 } from "@/types"
 import { AssistantImage } from "@/types/images/assistant-image"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
-import { useRouter } from "next/navigation"
+import { useRouter } from "nextjs-toploader/app"
 import { FC, useEffect, useState } from "react"
 import { isMobileScreen } from "@/lib/mobile"
 import { getPopularAssistants } from "@/db/assistants"
