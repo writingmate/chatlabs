@@ -7,7 +7,7 @@
   "crons": [
     {
       "path": "/api/cron/check-subscriptions",
-      "schedule": "* * * * *"
+      "schedule": "*/5 * * * *"
     }
   ]
 }
