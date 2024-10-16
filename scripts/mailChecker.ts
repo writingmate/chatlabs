@@ -4,6 +4,7 @@ const { simpleParser, ParsedMail } = require('mailparser');
 const nodemailer = require('nodemailer');
 const OpenAI = require('openai');
 const { Readable } = require('stream');
+const { google } = require('googleapis');
 
 // Set your OpenAI API key
 const openai = new OpenAI({
@@ -12,27 +13,55 @@ const openai = new OpenAI({
 
 // Gmail credentials
 const USERNAME = 'writingmateai@gmail.com';
-const PASSWORD = process.env.GMAIL_PASSWORD;
+const CLIENT_ID = process.env.GMAIL_CLIENT_ID;
+const CLIENT_SECRET = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID;
+const REFRESH_TOKEN = process.env.SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET;
 
-const imap = new Imap({
-    user: USERNAME,
-    password: PASSWORD,
-    host: 'imap.gmail.com',
-    port: 993,
-    tls: true,
-});
+// Function to get access token
+async function getAccessToken() {
+    const oauth2Client = new google.auth.OAuth2(
+        CLIENT_ID,
+        CLIENT_SECRET,
+        'https://developers.google.com/oauthplayground'
+    );
 
-function connectToGmail(): Promise<void> {
+    oauth2Client.setCredentials({
+        refresh_token: REFRESH_TOKEN
+    });
+
+    const { token } = await oauth2Client.getAccessToken();
+    return token;
+}
+
+async function connectToGmail(): Promise<Imap> {
     console.log('Connecting to Gmail...');
-    return new Promise<void>((resolve, reject) => {
+    const accessToken = await getAccessToken();
+
+    return new Promise<Imap>((resolve, reject) => {
+        const imap = new Imap({
+            user: USERNAME,
+            host: 'imap.gmail.com',
+            port: 993,
+            tls: true,
+            authTimeout: 3000,
+            tlsOptions: { rejectUnauthorized: false },
+            auth: {
+                type: 'OAuth2',
+                user: USERNAME,
+                accessToken: accessToken,
+            },
+        });
+
         imap.once('ready', () => {
             console.log('Successfully connected to Gmail');
-            resolve();
+            resolve(imap);
         });
+
         imap.once('error', (err: Error) => {
             console.error('Error connecting to Gmail:', err);
             reject(err);
         });
+
         imap.connect();
     });
 }
@@ -184,8 +213,9 @@ async function saveDraft(replyContent: ReplyContent): Promise<void> {
 
 async function main(): Promise<void> {
     console.log('Starting mail checker script...');
+    let imap: Imap | null = null;
     try {
-        await connectToGmail();
+        imap = await connectToGmail();
 
         let totalProcessed = 0;
         for await (const emailBatch of fetchEmails(20)) {
@@ -200,10 +230,12 @@ async function main(): Promise<void> {
         }
 
         console.log(`Finished processing. Total emails processed: ${totalProcessed}`);
-        imap.end();
     } catch (error) {
         console.error('Error in main process:', error);
     } finally {
+        if (imap) {
+            imap.end();
+        }
         console.log('Mail checker script completed');
     }
 }
