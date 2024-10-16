@@ -28,7 +28,7 @@ interface PreviewProps2 {
   theme?: string
   setInspectMode: (inspectMode: boolean) => void
   onElementClick: (element: MessageHtmlElement) => void
-  handleFixError: (error: string) => void
+  handleFixError: (errors: string[], consoleMessages: string[]) => void
 }
 
 const CodeViewerPreview2: React.FC<PreviewProps2> = ({
@@ -293,9 +293,7 @@ const CodeViewerPreview2: React.FC<PreviewProps2> = ({
             <Button
               size="sm"
               variant="destructive"
-              onClick={() =>
-                handleFixError(activeErrors[activeErrors.length - 1])
-              }
+              onClick={() => handleFixError(activeErrors, consoleMessages)}
             >
               Try fixing it
             </Button>

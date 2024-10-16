@@ -73,7 +73,7 @@ const webScraper = async (
       logger.debug("Content fetched and converted to markdown")
     }
   } catch (error: any) {
-    logger.error({ error: error.message }, "Failed to fetch the URL")
+    logger.error({ err: error.message }, "Failed to fetch the URL")
     mdDoc = "Failed to fetch the URL: " + error.message
   }
 

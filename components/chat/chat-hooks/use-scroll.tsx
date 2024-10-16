@@ -21,31 +21,53 @@ export const useScrollBase = (
   const isAutoScrolling = useRef(false)
 
   const [isAtTop, setIsAtTop] = useState(false)
-  const [isAtBottom, setIsAtBottom] = useState(false)
+  const [isAtBottom, setIsAtBottom] = useState(true)
   const [userScrolled, setUserScrolled] = useState(false)
   const [isOverflowing, setIsOverflowing] = useState(false)
 
-  const handleScroll: UIEventHandler<HTMLDivElement> = useCallback(e => {
-    const target = e.target as HTMLDivElement
-
-    const bottom =
-      Math.ceil(target.scrollTop + target.clientHeight) >=
-      target.scrollHeight - 60
-
-    setIsAtBottom(bottom)
-
-    const top = target.scrollTop === 0
-    setIsAtTop(top)
-
-    if (!bottom && !isAutoScrolling.current) {
-      setUserScrolled(true)
-    } else {
-      setUserScrolled(false)
+  const checkIsAtBottom = useCallback(() => {
+    if (scrollRef.current) {
+      const { scrollTop, clientHeight, scrollHeight } = scrollRef.current
+      const bottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight - 40
+      setIsAtBottom(bottom)
     }
-
-    const isOverflow = target.scrollHeight > target.clientHeight
-    setIsOverflowing(isOverflow)
   }, [])
+
+  useEffect(() => {
+    const currentRef = scrollRef.current
+    if (currentRef) {
+      const resizeObserver = new ResizeObserver(() => {
+        checkIsAtBottom()
+      })
+
+      resizeObserver.observe(currentRef)
+
+      return () => {
+        resizeObserver.disconnect()
+      }
+    }
+  }, [checkIsAtBottom])
+
+  const handleScroll: UIEventHandler<HTMLDivElement> = useCallback(
+    e => {
+      const target = e.target as HTMLDivElement
+
+      const isOverflow = target.scrollHeight > target.clientHeight
+      setIsOverflowing(isOverflow)
+
+      checkIsAtBottom()
+
+      const top = target.scrollTop === 0
+      setIsAtTop(top)
+
+      if (!isAtBottom && !isAutoScrolling.current) {
+        setUserScrolled(true)
+      } else {
+        setUserScrolled(false)
+      }
+    },
+    [checkIsAtBottom, isAtBottom]
+  )
 
   function scrollIntoView() {
     if (endRef.current) {
@@ -89,7 +111,8 @@ export const useScrollBase = (
     scrollToTop,
     scrollToBottom,
     setIsAtBottom,
-    setUserScrolled // Add this line to expose setUserScrolled
+    setUserScrolled,
+    checkIsAtBottom
   }
 }
 

@@ -5,7 +5,7 @@ import { ChatMessage } from "@/types"
 import { updateMessage } from "@/db/messages"
 import { reconstructContentWithCodeBlocks } from "@/lib/messages"
 
-export function useCodeBlockManager(ignore: ChatMessage[]) {
+export function useCodeBlockManager(ignore?: ChatMessage[]) {
     const [selectedCodeBlock, setSelectedCodeBlock] = useState<CodeBlock | null>(null)
     const { isGenerating, chatMessages, setChatMessages } = useContext(ChatbotUIChatContext)
 

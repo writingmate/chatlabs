@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     )
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error"
-    logger.error(`❌ Error parsing webhook: ${errorMessage}`)
+    logger.error({ err: err }, `❌ Error parsing webhook: ${errorMessage}`)
     return createErrorResponse(`Webhook Error: ${errorMessage}`, 400)
   }
 
@@ -88,8 +88,8 @@ export async function POST(req: Request) {
     )
   } catch (error) {
     logger.error(
-      `[${event.id}][${event.type}]: Error processing webhook:`,
-      error
+      { err: error },
+      `[${event.id}][${event.type}]: Error processing webhook:`
     )
     return createErrorResponse("Webhook processing failed", 500)
   }

@@ -26,7 +26,7 @@ import {
 } from "@tabler/icons-react"
 import { ChatbotUIContext } from "@/context/context"
 import { Button } from "../ui/button"
-import { cn } from "@/lib/utils"
+import { cn, onlyUniqueById } from "@/lib/utils"
 import { SIDEBAR_ITEM_ICON_SIZE } from "@/components/sidebar/items/all/sidebar-display-item"
 import { SearchInput } from "../ui/search-input"
 import { ProfileSettings } from "../utility/profile-settings"
@@ -89,6 +89,14 @@ export const Sidebar: FC = () => {
   const [reachedEnd, setReachedEnd] = useState(false)
 
   const loadMoreChats = useCallback(async () => {
+    console.log(
+      "loadMoreChats",
+      searchQueries.chats,
+      chatOffset,
+      chats,
+      reachedEnd,
+      searchLoading
+    )
     if (searchLoading) return
     if (reachedEnd) return
     const lastChatCreatedAt = chats?.[chats.length - 1]?.created_at
@@ -109,7 +117,9 @@ export const Sidebar: FC = () => {
       if (offset === 0) {
         setChats(newChats)
       } else {
-        setChats(prevChats => [...prevChats, ...newChats])
+        setChats(prevChats =>
+          [...prevChats, ...newChats].filter(onlyUniqueById)
+        )
       }
       setChatOffset(offset) // Update offset for pagination
       setSearchLoading(false)

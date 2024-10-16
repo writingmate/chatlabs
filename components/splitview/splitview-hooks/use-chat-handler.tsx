@@ -26,6 +26,8 @@ import { isMobileScreen } from "@/lib/mobile"
 import { SubscriptionRequiredError } from "@/lib/errors"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { encode } from "gpt-tokenizer"
+import { useAtom } from "jotai"
+import { userInputAtom } from "@/atoms/chatAtoms"
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -58,9 +60,7 @@ export const useChatHandler = () => {
     isPromptPickerOpen,
     isFilePickerOpen,
     isToolPickerOpen,
-    setIsPaywallOpen,
-    userInput,
-    setUserInput
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const {
@@ -87,6 +87,8 @@ export const useChatHandler = () => {
   } = useContext(ChatbotUIChatContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
+
+  const [userInput, setUserInput] = useAtom(userInputAtom)
 
   useEffect(() => {
     if (!isPromptPickerOpen || !isFilePickerOpen || !isToolPickerOpen) {

@@ -49,6 +49,8 @@ import { motion, AnimatePresence } from "framer-motion" // Add this import
 import { cn } from "@/lib/utils"
 import { ModelIcon } from "../models/model-icon"
 import { Virtualizer } from "virtua"
+import { useAtom } from "jotai"
+import { userInputAtom } from "@/atoms/chatAtoms"
 
 interface ChatUIProps {
   chatId?: string
@@ -412,7 +414,7 @@ ${content}
                 theme={theme}
               />
             ) : (
-              <Virtualizer scrollRef={scrollRef}>
+              <>
                 <div ref={messagesStartRef} />
                 <ChatMessages
                   onSelectCodeBlock={onSelectCodeBlock}
@@ -434,7 +436,7 @@ ${content}
                     </Button>
                   )}
                 </div>
-              </Virtualizer>
+              </>
             )}
             <div className="bg-background sticky bottom-0 mx-2 items-end pb-2">
               {chatMessages?.length === 0 && (

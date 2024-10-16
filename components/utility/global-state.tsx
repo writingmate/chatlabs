@@ -86,7 +86,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [openaiAssistants, setOpenaiAssistants] = useState<any[]>([])
 
   // PASSIVE CHAT STORE
-  const [userInput, setUserInput] = useState<string>("")
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatSettings, setChatSettings] = useState<ChatSettings>(() => {
     if (typeof window !== "undefined") {
@@ -282,7 +281,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       workspaces.find(w => w.is_home)?.id as string,
       profile?.user_id as string
     )
-    setUserInput("")
     setChatMessages([])
     setSelectedChat(null)
     setIsGenerating(false)
@@ -463,8 +461,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setOpenaiAssistants,
 
         // PASSIVE CHAT STORE
-        userInput,
-        setUserInput,
         chatMessages,
         setChatMessages,
         chatSettings,
