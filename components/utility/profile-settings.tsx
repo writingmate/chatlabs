@@ -96,6 +96,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Menu } from "lucide-react"
 import { SIDEBAR_ITEM_ICON_SIZE } from "../sidebar/items/all/sidebar-display-item"
+import { WorkspaceSwitcher } from "./workspace-switcher"
 
 interface ProfileSettingsProps {
   isCollapsed: boolean
@@ -528,6 +529,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="mb-1 w-[290px] cursor-pointer text-sm">
+          <WorkspaceSwitcher />
           <DropdownMenuItem
             onClick={() => setIsProfileSettingsOpen("profile")}
             className="px-1"
@@ -1035,7 +1037,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                       <TableBody>
                         {workspaceUsers.map(user => (
                           <TableRow key={user.user_id}>
-                            <TableCell>{user.email}</TableCell>
+                            <TableCell className="grow">{user.email}</TableCell>
                             <TableCell>
                               <Select
                                 value={user.role}

@@ -474,6 +474,7 @@ export const Sidebar: FC = () => {
       showSidebar,
       searchQueries,
       profile,
+      selectedWorkspace,
       isPaywallOpen, // Use context's state
       loadMoreChats, // Add loadMoreChats to dependencies
       searchLoading // Add searchLoading to dependencies

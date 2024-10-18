@@ -2,10 +2,14 @@
 
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
 import { ChatbotUIContext } from "@/context/context"
 import { createWorkspace } from "@/db/workspaces"
 import useHotkey from "@/lib/hooks/use-hotkey"
@@ -16,6 +20,9 @@ import { useRouter } from "nextjs-toploader/app"
 import { FC, useContext, useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
+import { SIDEBAR_ITEM_ICON_SIZE } from "../sidebar/items/all/sidebar-display-item"
+import { SIDEBAR_ICON_STROKE } from "../sidebar/sidebar-switcher"
+import { cn } from "@/lib/utils"
 
 interface WorkspaceSwitcherProps {}
 
@@ -44,7 +51,10 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
     setValue(selectedWorkspace.id)
   }, [selectedWorkspace])
 
-  const handleCreateWorkspace = async () => {
+  const handleCreateWorkspace = async (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
+    e.preventDefault()
+
     if (!selectedWorkspace) return
 
     const createdWorkspace = await createWorkspace({
@@ -101,11 +111,8 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
   const IconComponent = selectedWorkspace?.is_home ? IconHome : IconBuilding
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger
-        className="border-input flex h-[36px]
-        w-full cursor-pointer items-center justify-between rounded-md border px-2 py-1 hover:opacity-50"
-      >
+    <DropdownMenuSub>
+      <DropdownMenuSubTrigger className="px-1">
         <div className="flex items-center truncate">
           {selectedWorkspace && (
             <div className="flex items-center">
@@ -119,111 +126,114 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
                   alt={selectedWorkspace.name}
                 />
               ) : (
-                <IconComponent className="mb-0.5 mr-2" size={22} />
+                <IconComponent
+                  className="text-muted-foreground mr-2"
+                  size={SIDEBAR_ITEM_ICON_SIZE}
+                  stroke={SIDEBAR_ICON_STROKE}
+                />
               )}
             </div>
           )}
-
           {getWorkspaceName(value) || "Select workspace..."}
         </div>
+      </DropdownMenuSubTrigger>
+      <DropdownMenuSubContent>
+        {workspaces
+          .filter(workspace => workspace.is_home)
+          .map(workspace => {
+            const image = workspaceImages.find(
+              image => image.workspaceId === workspace.id
+            )
 
-        <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
-      </PopoverTrigger>
+            return (
+              <DropdownMenuItem
+                key={workspace.id}
+                className={cn("cursor-pointer", {
+                  "bg-accent": selectedWorkspace?.id === workspace.id
+                })}
+                onSelect={() => handleSelect(workspace.id)}
+              >
+                {image ? (
+                  <Image
+                    style={{
+                      width: SIDEBAR_ITEM_ICON_SIZE,
+                      height: SIDEBAR_ITEM_ICON_SIZE
+                    }}
+                    className="mr-2 rounded"
+                    src={image.url || ""}
+                    width={SIDEBAR_ITEM_ICON_SIZE}
+                    height={SIDEBAR_ITEM_ICON_SIZE}
+                    alt={workspace.name}
+                  />
+                ) : (
+                  <IconHome
+                    className="text-muted-foreground mr-2"
+                    size={SIDEBAR_ITEM_ICON_SIZE}
+                    stroke={SIDEBAR_ICON_STROKE}
+                  />
+                )}
 
-      <PopoverContent className="p-2">
-        <div className="space-y-2">
-          <Button
-            className="flex w-full items-center space-x-2"
-            size="sm"
-            onClick={handleCreateWorkspace}
-          >
-            <IconPlus />
-            <div className="ml-2">New Workspace</div>
-          </Button>
+                {workspace.name}
+              </DropdownMenuItem>
+            )
+          })}
 
-          <Input
-            placeholder="Search workspaces..."
-            autoFocus
-            value={search}
-            onChange={e => setSearch(e.target.value)}
+        {workspaces
+          .filter(
+            workspace =>
+              !workspace.is_home &&
+              workspace.name.toLowerCase().includes(search.toLowerCase())
+          )
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(workspace => {
+            const image = workspaceImages.find(
+              image => image.workspaceId === workspace.id
+            )
+
+            return (
+              <DropdownMenuItem
+                key={workspace.id}
+                className={cn("cursor-pointer", {
+                  "bg-accent": selectedWorkspace?.id === workspace.id
+                })}
+                onSelect={() => handleSelect(workspace.id)}
+              >
+                {image ? (
+                  <Image
+                    style={{
+                      width: SIDEBAR_ITEM_ICON_SIZE,
+                      height: SIDEBAR_ITEM_ICON_SIZE
+                    }}
+                    className="mr-2 rounded"
+                    src={image.url || ""}
+                    width={SIDEBAR_ITEM_ICON_SIZE}
+                    height={SIDEBAR_ITEM_ICON_SIZE}
+                    alt={workspace.name}
+                  />
+                ) : (
+                  <IconBuilding
+                    className="text-muted-foreground mr-2"
+                    stroke={SIDEBAR_ICON_STROKE}
+                    size={SIDEBAR_ITEM_ICON_SIZE}
+                  />
+                )}
+
+                {workspace.name}
+              </DropdownMenuItem>
+            )
+          })}
+        <DropdownMenuItem
+          className="flex w-full items-center space-x-2"
+          onClick={handleCreateWorkspace}
+        >
+          <IconPlus
+            className="text-muted-foreground mr-2"
+            size={SIDEBAR_ITEM_ICON_SIZE}
+            stroke={SIDEBAR_ICON_STROKE}
           />
-
-          <div className="flex flex-col space-y-1">
-            {workspaces
-              .filter(workspace => workspace.is_home)
-              .map(workspace => {
-                const image = workspaceImages.find(
-                  image => image.workspaceId === workspace.id
-                )
-
-                return (
-                  <Button
-                    key={workspace.id}
-                    className="flex items-center justify-start"
-                    variant="ghost"
-                    onClick={() => handleSelect(workspace.id)}
-                  >
-                    {image ? (
-                      <Image
-                        style={{ width: "28px", height: "28px" }}
-                        className="mr-3 rounded"
-                        src={image.url || ""}
-                        width={28}
-                        height={28}
-                        alt={workspace.name}
-                      />
-                    ) : (
-                      <IconHome className="mr-3" size={28} />
-                    )}
-
-                    <div className="text-lg font-semibold">
-                      {workspace.name}
-                    </div>
-                  </Button>
-                )
-              })}
-
-            {workspaces
-              .filter(
-                workspace =>
-                  !workspace.is_home &&
-                  workspace.name.toLowerCase().includes(search.toLowerCase())
-              )
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map(workspace => {
-                const image = workspaceImages.find(
-                  image => image.workspaceId === workspace.id
-                )
-
-                return (
-                  <Button
-                    key={workspace.id}
-                    className="flex items-center justify-start"
-                    variant="ghost"
-                    onClick={() => handleSelect(workspace.id)}
-                  >
-                    {image ? (
-                      <Image
-                        style={{ width: "28px", height: "28px" }}
-                        className="mr-3 rounded"
-                        src={image.url || ""}
-                        width={28}
-                        height={28}
-                        alt={workspace.name}
-                      />
-                    ) : (
-                      <IconBuilding className="mr-3" size={28} />
-                    )}
-
-                    <div className="text-lg font-semibold">
-                      {workspace.name}
-                    </div>
-                  </Button>
-                )
-              })}
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
+          New Workspace
+        </DropdownMenuItem>
+      </DropdownMenuSubContent>
+    </DropdownMenuSub>
   )
 }
