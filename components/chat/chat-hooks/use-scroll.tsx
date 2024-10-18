@@ -29,16 +29,6 @@ export const useScrollBase = (
     if (scrollRef.current) {
       const { scrollTop, clientHeight, scrollHeight } = scrollRef.current
       const bottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight - 40
-      console.log(
-        "bottom",
-        bottom,
-        "scrollTop",
-        scrollTop,
-        "clientHeight",
-        clientHeight,
-        "scrollHeight",
-        scrollHeight
-      )
       setIsAtBottom(bottom)
     }
   }, [scrollRef, setIsAtBottom])

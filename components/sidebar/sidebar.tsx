@@ -89,14 +89,6 @@ export const Sidebar: FC = () => {
   const [reachedEnd, setReachedEnd] = useState(false)
 
   const loadMoreChats = useCallback(async () => {
-    console.log(
-      "loadMoreChats",
-      searchQueries.chats,
-      chatOffset,
-      chats,
-      reachedEnd,
-      searchLoading
-    )
     if (searchLoading) return
     if (reachedEnd) return
     const lastChatCreatedAt = chats?.[chats.length - 1]?.created_at
@@ -351,13 +343,6 @@ export const Sidebar: FC = () => {
                 hasSubmenu
                 isCollapsed={isCollapsed}
               />
-              <SidebarItem
-                icon={<IconPuzzle {...iconProps} />}
-                label="Plugins"
-                onClick={() => handleSubmenuOpen("tools")}
-                hasSubmenu
-                isCollapsed={isCollapsed}
-              />
               <Link href="/splitview" target="_blank" passHref>
                 <SidebarItem
                   icon={<IconLayoutColumns {...iconProps} />}
@@ -386,7 +371,7 @@ export const Sidebar: FC = () => {
             >
               <div className="flex grow flex-col p-2 pb-0">
                 <SearchInput
-                  placeholder="Search chats and messages"
+                  placeholder="Search chats..."
                   value={searchQueries.chats}
                   loading={searchLoading}
                   onChange={e =>
@@ -434,47 +419,45 @@ export const Sidebar: FC = () => {
           )}
 
           {profile && (
-            <div className="border-t p-2">
+            <div className="border-t">
               <ProfileSettings isCollapsed={isCollapsed} />
             </div>
           )}
 
           {!isCollapsed &&
-            (["prompts", "assistants", "files", "tools"] as const).map(
-              contentType => (
-                <SlidingSubmenu
-                  key={contentType}
-                  isOpen={activeSubmenu === contentType}
-                  contentType={contentType}
-                  isCollapsed={isCollapsed}
-                >
-                  <>
-                    <div className="mb-2 flex items-center justify-between space-x-2">
-                      <SearchInput
-                        className="w-full"
-                        placeholder={`Search ${contentType}`}
-                        value={searchQueries[contentType]}
-                        onChange={e =>
-                          setSearchQueries({
-                            ...searchQueries,
-                            [contentType]: e
-                          })
-                        }
-                      />
-                      <SidebarCreateButtons
-                        contentType={contentType}
-                        hasData={dataMap[contentType].length > 0}
-                      />
-                    </div>
-                    <SidebarDataList
-                      contentType={contentType}
-                      data={dataMap[contentType]}
-                      folders={foldersMap[contentType]}
+            (["prompts", "assistants", "files"] as const).map(contentType => (
+              <SlidingSubmenu
+                key={contentType}
+                isOpen={activeSubmenu === contentType}
+                contentType={contentType}
+                isCollapsed={isCollapsed}
+              >
+                <>
+                  <div className="mb-2 flex items-center justify-between space-x-2">
+                    <SearchInput
+                      className="w-full"
+                      placeholder={`Search ${contentType}`}
+                      value={searchQueries[contentType]}
+                      onChange={e =>
+                        setSearchQueries({
+                          ...searchQueries,
+                          [contentType]: e
+                        })
+                      }
                     />
-                  </>
-                </SlidingSubmenu>
-              )
-            )}
+                    <SidebarCreateButtons
+                      contentType={contentType}
+                      hasData={dataMap[contentType].length > 0}
+                    />
+                  </div>
+                  <SidebarDataList
+                    contentType={contentType}
+                    data={dataMap[contentType]}
+                    folders={foldersMap[contentType]}
+                  />
+                </>
+              </SlidingSubmenu>
+            ))}
         </motion.div>
       </>
     ),

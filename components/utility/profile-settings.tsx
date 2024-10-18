@@ -20,11 +20,15 @@ import {
   IconKey,
   IconLogout,
   IconSettings,
-  IconUser
+  IconTrash,
+  IconUser,
+  IconPuzzle,
+  IconMenu,
+  IconX
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { useRouter, redirect } from "next/navigation"
-import { FC, useCallback, useContext, useRef, useState } from "react"
+import { FC, useCallback, useContext, useRef, useState, useEffect } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 import { Button } from "../ui/button"
@@ -56,6 +60,42 @@ import { debounce } from "@/lib/debounce"
 import { Callout, CalloutDescription, CalloutTitle } from "../ui/callout"
 import { Loader } from "lucide-react"
 import { ButtonWithTooltip } from "../ui/button-with-tooltip"
+import {
+  getWorkspaceUsers,
+  removeWorkspaceUser,
+  updateWorkspaceUserRole
+} from "@/db/workspaces"
+import { DialogDescription } from "@radix-ui/react-dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "../ui/select"
+import { getWorkspaces } from "@/db/workspaces"
+import { Tables } from "@/supabase/types"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "../ui/table"
+import { useAuth } from "@/context/auth"
+import { SidebarCreateButtons } from "../sidebar/sidebar-create-buttons"
+import { SidebarDataList } from "../sidebar/sidebar-data-list"
+import { SearchInput } from "../ui/search-input"
+import { ToolManager } from "./ToolManager"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+import { Menu } from "lucide-react"
+import { SIDEBAR_ITEM_ICON_SIZE } from "../sidebar/items/all/sidebar-display-item"
 
 interface ProfileSettingsProps {
   isCollapsed: boolean
@@ -71,12 +111,18 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     availableOpenRouterModels,
     setIsPaywallOpen,
     isProfileSettingsOpen,
-    setIsProfileSettingsOpen
+    setIsProfileSettingsOpen,
+    tools,
+    folders,
+    selectedWorkspace,
+    setSelectedWorkspace
   } = useContext(ChatbotUIContext)
 
   const [loadingBillingPortal, setLoadingBillingPortal] = useState(false)
 
   const router = useRouter()
+
+  const { user: currentUser } = useAuth()
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -160,6 +206,83 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     profile?.send_message_on_enter || true
   )
 
+  const [workspaces, setWorkspaces] = useState<Tables<"workspaces">[]>([])
+  const [workspaceUsers, setWorkspaceUsers] = useState<
+    Tables<"workspace_users">[]
+  >([])
+  const [inviteEmail, setInviteEmail] = useState("")
+
+  const [searchQuery, setSearchQuery] = useState("")
+  const [showPlugins, setShowPlugins] = useState(true)
+
+  const filteredTools = tools.filter(tool =>
+    tool.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const toolsFolders = folders.filter(folder => folder.type === "tools")
+
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      try {
+        const fetchedWorkspaces = await getWorkspaces()
+        setWorkspaces(fetchedWorkspaces)
+      } catch (error) {
+        console.error("Error fetching workspaces:", error)
+        toast.error("Failed to fetch workspaces")
+      }
+    }
+
+    fetchWorkspaces()
+  }, [])
+
+  useEffect(() => {
+    if (selectedWorkspace) {
+      fetchWorkspaceUsers(selectedWorkspace.id)
+    }
+  }, [selectedWorkspace])
+
+  const fetchWorkspaceUsers = async (workspaceId: string) => {
+    try {
+      const users = await getWorkspaceUsers(workspaceId)
+      setWorkspaceUsers(users)
+    } catch (error) {
+      console.error("Error fetching workspace users:", error)
+      toast.error("Failed to fetch workspace users")
+    }
+  }
+
+  const handleInviteUser = async () => {
+    if (!selectedWorkspace || !inviteEmail) {
+      toast.error("Please select a workspace and enter an email address")
+      return
+    }
+
+    try {
+      const response = await fetch("/api/workspaces/invite", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          workspaceId: selectedWorkspace,
+          email: inviteEmail
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Failed to invite user")
+      }
+
+      const data = await response.json()
+      toast.success(data.message)
+      setInviteEmail("")
+      fetchWorkspaceUsers(selectedWorkspace.id)
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred while inviting the user")
+    }
+  }
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
@@ -167,7 +290,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     return
   }
 
-  const handleSave = async () => {
+  const handleSaveProfile = async () => {
     if (!profile) return
     let profileImageUrl = profile.image_url
     let profileImagePath = ""
@@ -185,6 +308,31 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
       profile_context: profileInstructions,
       image_url: profileImageUrl,
       image_path: profileImagePath,
+      experimental_code_editor: experimentalCodeEditor
+    })
+
+    setProfile(updatedProfile)
+
+    toast.success("Profile updated!")
+  }
+
+  const handleSaveShortcuts = async () => {
+    // Update profile with shortcuts-related fields
+    if (!profile) return
+    const updatedProfile = await updateProfile(profile.id, {
+      tools_command: toolsCommand,
+      assistant_command: assistantCommand,
+      files_command: filesCommand,
+      prompt_command: promptCommand,
+      send_message_on_enter: sendMessageOnEnter
+    })
+    setProfile(updatedProfile)
+    toast.success("Shortcuts updated!")
+  }
+
+  const handleSaveAPIKeys = async () => {
+    if (!profile) return
+    const updatedProfile = await updateProfile(profile.id, {
       openai_api_key: openaiAPIKey,
       openai_organization_id: openaiOrgID,
       anthropic_api_key: anthropicAPIKey,
@@ -199,18 +347,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
       azure_openai_45_turbo_id: azureOpenai45TurboID,
       azure_openai_45_vision_id: azureOpenai45VisionID,
       azure_openai_embeddings_id: azureEmbeddingsID,
-      openrouter_api_key: openrouterAPIKey,
-      send_message_on_enter: sendMessageOnEnter,
-      tools_command: toolsCommand,
-      assistant_command: assistantCommand,
-      files_command: filesCommand,
-      prompt_command: promptCommand,
-      experimental_code_editor: experimentalCodeEditor
+      openrouter_api_key: openrouterAPIKey
     })
-
     setProfile(updatedProfile)
-
-    toast.success("Profile updated!")
 
     const providers = [
       "openai",
@@ -224,14 +363,14 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     ]
 
     providers.forEach(async provider => {
-      let providerKey: keyof typeof profile
+      let providerKey: keyof typeof updatedProfile
 
       if (provider === "google") {
         providerKey = "google_gemini_api_key"
       } else if (provider === "azure") {
         providerKey = "azure_openai_api_key"
       } else {
-        providerKey = `${provider}_api_key` as keyof typeof profile
+        providerKey = `${provider}_api_key` as keyof typeof updatedProfile
       }
 
       const models = LLM_LIST_MAP[provider]
@@ -251,7 +390,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
               )
               return [...prev, ...newModels]
             })
-          } else {
+          } else if (!hasApiKey) {
             setAvailableOpenRouterModels([])
           }
         } else {
@@ -272,7 +411,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
       }
     })
 
-    setIsProfileSettingsOpen("")
+    toast.success("API Keys updated!")
   }
 
   function resetToDefaults() {
@@ -306,473 +445,650 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     }
   }
 
+  const handleRoleChange = async (
+    user: Tables<"workspace_users">,
+    newRole: string
+  ) => {
+    try {
+      if (!selectedWorkspace) {
+        toast.error("No workspace selected")
+        return
+      }
+      await updateWorkspaceUserRole(
+        selectedWorkspace.id,
+        user.user_id,
+        newRole as "OWNER" | "MEMBER"
+      )
+      setWorkspaceUsers(prevUsers =>
+        prevUsers.map(u =>
+          u.user_id === user.user_id
+            ? { ...u, role: newRole as "OWNER" | "MEMBER" }
+            : u
+        )
+      )
+      toast.success(`Updated ${user.email}'s role to ${newRole}`)
+    } catch (error) {
+      console.error("Error updating user role:", error)
+      toast.error("Failed to update user role")
+    }
+  }
+
+  const handleRemoveUser = async (user: Tables<"workspace_users">) => {
+    if (
+      confirm(
+        `Are you sure you want to remove ${user.email} from this workspace?`
+      )
+    ) {
+      try {
+        // Implement the removeWorkspaceUser function in your DB operations
+        if (!selectedWorkspace) {
+          toast.error("No workspace selected")
+          return
+        }
+        await removeWorkspaceUser(selectedWorkspace.id, user.user_id)
+        setWorkspaceUsers(prevUsers =>
+          prevUsers.filter(u => u.user_id !== user.user_id)
+        )
+        toast.success(`Removed ${user.email} from the workspace`)
+      } catch (error) {
+        console.error("Error removing user from workspace:", error)
+        toast.error("Failed to remove user from workspace")
+      }
+    }
+  }
+
   if (!profile) return null
 
   return (
-    <Dialog
-      open={isProfileSettingsOpen !== ""}
-      onOpenChange={open => setIsProfileSettingsOpen(open ? "profile" : "")}
-    >
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className={cn(
-            "flex h-8 w-full items-center justify-start space-x-2 rounded-lg p-2 pl-1 text-sm"
-          )}
-        >
-          <Avatar className="size-8">
-            <AvatarImage src={profile.image_url!} />
-            <AvatarFallback>
-              <IconUser size={SIDEBAR_ICON_SIZE} />
-            </AvatarFallback>
-          </Avatar>
-          {!isCollapsed && (
-            <div className="flex w-full items-center justify-between">
-              <div>{profile.display_name}</div>
-              <IconSettings
-                size={18}
-                className="text-muted-foreground"
-                stroke={1.5}
-              />
-            </div>
-          )}
-        </Button>
-      </DialogTrigger>
-
-      <DialogContent className="flex h-screen flex-col gap-0 p-0 sm:h-[80vh] sm:max-w-[900px]">
-        <DialogHeader className="border-b px-6 py-4">
-          <DialogTitle className="flex items-center justify-between space-x-2">
-            <div className="flex items-center space-x-2">
-              <IconSettings className="mr-1" size={20} stroke={1.5} /> Settings
-            </div>
-
-            <ButtonWithTooltip
-              tooltip="Sign out"
-              tabIndex={-1}
-              className="text-xs"
-              size="icon"
-              variant={"ghost"}
-              onClick={handleSignOut}
-            >
-              <IconLogout stroke={1.5} size={20} />
-            </ButtonWithTooltip>
-          </DialogTitle>
-        </DialogHeader>
-
-        <Tabs
-          orientation="vertical"
-          value={isProfileSettingsOpen}
-          onValueChange={value =>
-            value !== "" && setIsProfileSettingsOpen(value)
-          }
-          className="my-0 flex flex-1 overflow-hidden"
-        >
-          <TabsList className="flex h-full flex-col justify-start rounded-none border-r sm:w-48">
-            <TabsTrigger value="profile" className="w-full justify-start">
-              Profile
-            </TabsTrigger>
-            <TabsTrigger value="shortcuts" className="w-full  justify-start">
-              Shortcuts
-            </TabsTrigger>
-            <TabsTrigger value="keys" className="w-full justify-start">
-              API Keys
-            </TabsTrigger>
-            <TabsTrigger value="subscription" className="w-full justify-start">
-              Subscription
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="flex-1 overflow-y-auto p-6">
-            <TabsContent value="profile">
-              <form className={"space-y-2"}>
-                <div className="space-y-1">
-                  <Label>Profile Image</Label>
-                  <ImagePicker
-                    src={profileImageSrc}
-                    image={profileImageFile}
-                    height={50}
-                    width={50}
-                    onSrcChange={setProfileImageSrc}
-                    onImageChange={setProfileImageFile}
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <Label>Chat Display Name</Label>
-                  <Input
-                    placeholder="Chat display name..."
-                    value={displayName}
-                    onChange={e => setDisplayName(e.target.value)}
-                    maxLength={PROFILE_DISPLAY_NAME_MAX}
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <Label className="text-sm">
-                    What would you like the AI to know about you to provide
-                    better responses?
-                  </Label>
-                  <TextareaAutosize
-                    value={profileInstructions}
-                    onValueChange={setProfileInstructions}
-                    placeholder="Profile context... (optional)"
-                    minRows={6}
-                    maxRows={10}
-                  />
-                  <LimitDisplay
-                    used={profileInstructions.length}
-                    limit={PROFILE_CONTEXT_MAX}
-                  />
-                </div>
-                <div className="flex items-center justify-between space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <Label>Artifacts</Label>
-                    <WithTooltip
-                      asChild={true}
-                      trigger={
-                        <IconInfoCircle
-                          size={18}
-                          stroke={1.5}
-                          className="text-foreground/60"
-                        />
-                      }
-                      display={
-                        <div className={"text-xs"}>
-                          Artifacts allow ChatLabs to share substantial,
-                          standalone content with you in a dedicated window
-                          separate from the main conversation. Artifacts make it
-                          easy to work with significant pieces of content that
-                          you may want to modify, build upon, or reference
-                          later.
-                        </div>
-                      }
-                    />
-                  </div>
-                  <Switch
-                    checked={experimentalCodeEditor}
-                    onCheckedChange={setExperimentalCodeEditor}
-                  />
-                </div>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="shortcuts">
-              <div className="space-y-5">
-                <div className={"flex items-center justify-between"}>
-                  <Label>
-                    Send message on{" "}
-                    {navigator.platform.toUpperCase().indexOf("MAC") > -1
-                      ? "⌘"
-                      : "Ctrl"}
-                    +Enter
-                  </Label>
-                  <Switch
-                    checked={!sendMessageOnEnter}
-                    onCheckedChange={() =>
-                      setSendMessageOnEnter(!sendMessageOnEnter)
-                    }
-                  />
-                </div>
-
-                <Separator />
-                <div>
-                  <div className={"grid grid-cols-2 items-center gap-1"}>
-                    <Label>Assistant command</Label>
-                    <Input
-                      minLength={1}
-                      maxLength={1}
-                      value={assistantCommand}
-                      onChange={e => setAssistantCommand(e.target.value)}
-                    />
-                    <Label>Plugins command</Label>
-                    <Input
-                      minLength={1}
-                      maxLength={1}
-                      value={toolsCommand}
-                      onChange={e => setToolsCommand(e.target.value)}
-                    />
-                    <Label>Prompt command</Label>
-                    <Input
-                      minLength={1}
-                      maxLength={1}
-                      value={promptCommand}
-                      onChange={e => setPromptCommand(e.target.value)}
-                    />
-                    <Label>Files command</Label>
-                    <Input
-                      minLength={1}
-                      maxLength={1}
-                      value={filesCommand}
-                      onChange={e => setFilesCommand(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <Button
-                  className="w-full"
-                  variant={"secondary"}
-                  onClick={resetToDefaults}
-                >
-                  Reset to defaults
-                </Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="keys">
-              <Callout variant={"info"}>
-                <CalloutTitle className="flex items-center space-x-2">
-                  <IconKey className="mr-1 size-4" stroke={1.5} /> API Keys
-                </CalloutTitle>
-                <CalloutDescription>
-                  <p>There are two ways to use API keys in ChatLabs:</p>
-                  <ol className="mt-2 list-inside list-decimal">
-                    <li className="mb-2">
-                      <strong>Paid ChatLabs accounts:</strong> By default,
-                      ChatLabs provides API keys with usage limits based on your
-                      subscription plan. These keys are managed by ChatLabs and
-                      ensure a seamless experience.
-                    </li>
-                    <li>
-                      <strong>Your own API keys:</strong> If you provide your
-                      own API keys here, ChatLabs will use them instead. This
-                      option lifts the plan-based limitations but requires you
-                      to manage your own API usage and billing with the
-                      respective providers.
-                    </li>
-                  </ol>
-                  <p className="mt-2">
-                    Choose the option that best suits your needs and usage
-                    patterns.
-                  </p>
-                </CalloutDescription>
-              </Callout>
-              <div className="mt-5 space-y-2">
-                <Label className="flex items-center">
-                  {useAzureOpenai ? "Azure OpenAI API Key" : "OpenAI API Key"}
-
-                  <Button
-                    className="ml-3 h-[18px] w-[150px] text-[11px]"
-                    onClick={() => setUseAzureOpenai(!useAzureOpenai)}
-                  >
-                    {useAzureOpenai
-                      ? "Switch To Standard OpenAI"
-                      : "Switch To Azure OpenAI"}
-                  </Button>
-                </Label>
-
-                {useAzureOpenai ? (
-                  <Input
-                    placeholder="Azure OpenAI API Key"
-                    type="password"
-                    value={azureOpenaiAPIKey}
-                    onChange={e => setAzureOpenaiAPIKey(e.target.value)}
-                  />
-                ) : (
-                  <Input
-                    placeholder="OpenAI API Key"
-                    type="password"
-                    value={openaiAPIKey}
-                    onChange={e => setOpenaiAPIKey(e.target.value)}
-                  />
-                )}
-              </div>
-
-              <div className="ml-8 space-y-3">
-                {useAzureOpenai && (
-                  <>
-                    <div className="space-y-1">
-                      <Label>Azure Endpoint</Label>
-                      <Input
-                        placeholder="https://your-endpoint.openai.azure.com"
-                        value={azureOpenaiEndpoint}
-                        onChange={e => setAzureOpenaiEndpoint(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label>Azure GPT-3.5 Turbo Deployment Name</Label>
-                      <Input
-                        placeholder="Azure GPT-3.5 Turbo Deployment Name"
-                        value={azureOpenai35TurboID}
-                        onChange={e => setAzureOpenai35TurboID(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label>Azure GPT-4.5 Turbo Deployment Name</Label>
-                      <Input
-                        placeholder="Azure GPT-4.5 Turbo Deployment Name"
-                        value={azureOpenai45TurboID}
-                        onChange={e => setAzureOpenai45TurboID(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label>Azure GPT-4.5 Vision Deployment Name</Label>
-                      <Input
-                        placeholder="Azure GPT-4.5 Vision Deployment Name"
-                        value={azureOpenai45VisionID}
-                        onChange={e => setAzureOpenai45VisionID(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label>Azure Embeddings Deployment Name</Label>
-                      <Input
-                        placeholder="Azure Embeddings Deployment Name"
-                        value={azureEmbeddingsID}
-                        onChange={e => setAzureEmbeddingsID(e.target.value)}
-                      />
-                    </div>
-                  </>
-                )}
-                {!useAzureOpenai && (
-                  <div className="space-y-1">
-                    <Label>OpenAI Organization ID</Label>
-                    <Input
-                      placeholder="OpenAI Organization ID (optional)"
-                      type="password"
-                      value={openaiOrgID}
-                      onChange={e => setOpenaiOrgID(e.target.value)}
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                <Label>Anthropic API Key</Label>
-                <Input
-                  placeholder="Anthropic API Key"
-                  type="password"
-                  value={anthropicAPIKey}
-                  onChange={e => setAnthropicAPIKey(e.target.value)}
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className={cn(
+              "flex h-auto w-full items-center justify-start space-x-2 rounded-none p-2 px-3 text-sm"
+            )}
+          >
+            <Avatar className="size-8">
+              <AvatarImage src={profile.image_url!} />
+              <AvatarFallback>
+                <IconUser size={SIDEBAR_ICON_SIZE} />
+              </AvatarFallback>
+            </Avatar>
+            {!isCollapsed && (
+              <div className="flex w-full items-center justify-between">
+                <div>{profile.display_name}</div>
+                <IconMenu
+                  stroke={1.5}
+                  size={18}
+                  className="text-muted-foreground"
                 />
               </div>
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="mb-1 w-[290px] cursor-pointer text-sm">
+          <DropdownMenuItem
+            onClick={() => setIsProfileSettingsOpen("profile")}
+            className="px-1"
+          >
+            <IconSettings
+              size={SIDEBAR_ITEM_ICON_SIZE}
+              stroke={1.5}
+              className="text-muted-foreground mr-2 text-sm"
+            />
+            Settings
+          </DropdownMenuItem>
+          <ThemeSwitcher />
+          <DropdownMenuItem onClick={exportLocalStorageAsJSON} className="px-1">
+            <IconFileDownload
+              size={SIDEBAR_ITEM_ICON_SIZE}
+              stroke={1.5}
+              className="text-muted-foreground mr-2 text-sm"
+            />
+            Export Data
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleSignOut} className="px-1">
+            <IconLogout
+              size={SIDEBAR_ITEM_ICON_SIZE}
+              stroke={1.5}
+              className="text-muted-foreground mr-2 text-sm"
+            />
+            Sign Out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-              <div className="space-y-1">
-                <Label>Google Gemini API Key</Label>
-                <Input
-                  placeholder="Google Gemini API Key"
-                  type="password"
-                  value={googleGeminiAPIKey}
-                  onChange={e => setGoogleGeminiAPIKey(e.target.value)}
-                />
+      <Dialog
+        open={isProfileSettingsOpen !== ""}
+        onOpenChange={open => setIsProfileSettingsOpen(open ? "profile" : "")}
+      >
+        <DialogContent className="flex h-screen flex-col gap-0 p-0 sm:h-[80vh] sm:max-w-[900px]">
+          <DialogHeader className="border-b px-4 py-2 pr-2">
+            <DialogTitle className="flex items-center justify-between space-x-2">
+              <div className="flex items-center space-x-2">
+                <IconSettings className="mr-1" size={20} stroke={1.5} />{" "}
+                Settings
               </div>
 
-              <div className="space-y-1">
-                <Label>Mistral API Key</Label>
-                <Input
-                  placeholder="Mistral API Key"
-                  type="password"
-                  value={mistralAPIKey}
-                  onChange={e => setMistralAPIKey(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <Label>Groq API Key</Label>
-                <Input
-                  placeholder="Groq API Key"
-                  type="password"
-                  value={groqAPIKey}
-                  onChange={e => setGroqAPIKey(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <Label>Perplexity API Key</Label>
-                <Input
-                  placeholder="Perplexity API Key"
-                  type="password"
-                  value={perplexityAPIKey}
-                  onChange={e => setPerplexityAPIKey(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <Label>OpenRouter API Key</Label>
-                <Input
-                  placeholder="OpenRouter API Key"
-                  type="password"
-                  value={openrouterAPIKey}
-                  onChange={e => setOpenrouterAPIKey(e.target.value)}
-                />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="subscription">
-              <div className="space-y-2">
-                <Label>Current Subscription Plan</Label>
-                <div className="text-xl font-semibold capitalize">
-                  {profile.plan.split("_")[0]}
-                </div>
-                <p className="text-sm">
-                  {
-                    {
-                      [PLAN_FREE]:
-                        "Upgrade to paid plan to unlock all models, plugins and image generation.",
-                      [PLAN_PRO]:
-                        "Upgrade to Ultimate to get access to OpenAI o1-preview and Claude 3 Opus",
-                      [PLAN_ULTIMATE]:
-                        "You're on the Ultimate plan! Enjoy your access to all models, plugins and image generation."
-                    }[profile.plan.split("_")[0]]
-                  }
-                </p>
-                {profile?.plan !== PLAN_FREE ? (
-                  <Button
-                    className="bg-violet-600"
-                    loading={loadingBillingPortal}
-                    onClick={handleRedirectToBillingPortal}
-                  >
-                    Manage Subscription
-                    {loadingBillingPortal ? (
-                      <Loader className="ml-1 size-4 animate-spin" />
-                    ) : (
-                      <IconExternalLink className="ml-1 size-4" stroke={1.5} />
-                    )}
-                  </Button>
-                ) : (
-                  <Button
-                    className="bg-violet-600"
-                    onClick={() => setIsPaywallOpen(true)}
-                  >
-                    Upgrade
-                  </Button>
-                )}
-              </div>
-            </TabsContent>
-          </div>
-        </Tabs>
-
-        <DialogFooter className="border-t px-6 py-4">
-          <div className="flex w-full items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <ThemeSwitcher />
-              <WithTooltip
-                display={
-                  <div>
-                    Download ChatLabs 1.0 data as JSON. Import coming soon!
-                  </div>
-                }
-                trigger={
-                  <Button
-                    variant={"ghost"}
-                    size="icon"
-                    onClick={exportLocalStorageAsJSON}
-                  >
-                    <IconFileDownload size={SIDEBAR_ICON_SIZE} stroke={1.5} />
-                  </Button>
-                }
-              />
-            </div>
-            <div className="space-x-2">
-              <Button
-                variant="ghost"
+              <ButtonWithTooltip
+                tooltip="Close"
+                tabIndex={-1}
+                className="text-xs"
+                size="icon"
+                variant={"ghost"}
                 onClick={() => setIsProfileSettingsOpen("")}
               >
-                Cancel
-              </Button>
-              <Button onClick={handleSave}>Save</Button>
+                <IconX stroke={1.5} size={20} />
+              </ButtonWithTooltip>
+            </DialogTitle>
+          </DialogHeader>
+
+          <Tabs
+            orientation="vertical"
+            value={isProfileSettingsOpen}
+            onValueChange={value =>
+              value !== "" && setIsProfileSettingsOpen(value)
+            }
+            className="my-0 flex flex-1 overflow-hidden"
+          >
+            <TabsList className="flex h-full flex-col justify-start rounded-none border-r sm:w-48">
+              <TabsTrigger value="profile" className="w-full justify-start">
+                Profile
+              </TabsTrigger>
+              <TabsTrigger value="team" className="w-full justify-start">
+                Team
+              </TabsTrigger>
+              <TabsTrigger value="shortcuts" className="w-full  justify-start">
+                Shortcuts
+              </TabsTrigger>
+              <TabsTrigger value="keys" className="w-full justify-start">
+                API Keys
+              </TabsTrigger>
+              <TabsTrigger
+                value="subscription"
+                className="w-full justify-start"
+              >
+                Subscription
+              </TabsTrigger>
+              <TabsTrigger value="plugins" className="w-full justify-start">
+                Plugins
+              </TabsTrigger>
+            </TabsList>
+
+            <div className="flex-1 overflow-y-auto p-6">
+              <TabsContent value="profile">
+                <form
+                  onSubmit={e => {
+                    e.preventDefault()
+                    handleSaveProfile()
+                  }}
+                  className="space-y-4"
+                >
+                  <div className="space-y-1">
+                    <Label>Profile Image</Label>
+                    <ImagePicker
+                      src={profileImageSrc}
+                      image={profileImageFile}
+                      height={50}
+                      width={50}
+                      onSrcChange={setProfileImageSrc}
+                      onImageChange={setProfileImageFile}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label>Chat Display Name</Label>
+                    <Input
+                      placeholder="Chat display name..."
+                      value={displayName}
+                      onChange={e => setDisplayName(e.target.value)}
+                      maxLength={PROFILE_DISPLAY_NAME_MAX}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-sm">
+                      What would you like the AI to know about you to provide
+                      better responses?
+                    </Label>
+                    <TextareaAutosize
+                      value={profileInstructions}
+                      onValueChange={setProfileInstructions}
+                      placeholder="Profile context... (optional)"
+                      minRows={6}
+                      maxRows={10}
+                    />
+                    <LimitDisplay
+                      used={profileInstructions.length}
+                      limit={PROFILE_CONTEXT_MAX}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <Label>Artifacts</Label>
+                      <WithTooltip
+                        asChild={true}
+                        trigger={
+                          <IconInfoCircle
+                            size={18}
+                            stroke={1.5}
+                            className="text-foreground/60"
+                          />
+                        }
+                        display={
+                          <div className={"text-xs"}>
+                            Artifacts allow ChatLabs to share substantial,
+                            standalone content with you in a dedicated window
+                            separate from the main conversation. Artifacts make
+                            it easy to work with significant pieces of content
+                            that you may want to modify, build upon, or
+                            reference later.
+                          </div>
+                        }
+                      />
+                    </div>
+                    <Switch
+                      checked={experimentalCodeEditor}
+                      onCheckedChange={setExperimentalCodeEditor}
+                    />
+                  </div>
+                  <Button type="submit">Save Profile</Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="shortcuts">
+                <form
+                  onSubmit={e => {
+                    e.preventDefault()
+                    handleSaveShortcuts()
+                  }}
+                  className="space-y-4"
+                >
+                  <div className={"flex items-center justify-between"}>
+                    <Label>
+                      Send message on{" "}
+                      {navigator.platform.toUpperCase().indexOf("MAC") > -1
+                        ? "⌘"
+                        : "Ctrl"}
+                      +Enter
+                    </Label>
+                    <Switch
+                      checked={!sendMessageOnEnter}
+                      onCheckedChange={() =>
+                        setSendMessageOnEnter(!sendMessageOnEnter)
+                      }
+                    />
+                  </div>
+
+                  <Separator />
+                  <div>
+                    <div className={"grid grid-cols-2 items-center gap-1"}>
+                      <Label>Assistant command</Label>
+                      <Input
+                        minLength={1}
+                        maxLength={1}
+                        value={assistantCommand}
+                        onChange={e => setAssistantCommand(e.target.value)}
+                      />
+                      <Label>Plugins command</Label>
+                      <Input
+                        minLength={1}
+                        maxLength={1}
+                        value={toolsCommand}
+                        onChange={e => setToolsCommand(e.target.value)}
+                      />
+                      <Label>Prompt command</Label>
+                      <Input
+                        minLength={1}
+                        maxLength={1}
+                        value={promptCommand}
+                        onChange={e => setPromptCommand(e.target.value)}
+                      />
+                      <Label>Files command</Label>
+                      <Input
+                        minLength={1}
+                        maxLength={1}
+                        value={filesCommand}
+                        onChange={e => setFilesCommand(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    className="w-full"
+                    variant={"secondary"}
+                    onClick={resetToDefaults}
+                  >
+                    Reset to defaults
+                  </Button>
+                  <Button type="submit">Save Shortcuts</Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="keys">
+                <form
+                  onSubmit={e => {
+                    e.preventDefault()
+                    handleSaveAPIKeys()
+                  }}
+                  className="space-y-4"
+                >
+                  <Callout variant={"info"}>
+                    <CalloutTitle className="flex items-center space-x-2">
+                      <IconKey className="mr-1 size-4" stroke={1.5} /> API Keys
+                    </CalloutTitle>
+                    <CalloutDescription>
+                      <p>There are two ways to use API keys in ChatLabs:</p>
+                      <ol className="mt-2 list-inside list-decimal">
+                        <li className="mb-2">
+                          <strong>Paid ChatLabs accounts:</strong> By default,
+                          ChatLabs provides API keys with usage limits based on
+                          your subscription plan. These keys are managed by
+                          ChatLabs and ensure a seamless experience.
+                        </li>
+                        <li>
+                          <strong>Your own API keys:</strong> If you provide
+                          your own API keys here, ChatLabs will use them
+                          instead. This option lifts the plan-based limitations
+                          but requires you to manage your own API usage and
+                          billing with the respective providers.
+                        </li>
+                      </ol>
+                      <p className="mt-2">
+                        Choose the option that best suits your needs and usage
+                        patterns.
+                      </p>
+                    </CalloutDescription>
+                  </Callout>
+                  <div className="mt-5 space-y-2">
+                    <Label className="flex items-center">
+                      {useAzureOpenai
+                        ? "Azure OpenAI API Key"
+                        : "OpenAI API Key"}
+
+                      <Button
+                        className="ml-3 h-[18px] w-[150px] text-[11px]"
+                        onClick={() => setUseAzureOpenai(!useAzureOpenai)}
+                      >
+                        {useAzureOpenai
+                          ? "Switch To Standard OpenAI"
+                          : "Switch To Azure OpenAI"}
+                      </Button>
+                    </Label>
+
+                    {useAzureOpenai ? (
+                      <Input
+                        placeholder="Azure OpenAI API Key"
+                        type="password"
+                        value={azureOpenaiAPIKey}
+                        onChange={e => setAzureOpenaiAPIKey(e.target.value)}
+                      />
+                    ) : (
+                      <Input
+                        placeholder="OpenAI API Key"
+                        type="password"
+                        value={openaiAPIKey}
+                        onChange={e => setOpenaiAPIKey(e.target.value)}
+                      />
+                    )}
+                  </div>
+
+                  <div className="ml-8 space-y-3">
+                    {useAzureOpenai && (
+                      <>
+                        <div className="space-y-1">
+                          <Label>Azure Endpoint</Label>
+                          <Input
+                            placeholder="https://your-endpoint.openai.azure.com"
+                            value={azureOpenaiEndpoint}
+                            onChange={e =>
+                              setAzureOpenaiEndpoint(e.target.value)
+                            }
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Azure GPT-3.5 Turbo Deployment Name</Label>
+                          <Input
+                            placeholder="Azure GPT-3.5 Turbo Deployment Name"
+                            value={azureOpenai35TurboID}
+                            onChange={e =>
+                              setAzureOpenai35TurboID(e.target.value)
+                            }
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Azure GPT-4.5 Turbo Deployment Name</Label>
+                          <Input
+                            placeholder="Azure GPT-4.5 Turbo Deployment Name"
+                            value={azureOpenai45TurboID}
+                            onChange={e =>
+                              setAzureOpenai45TurboID(e.target.value)
+                            }
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Azure GPT-4.5 Vision Deployment Name</Label>
+                          <Input
+                            placeholder="Azure GPT-4.5 Vision Deployment Name"
+                            value={azureOpenai45VisionID}
+                            onChange={e =>
+                              setAzureOpenai45VisionID(e.target.value)
+                            }
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Azure Embeddings Deployment Name</Label>
+                          <Input
+                            placeholder="Azure Embeddings Deployment Name"
+                            value={azureEmbeddingsID}
+                            onChange={e => setAzureEmbeddingsID(e.target.value)}
+                          />
+                        </div>
+                      </>
+                    )}
+                    {!useAzureOpenai && (
+                      <div className="space-y-1">
+                        <Label>OpenAI Organization ID</Label>
+                        <Input
+                          placeholder="OpenAI Organization ID (optional)"
+                          type="password"
+                          value={openaiOrgID}
+                          onChange={e => setOpenaiOrgID(e.target.value)}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label>Anthropic API Key</Label>
+                    <Input
+                      placeholder="Anthropic API Key"
+                      type="password"
+                      value={anthropicAPIKey}
+                      onChange={e => setAnthropicAPIKey(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label>Google Gemini API Key</Label>
+                    <Input
+                      placeholder="Google Gemini API Key"
+                      type="password"
+                      value={googleGeminiAPIKey}
+                      onChange={e => setGoogleGeminiAPIKey(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label>Mistral API Key</Label>
+                    <Input
+                      placeholder="Mistral API Key"
+                      type="password"
+                      value={mistralAPIKey}
+                      onChange={e => setMistralAPIKey(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label>Groq API Key</Label>
+                    <Input
+                      placeholder="Groq API Key"
+                      type="password"
+                      value={groqAPIKey}
+                      onChange={e => setGroqAPIKey(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label>Perplexity API Key</Label>
+                    <Input
+                      placeholder="Perplexity API Key"
+                      type="password"
+                      value={perplexityAPIKey}
+                      onChange={e => setPerplexityAPIKey(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label>OpenRouter API Key</Label>
+                    <Input
+                      placeholder="OpenRouter API Key"
+                      type="password"
+                      value={openrouterAPIKey}
+                      onChange={e => setOpenrouterAPIKey(e.target.value)}
+                    />
+                  </div>
+                  <Button type="submit">Save API Keys</Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="subscription">
+                <div className="space-y-2">
+                  <Label>Current Subscription Plan</Label>
+                  <div className="text-xl font-semibold capitalize">
+                    {profile.plan.split("_")[0]}
+                  </div>
+                  <p className="text-sm">
+                    {
+                      {
+                        [PLAN_FREE]:
+                          "Upgrade to paid plan to unlock all models, plugins and image generation.",
+                        [PLAN_PRO]:
+                          "Upgrade to Ultimate to get access to OpenAI o1-preview and Claude 3 Opus",
+                        [PLAN_ULTIMATE]:
+                          "You're on the Ultimate plan! Enjoy your access to all models, plugins and image generation."
+                      }[profile.plan.split("_")[0]]
+                    }
+                  </p>
+                  {profile?.plan !== PLAN_FREE ? (
+                    <Button
+                      className="bg-violet-600"
+                      loading={loadingBillingPortal}
+                      onClick={handleRedirectToBillingPortal}
+                    >
+                      Manage Subscription
+                      {loadingBillingPortal ? (
+                        <Loader className="ml-1 size-4 animate-spin" />
+                      ) : (
+                        <IconExternalLink
+                          className="ml-1 size-4"
+                          stroke={1.5}
+                        />
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      className="bg-violet-600"
+                      onClick={() => setIsPaywallOpen(true)}
+                    >
+                      Upgrade
+                    </Button>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="team" className="space-y-4">
+                <div>
+                  <Label>Invite User to the Team</Label>
+                  <div className="flex space-x-2">
+                    <Input
+                      type="email"
+                      placeholder="Enter email address"
+                      value={inviteEmail}
+                      onChange={e => setInviteEmail(e.target.value)}
+                    />
+                    <Button onClick={handleInviteUser}>Invite</Button>
+                  </div>
+                </div>
+                {selectedWorkspace && (
+                  <div>
+                    <Label>Team Members</Label>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Role</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {workspaceUsers.map(user => (
+                          <TableRow key={user.user_id}>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>
+                              <Select
+                                value={user.role}
+                                onValueChange={newRole =>
+                                  handleRoleChange(user, newRole)
+                                }
+                                disabled={
+                                  workspaceUsers.find(
+                                    u =>
+                                      u.role === "OWNER" &&
+                                      u.status === "ACTIVE"
+                                  )?.user_id !== currentUser?.id
+                                }
+                              >
+                                <SelectTrigger className="w-[100px]">
+                                  <SelectValue placeholder="Select role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="OWNER">Owner</SelectItem>
+                                  <SelectItem value="MEMBER">Member</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                            <TableCell>{user.status}</TableCell>
+                            <TableCell>
+                              {user.role !== "OWNER" && (
+                                <Button
+                                  variant="destructive"
+                                  size="icon"
+                                  onClick={() => handleRemoveUser(user)}
+                                >
+                                  <IconTrash size={18} stroke={1.5} />
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </TabsContent>
+              <TabsContent
+                value="plugins"
+                className="m-0 flex grow flex-col space-y-4"
+              >
+                <ToolManager />
+              </TabsContent>
             </div>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </Tabs>
+          <DialogDescription />
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
