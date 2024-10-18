@@ -24,7 +24,8 @@ import {
   IconUser,
   IconPuzzle,
   IconMenu,
-  IconX
+  IconX,
+  IconSend
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { useRouter, redirect } from "next/navigation"
@@ -309,6 +310,26 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
       fetchWorkspaceUsers(selectedWorkspace.id)
     } catch (error: any) {
       toast.error(error.message || "An error occurred while inviting the user")
+    }
+  }
+
+  const handleResendInvite = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resend({
+        email: email,
+        type: "signup"
+      })
+
+      if (error) {
+        toast.error(error.message || "Failed to resend invite")
+        return
+      }
+
+      toast.success("Invite resent successfully")
+    } catch (error: any) {
+      toast.error(
+        error.message || "An error occurred while resending the invite"
+      )
     }
   }
 
@@ -1181,6 +1202,16 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                             </TableCell>
                             <TableCell>{user.status}</TableCell>
                             <TableCell>
+                              {user.status === "PENDING" && (
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  onClick={() => handleResendInvite(user.email)}
+                                  className="mr-2"
+                                >
+                                  <IconSend size={18} stroke={1.5} />
+                                </Button>
+                              )}
                               {user.role !== "OWNER" && (
                                 <Button
                                   variant="destructive"

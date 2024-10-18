@@ -82,7 +82,7 @@ export async function POST(req: Request) {
 
     logger.info({ invitedUser }, `Invitation sent successfully to ${email}`)
 
-    existingUser = invitedUser
+    existingUser = invitedUser.user
   } else {
     logger.info(`User ${existingUser.id} already exists. Skipping creation.`)
   }
