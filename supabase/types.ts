@@ -399,51 +399,6 @@ export type Database = {
           },
         ]
       }
-      assistant_prompts: {
-        Row: {
-          assistant_id: string
-          content: string
-          created_at: string
-          id: string
-          name: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          assistant_id: string
-          content: string
-          created_at?: string
-          id?: string
-          name: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          assistant_id?: string
-          content?: string
-          created_at?: string
-          id?: string
-          name?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "assistant_prompts_assistant_id_fkey"
-            columns: ["assistant_id"]
-            isOneToOne: false
-            referencedRelation: "assistants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "assistant_prompts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       assistant_tools: {
         Row: {
           assistant_id: string
@@ -671,7 +626,6 @@ export type Database = {
           id: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
-          last_chat_message_id: string | null
           last_shared_message_id: string | null
           model: string
           name: string
@@ -695,7 +649,6 @@ export type Database = {
           id?: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
-          last_chat_message_id?: string | null
           last_shared_message_id?: string | null
           model: string
           name: string
@@ -719,7 +672,6 @@ export type Database = {
           id?: string
           include_profile_context?: boolean
           include_workspace_instructions?: boolean
-          last_chat_message_id?: string | null
           last_shared_message_id?: string | null
           model?: string
           name?: string
@@ -746,13 +698,6 @@ export type Database = {
             columns: ["folder_id"]
             isOneToOne: false
             referencedRelation: "folders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "chats_last_chat_message_id_fkey"
-            columns: ["last_chat_message_id"]
-            isOneToOne: true
-            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
           {
@@ -1504,7 +1449,6 @@ export type Database = {
           profile_context: string
           prompt_command: string | null
           send_message_on_enter: boolean | null
-          stripe_customer_id: string | null
           system_prompt_template: string | null
           tools_command: string | null
           updated_at: string | null
@@ -1542,7 +1486,6 @@ export type Database = {
           profile_context: string
           prompt_command?: string | null
           send_message_on_enter?: boolean | null
-          stripe_customer_id?: string | null
           system_prompt_template?: string | null
           tools_command?: string | null
           updated_at?: string | null
@@ -1580,7 +1523,6 @@ export type Database = {
           profile_context?: string
           prompt_command?: string | null
           send_message_on_enter?: boolean | null
-          stripe_customer_id?: string | null
           system_prompt_template?: string | null
           tools_command?: string | null
           updated_at?: string | null
@@ -1761,65 +1703,6 @@ export type Database = {
           },
         ]
       }
-      shared_chats: {
-        Row: {
-          chat_id: string
-          created_at: string
-          id: string
-          last_message_id: string
-          updated_at: string
-          user_id: string
-          workspace_id: string
-        }
-        Insert: {
-          chat_id: string
-          created_at?: string
-          id?: string
-          last_message_id: string
-          updated_at?: string
-          user_id: string
-          workspace_id: string
-        }
-        Update: {
-          chat_id?: string
-          created_at?: string
-          id?: string
-          last_message_id?: string
-          updated_at?: string
-          user_id?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shared_chats_chat_id_fkey"
-            columns: ["chat_id"]
-            isOneToOne: false
-            referencedRelation: "chats"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "shared_chats_last_message_id_fkey"
-            columns: ["last_message_id"]
-            isOneToOne: false
-            referencedRelation: "messages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "shared_chats_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "shared_chats_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       tool_workspaces: {
         Row: {
           created_at: string
@@ -1973,6 +1856,42 @@ export type Database = {
           },
         ]
       }
+      workspace_profiles: {
+        Row: {
+          created_at: string
+          updated_at: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          updated_at?: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          updated_at?: string | null
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_profiles_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspaces: {
         Row: {
           created_at: string
@@ -1989,9 +1908,10 @@ export type Database = {
           instructions: string
           is_home: boolean
           name: string
+          plan: string
           sharing: string
+          stripe_customer_id: string | null
           updated_at: string | null
-          user_id: string
         }
         Insert: {
           created_at?: string
@@ -2008,9 +1928,10 @@ export type Database = {
           instructions: string
           is_home?: boolean
           name: string
+          plan?: string
           sharing?: string
+          stripe_customer_id?: string | null
           updated_at?: string | null
-          user_id: string
         }
         Update: {
           created_at?: string
@@ -2027,19 +1948,12 @@ export type Database = {
           instructions?: string
           is_home?: boolean
           name?: string
+          plan?: string
           sharing?: string
+          stripe_customer_id?: string | null
           updated_at?: string | null
-          user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "workspaces_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
@@ -2223,7 +2137,6 @@ export type Database = {
           id: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
-          last_chat_message_id: string | null
           last_shared_message_id: string | null
           model: string
           name: string
@@ -2338,6 +2251,7 @@ export type Database = {
           owner_id: string | null
           path_tokens: string[] | null
           updated_at: string | null
+          user_metadata: Json | null
           version: string | null
         }
         Insert: {
@@ -2351,6 +2265,7 @@ export type Database = {
           owner_id?: string | null
           path_tokens?: string[] | null
           updated_at?: string | null
+          user_metadata?: Json | null
           version?: string | null
         }
         Update: {
@@ -2364,6 +2279,7 @@ export type Database = {
           owner_id?: string | null
           path_tokens?: string[] | null
           updated_at?: string | null
+          user_metadata?: Json | null
           version?: string | null
         }
         Relationships: [
@@ -2372,6 +2288,104 @@ export type Database = {
             columns: ["bucket_id"]
             isOneToOne: false
             referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          in_progress_size: number
+          key: string
+          owner_id: string | null
+          upload_signature: string
+          user_metadata: Json | null
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id: string
+          in_progress_size?: number
+          key: string
+          owner_id?: string | null
+          upload_signature: string
+          user_metadata?: Json | null
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          in_progress_size?: number
+          key?: string
+          owner_id?: string | null
+          upload_signature?: string
+          user_metadata?: Json | null
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads_parts: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          etag: string
+          id: string
+          key: string
+          owner_id: string | null
+          part_number: number
+          size: number
+          upload_id: string
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          etag: string
+          id?: string
+          key: string
+          owner_id?: string | null
+          part_number: number
+          size?: number
+          upload_id: string
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          etag?: string
+          id?: string
+          key?: string
+          owner_id?: string | null
+          part_number?: number
+          size?: number
+          upload_id?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "s3_multipart_uploads"
             referencedColumns: ["id"]
           },
         ]
@@ -2414,6 +2428,41 @@ export type Database = {
           size: number
           bucket_id: string
         }[]
+      }
+      list_multipart_uploads_with_delimiter: {
+        Args: {
+          bucket_id: string
+          prefix_param: string
+          delimiter_param: string
+          max_keys?: number
+          next_key_token?: string
+          next_upload_token?: string
+        }
+        Returns: {
+          key: string
+          id: string
+          created_at: string
+        }[]
+      }
+      list_objects_with_delimiter: {
+        Args: {
+          bucket_id: string
+          prefix_param: string
+          delimiter_param: string
+          max_keys?: number
+          start_after?: string
+          next_token?: string
+        }
+        Returns: {
+          name: string
+          id: string
+          metadata: Json
+          updated_at: string
+        }[]
+      }
+      operation: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       search: {
         Args: {

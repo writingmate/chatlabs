@@ -5,11 +5,11 @@ import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 import { ACTIVE_PLAN_STATUSES, PLAN_FREE, PLANS } from "@/lib/stripe/config"
 import { buffer } from "node:stream/consumers"
-import {
-  getProfileByStripeCustomerId,
-  updateProfileByUserId
-} from "@/db/profile"
 import { createErrorResponse } from "@/lib/response"
+import {
+  getWorkspaceByStripeCustomerId,
+  updateWorkspaceById
+} from "@/db/workspaces"
 
 const supabaseAdmin = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -54,12 +54,12 @@ export async function POST(req: Request) {
   const stripeCustomerId = subscription.customer as string
 
   try {
-    const { data: profile } = await getProfileByStripeCustomerId(
+    const { data: workspace } = await getWorkspaceByStripeCustomerId(
       supabaseAdmin,
       stripeCustomerId
     )
 
-    if (!profile) {
+    if (!workspace) {
       throw new Error(
         `Profile not found for Stripe customer ${stripeCustomerId}`
       )
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
       }
     }
 
-    await updateProfileByUserId(supabaseAdmin, profile.user_id, {
+    await updateWorkspaceById(supabaseAdmin, workspace.id, {
       stripe_customer_id: stripeCustomerId,
       plan
     })

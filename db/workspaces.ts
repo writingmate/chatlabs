@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase/browser-client"
-import { TablesInsert, TablesUpdate } from "@/supabase/types"
+import { Database, TablesInsert, TablesUpdate } from "@/supabase/types"
+import { SupabaseClient } from "@supabase/supabase-js"
 
 export const getHomeWorkspaceByUserId = async (
   userId: string,
@@ -47,10 +48,21 @@ export const getWorkspaceById = async (
 }
 
 export const getWorkspacesByUserId = async (userId: string) => {
+  const { data: workspaceProfile, error: workspaceProfileError } =
+    await supabase
+      .from("workspace_profiles")
+      .select(`*`)
+      .eq("user_id", userId)
+      .single()
+
+  if (!workspaceProfile) {
+    throw new Error(workspaceProfileError.message)
+  }
+
   const { data: workspaces, error } = await supabase
     .from("workspaces")
     .select("*")
-    .eq("user_id", userId)
+    .eq("id", workspaceProfile.workspace_id)
     .order("created_at", { ascending: false })
 
   if (!workspaces) {
@@ -80,9 +92,22 @@ export const updateWorkspace = async (
   workspaceId: string,
   workspace: TablesUpdate<"workspaces">
 ) => {
+  // Do not send data related to the pivot tables
+  // Otherwise the request will fail
+  const modifiedWorkspace = {
+    ...workspace,
+    chats: undefined,
+    assistants: undefined,
+    folders: undefined,
+    files: undefined,
+    presets: undefined,
+    prompts: undefined,
+    tools: undefined,
+    models: undefined
+  }
   const { data: updatedWorkspace, error } = await supabase
     .from("workspaces")
-    .update(workspace)
+    .update(modifiedWorkspace)
     .eq("id", workspaceId)
     .select("*")
     .single()
@@ -105,4 +130,41 @@ export const deleteWorkspace = async (workspaceId: string) => {
   }
 
   return true
+}
+
+export async function updateWorkspaceByStripeCustomerId(
+  supabaseAdmin: SupabaseClient,
+  stripeCustomerId: string,
+  profile: Database["public"]["Tables"]["workspaces"]["Update"]
+) {
+  return supabaseAdmin
+    .from("workspaces")
+    .update(profile)
+    .eq("stripe_customer_id", stripeCustomerId)
+    .select("*")
+    .single()
+}
+
+export async function getWorkspaceByStripeCustomerId(
+  supabaseAdmin: SupabaseClient,
+  stripeCustomerId: string
+) {
+  return supabaseAdmin
+    .from("workspaces")
+    .select("*")
+    .eq("stripe_customer_id", stripeCustomerId)
+    .single()
+}
+
+export function updateWorkspaceById(
+  supabaseAdmin: SupabaseClient,
+  workspaceId: string,
+  workspace: Database["public"]["Tables"]["workspaces"]["Update"]
+) {
+  return supabaseAdmin
+    .from("workspaces")
+    .update(workspace)
+    .eq("id", workspaceId)
+    .select("*")
+    .single()
 }

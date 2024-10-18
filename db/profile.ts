@@ -75,30 +75,6 @@ export const deleteProfile = async (profileId: string) => {
   return true
 }
 
-export async function updateProfileByStripeCustomerId(
-  supabaseAdmin: SupabaseClient,
-  stripeCustomerId: string,
-  profile: Database["public"]["Tables"]["profiles"]["Update"]
-) {
-  return supabaseAdmin
-    .from("profiles")
-    .update(profile)
-    .eq("stripe_customer_id", stripeCustomerId)
-    .select("*")
-    .single()
-}
-
-export async function getProfileByStripeCustomerId(
-  supabaseAdmin: SupabaseClient,
-  stripeCustomerId: string
-) {
-  return supabaseAdmin
-    .from("profiles")
-    .select("*")
-    .eq("stripe_customer_id", stripeCustomerId)
-    .single()
-}
-
 export function updateProfileByUserId(
   supabaseAdmin: SupabaseClient,
   userId: string,

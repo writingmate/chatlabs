@@ -69,12 +69,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     setAvailableHostedModels,
     setAvailableOpenRouterModels,
     availableOpenRouterModels,
-    setIsPaywallOpen,
     isProfileSettingsOpen,
     setIsProfileSettingsOpen
   } = useContext(ChatbotUIContext)
-
-  const [loadingBillingPortal, setLoadingBillingPortal] = useState(false)
 
   const router = useRouter()
 
@@ -289,23 +286,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     }
   }
 
-  const handleRedirectToBillingPortal = async (
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    e.stopPropagation()
-    e.preventDefault()
-    setLoadingBillingPortal(true)
-    try {
-      await redirectToBillingPortal()
-    } catch (error) {
-      toast.error(
-        "Failed to redirect to billing portal. Something went wrong. Please try again."
-      )
-    } finally {
-      setLoadingBillingPortal(false)
-    }
-  }
-
   if (!profile) return null
 
   return (
@@ -377,9 +357,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
             </TabsTrigger>
             <TabsTrigger value="keys" className="w-full justify-start">
               API Keys
-            </TabsTrigger>
-            <TabsTrigger value="subscription" className="w-full justify-start">
-              Subscription
             </TabsTrigger>
           </TabsList>
 
@@ -693,48 +670,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                   value={openrouterAPIKey}
                   onChange={e => setOpenrouterAPIKey(e.target.value)}
                 />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="subscription">
-              <div className="space-y-2">
-                <Label>Current Subscription Plan</Label>
-                <div className="text-xl font-semibold capitalize">
-                  {profile.plan.split("_")[0]}
-                </div>
-                <p className="text-sm">
-                  {
-                    {
-                      [PLAN_FREE]:
-                        "Upgrade to paid plan to unlock all models, plugins and image generation.",
-                      [PLAN_PRO]:
-                        "Upgrade to Ultimate to get access to OpenAI o1-preview and Claude 3 Opus",
-                      [PLAN_ULTIMATE]:
-                        "You're on the Ultimate plan! Enjoy your access to all models, plugins and image generation."
-                    }[profile.plan.split("_")[0]]
-                  }
-                </p>
-                {profile?.plan !== PLAN_FREE ? (
-                  <Button
-                    className="bg-violet-600"
-                    loading={loadingBillingPortal}
-                    onClick={handleRedirectToBillingPortal}
-                  >
-                    Manage Subscription
-                    {loadingBillingPortal ? (
-                      <Loader className="ml-1 size-4 animate-spin" />
-                    ) : (
-                      <IconExternalLink className="ml-1 size-4" stroke={1.5} />
-                    )}
-                  </Button>
-                ) : (
-                  <Button
-                    className="bg-violet-600"
-                    onClick={() => setIsPaywallOpen(true)}
-                  >
-                    Upgrade
-                  </Button>
-                )}
               </div>
             </TabsContent>
           </div>

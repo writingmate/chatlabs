@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { IconMail } from "@tabler/icons-react"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
+import { inviteUser } from "@/actions/invite"
 
 export default function LoginForm({
   redirectTo,
@@ -111,20 +112,10 @@ export default function LoginForm({
       e.preventDefault()
       e.stopPropagation()
       setDisabled(true)
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email,
-        options: {
-          emailRedirectTo: encodeURIComponent(
-            `${window.location.origin}/auth/confirm?${callbackRedirectSearchParams.toString()}`
-          )
-        }
-      })
+
+      await inviteUser({ email })
 
       setDisabled(false)
-
-      if (error) {
-        return router.push(`/login?message=${error.message}`)
-      }
 
       return router.push("/login?message=Check your email for a login link")
     } catch (error) {

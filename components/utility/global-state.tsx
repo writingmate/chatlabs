@@ -279,7 +279,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     }
 
     await fetchWorkspaceData(
-      workspaces.find(w => w.is_home)?.id as string,
+      workspaces?.[0].id as string,
       profile?.user_id as string
     )
     setUserInput("")

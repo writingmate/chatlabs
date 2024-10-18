@@ -44,6 +44,7 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { searchChatsAndMessages } from "@/db/chats"
 import { debounce } from "@/lib/debounce"
 import { Tables } from "@/supabase/types"
+import { WorkspaceSettings } from "../workspace/workspace-settings"
 
 export const Sidebar: FC = () => {
   const {
@@ -394,6 +395,9 @@ export const Sidebar: FC = () => {
               <ProfileSettings isCollapsed={isCollapsed} />
             </div>
           )}
+          <div className="border-t p-2">
+            <WorkspaceSettings isCollapsed={isCollapsed} />
+          </div>
 
           {!isCollapsed &&
             (["prompts", "assistants", "files", "tools"] as const).map(

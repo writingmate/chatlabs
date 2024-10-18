@@ -7,7 +7,12 @@ import {
 import { updateWorkspace } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { LLMID } from "@/types"
-import { IconHome, IconSettings } from "@tabler/icons-react"
+import {
+  IconHome,
+  IconSettings,
+  IconInfoCircle,
+  IconExternalLink
+} from "@tabler/icons-react"
 import { FC, useContext, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
@@ -27,10 +32,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { DeleteWorkspace } from "./delete-workspace"
+import { Switch } from "@/components/ui/switch"
+import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils"
+import { supabase } from "@/lib/supabase/browser-client"
+import { inviteUser } from "@/actions/invite"
+import { PLAN_FREE, PLAN_PRO, PLAN_ULTIMATE } from "@/lib/stripe/config"
+import { Loader } from "lucide-react"
+import { redirectToBillingPortal } from "@/actions/stripe"
 
-interface WorkspaceSettingsProps {}
+export const SIDEBAR_ICON_SIZE = 28
 
-export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
+interface WorkspaceSettingsProps {
+  isCollapsed: boolean
+}
+
+export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({
+  isCollapsed
+}) => {
   const {
     profile,
     selectedWorkspace,
@@ -38,7 +57,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
     setWorkspaces,
     setChatSettings,
     workspaceImages,
-    setWorkspaceImages
+    setWorkspaceImages,
+    setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -54,6 +74,10 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
   const [instructions, setInstructions] = useState(
     selectedWorkspace?.instructions || ""
   )
+  const [emailToInvite, setEmailToInvite] = useState("")
+  const [sharing, setSharing] = useState(selectedWorkspace?.sharing || "")
+  const [inviteInProgress, setInviteInProgress] = useState(false)
+  const [loadingBillingPortal, setLoadingBillingPortal] = useState(false)
 
   const [defaultChatSettings, setDefaultChatSettings] = useState({
     model: selectedWorkspace?.default_model,
@@ -115,7 +139,8 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
       embeddings_provider: defaultChatSettings.embeddingsProvider,
       include_profile_context: defaultChatSettings.includeProfileContext,
       include_workspace_instructions:
-        defaultChatSettings.includeWorkspaceInstructions
+        defaultChatSettings.includeWorkspaceInstructions,
+      sharing
     })
 
     if (
@@ -156,6 +181,43 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
     toast.success("Workspace updated!")
   }
 
+  const handleInviteUser = async () => {
+    try {
+      setInviteInProgress(true)
+
+      await inviteUser({
+        email: emailToInvite,
+        workspace_id: selectedWorkspace?.id
+      })
+
+      setInviteInProgress(false)
+
+      toast.success("User has been successfully invited")
+    } catch (error) {
+      toast.error("Unable to send the invitation due to an unexpected error")
+      console.error(error)
+    } finally {
+      setInviteInProgress(false)
+    }
+  }
+
+  const handleRedirectToBillingPortal = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.stopPropagation()
+    e.preventDefault()
+    setLoadingBillingPortal(true)
+    try {
+      await redirectToBillingPortal()
+    } catch (error) {
+      toast.error(
+        "Failed to redirect to billing portal. Something went wrong. Please try again."
+      )
+    } finally {
+      setLoadingBillingPortal(false)
+    }
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       buttonRef.current?.click()
@@ -167,16 +229,25 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <WithTooltip
-          display={<div>Workspace Settings</div>}
-          trigger={
-            <IconSettings
-              className="ml-3 cursor-pointer pr-[5px] hover:opacity-50"
-              size={32}
-              onClick={() => setIsOpen(true)}
-            />
-          }
-        />
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "flex w-full items-center justify-start space-x-2 rounded-lg p-2 pl-1 text-sm"
+          )}
+        >
+          <IconHome size={SIDEBAR_ICON_SIZE} />
+          {!isCollapsed && (
+            <div className="flex w-full items-center justify-between">
+              <div>{profile.display_name}</div>
+              <IconSettings
+                size={18}
+                className="text-muted-foreground"
+                stroke={1.5}
+              />
+            </div>
+          )}
+        </Button>
       </SheetTrigger>
 
       <SheetContent
@@ -258,6 +329,89 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
                   used={instructions.length}
                   limit={WORKSPACE_INSTRUCTIONS_MAX}
                 />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center space-x-2">
+                  <Label>Public resources</Label>
+                  <WithTooltip
+                    asChild
+                    trigger={
+                      <IconInfoCircle
+                        size={18}
+                        stroke={1.5}
+                        className="text-foreground/60"
+                      />
+                    }
+                    display={
+                      <div className={"text-xs"}>
+                        Share Prompts, Assistants, Files, Plugins between all
+                        the users in the workspace
+                      </div>
+                    }
+                  />
+                </div>
+                <Switch
+                  checked={sharing === "public"}
+                  onCheckedChange={checked =>
+                    setSharing(checked ? "public" : "private")
+                  }
+                />
+              </div>
+              <Separator />
+              <div className="space-y-1">
+                <Label>Invite user to the workspace</Label>
+                <Input
+                  placeholder="Email"
+                  value={emailToInvite}
+                  onChange={e => setEmailToInvite(e.target.value)}
+                />
+              </div>
+              <Button
+                className="w-full"
+                variant={"outline"}
+                onClick={handleInviteUser}
+                disabled={inviteInProgress}
+              >
+                Invite user
+              </Button>
+              <div className="space-y-2">
+                <Label>Current Subscription Plan</Label>
+                <div className="text-xl font-semibold capitalize">
+                  {profile.plan.split("_")[0]}
+                </div>
+                <p className="text-sm">
+                  {
+                    {
+                      [PLAN_FREE]:
+                        "Upgrade to paid plan to unlock all models, plugins and image generation.",
+                      [PLAN_PRO]:
+                        "Upgrade to Ultimate to get access to OpenAI o1-preview and Claude 3 Opus",
+                      [PLAN_ULTIMATE]:
+                        "You're on the Ultimate plan! Enjoy your access to all models, plugins and image generation."
+                    }[profile.plan.split("_")[0]]
+                  }
+                </p>
+                {profile?.plan !== PLAN_FREE ? (
+                  <Button
+                    className="bg-violet-600"
+                    loading={loadingBillingPortal}
+                    onClick={handleRedirectToBillingPortal}
+                  >
+                    Manage Subscription
+                    {loadingBillingPortal ? (
+                      <Loader className="ml-1 size-4 animate-spin" />
+                    ) : (
+                      <IconExternalLink className="ml-1 size-4" stroke={1.5} />
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    className="bg-violet-600"
+                    onClick={() => setIsPaywallOpen(true)}
+                  >
+                    Upgrade
+                  </Button>
+                )}
               </div>
             </TabsContent>
 
