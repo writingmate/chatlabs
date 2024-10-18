@@ -1926,53 +1926,6 @@ export type Database = {
           },
         ]
       }
-      user_questions: {
-        Row: {
-          company_name: string | null
-          company_size: string | null
-          created_at: string
-          id: string
-          job_role: string | null
-          other_source: string | null
-          purchase_reason: string | null
-          source: string | null
-          use_cases: string | null
-          user_id: string
-        }
-        Insert: {
-          company_name?: string | null
-          company_size?: string | null
-          created_at?: string
-          id?: string
-          job_role?: string | null
-          other_source?: string | null
-          purchase_reason?: string | null
-          source?: string | null
-          use_cases?: string | null
-          user_id: string
-        }
-        Update: {
-          company_name?: string | null
-          company_size?: string | null
-          created_at?: string
-          id?: string
-          job_role?: string | null
-          other_source?: string | null
-          purchase_reason?: string | null
-          source?: string | null
-          use_cases?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_questions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       workspace_users: {
         Row: {
           created_at: string
@@ -2201,6 +2154,21 @@ export type Database = {
             }
             Returns: string
           }
+      is_workspace_member: {
+        Args: {
+          workspace_id: string
+          user_id: string
+          check_role?: string
+        }
+        Returns: boolean
+      }
+      is_workspace_owner: {
+        Args: {
+          workspace_id: string
+          user_id: string
+        }
+        Returns: boolean
+      }
       match_file_items_local: {
         Args: {
           query_embedding: string

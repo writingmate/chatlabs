@@ -123,8 +123,16 @@ export const getWorkspaceUsers = async (
   return data as Tables<"workspace_users">[]
 }
 
-export const getWorkspaces = async (): Promise<Tables<"workspaces">[]> => {
-  const { data, error } = await supabase.from("workspaces").select("*")
+export const getWorkspaces = async (
+  workspaceId?: string
+): Promise<Tables<"workspaces">[]> => {
+  const query = supabase.from("workspaces").select("*")
+
+  if (workspaceId) {
+    query.eq("id", workspaceId)
+  }
+
+  const { data, error } = await query
 
   if (error) {
     console.error("Error fetching workspaces:", error)
@@ -156,4 +164,57 @@ export async function removeWorkspaceUser(workspaceId: string, userId: string) {
 
   if (error) throw error
   return data
+}
+
+export const getPendingInvites = async (
+  userId: string
+): Promise<
+  (Tables<"workspace_users"> & { workspaces: Tables<"workspaces"> | null })[]
+> => {
+  const { data, error } = await supabase
+    .from("workspace_users")
+    .select("*, workspaces(*)")
+    .eq("user_id", userId)
+    .eq("status", "PENDING")
+
+  if (error) {
+    console.error("Error fetching pending invites:", error)
+    throw error
+  }
+
+  return data
+}
+
+export const acceptInvite = async (
+  workspaceId: string,
+  userId: string
+): Promise<Tables<"workspaces">> => {
+  // First, update the workspace_users status to "accepted"
+  const { error: updateError } = await supabase
+    .from("workspace_users")
+    .update({ status: "ACTIVE" })
+    .eq("workspace_id", workspaceId)
+    .eq("user_id", userId)
+
+  if (updateError) {
+    console.error("Error accepting invite:", updateError)
+    throw updateError
+  }
+
+  // Then, fetch the workspace details
+  const { data: workspace, error: fetchError } = await supabase
+    .from("workspaces")
+    .select("*")
+    .eq("id", workspaceId)
+    .single()
+
+  if (fetchError) {
+    console.error(
+      "Error fetching workspace after accepting invite:",
+      fetchError
+    )
+    throw fetchError
+  }
+
+  return workspace as Tables<"workspaces">
 }

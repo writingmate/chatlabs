@@ -97,6 +97,12 @@ import {
 import { Menu } from "lucide-react"
 import { SIDEBAR_ITEM_ICON_SIZE } from "../sidebar/items/all/sidebar-display-item"
 import { WorkspaceSwitcher } from "./workspace-switcher"
+import { WorkspaceSettings } from "../workspace/workspace-settings"
+import { uploadWorkspaceImage } from "@/db/storage/workspace-images"
+import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
+import { updateWorkspace } from "@/db/workspaces"
+import { convertBlobToBase64 } from "@/lib/blob-to-b64"
+import { deleteWorkspace } from "@/db/workspaces"
 
 interface ProfileSettingsProps {
   isCollapsed: boolean
@@ -116,7 +122,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     tools,
     folders,
     selectedWorkspace,
-    setSelectedWorkspace
+    setSelectedWorkspace,
+    workspaceImages,
+    setWorkspaceImages
   } = useContext(ChatbotUIContext)
 
   const [loadingBillingPortal, setLoadingBillingPortal] = useState(false)
@@ -216,6 +224,15 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [showPlugins, setShowPlugins] = useState(true)
 
+  const [workspaceName, setWorkspaceName] = useState(
+    selectedWorkspace?.name || ""
+  )
+  const [workspaceImageLink, setWorkspaceImageLink] = useState("")
+  const [workspaceSelectedImage, setWorkspaceSelectedImage] =
+    useState<File | null>(null)
+
+  const [isDeletingWorkspace, setIsDeletingWorkspace] = useState(false)
+
   const filteredTools = tools.filter(tool =>
     tool.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
@@ -242,6 +259,17 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     }
   }, [selectedWorkspace])
 
+  useEffect(() => {
+    if (selectedWorkspace) {
+      setWorkspaceName(selectedWorkspace.name)
+      const workspaceImage =
+        workspaceImages.find(
+          image => image.path === selectedWorkspace.image_path
+        )?.base64 || ""
+      setWorkspaceImageLink(workspaceImage)
+    }
+  }, [selectedWorkspace, workspaceImages])
+
   const fetchWorkspaceUsers = async (workspaceId: string) => {
     try {
       const users = await getWorkspaceUsers(workspaceId)
@@ -265,7 +293,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          workspaceId: selectedWorkspace,
+          workspaceId: selectedWorkspace.id,
           email: inviteEmail
         })
       })
@@ -413,6 +441,93 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     })
 
     toast.success("API Keys updated!")
+  }
+
+  const handleSaveWorkspace = async () => {
+    if (!selectedWorkspace) return
+
+    let imagePath = selectedWorkspace.image_path
+
+    if (workspaceSelectedImage) {
+      imagePath = await uploadWorkspaceImage(
+        selectedWorkspace,
+        workspaceSelectedImage
+      )
+
+      const url = (await getWorkspaceImageFromStorage(imagePath)) || ""
+
+      if (url) {
+        const response = await fetch(url)
+        const blob = await response.blob()
+        const base64 = await convertBlobToBase64(blob)
+
+        setWorkspaceImages(prev => [
+          ...prev,
+          {
+            workspaceId: selectedWorkspace.id,
+            path: imagePath,
+            base64,
+            url
+          }
+        ])
+      }
+    }
+
+    const updatedWorkspace = await updateWorkspace(selectedWorkspace.id, {
+      name: workspaceName,
+      image_path: imagePath
+    })
+
+    setSelectedWorkspace(updatedWorkspace)
+    setWorkspaces(workspaces => {
+      return workspaces.map(workspace => {
+        if (workspace.id === selectedWorkspace.id) {
+          return updatedWorkspace
+        }
+        return workspace
+      })
+    })
+
+    toast.success("Workspace updated!")
+  }
+
+  const handleDeleteWorkspace = async () => {
+    if (!selectedWorkspace) return
+
+    // Check if this is the last workspace
+    if (workspaces.length <= 1) {
+      toast.error("You cannot delete your last workspace.")
+      return
+    }
+
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this workspace? This action cannot be undone."
+    )
+    if (!confirmDelete) return
+
+    setIsDeletingWorkspace(true)
+
+    try {
+      await deleteWorkspace(selectedWorkspace.id)
+      toast.success("Workspace deleted successfully")
+
+      // Remove the deleted workspace from the list
+      const updatedWorkspaces = workspaces.filter(
+        w => w.id !== selectedWorkspace.id
+      )
+      setWorkspaces(updatedWorkspaces)
+
+      // Select the first available workspace
+      const nextWorkspace = updatedWorkspaces[0]
+      setSelectedWorkspace(nextWorkspace)
+
+      setIsProfileSettingsOpen("")
+    } catch (error) {
+      console.error("Error deleting workspace:", error)
+      toast.error("Failed to delete workspace")
+    } finally {
+      setIsDeletingWorkspace(false)
+    }
   }
 
   function resetToDefaults() {
@@ -615,6 +730,9 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
               </TabsTrigger>
               <TabsTrigger value="plugins" className="w-full justify-start">
                 Plugins
+              </TabsTrigger>
+              <TabsTrigger value="workspace" className="w-full justify-start">
+                Workspace
               </TabsTrigger>
             </TabsList>
 
@@ -1085,6 +1203,58 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 className="m-0 flex grow flex-col space-y-4"
               >
                 <ToolManager />
+              </TabsContent>
+              <TabsContent value="workspace">
+                <form
+                  onSubmit={e => {
+                    e.preventDefault()
+                    handleSaveWorkspace()
+                  }}
+                  className="space-y-4"
+                >
+                  <div className="space-y-1">
+                    <Label>Workspace Name</Label>
+                    <Input
+                      placeholder="Workspace name..."
+                      value={workspaceName}
+                      onChange={e => setWorkspaceName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label>Workspace Image</Label>
+                    <ImagePicker
+                      src={workspaceImageLink}
+                      image={workspaceSelectedImage}
+                      onSrcChange={setWorkspaceImageLink}
+                      onImageChange={setWorkspaceSelectedImage}
+                      width={50}
+                      height={50}
+                    />
+                  </div>
+
+                  <Button type="submit">Save Workspace</Button>
+                </form>
+
+                <Separator className="my-6" />
+
+                <Callout variant="destructive" className="mt-6">
+                  <div className="space-y-2">
+                    <Label className="text-lg font-semibold">Danger Zone</Label>
+                    <p className="text-sm">
+                      Once you delete a workspace, there is no going back.
+                      Please be certain.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={handleDeleteWorkspace}
+                      disabled={isDeletingWorkspace || workspaces.length <= 1}
+                    >
+                      {isDeletingWorkspace ? "Deleting..." : "Delete Workspace"}
+                    </Button>
+                  </div>
+                </Callout>
               </TabsContent>
             </div>
           </Tabs>
