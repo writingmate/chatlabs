@@ -5,7 +5,11 @@
 import { ChatbotUIContext } from "@/context/context"
 import { getProfileByUserId } from "@/db/profile"
 import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
-import { getWorkspaceById, getWorkspacesByUserId } from "@/db/workspaces"
+import {
+  getWorkspaceById,
+  getWorkspaces,
+  getWorkspacesByUserId
+} from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import {
   fetchHostedModels,
@@ -72,7 +76,16 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   // WORKSPACE STORE
   const [selectedWorkspace, setSelectedWorkspace] =
-    useState<Tables<"workspaces"> | null>(null)
+    useState<Tables<"workspaces"> | null>(() => {
+      if (typeof window !== "undefined") {
+        const storedWorkspace =
+          window?.localStorage?.getItem("selectedWorkspace")
+        if (storedWorkspace) {
+          return JSON.parse(storedWorkspace)
+        }
+      }
+      return null
+    })
   const [workspaceImages, setWorkspaceImages] = useState<WorkspaceImage[]>([])
 
   // PRESET STORE
@@ -170,7 +183,12 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     () => !isMobileScreen()
   )
 
+  const [fetchingStartingData, setFetchingStartingData] =
+    useState<boolean>(false)
+
   useEffect(() => {
+    if (fetchingStartingData) return
+    setFetchingStartingData(true)
     ;(async () => {
       try {
         const profile = await fetchStartingData()
@@ -216,12 +234,15 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
           })),
           ...allModels
         ])
+
+        setFetchingStartingData(false)
       } catch (error) {
+        setFetchingStartingData(false)
         setLoading(false)
         console.error("Error fetching models:", error)
       }
     })()
-  }, [])
+  }, [selectedWorkspace])
 
   useEffect(() => {
     if (chatSettings) {
@@ -231,7 +252,14 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         console.error("Error setting chat settings:", error)
       }
     }
-  }, [chatSettings])
+
+    if (selectedWorkspace) {
+      localStorage.setItem(
+        "selectedWorkspace",
+        JSON.stringify(selectedWorkspace)
+      )
+    }
+  }, [chatSettings, selectedWorkspace])
 
   const fetchStartingData = async (): Promise<
     Tables<"profiles"> | undefined
@@ -248,9 +276,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
     setProfile(profile)
 
-    const workspaces = await getWorkspacesByUserId(user.id)
+    const workspaces = await getWorkspaces()
     setWorkspaces(workspaces)
-    setSelectedWorkspace(workspaces?.[0])
 
     for (const workspace of workspaces) {
       let workspaceImageUrl = ""
@@ -277,8 +304,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       }
     }
 
+    const workspaceToFetch =
+      selectedWorkspace || workspaces.find(w => w.is_home)
+
     await fetchWorkspaceData(
-      workspaces.find(w => w.is_home)?.id as string,
+      workspaceToFetch?.id as string,
       profile?.user_id as string
     )
     setChatMessages([])

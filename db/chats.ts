@@ -105,13 +105,14 @@ export const searchChatsByName = async (
   // Start building the query
   let query = supabase
     .from("chats")
-    .select("*")
+    .select("*, applications(*)")
     .eq("workspace_id", workspaceId)
     .order("created_at", { ascending: false })
 
   // Add search term condition if provided
   if (searchTerm) {
-    query = query.ilike("name", `%${searchTerm}%`)
+    query = query.ilike("applications.name", `%${searchTerm}%`)
+    // query = query.or("name.not.is.null,applications.not.is.null")
   }
 
   // Add condition to fetch chats before a specific created_at timestamp

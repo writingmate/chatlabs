@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/browser-client"
-import { TablesInsert, TablesUpdate } from "@/supabase/types"
+import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
 
 export const getHomeWorkspaceByUserId = async (
   userId: string,
@@ -105,4 +105,116 @@ export const deleteWorkspace = async (workspaceId: string) => {
   }
 
   return true
+}
+
+export const getWorkspaceUsers = async (
+  workspaceId: string
+): Promise<Tables<"workspace_users">[]> => {
+  const { data, error } = await supabase
+    .from("workspace_users")
+    .select("user_id, email, role, status")
+    .eq("workspace_id", workspaceId)
+
+  if (error) {
+    console.error("Error fetching workspace users:", error)
+    throw error
+  }
+
+  return data as Tables<"workspace_users">[]
+}
+
+export const getWorkspaces = async (
+  workspaceId?: string
+): Promise<Tables<"workspaces">[]> => {
+  const query = supabase.from("workspaces").select("*")
+
+  if (workspaceId) {
+    query.eq("id", workspaceId)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error("Error fetching workspaces:", error)
+    throw error
+  }
+
+  return data as Tables<"workspaces">[]
+}
+
+export async function updateWorkspaceUserRole(
+  workspaceId: string,
+  userId: string,
+  newRole: "OWNER" | "MEMBER"
+) {
+  const { data, error } = await supabase
+    .from("workspace_users")
+    .update({ role: newRole })
+    .match({ workspace_id: workspaceId, user_id: userId })
+
+  if (error) throw error
+  return data
+}
+
+export async function removeWorkspaceUser(workspaceId: string, userId: string) {
+  const { data, error } = await supabase
+    .from("workspace_users")
+    .delete()
+    .match({ workspace_id: workspaceId, user_id: userId })
+
+  if (error) throw error
+  return data
+}
+
+export const getPendingInvites = async (
+  userId: string
+): Promise<
+  (Tables<"workspace_users"> & { workspaces: Tables<"workspaces"> | null })[]
+> => {
+  const { data, error } = await supabase
+    .from("workspace_users")
+    .select("*, workspaces(*)")
+    .eq("user_id", userId)
+    .eq("status", "PENDING")
+
+  if (error) {
+    console.error("Error fetching pending invites:", error)
+    throw error
+  }
+
+  return data
+}
+
+export const acceptInvite = async (
+  workspaceId: string,
+  userId: string
+): Promise<Tables<"workspaces">> => {
+  // First, update the workspace_users status to "accepted"
+  const { error: updateError } = await supabase
+    .from("workspace_users")
+    .update({ status: "ACTIVE" })
+    .eq("workspace_id", workspaceId)
+    .eq("user_id", userId)
+
+  if (updateError) {
+    console.error("Error accepting invite:", updateError)
+    throw updateError
+  }
+
+  // Then, fetch the workspace details
+  const { data: workspace, error: fetchError } = await supabase
+    .from("workspaces")
+    .select("*")
+    .eq("id", workspaceId)
+    .single()
+
+  if (fetchError) {
+    console.error(
+      "Error fetching workspace after accepting invite:",
+      fetchError
+    )
+    throw fetchError
+  }
+
+  return workspace as Tables<"workspaces">
 }

@@ -11,6 +11,7 @@ import { CommandK } from "../utility/command-k"
 import { PlanPicker } from "@/components/upgrade/plan-picker"
 import { useTheme } from "next-themes"
 import { ChatbotUIContext } from "@/context/context"
+import { InviteHandler } from "../utility/InviteHandler"
 
 export const SIDEBAR_WIDTH = 350
 
@@ -67,6 +68,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
       <div className="flex size-full overflow-x-hidden">
         <CommandK />
         <PlanPicker />
+        <InviteHandler />
 
         <Sidebar />
 

@@ -17,21 +17,27 @@ import { FC, useContext, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 
 interface UpdateChatProps {
-  chat: Tables<"chats">
+  chat: Tables<"chats"> & { applications: Tables<"applications">[] }
   className?: string
-  setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>
+  setChats: React.Dispatch<
+    React.SetStateAction<
+      (Tables<"chats"> & { applications?: Tables<"applications">[] })[]
+    >
+  >
 }
 
 export const PinChat: FC<UpdateChatProps> = ({ chat, className, setChats }) => {
-  // const { setChats } = useContext(ChatbotUIContext)
-
   const handlePinChat = async (e: React.MouseEvent<SVGSVGElement>) => {
     const updatedChat = await updateChat(chat.id, {
       pinned: !chat.pinned,
       updated_at: chat.updated_at
     })
     setChats(prevState =>
-      prevState.map(c => (c.id === chat.id ? updatedChat : c))
+      prevState.map(c =>
+        c.id === chat.id
+          ? { ...updatedChat, applications: c.applications || [] }
+          : c
+      )
     )
   }
 

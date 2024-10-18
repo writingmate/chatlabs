@@ -6,6 +6,9 @@ import {
   SIDEBAR_ICON_STROKE
 } from "../sidebar/sidebar-switcher"
 import { Button } from "../ui/button"
+import { DropdownMenuItem } from "../ui/dropdown-menu"
+import { Switch } from "../ui/switch"
+import { SIDEBAR_ITEM_ICON_SIZE } from "../sidebar/items/all/sidebar-display-item"
 
 interface ThemeSwitcherProps {}
 
@@ -22,17 +25,33 @@ export const ThemeSwitcher: FC<ThemeSwitcherProps> = () => {
   }
 
   return (
-    <Button
-      className="flex cursor-pointer space-x-2"
-      variant="ghost"
-      size="icon"
-      onClick={() => handleChange(theme === "light" ? "dark" : "light")}
+    <DropdownMenuItem
+      className="flex cursor-pointer justify-between px-1"
+      onClick={e => {
+        e.preventDefault()
+        e.stopPropagation()
+        handleChange(theme === "light" ? "dark" : "light")
+      }}
     >
-      {theme === "dark" ? (
-        <IconMoon size={SIDEBAR_ICON_SIZE} stroke={SIDEBAR_ICON_STROKE} />
-      ) : (
-        <IconSun size={SIDEBAR_ICON_SIZE} stroke={SIDEBAR_ICON_STROKE} />
-      )}
-    </Button>
+      <div className="flex items-center">
+        {theme === "dark" ? (
+          <IconMoon
+            size={SIDEBAR_ITEM_ICON_SIZE}
+            stroke={SIDEBAR_ICON_STROKE}
+            className="text-muted-foreground mr-2"
+          />
+        ) : (
+          <IconSun
+            size={SIDEBAR_ITEM_ICON_SIZE}
+            stroke={SIDEBAR_ICON_STROKE}
+            className="text-muted-foreground mr-2"
+          />
+        )}
+        <span className="text-sm">
+          {theme === "dark" ? "Dark Mode" : "Light Mode"}
+        </span>
+      </div>
+      <Switch checked={theme === "dark"} />
+    </DropdownMenuItem>
   )
 }
