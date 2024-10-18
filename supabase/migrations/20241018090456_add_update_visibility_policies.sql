@@ -157,16 +157,6 @@ SELECT USING (
         )
     );
 
--- Shared chats
-DROP POLICY IF EXISTS "Users can view shared chats in their workspaces" ON public.shared_chats;
-
-CREATE POLICY "Users can view shared chats in their workspaces" ON public.shared_chats FOR
-SELECT USING (
-        is_workspace_member (
-            shared_chats.workspace_id, auth.uid ()
-        )
-    );
-
 DROP POLICY IF EXISTS "Allow read access to members of a workspace" ON assistant_workspaces;
 
 CREATE POLICY "Allow read access to members of a workspace" ON assistant_workspaces FOR

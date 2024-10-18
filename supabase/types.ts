@@ -1761,65 +1761,7 @@ export type Database = {
           },
         ]
       }
-      shared_chats: {
-        Row: {
-          chat_id: string
-          created_at: string
-          id: string
-          last_message_id: string
-          updated_at: string
-          user_id: string
-          workspace_id: string
-        }
-        Insert: {
-          chat_id: string
-          created_at?: string
-          id?: string
-          last_message_id: string
-          updated_at?: string
-          user_id: string
-          workspace_id: string
-        }
-        Update: {
-          chat_id?: string
-          created_at?: string
-          id?: string
-          last_message_id?: string
-          updated_at?: string
-          user_id?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shared_chats_chat_id_fkey"
-            columns: ["chat_id"]
-            isOneToOne: false
-            referencedRelation: "chats"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "shared_chats_last_message_id_fkey"
-            columns: ["last_message_id"]
-            isOneToOne: false
-            referencedRelation: "messages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "shared_chats_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "shared_chats_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+
       tool_workspaces: {
         Row: {
           created_at: string
