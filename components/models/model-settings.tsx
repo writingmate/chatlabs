@@ -1,13 +1,14 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
 import { LLM, LLMID } from "@/types"
 import { ModelVisibilityOption } from "@/components/models/model-visibility-option"
-import { IconSettings } from "@tabler/icons-react"
-import { useContext, useEffect, useState } from "react"
+import { IconSettings, IconFilterOff } from "@tabler/icons-react"
+import { useContext, useEffect, useState, useMemo, useCallback } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { Button } from "@/components/ui/button"
 import { updateProfile } from "@/db/profile"
@@ -24,6 +25,20 @@ import {
 } from "@/lib/build-prompt"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { updateWorkspace } from "@/db/workspaces"
+import { SearchInput } from "@/components/ui/search-input"
+import { ModelDetails } from "@/components/models/model-details"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import { CATEGORIES } from "@/lib/models/categories"
+import debounce from "lodash/debounce"
+import { VList } from "virtua"
+import { HoverCardPortal } from "@radix-ui/react-hover-card"
 
 export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "gpt-3.5-turbo-0125": false,
@@ -70,7 +85,7 @@ It should contain the following dynamic variables for ChatLabs functioning prope
 const SYSTEM_PROMPT_WARNING = `
 The system prompt should contain the following dynamic variables for ChatLabs functioning properly: {profile_context}, {local_date}, and {assistant}. {profile_context} is the user's profile context, {local_date} is the current date, and {assistant} is the name of the assistant and it's instructions.`
 
-function ModelSettings({ models }: { models?: LLM[] }) {
+export const ModelSettings = ({ models }: { models?: LLM[] }) => {
   const {
     profile,
     selectedWorkspace,
@@ -82,10 +97,7 @@ function ModelSettings({ models }: { models?: LLM[] }) {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const [visibility, setVisibility] = useState<Record<LLMID, boolean>>(
-    (profile?.model_visibility || DEFAULT_MODEL_VISIBILITY) as Record<
-      LLMID,
-      boolean
-    >
+    {} as Record<LLMID, boolean>
   )
 
   const [systemPromptTemplate, setSystemPromptTemplate] = useState(
@@ -93,6 +105,91 @@ function ModelSettings({ models }: { models?: LLM[] }) {
   )
 
   const validSystemPrompt = validateSystemPromptTemplate(systemPromptTemplate)
+
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedTier, setSelectedTier] = useState<string>("all")
+  const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [visibilityFilter, setVisibilityFilter] = useState<string>("all")
+
+  const tiers = [
+    { value: "all", label: "All Tiers" },
+    { value: "free", label: "Free" },
+    { value: "pro", label: "Pro" },
+    { value: "ultimate", label: "Ultimate" }
+  ]
+
+  const categories = [
+    { value: "all", label: "All Categories" },
+    ...Object.entries(CATEGORIES).map(([key, value]) => ({
+      value: key,
+      label: value.category
+    }))
+  ]
+
+  const visibilityOptions = [
+    { value: "all", label: "All Models" },
+    { value: "enabled", label: "Selected Models" },
+    { value: "disabled", label: "Unselected Models" }
+  ]
+
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
+
+  // Debounce the search query update
+  const debouncedSetSearchQuery = useCallback(
+    debounce((value: string) => {
+      setDebouncedSearchQuery(value)
+    }, 300),
+    []
+  )
+
+  // Update both the immediate and debounced search queries
+  const handleSearchQueryChange = (value: string) => {
+    setSearchQuery(value)
+    debouncedSetSearchQuery(value)
+  }
+
+  // Memoize the filtered models
+  const filteredModels = useMemo(() => {
+    return models?.filter(
+      model =>
+        model.modelName
+          .toLowerCase()
+          .includes(debouncedSearchQuery.toLowerCase()) &&
+        (selectedTier === "all" || model.tier === selectedTier) &&
+        (selectedCategory === "all" ||
+          model.categories?.some(
+            cat => cat.category === CATEGORIES[selectedCategory].category
+          )) &&
+        (visibilityFilter === "all" ||
+          (visibilityFilter === "enabled" && visibility[model.modelId]) ||
+          (visibilityFilter === "disabled" && !visibility[model.modelId]))
+    )
+  }, [
+    models,
+    debouncedSearchQuery,
+    selectedTier,
+    selectedCategory,
+    visibilityFilter,
+    visibility
+  ])
+
+  useEffect(() => {
+    if (models) {
+      const initialVisibility = models.reduce(
+        (acc, model) => {
+          acc[model.modelId] =
+            (profile?.model_visibility as Record<LLMID, boolean>)?.[
+              model.modelId
+            ] ??
+            DEFAULT_MODEL_VISIBILITY[model.modelId] ??
+            false
+          return acc
+        },
+        {} as Record<LLMID, boolean>
+      )
+      setVisibility(initialVisibility)
+    }
+  }, [models, profile])
 
   function handleSave() {
     if (!profile) {
@@ -114,6 +211,13 @@ function ModelSettings({ models }: { models?: LLM[] }) {
       default_context_length: chatSettings?.contextLength
     })
     setDialogOpen(false)
+  }
+
+  const resetFilters = () => {
+    setSearchQuery("")
+    setSelectedTier("all")
+    setSelectedCategory("all")
+    setVisibilityFilter("all")
   }
 
   return (
@@ -139,18 +243,24 @@ function ModelSettings({ models }: { models?: LLM[] }) {
           </div>
         </div>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="flex h-[90vh] max-w-2xl flex-col">
         <DialogTitle>Manage models</DialogTitle>
-        <Tabs className={"flex w-full flex-col justify-center"}>
-          <TabsList className={"mx-auto"}>
-            <TabsTrigger value={"basic"} title={"Basic settings"}>
-              Model parameters
-            </TabsTrigger>
-            <TabsTrigger value={"visibility"} title={"Model visibility"}>
+        <DialogDescription>
+          Configure and discover all LLM models here.
+        </DialogDescription>
+        <Tabs className="flex w-full grow flex-col">
+          <TabsList className="mx-auto">
+            <TabsTrigger value="visibility" title="Model visibility">
               Discover models
             </TabsTrigger>
+            <TabsTrigger value="basic" title="Basic settings">
+              Model parameters
+            </TabsTrigger>
           </TabsList>
-          <TabsContent value={"basic"}>
+          <TabsContent
+            value="basic"
+            className="flex grow flex-col [&[hidden]]:hidden"
+          >
             <div className="mb-4 mt-2 flex items-center space-x-2">
               <Label>System Prompt</Label>
               <InfoIconTooltip label={SYSTEM_PROMPT_DESCRIPTION} />
@@ -191,21 +301,118 @@ function ModelSettings({ models }: { models?: LLM[] }) {
               showTooltip={true}
             />
           </TabsContent>
-          <TabsContent value={"visibility"}>
-            <div className="max-h-[360px] w-full space-y-0 overflow-y-auto">
-              {models?.map(model => (
-                <ModelVisibilityOption
-                  key={model.modelId}
-                  selected={!!visibility?.[model.modelId]}
-                  model={model}
-                  onSelect={checked => {
-                    setVisibility({
-                      ...visibility,
-                      [model.modelId]: checked
-                    })
-                  }}
-                />
-              ))}
+          <TabsContent
+            value="visibility"
+            className="flex grow flex-col justify-start"
+          >
+            <div className="mb-4 flex flex-col flex-wrap items-center gap-2">
+              <SearchInput
+                placeholder="Search models..."
+                value={searchQuery}
+                onChange={handleSearchQueryChange}
+                className="w-full"
+              />
+              <div className="grid w-full grid-cols-3 gap-2">
+                <Select
+                  value={selectedTier}
+                  onValueChange={value => setSelectedTier(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select tier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tiers.map(tier => (
+                      <SelectItem key={tier.value} value={tier.value}>
+                        {tier.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select
+                  value={selectedCategory}
+                  onValueChange={value => setSelectedCategory(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(category => (
+                      <SelectItem key={category.value} value={category.value}>
+                        {category.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select
+                  value={visibilityFilter}
+                  onValueChange={value => setVisibilityFilter(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter visibility" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {visibilityOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="text-muted-foreground mb-2 text-sm">
+              Note: Not all models have assigned categories. Filtering by
+              category may exclude some models.
+            </div>
+            <div className="grow overflow-hidden">
+              <VList className="size-full space-y-0">
+                {filteredModels && filteredModels.length > 0 ? (
+                  filteredModels.map(model => (
+                    <HoverCard
+                      key={model.modelId}
+                      openDelay={100}
+                      closeDelay={0}
+                    >
+                      <HoverCardTrigger>
+                        <ModelVisibilityOption
+                          selected={visibility[model.modelId] ?? false}
+                          model={model}
+                          onSelect={checked => {
+                            setVisibility(prev => ({
+                              ...prev,
+                              [model.modelId]: checked
+                            }))
+                          }}
+                        />
+                      </HoverCardTrigger>
+                      <HoverCardPortal>
+                        <HoverCardContent
+                          align="start"
+                          sideOffset={-4}
+                          side="left"
+                          className="w-90"
+                        >
+                          <ModelDetails model={model} />
+                        </HoverCardContent>
+                      </HoverCardPortal>
+                    </HoverCard>
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-4">
+                    <p className="text-muted-foreground mb-2">
+                      No models found with the current filters.
+                    </p>
+                    <Button
+                      onClick={resetFilters}
+                      variant="outline"
+                      className="flex items-center"
+                    >
+                      <IconFilterOff className="mr-2" size={16} />
+                      Reset Filters
+                    </Button>
+                  </div>
+                )}
+              </VList>
             </div>
           </TabsContent>
         </Tabs>
@@ -214,5 +421,3 @@ function ModelSettings({ models }: { models?: LLM[] }) {
     </Dialog>
   )
 }
-
-export { ModelSettings }
