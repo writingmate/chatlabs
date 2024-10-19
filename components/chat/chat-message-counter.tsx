@@ -9,7 +9,6 @@ import { getMessageCountForModel } from "@/db/messages"
 import { Button } from "@/components/ui/button"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { tr } from "date-fns/locale"
 
 interface ChatMessageCounterProps {}
 

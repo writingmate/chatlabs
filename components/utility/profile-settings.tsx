@@ -1,10 +1,5 @@
 import { ChatbotUIContext } from "@/context/context"
-import {
-  PROFILE_CONTEXT_MAX,
-  PROFILE_DISPLAY_NAME_MAX,
-  PROFILE_USERNAME_MAX,
-  PROFILE_USERNAME_MIN
-} from "@/db/limits"
+import { PROFILE_CONTEXT_MAX, PROFILE_DISPLAY_NAME_MAX } from "@/db/limits"
 import { updateProfile } from "@/db/profile"
 import { uploadProfileImage } from "@/db/storage/profile-images"
 import { exportLocalStorageAsJSON } from "@/lib/export-old-data"

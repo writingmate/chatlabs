@@ -18,29 +18,28 @@ export const getMessageById = async (messageId: string) => {
 export const getMessageCountForModel = async (
   userId: string,
   model: string,
-  since?: Date
+  date?: Date,
+  client = supabase
 ) => {
-  if (!since) {
-    // one day ago
-    // clone date and set it to midnight
-    since = new Date()
-    since.setHours(0, 0, 0, 0)
+  if (!date) {
+    date = new Date()
   }
 
-  const { count, error } = await supabase
-    .from("messages")
-    .select("*", { count: "exact", head: true })
+  const { data, error } = await client
+    .from("daily_message_count")
+    .select("count")
     .eq("user_id", userId)
-    .gt("created_at", since.toISOString())
-    .eq("role", "user")
-    .eq("model", model)
+    .eq("model_id", model)
+    .eq("day", date.toISOString().split("T")[0])
 
   if (error) {
-    throw new Error(error.message)
+    console.error("Error fetching daily message count:", error)
+    throw new Error("Could not fetch message count")
   }
 
-  return count
+  return data?.[0]?.count || 0
 }
+
 export const getMessageCount = async (since?: Date) => {
   if (!since) {
     // one day ago

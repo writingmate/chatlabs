@@ -19,7 +19,12 @@ export const ModelVisibilityOption: FC<ModelVisibilityOption> = ({
   const { theme } = useTheme()
 
   return (
-    <div className="flex w-full justify-start space-x-3 truncate rounded p-2">
+    <div
+      onClick={e => {
+        onSelect(!selected)
+      }}
+      className="hover:bg-accent flex w-full cursor-pointer justify-start space-x-3 truncate rounded p-2"
+    >
       <div className="flex w-full items-center justify-between space-x-2">
         <div className={"relative flex items-center space-x-2"}>
           <ModelIcon
@@ -39,7 +44,7 @@ export const ModelVisibilityOption: FC<ModelVisibilityOption> = ({
             )}
           </div>
         </div>
-        <Switch checked={selected} onCheckedChange={onSelect} />
+        <Switch checked={selected} />
       </div>
     </div>
   )

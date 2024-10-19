@@ -46,16 +46,16 @@ export function ModelDetails({
 
   return (
     <div className={cn("flex w-[320px] flex-col space-y-2", className)}>
-      <div className={"flex items-center space-x-2"}>
+      <div className="flex items-center space-x-2 overflow-hidden whitespace-nowrap">
         <ModelIcon
           provider={model?.provider}
           modelId={model?.modelId}
           width={26}
           height={26}
         />
-        <span className={"capitalize"}>{model.provider}</span>
+        <span className="capitalize">{model.provider}</span>
         <span>/</span>
-        <span className={"font-semibold"}>{model.modelName}</span>
+        <span className="truncate font-semibold">{model.modelName}</span>
       </div>
       <div className="flex flex-wrap gap-2">
         {model.categories?.map(category => (

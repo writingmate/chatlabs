@@ -1,13 +1,12 @@
 import { FC } from "react"
 import Image from "next/image"
 interface ChatbotUISVGProps {
-  theme: "dark" | "light"
+  theme?: "dark" | "light"
   size: number
   className?: string
 }
 
 export const ChatbotUISVG: FC<ChatbotUISVGProps> = ({
-  theme,
   size = 141,
   className
 }) => {

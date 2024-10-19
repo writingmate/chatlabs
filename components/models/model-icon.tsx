@@ -12,7 +12,6 @@ import { FC, HTMLAttributes } from "react"
 import { AnthropicSVG } from "../icons/anthropic-svg"
 import { GoogleSVG } from "../icons/google-svg"
 import { OpenAISVG } from "../icons/openai-svg"
-import { parseOpenRouterModelName } from "@/lib/models/fetch-models"
 import { MicrosoftSVG } from "@/components/icons/microsoft-svg"
 import { Chat } from "openai/resources/index.mjs"
 import { ChatbotUISVG } from "../icons/chatbotui-svg"
@@ -127,6 +126,10 @@ export const ModelIcon: FC<ModelIconProps> = ({
           height={height}
         />
       )
+    // @ts-ignore
+    case "google ai studio":
+    // @ts-ignore
+    case "azure":
     case "microsoft":
       return (
         <MicrosoftSVG
@@ -153,24 +156,23 @@ export const ModelIcon: FC<ModelIconProps> = ({
           height={height}
         />
       )
-    case "openrouter":
-      const { provider } = parseOpenRouterModelName(modelId!)
-      return (
-        <ModelIcon
-          className={className}
-          provider={provider as ModelProvider}
-          height={height}
-          width={width}
-        />
-      )
+    // case "openrouter":
+    //   const { provider } = parseOpenRouterModelName(modelId!)
+    //   return (
+    //     <ModelIcon
+    //       className={className}
+    //       provider={provider as ModelProvider}
+    //       height={height}
+    //       width={width}
+    //     />
+    //   )
     default:
       return (
         <ChatbotUISVG
           className={cn(
-            "dark:border-foreground/10 rounded-sm dark:border",
+            "border-background/10 dark:border-foreground/10 rounded-sm border invert dark:invert-0",
             className
           )}
-          theme={theme === "dark" ? "light" : "dark"}
           size={width}
         />
       )
