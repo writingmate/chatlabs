@@ -9,6 +9,14 @@ const HoverCard = HoverCardPrimitive.Root
 
 const HoverCardTrigger = HoverCardPrimitive.Trigger
 
+const HoverCardArrow = React.forwardRef<
+  React.ElementRef<typeof HoverCardPrimitive.Arrow>,
+  React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Arrow>
+>((props, ref) => (
+  <HoverCardPrimitive.Arrow ref={ref} className="text-background" {...props} />
+))
+HoverCardArrow.displayName = "HoverCardArrow"
+
 const HoverCardContent = React.forwardRef<
   React.ElementRef<typeof HoverCardPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content>
@@ -26,4 +34,4 @@ const HoverCardContent = React.forwardRef<
 ))
 HoverCardContent.displayName = HoverCardPrimitive.Content.displayName
 
-export { HoverCard, HoverCardTrigger, HoverCardContent }
+export { HoverCard, HoverCardTrigger, HoverCardContent, HoverCardArrow }

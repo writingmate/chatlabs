@@ -399,51 +399,6 @@ export type Database = {
           },
         ]
       }
-      assistant_prompts: {
-        Row: {
-          assistant_id: string
-          content: string
-          created_at: string
-          id: string
-          name: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          assistant_id: string
-          content: string
-          created_at?: string
-          id?: string
-          name: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          assistant_id?: string
-          content?: string
-          created_at?: string
-          id?: string
-          name?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "assistant_prompts_assistant_id_fkey"
-            columns: ["assistant_id"]
-            isOneToOne: false
-            referencedRelation: "assistants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "assistant_prompts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       assistant_tools: {
         Row: {
           assistant_id: string
@@ -671,7 +626,6 @@ export type Database = {
           id: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
-          last_chat_message_id: string | null
           last_shared_message_id: string | null
           model: string
           name: string
@@ -695,7 +649,6 @@ export type Database = {
           id?: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
-          last_chat_message_id?: string | null
           last_shared_message_id?: string | null
           model: string
           name: string
@@ -719,7 +672,6 @@ export type Database = {
           id?: string
           include_profile_context?: boolean
           include_workspace_instructions?: boolean
-          last_chat_message_id?: string | null
           last_shared_message_id?: string | null
           model?: string
           name?: string
@@ -746,13 +698,6 @@ export type Database = {
             columns: ["folder_id"]
             isOneToOne: false
             referencedRelation: "folders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "chats_last_chat_message_id_fkey"
-            columns: ["last_chat_message_id"]
-            isOneToOne: true
-            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
           {
@@ -918,6 +863,44 @@ export type Database = {
           },
           {
             foreignKeyName: "collections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_message_count: {
+        Row: {
+          count: number
+          created_at: string | null
+          day: string
+          id: string
+          model_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string | null
+          day: string
+          id?: string
+          model_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          count?: number
+          created_at?: string | null
+          day?: string
+          id?: string
+          model_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_message_count_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -1761,7 +1744,6 @@ export type Database = {
           },
         ]
       }
-
       tool_workspaces: {
         Row: {
           created_at: string
@@ -2225,7 +2207,6 @@ export type Database = {
           id: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
-          last_chat_message_id: string | null
           last_shared_message_id: string | null
           model: string
           name: string
