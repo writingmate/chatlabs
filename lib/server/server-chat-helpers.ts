@@ -21,6 +21,7 @@ import {
   PLAN_ULTIMATE
 } from "@/lib/stripe/config"
 import { ApiError } from "next/dist/server/api-utils"
+import { getMessageCountForModel } from "@/db/messages"
 
 function createClient() {
   return createServerClient<Database>(
@@ -160,23 +161,15 @@ export async function validateMessageCount(
     )
   }
 
-  // clone date and set it to midnight
-  let previousDate = new Date(date)
-  previousDate.setUTCHours(0, 0, 0, 0)
+  // Query the daily_message_count table
+  const dailyCount = await getMessageCountForModel(
+    profile.user_id,
+    model,
+    date,
+    supabase
+  )
 
-  // count messages sent today starting from midnight
-  const { count } = await supabase
-    .from("messages")
-    .select("*", {
-      count: "exact"
-    })
-    .eq("role", "user")
-    .eq("model", model)
-    .gte("created_at", previousDate.toISOString())
-
-  if (count === null) {
-    throw new Error("Could not fetch message count")
-  }
+  const count = dailyCount || 0
 
   // Check catch-all limit first
   if (count >= CATCHALL_MESSAGE_DAILY_LIMIT) {
