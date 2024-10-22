@@ -6,13 +6,17 @@ import { Tables } from "@/supabase/types"
 import { LLM } from "@/types"
 import { useRouter } from "nextjs-toploader/app"
 import { useParams } from "next/navigation"
-import { FC, useContext, useMemo, useRef } from "react"
+import { FC, useCallback, useContext, useMemo, useRef } from "react"
 import { DeleteChat } from "./delete-chat"
 import { UpdateChat } from "./update-chat"
-import { SIDEBAR_ITEM_ICON_SIZE } from "@/components/sidebar/items/all/sidebar-display-item"
+import {
+  SIDEBAR_ITEM_ICON_SIZE,
+  SIDEBAR_ITEM_ICON_STROKE
+} from "@/components/sidebar/items/all/sidebar-display-item"
 import { PinChat } from "@/components/sidebar/items/chat/pin-chat"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { IconApps } from "@tabler/icons-react"
 
 interface ChatItemProps {
   chat: Tables<"chats">
@@ -26,6 +30,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     availableLocalModels,
     assistantImages,
     availableOpenRouterModels,
+    allModels,
     setChats
   } = useContext(ChatbotUIContext)
 
@@ -33,31 +38,43 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
 
   const router = useRouter()
   const params = useParams()
-  const isActive = params.chatid === chat.id || selectedChat?.id === chat.id
+  const isActive = params?.chatid === chat.id || selectedChat?.id === chat.id
 
   const itemRef = useRef<HTMLDivElement>(null)
 
-  const handleClick = () => {
-    if (!selectedWorkspace) return
-    return router.push(`/chat/${chat.id}`)
-  }
+  const application = (
+    chat as Tables<"chats"> & { applications: Tables<"applications">[] }
+  ).applications?.[0]
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter") {
-      e.stopPropagation()
-      itemRef.current?.click()
+  const handleClick = useCallback(() => {
+    if (application) {
+      return router.push(`/applications/${application.id}`)
     }
-  }
+    return router.push(`/chat/${chat.id}`)
+  }, [chat, application, router, selectedWorkspace])
 
-  const MODEL_DATA = [
-    ...LLM_LIST,
-    ...availableLocalModels,
-    ...availableOpenRouterModels
-  ].find(llm => llm.modelId === chat.model) as LLM
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Enter") {
+        e.stopPropagation()
+        itemRef.current?.click()
+      }
+    },
+    [chat, application, router, selectedWorkspace]
+  )
 
-  const assistant = chat.assistant_id
-    ? assistants.find(a => a.id === chat.assistant_id)
-    : null
+  const MODEL_DATA = useMemo(
+    () => allModels.find(llm => llm.modelId === chat.model) as LLM,
+    [allModels, chat.model]
+  )
+
+  const assistant = useMemo(
+    () =>
+      chat.assistant_id
+        ? assistants.find(a => a.id === chat.assistant_id)
+        : null,
+    [chat, assistants]
+  )
 
   return useMemo(
     () => (
@@ -71,7 +88,22 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
         onKeyDown={handleKeyDown}
         onClick={handleClick}
       >
-        {assistant ? (
+        {application ? (
+          <div
+            className={cn(
+              "text-muted-foreground border-foreground/10 flex items-center justify-center rounded border"
+            )}
+            style={{
+              width: SIDEBAR_ITEM_ICON_SIZE,
+              height: SIDEBAR_ITEM_ICON_SIZE
+            }}
+          >
+            <IconApps
+              size={SIDEBAR_ITEM_ICON_SIZE - 4}
+              stroke={SIDEBAR_ITEM_ICON_STROKE}
+            />
+          </div>
+        ) : assistant ? (
           <AssistantIcon assistant={assistant} size={SIDEBAR_ITEM_ICON_SIZE} />
         ) : (
           <ModelIcon
@@ -82,7 +114,9 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           />
         )}
 
-        <div className="ml-3 flex-1 truncate text-sm">{chat.name}</div>
+        <div className="ml-3 flex-1 truncate text-sm">
+          {application ? application.name : chat.name}
+        </div>
 
         <div
           onClick={e => {
@@ -91,23 +125,27 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           }}
           className={`ml-2 flex space-x-2`}
         >
-          <UpdateChat
-            className={!isActive ? " hidden group-hover:flex" : ""}
-            chat={chat}
-            setChats={setChats}
-          />
-          <DeleteChat
-            className={!isActive ? " hidden group-hover:flex" : ""}
-            chat={chat}
-            setChats={setChats}
-            handleNewChat={handleNewChat}
-          />
+          {application ? null : (
+            <>
+              <UpdateChat
+                className={!isActive ? " hidden group-hover:flex" : ""}
+                chat={chat}
+                setChats={setChats}
+              />
+              <DeleteChat
+                className={!isActive ? " hidden group-hover:flex" : ""}
+                chat={chat}
+                setChats={setChats}
+                handleNewChat={handleNewChat}
+              />
+            </>
+          )}
           <PinChat
             className={
               !isActive && !chat.pinned ? " hidden group-hover:flex" : ""
             }
             setChats={setChats}
-            chat={chat}
+            chat={chat as any}
           />
         </div>
       </div>

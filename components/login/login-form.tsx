@@ -43,7 +43,7 @@ export default function LoginForm({
     return disposableEmail.validate(email)
   }
 
-  redirectTo = params.get("next") || redirectTo
+  redirectTo = params?.get("next") || redirectTo
 
   const { theme } = useTheme()
 

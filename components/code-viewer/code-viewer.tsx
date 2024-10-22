@@ -209,6 +209,7 @@ Please fix the error`,
       </div>
     ),
     [
+      showCloseButton,
       codeBlock,
       execute,
       inspectMode,

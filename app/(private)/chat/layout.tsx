@@ -12,7 +12,6 @@ interface ChatLayoutProps {
 }
 
 export default function ChatLayout({ children }: ChatLayoutProps) {
-  const pathname = usePathname()
   return (
     <ChatbotUIChatProvider id={"one"}>
       <Dashboard>

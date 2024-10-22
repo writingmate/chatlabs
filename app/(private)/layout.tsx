@@ -9,6 +9,7 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 import NextTopLoader from "nextjs-toploader"
+import { URLMessagePopup } from "@/components/utility/url-message-popup"
 
 const font = DM_Sans({ subsets: ["latin"] })
 const APP_NAME = "ChatLabs"
@@ -88,6 +89,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           shadow={false}
           showSpinner={false}
         />
+        <URLMessagePopup />
         <Providers attribute="class" defaultTheme="light">
           <Toaster richColors position="top-center" duration={3000} />
           <div className="bg-background text-foreground flex size-full flex-col items-center sm:h-screen">

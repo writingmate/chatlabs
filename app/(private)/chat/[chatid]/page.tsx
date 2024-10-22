@@ -4,7 +4,7 @@ import { ChatUI } from "@/components/chat/chat-ui"
 import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
 import { useContext, useEffect } from "react"
 import { ChatbotUIChatContext } from "@/context/chat"
-import { useParams } from "next/navigation"
+import { notFound, useParams } from "next/navigation"
 import { ChatbotUIContext } from "@/context/context"
 import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
 
@@ -19,7 +19,11 @@ export default function ChatIDPage() {
   } = useCodeBlockManager(chatMessages)
 
   const params = useParams()
-  const chatId = params.chatid as string
+  const chatId = params?.chatid as string
+
+  if (!chatId) {
+    return notFound()
+  }
 
   return (
     <>
