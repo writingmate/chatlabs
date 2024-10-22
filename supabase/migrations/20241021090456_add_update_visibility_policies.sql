@@ -3,19 +3,43 @@
 -- Assistants
 DROP POLICY IF EXISTS "Users can view assistants in their workspaces" ON public.assistants;
 
+DROP POLICY IF EXISTS "Users can create assistants" ON public.assistants;
+
+DROP POLICY IF EXISTS "Users can update their assistants" ON public.assistants;
+
+DROP POLICY IF EXISTS "Users can delete their assistants" ON public.assistants;
+
 CREATE POLICY "Users can view assistants in their workspaces" ON public.assistants FOR
 SELECT USING (
-        EXISTS (
-            SELECT 1
-            FROM public.assistant_workspaces aw
-            WHERE
-                aw.assistant_id = assistants.id
-                AND is_workspace_member (aw.workspace_id, auth.uid ())
-        )
+        CASE
+            WHEN has_workspace_feature_enabled (auth.uid ()) THEN EXISTS (
+                SELECT 1
+                FROM public.assistant_workspaces aw
+                WHERE
+                    aw.assistant_id = assistants.id
+                    AND is_workspace_member (aw.workspace_id, auth.uid ())
+            )
+            ELSE
+            -- Fall back to old behavior
+            EXISTS (
+                SELECT 1
+                FROM public.assistant_workspaces aw
+                    JOIN workspaces w ON aw.workspace_id = w.id
+                WHERE
+                    aw.assistant_id = assistants.id
+                    AND w.user_id = auth.uid ()
+            )
+        END
     );
 
 -- Chats
 DROP POLICY IF EXISTS "Users can view chats in their workspaces" ON public.chats;
+
+DROP POLICY IF EXISTS "Users can create chats" ON public.chats;
+
+DROP POLICY IF EXISTS "Users can update their chats" ON public.chats;
+
+DROP POLICY IF EXISTS "Users can delete their chats" ON public.chats;
 
 CREATE POLICY "Users can view chats in their workspaces" ON public.chats FOR
 SELECT USING (
@@ -26,6 +50,12 @@ SELECT USING (
 
 -- Collections
 DROP POLICY IF EXISTS "Users can view collections in their workspaces" ON public.collections;
+
+DROP POLICY IF EXISTS "Users can create collections" ON public.collections;
+
+DROP POLICY IF EXISTS "Users can update their collections" ON public.collections;
+
+DROP POLICY IF EXISTS "Users can delete their collections" ON public.collections;
 
 CREATE POLICY "Users can view collections in their workspaces" ON public.collections FOR
 SELECT USING (
@@ -41,6 +71,12 @@ SELECT USING (
 -- Files
 DROP POLICY IF EXISTS "Users can view files in their workspaces" ON public.files;
 
+DROP POLICY IF EXISTS "Users can create files" ON public.files;
+
+DROP POLICY IF EXISTS "Users can update their files" ON public.files;
+
+DROP POLICY IF EXISTS "Users can delete their files" ON public.files;
+
 CREATE POLICY "Users can view files in their workspaces" ON public.files FOR
 SELECT USING (
         EXISTS (
@@ -55,6 +91,12 @@ SELECT USING (
 -- Folders
 DROP POLICY IF EXISTS "Users can view folders in their workspaces" ON public.folders;
 
+DROP POLICY IF EXISTS "Users can create folders" ON public.folders;
+
+DROP POLICY IF EXISTS "Users can update their folders" ON public.folders;
+
+DROP POLICY IF EXISTS "Users can delete their folders" ON public.folders;
+
 CREATE POLICY "Users can view folders in their workspaces" ON public.folders FOR
 SELECT USING (
         is_workspace_member (
@@ -64,6 +106,12 @@ SELECT USING (
 
 -- Models
 DROP POLICY IF EXISTS "Users can view models in their workspaces" ON public.models;
+
+DROP POLICY IF EXISTS "Users can create models" ON public.models;
+
+DROP POLICY IF EXISTS "Users can update their models" ON public.models;
+
+DROP POLICY IF EXISTS "Users can delete their models" ON public.models;
 
 CREATE POLICY "Users can view models in their workspaces" ON public.models FOR
 SELECT USING (
@@ -79,6 +127,12 @@ SELECT USING (
 -- Presets
 DROP POLICY IF EXISTS "Users can view presets in their workspaces" ON public.presets;
 
+DROP POLICY IF EXISTS "Users can create presets" ON public.presets;
+
+DROP POLICY IF EXISTS "Users can update their presets" ON public.presets;
+
+DROP POLICY IF EXISTS "Users can delete their presets" ON public.presets;
+
 CREATE POLICY "Users can view presets in their workspaces" ON public.presets FOR
 SELECT USING (
         EXISTS (
@@ -92,6 +146,12 @@ SELECT USING (
 
 -- Prompts
 DROP POLICY IF EXISTS "Users can view prompts in their workspaces" ON public.prompts;
+
+DROP POLICY IF EXISTS "Users can create prompts" ON public.prompts;
+
+DROP POLICY IF EXISTS "Users can update their prompts" ON public.prompts;
+
+DROP POLICY IF EXISTS "Users can delete their prompts" ON public.prompts;
 
 CREATE POLICY "Users can view prompts in their workspaces" ON public.prompts FOR
 SELECT USING (
@@ -107,6 +167,12 @@ SELECT USING (
 -- Tools
 DROP POLICY IF EXISTS "Users can view tools in their workspaces" ON public.tools;
 
+DROP POLICY IF EXISTS "Users can create tools" ON public.tools;
+
+DROP POLICY IF EXISTS "Users can update their tools" ON public.tools;
+
+DROP POLICY IF EXISTS "Users can delete their tools" ON public.tools;
+
 CREATE POLICY "Users can view tools in their workspaces" ON public.tools FOR
 SELECT USING (
         EXISTS (
@@ -121,6 +187,12 @@ SELECT USING (
 -- Messages (related to chats)
 DROP POLICY IF EXISTS "Users can view messages in their workspace chats" ON public.messages;
 
+DROP POLICY IF EXISTS "Users can create messages" ON public.messages;
+
+DROP POLICY IF EXISTS "Users can update their messages" ON public.messages;
+
+DROP POLICY IF EXISTS "Users can delete their messages" ON public.messages;
+
 CREATE POLICY "Users can view messages in their workspace chats" ON public.messages FOR
 SELECT USING (
         EXISTS (
@@ -134,6 +206,12 @@ SELECT USING (
 
 -- File items (related to files)
 DROP POLICY IF EXISTS "Users can view file items in their workspace files" ON public.file_items;
+
+DROP POLICY IF EXISTS "Users can create file items" ON public.file_items;
+
+DROP POLICY IF EXISTS "Users can update their file items" ON public.file_items;
+
+DROP POLICY IF EXISTS "Users can delete their file items" ON public.file_items;
 
 CREATE POLICY "Users can view file items in their workspace files" ON public.file_items FOR
 SELECT USING (
@@ -150,6 +228,12 @@ SELECT USING (
 -- Applications
 DROP POLICY IF EXISTS "Users can view applications in their workspaces" ON public.applications;
 
+DROP POLICY IF EXISTS "Users can create applications" ON public.applications;
+
+DROP POLICY IF EXISTS "Users can update their applications" ON public.applications;
+
+DROP POLICY IF EXISTS "Users can delete their applications" ON public.applications;
+
 CREATE POLICY "Users can view applications in their workspaces" ON public.applications FOR
 SELECT USING (
         is_workspace_member (
@@ -158,6 +242,8 @@ SELECT USING (
     );
 
 DROP POLICY IF EXISTS "Allow read access to members of a workspace" ON assistant_workspaces;
+
+DROP POLICY IF EXISTS "Allow write access to workspace owners" ON assistant_workspaces;
 
 CREATE POLICY "Allow read access to members of a workspace" ON assistant_workspaces FOR
 SELECT USING (

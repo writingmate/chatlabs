@@ -1,22 +1,21 @@
--- Add new columns to workspaces table
+-- Add new columns without dropping old ones
 ALTER TABLE workspaces
-ADD COLUMN stripe_customer_id TEXT,
-ADD COLUMN plan TEXT DEFAULT 'free';
+ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT,
+ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'free';
 
--- Migrate data from profiles to workspaces
-UPDATE workspaces
+-- Only migrate data for users with feature enabled
+UPDATE workspaces w
 SET
-    stripe_customer_id = profiles.stripe_customer_id,
-    plan = profiles.plan
-FROM profiles
+    stripe_customer_id = p.stripe_customer_id,
+    plan = p.plan
+FROM profiles p
 WHERE
-    workspaces.user_id = profiles.user_id;
+    w.user_id = p.user_id
+    AND p.workspace_migration_enabled = true;
 
--- Remove columns from profiles table
--- ALTER TABLE profiles
--- DROP COLUMN stripe_customer_id,
--- DROP COLUMN plan;
+-- Add constraint only for new data
+ALTER TABLE workspaces
+DROP CONSTRAINT IF EXISTS workspaces_stripe_customer_id_key;
 
--- Add a unique constraint on stripe_customer_id in workspaces
 ALTER TABLE workspaces
 ADD CONSTRAINT workspaces_stripe_customer_id_key UNIQUE (stripe_customer_id);
