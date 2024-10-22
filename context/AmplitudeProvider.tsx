@@ -57,9 +57,9 @@ export function AmplitudeProvider({ children }: { children: ReactNode }) {
       identify.set("id", user.id)
     }
 
-    if (profile) {
-      identify.set("plan", profile.plan as string)
-    }
+    // if (profile) {
+    //   identify.set("plan", profile.plan as string)
+    // }
 
     amplitude.identify(identify)
   }, [user, profile])
