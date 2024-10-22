@@ -44,7 +44,7 @@ export const AuthProvider = ({
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", session?.user?.id as string)
+          .eq("user_id", session?.user?.id as string)
           .single()
 
         if (profileData) setProfile(profileData)

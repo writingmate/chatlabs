@@ -249,12 +249,12 @@ ${content}
   }
 
   const handleSearchParams = (): void => {
-    const promptId = searchParams.get("prompt_id")
-    let modelId = searchParams.get("model") as LLMID
-    const remixFileId = searchParams.get("remix")
-    const forkMessageId = searchParams.get("forkMessageId")
-    const assistantId = searchParams.get("assistant")
-    const forkSequenceNo = parseInt(searchParams.get("forkSequenceNo") || "-1")
+    const promptId = searchParams?.get("prompt_id")
+    let modelId = searchParams?.get("model") as LLMID
+    const remixFileId = searchParams?.get("remix")
+    const forkMessageId = searchParams?.get("forkMessageId")
+    const assistantId = searchParams?.get("assistant") || null
+    const forkSequenceNo = parseInt(searchParams?.get("forkSequenceNo") || "-1")
 
     if (promptId) {
       getPromptById(parseIdFromSlug(promptId))

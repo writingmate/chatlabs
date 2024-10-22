@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/middleware"
 import { NextRequest, NextResponse } from "next/server"
 import { Ratelimit } from "@upstash/ratelimit"
 import { kv } from "@vercel/kv"
-import { Session, SupabaseClient } from "@supabase/supabase-js"
+import { SupabaseClient } from "@supabase/supabase-js"
+import { logger as log } from "@/lib/logger"
 
 const ratelimit = new Ratelimit({
   // @ts-ignore
@@ -15,6 +16,7 @@ async function rateLimitMiddleware(
   request: NextRequest
 ) {
   const session = (await supabase.auth.getSession()).data?.session
+
   if (
     session &&
     request.nextUrl.pathname.startsWith("/api/chat") &&
@@ -22,10 +24,15 @@ async function rateLimitMiddleware(
   ) {
     const userId = session?.user.id
     if (userId) {
+      log.debug({ userId, path: request.nextUrl.pathname }, "Checking rate limit")
+
       const { success, pending, limit, reset, remaining } =
         await ratelimit.limit([userId, request.nextUrl.pathname].join("-"))
 
+      log.debug({ success, remaining, reset }, "Rate limit check result")
+
       if (!success) {
+        log.warn({ userId }, "Rate limit exceeded")
         return NextResponse.json(
           {
             message:
@@ -47,24 +54,23 @@ async function redirectToSetupMiddleware(
   const session = (await supabase.auth.getSession()).data?.session
   const path = request.nextUrl.pathname
 
-  // if the user is not logged in and they are on the homepage, do nothing
+  log.debug({ path, hasSession: !!session }, "Checking setup redirect")
+
   if (!session && path === "/") {
     return
   }
 
-  // if the user is not logged in and they are not on the homepage, redirect them to the homepage
   if (!session && path !== "/") {
+    log.info({ from: path }, "Redirecting unauthenticated user to homepage")
     return NextResponse.redirect(new URL("/", request.url))
   }
 
-  // if the user is logged in and they are on the homepage, check if they have onboarded
   const redirectToChat = request.nextUrl.pathname === "/"
 
   if (!redirectToChat) {
     return
   }
 
-  // if the user is logged in and they have not onboarded, redirect them to the setup page
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("*")
@@ -72,10 +78,12 @@ async function redirectToSetupMiddleware(
     .single()
 
   if (!profile) {
+    log.info({ userId: session?.user.id }, "Profile not found, redirecting to login")
     return NextResponse.redirect(new URL("/login", request.url))
   }
 
   if (!profile.has_onboarded) {
+    log.info({ userId: session?.user.id }, "User not onboarded, redirecting to setup")
     return NextResponse.redirect(new URL("/setup", request.url))
   }
 }
@@ -88,17 +96,12 @@ async function redirectToChat(supabase: SupabaseClient, request: NextRequest) {
 
   if (request.nextUrl.pathname === "/") {
     const currentUrl = new URL(request.url)
-
+    log.debug({ userId: session.user.id }, "Redirecting authenticated user to chat")
     return NextResponse.redirect(
       new URL(`/chat?${currentUrl.searchParams.toString()}`, request.url)
     )
   }
 }
-
-type Middleware = (
-  supabase: SupabaseClient,
-  request: NextRequest
-) => Promise<NextResponse | void>
 
 async function routeSubdomainMiddleware(
   supabase: SupabaseClient,
@@ -107,11 +110,19 @@ async function routeSubdomainMiddleware(
   const host = request.headers.get('host')
   const subdomain = host?.split('.')[0]
 
+  log.debug({ host, subdomain }, "Checking subdomain routing")
+
   if (host && host.includes('toolzflow.app') && subdomain !== 'www' && subdomain !== 'toolzflow') {
+    log.info({ subdomain }, "Rewriting URL for subdomain")
     const newUrl = new URL(`/share/${subdomain}`, request.url)
     return NextResponse.rewrite(newUrl)
   }
 }
+
+type Middleware = (
+  supabase: SupabaseClient,
+  request: NextRequest
+) => Promise<NextResponse | void>
 
 const middlewares: Middleware[] = [
   routeSubdomainMiddleware,
@@ -121,15 +132,33 @@ const middlewares: Middleware[] = [
 ]
 
 export async function middleware(request: NextRequest) {
+  log.debug(
+    {
+      path: request.nextUrl.pathname,
+      method: request.method,
+      host: request.headers.get('host')
+    },
+    "Middleware processing started"
+  )
+
   const { supabase, response } = createClient(request)
 
   for (const middleware of middlewares) {
     const result = await middleware(supabase, request)
     if (result) {
+      log.info(
+        {
+          middleware: middleware.name,
+          path: request.nextUrl.pathname,
+          status: result instanceof NextResponse ? result.status : 'unknown'
+        },
+        "Middleware intercepted request"
+      )
       return result
     }
   }
 
+  log.debug("Middleware processing completed")
   return response
 }
 
