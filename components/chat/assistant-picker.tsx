@@ -10,7 +10,7 @@ interface AssistantPickerProps {}
 
 export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
   const {
-    profile,
+    selectedWorkspace,
     assistants,
     focusAssistant,
     atCommand,
@@ -40,7 +40,7 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
   }
 
   const callSelectAssistant = (assistant: Tables<"assistants">) => {
-    if (!validatePlanForAssistant(profile, assistant)) {
+    if (!validatePlanForAssistant(selectedWorkspace, assistant)) {
       setIsPaywallOpen(true)
       return
     }

@@ -70,7 +70,12 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     if (contentType === "assistants" && item) {
       // setSelectedAssistant(item as Tables<"assistants">)
 
-      if (!validatePlanForAssistant(profile, item as Tables<"assistants">)) {
+      if (
+        !validatePlanForAssistant(
+          selectedWorkspace,
+          item as Tables<"assistants">
+        )
+      ) {
         setIsPaywallOpen(true)
         return
       }

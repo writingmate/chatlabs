@@ -42,7 +42,8 @@ export const ToolSelect: FC<ToolSelectProps> = ({
   onSelectTools,
   className
 }) => {
-  const { profile, tools, setIsPaywallOpen } = useContext(ChatbotUIContext)
+  const { selectedWorkspace, tools, setIsPaywallOpen } =
+    useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -67,7 +68,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
     }
   }
   function handleSelectTool(tool: Tables<"tools">, selected: boolean) {
-    if (!validatePlanForTools(profile, [tool], selectedModelId)) {
+    if (!validatePlanForTools(selectedWorkspace, [tool], selectedModelId)) {
       setIsPaywallOpen(true)
       return
     }
@@ -87,7 +88,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
     }
   }, [selectedTools])
 
-  if (!profile) return null
+  if (!selectedWorkspace) return null
 
   if (!tools || tools.length == 0) return null
 

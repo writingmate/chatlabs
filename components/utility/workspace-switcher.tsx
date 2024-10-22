@@ -23,6 +23,7 @@ import { Input } from "../ui/input"
 import { SIDEBAR_ITEM_ICON_SIZE } from "../sidebar/items/all/sidebar-display-item"
 import { SIDEBAR_ICON_STROKE } from "../sidebar/sidebar-switcher"
 import { cn } from "@/lib/utils"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
 interface WorkspaceSwitcherProps {}
 
@@ -30,6 +31,7 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
   useHotkey(";", () => setOpen(prevState => !prevState))
 
   const {
+    profile,
     workspaces,
     workspaceImages,
     selectedWorkspace,
@@ -80,12 +82,25 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
     return router.push(`/chat`)
   }
 
+  const getWorkspaceImage = (workspaceId: string) => {
+    const workspace = workspaces.find(workspace => workspace.id === workspaceId)
+
+    if (!workspace) return
+
+    return workspaceImages.find(image => image.workspaceId === workspace.id)
+      ?.url
+  }
+
   const getWorkspaceName = (workspaceId: string) => {
     const workspace = workspaces.find(workspace => workspace.id === workspaceId)
 
     if (!workspace) return
 
-    return workspace.name
+    return workspace.name === "Home"
+      ? profile?.user_id === workspace.user_id
+        ? "My ChatLabs"
+        : `${profile?.display_name || profile?.username}'s ChatLabs`
+      : workspace.name
   }
 
   const handleSelect = (workspaceId: string) => {
@@ -108,7 +123,7 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
       ? ""
       : ""
 
-  const IconComponent = selectedWorkspace?.is_home ? IconHome : IconBuilding
+  const workspaceName = getWorkspaceName(value)
 
   return (
     <DropdownMenuSub>
@@ -116,112 +131,50 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
         <div className="flex items-center truncate">
           {selectedWorkspace && (
             <div className="flex items-center">
-              {workspaceImage ? (
-                <Image
-                  style={{ width: "22px", height: "22px" }}
-                  className="mr-2 rounded"
-                  src={imageSrc}
-                  width={22}
-                  height={22}
-                  alt={selectedWorkspace.name}
+              <Avatar
+                style={{ width: "24px", height: "24px" }}
+                className="mr-2"
+              >
+                <AvatarImage
+                  src={getWorkspaceImage(selectedWorkspace.id)}
+                  alt={workspaceName}
                 />
-              ) : (
-                <IconComponent
-                  className="text-muted-foreground mr-2"
-                  size={SIDEBAR_ITEM_ICON_SIZE}
-                  stroke={SIDEBAR_ICON_STROKE}
-                />
-              )}
+                <AvatarFallback>
+                  {workspaceName?.slice(0, 1).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
             </div>
           )}
           {getWorkspaceName(value) || "Select workspace..."}
         </div>
       </DropdownMenuSubTrigger>
       <DropdownMenuSubContent>
-        {workspaces
-          .filter(workspace => workspace.is_home)
-          .map(workspace => {
-            const image = workspaceImages.find(
-              image => image.workspaceId === workspace.id
-            )
-
-            return (
-              <DropdownMenuItem
-                key={workspace.id}
-                className={cn("cursor-pointer", {
-                  "bg-accent": selectedWorkspace?.id === workspace.id
-                })}
-                onSelect={() => handleSelect(workspace.id)}
+        {workspaces.map(workspace => {
+          return (
+            <DropdownMenuItem
+              key={workspace.id}
+              className={cn("cursor-pointer", {
+                "bg-accent": selectedWorkspace?.id === workspace.id
+              })}
+              onSelect={() => handleSelect(workspace.id)}
+            >
+              <Avatar
+                style={{ width: "24px", height: "24px" }}
+                className="mr-2"
               >
-                {image ? (
-                  <Image
-                    style={{
-                      width: SIDEBAR_ITEM_ICON_SIZE,
-                      height: SIDEBAR_ITEM_ICON_SIZE
-                    }}
-                    className="mr-2 rounded"
-                    src={image.url || ""}
-                    width={SIDEBAR_ITEM_ICON_SIZE}
-                    height={SIDEBAR_ITEM_ICON_SIZE}
-                    alt={workspace.name}
-                  />
-                ) : (
-                  <IconHome
-                    className="text-muted-foreground mr-2"
-                    size={SIDEBAR_ITEM_ICON_SIZE}
-                    stroke={SIDEBAR_ICON_STROKE}
-                  />
-                )}
+                <AvatarImage
+                  src={getWorkspaceImage(workspace.id)}
+                  alt={getWorkspaceName(workspace.id)}
+                />
+                <AvatarFallback>
+                  {getWorkspaceName(workspace.id)?.slice(0, 1).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
 
-                {workspace.name}
-              </DropdownMenuItem>
-            )
-          })}
-
-        {workspaces
-          .filter(
-            workspace =>
-              !workspace.is_home &&
-              workspace.name.toLowerCase().includes(search.toLowerCase())
+              {getWorkspaceName(workspace.id)}
+            </DropdownMenuItem>
           )
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map(workspace => {
-            const image = workspaceImages.find(
-              image => image.workspaceId === workspace.id
-            )
-
-            return (
-              <DropdownMenuItem
-                key={workspace.id}
-                className={cn("cursor-pointer", {
-                  "bg-accent": selectedWorkspace?.id === workspace.id
-                })}
-                onSelect={() => handleSelect(workspace.id)}
-              >
-                {image ? (
-                  <Image
-                    style={{
-                      width: SIDEBAR_ITEM_ICON_SIZE,
-                      height: SIDEBAR_ITEM_ICON_SIZE
-                    }}
-                    className="mr-2 rounded"
-                    src={image.url || ""}
-                    width={SIDEBAR_ITEM_ICON_SIZE}
-                    height={SIDEBAR_ITEM_ICON_SIZE}
-                    alt={workspace.name}
-                  />
-                ) : (
-                  <IconBuilding
-                    className="text-muted-foreground mr-2"
-                    stroke={SIDEBAR_ICON_STROKE}
-                    size={SIDEBAR_ITEM_ICON_SIZE}
-                  />
-                )}
-
-                {workspace.name}
-              </DropdownMenuItem>
-            )
-          })}
+        })}
         <DropdownMenuItem
           className="flex w-full items-center space-x-2"
           onClick={handleCreateWorkspace}

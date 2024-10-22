@@ -64,6 +64,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
 }) => {
   const {
     profile,
+    selectedWorkspace,
     availableLocalModels,
     allModels,
     setIsPaywallOpen,
@@ -107,7 +108,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
 
   const handleSelectModel = useCallback(
     (modelId: LLMID) => {
-      if (!validatePlanForModel(profile, modelId)) {
+      if (!validatePlanForModel(selectedWorkspace, modelId)) {
         setIsPaywallOpen(true)
         return
       }
@@ -191,7 +192,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   const isFiltered =
     search || selectedTiers.length > 0 || selectedCategories.length > 0
 
-  if (allModels.length === 0 && profile?.plan.startsWith("byok_")) {
+  if (allModels.length === 0 && selectedWorkspace?.plan?.startsWith("byok_")) {
     return (
       <Button
         className="text-md items-end"

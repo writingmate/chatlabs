@@ -88,6 +88,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Menu } from "lucide-react"
@@ -99,6 +100,7 @@ import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
 import { updateWorkspace } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { deleteWorkspace } from "@/db/workspaces"
+import { getWorkspaceByStripeCustomerId } from "@/db/workspaces"
 
 interface ProfileSettingsProps {
   isCollapsed: boolean
@@ -276,7 +278,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     }
   }
 
-  const handleInviteUser = async () => {
+  const handleInviteUser = async (inviteEmail: string) => {
     if (!selectedWorkspace || !inviteEmail) {
       toast.error("Please select a workspace and enter an email address")
       return
@@ -305,26 +307,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
       fetchWorkspaceUsers(selectedWorkspace.id)
     } catch (error: any) {
       toast.error(error.message || "An error occurred while inviting the user")
-    }
-  }
-
-  const handleResendInvite = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resend({
-        email: email,
-        type: "signup"
-      })
-
-      if (error) {
-        toast.error(error.message || "Failed to resend invite")
-        return
-      }
-
-      toast.success("Invite resent successfully")
-    } catch (error: any) {
-      toast.error(
-        error.message || "An error occurred while resending the invite"
-      )
     }
   }
 
@@ -567,10 +549,19 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     e.preventDefault()
     setLoadingBillingPortal(true)
     try {
-      await redirectToBillingPortal()
+      if (!selectedWorkspace) {
+        throw new Error("No workspace selected")
+      }
+
+      if (!selectedWorkspace.stripe_customer_id) {
+        throw new Error("No Stripe customer ID associated with this workspace")
+      }
+
+      await redirectToBillingPortal(selectedWorkspace.id)
     } catch (error) {
+      console.error("Error redirecting to billing portal:", error)
       toast.error(
-        "Failed to redirect to billing portal. Something went wrong. Please try again."
+        "Failed to redirect to billing portal. Please try again or contact support."
       )
     } finally {
       setLoadingBillingPortal(false)
@@ -661,6 +652,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="mb-1 w-[290px] cursor-pointer text-sm">
           <WorkspaceSwitcher />
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => setIsProfileSettingsOpen("profile")}
             className="px-1"
@@ -1102,7 +1094,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 <div className="space-y-2">
                   <Label>Current Subscription Plan</Label>
                   <div className="text-xl font-semibold capitalize">
-                    {profile.plan.split("_")[0]}
+                    {selectedWorkspace?.plan?.split("_")[0]}
                   </div>
                   <p className="text-sm">
                     {
@@ -1113,10 +1105,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                           "Upgrade to Ultimate to get access to OpenAI o1-preview and Claude 3 Opus",
                         [PLAN_ULTIMATE]:
                           "You're on the Ultimate plan! Enjoy your access to all models, plugins and image generation."
-                      }[profile.plan.split("_")[0]]
+                      }[selectedWorkspace?.plan?.split("_")[0] || PLAN_FREE]
                     }
                   </p>
-                  {profile?.plan !== PLAN_FREE ? (
+                  {selectedWorkspace?.plan !== PLAN_FREE ? (
                     <Button
                       className="bg-violet-600"
                       loading={loadingBillingPortal}
@@ -1144,18 +1136,29 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
               </TabsContent>
 
               <TabsContent value="team" className="space-y-4">
-                <div>
-                  <Label>Invite User to the Team</Label>
-                  <div className="flex space-x-2">
-                    <Input
-                      type="email"
-                      placeholder="Enter email address"
-                      value={inviteEmail}
-                      onChange={e => setInviteEmail(e.target.value)}
-                    />
-                    <Button onClick={handleInviteUser}>Invite</Button>
-                  </div>
-                </div>
+                {selectedWorkspace &&
+                  workspaceUsers.find(
+                    u =>
+                      u.user_id === currentUser?.id &&
+                      u.role === "OWNER" &&
+                      u.status === "ACTIVE"
+                  ) && (
+                    <div>
+                      <Label>Invite User to the Team</Label>
+                      <div className="flex space-x-2">
+                        <Input
+                          type="email"
+                          placeholder="Enter email address"
+                          value={inviteEmail}
+                          onChange={e => setInviteEmail(e.target.value)}
+                        />
+                        <Button onClick={() => handleInviteUser(inviteEmail)}>
+                          Invite
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
                 {selectedWorkspace && (
                   <div>
                     <Label>Team Members</Label>
@@ -1169,56 +1172,69 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {workspaceUsers.map(user => (
-                          <TableRow key={user.user_id}>
-                            <TableCell className="grow">{user.email}</TableCell>
-                            <TableCell>
-                              <Select
-                                value={user.role}
-                                onValueChange={newRole =>
-                                  handleRoleChange(user, newRole)
-                                }
-                                disabled={
-                                  workspaceUsers.find(
-                                    u =>
-                                      u.role === "OWNER" &&
-                                      u.status === "ACTIVE"
-                                  )?.user_id !== currentUser?.id
-                                }
-                              >
-                                <SelectTrigger className="w-[100px]">
-                                  <SelectValue placeholder="Select role" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="OWNER">Owner</SelectItem>
-                                  <SelectItem value="MEMBER">Member</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell>{user.status}</TableCell>
-                            <TableCell>
-                              {user.status === "PENDING" && (
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  onClick={() => handleResendInvite(user.email)}
-                                  className="mr-2"
+                        {workspaceUsers.map(user => {
+                          const isCurrentUserOwner = workspaceUsers.find(
+                            u =>
+                              u.user_id === currentUser?.id &&
+                              u.role === "OWNER" &&
+                              u.status === "ACTIVE"
+                          )
+
+                          return (
+                            <TableRow key={user.user_id}>
+                              <TableCell className="grow">
+                                {user.email}
+                              </TableCell>
+                              <TableCell>
+                                <Select
+                                  value={user.role}
+                                  onValueChange={newRole =>
+                                    handleRoleChange(user, newRole)
+                                  }
+                                  disabled={!isCurrentUserOwner}
                                 >
-                                  <IconSend size={18} stroke={1.5} />
-                                </Button>
-                              )}
-                              {user.role !== "OWNER" && (
-                                <Button
-                                  variant="destructive"
-                                  size="icon"
-                                  onClick={() => handleRemoveUser(user)}
-                                >
-                                  <IconTrash size={18} stroke={1.5} />
-                                </Button>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                                  <SelectTrigger className="w-[100px]">
+                                    <SelectValue placeholder="Select role" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="OWNER">Owner</SelectItem>
+                                    <SelectItem value="MEMBER">
+                                      Member
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </TableCell>
+                              <TableCell>{user.status}</TableCell>
+                              <TableCell>
+                                {isCurrentUserOwner && (
+                                  <>
+                                    {user.status === "PENDING" && (
+                                      <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() =>
+                                          handleInviteUser(user.email)
+                                        }
+                                        className="mr-2"
+                                      >
+                                        <IconSend size={18} stroke={1.5} />
+                                      </Button>
+                                    )}
+                                    {user.role !== "OWNER" && (
+                                      <Button
+                                        variant="destructive"
+                                        size="icon"
+                                        onClick={() => handleRemoveUser(user)}
+                                      >
+                                        <IconTrash size={18} stroke={1.5} />
+                                      </Button>
+                                    )}
+                                  </>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
                       </TableBody>
                     </Table>
                   </div>

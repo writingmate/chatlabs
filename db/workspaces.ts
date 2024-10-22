@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
+import { SupabaseClient } from "@supabase/supabase-js"
 
 export const getHomeWorkspaceByUserId = async (
   userId: string,
@@ -217,4 +218,29 @@ export const acceptInvite = async (
   }
 
   return workspace as Tables<"workspaces">
+}
+
+// Add these new functions
+export async function updateWorkspaceByStripeCustomerId(
+  supabaseAdmin: SupabaseClient,
+  stripeCustomerId: string,
+  workspace: TablesUpdate<"workspaces">
+) {
+  return supabaseAdmin
+    .from("workspaces")
+    .update(workspace)
+    .eq("stripe_customer_id", stripeCustomerId)
+    .select("*")
+    .single()
+}
+
+export async function getWorkspaceByStripeCustomerId(
+  supabaseAdmin: SupabaseClient,
+  stripeCustomerId: string
+) {
+  return supabaseAdmin
+    .from("workspaces")
+    .select("*")
+    .eq("stripe_customer_id", stripeCustomerId)
+    .single()
 }

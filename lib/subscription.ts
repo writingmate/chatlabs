@@ -30,7 +30,7 @@ export const ALLOWED_MODELS =
   process.env.NEXT_PUBLIC_ALLOWED_MODELS?.split(",") || []
 
 export function validatePlanForModel(
-  profile: Tables<"profiles"> | null,
+  workspace: Tables<"workspaces"> | null,
   model?: LLMID
 ) {
   if (!model) {
@@ -42,7 +42,7 @@ export function validatePlanForModel(
     return true
   }
 
-  if (profile?.plan.startsWith("byok")) {
+  if (workspace?.plan?.startsWith("byok")) {
     return true
   }
 
@@ -63,11 +63,11 @@ export function validatePlanForModel(
     return true
   }
 
-  if (!profile) {
+  if (!workspace) {
     return false
   }
 
-  const userPlan = profile.plan.split("_")[0]
+  const userPlan = workspace.plan?.split("_")[0]
 
   if (userPlan === PLAN_ULTIMATE || userPlan === PLAN_PRO) return true
 
@@ -75,18 +75,18 @@ export function validatePlanForModel(
 }
 
 export function validatePlanForAssistant(
-  profile: Tables<"profiles"> | null,
+  workspace: Tables<"workspaces"> | null,
   assistant: Tables<"assistants">
 ) {
-  return validatePlanForModel(profile, assistant.model as LLMID)
+  return validatePlanForModel(workspace, assistant.model as LLMID)
 }
 
 export function validatePlanForTools(
-  profile: Tables<"profiles"> | null,
+  workspace: Tables<"workspaces"> | null,
   tools: any[],
   model?: LLMID
 ) {
-  if (model && validatePlanForModel(profile, model)) {
+  if (model && validatePlanForModel(workspace, model)) {
     return true
   }
   return false

@@ -53,14 +53,16 @@ export const validateChatSettings = (
     throw new Error("Message content not found")
   }
 
-  if (!validatePlanForModel(profile, modelData.modelId)) {
+  if (!validatePlanForModel(selectedWorkspace, modelData.modelId)) {
     const requiredPlan = modelData.tier === "ultimate" ? "Ultimate" : "Pro"
     throw new SubscriptionRequiredError(
       `${requiredPlan} plan required to use this model`
     )
   }
 
-  if (!validatePlanForTools(profile, selectedTools, modelData.modelId)) {
+  if (
+    !validatePlanForTools(selectedWorkspace, selectedTools, modelData.modelId)
+  ) {
     throw new SubscriptionRequiredError("Subscription required to use tools")
   }
 }

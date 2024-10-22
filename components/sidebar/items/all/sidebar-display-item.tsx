@@ -103,7 +103,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     collections: async (item: any) => {},
     assistants: async (assistant: Tables<"assistants">) => {
       if (!selectedWorkspace) return
-      if (!validatePlanForAssistant(profile, assistant)) {
+      if (!validatePlanForAssistant(selectedWorkspace, assistant)) {
         setIsPaywallOpen(true)
         return
       }
@@ -112,7 +112,9 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       return router.push(`/chat`)
     },
     tools: async (item: any) => {
-      if (!validatePlanForTools(profile, [item], chatSettings?.model)) {
+      if (
+        !validatePlanForTools(selectedWorkspace, [item], chatSettings?.model)
+      ) {
         setIsPaywallOpen(true)
         return
       }

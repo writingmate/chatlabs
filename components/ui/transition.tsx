@@ -11,8 +11,8 @@ interface TransitionProps {
 export default function Transition({ children }: TransitionProps) {
   const pathname = usePathname()
 
-  const pathParts = pathname.split("/")
-  const rootFolder = pathParts.length > 1 ? pathParts[1] : ""
+  const pathParts = pathname?.split("/") || []
+  const rootFolder = pathParts?.length > 1 ? pathParts[1] : ""
   return (
     <motion.div
       className="flex size-full"

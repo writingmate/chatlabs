@@ -6,7 +6,7 @@ import { stripe } from "@/lib/stripe"
 import { getOrCreateCustomer } from "@/lib/stripe/get-or-create-customer"
 import { PLANS } from "@/lib/stripe/config"
 import { redirect } from "next/navigation"
-import { getServerProfile } from "@/lib/server/server-chat-helpers"
+import { createServiceRoleClient } from "@/lib/supabase/server"
 
 export async function createCheckoutSession(
   data: FormData
@@ -15,8 +15,9 @@ export async function createCheckoutSession(
     const plan = data.get("plan") as string
     const userId = data.get("userId") as string
     const email = data.get("email") as string
+    const workspaceId = data.get("workspaceId") as string
 
-    if (!userId || !email || !plan) {
+    if (!userId || !email || !plan || !workspaceId) {
       throw new Error("Missing required fields")
     }
 
@@ -40,7 +41,8 @@ export async function createCheckoutSession(
 
     const customerId = await getOrCreateCustomer({
       email,
-      userId
+      userId,
+      workspaceId
     })
 
     const price = prices.data[0].id
@@ -56,6 +58,9 @@ export async function createCheckoutSession(
             quantity: 1
           }
         ],
+        metadata: {
+          workspaceId // Add workspaceId to metadata for webhook handling
+        },
         success_url: `${origin}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/subscription/cancel`
       })
@@ -66,19 +71,30 @@ export async function createCheckoutSession(
     }
   } catch (error) {
     console.error("Error in createCheckoutSession:", error)
-    throw error // Re-throw the error to be handled by the caller
+    throw error
   }
 }
 
-export async function createBillingPortalSession(customerId: string) {
+export async function createBillingPortalSession(workspaceId: string) {
   try {
     const origin = headers().get("origin")
     if (!origin) {
       throw new Error("Origin header is missing")
     }
 
+    const supabase = createServiceRoleClient()
+    const { data: workspace, error } = await supabase
+      .from("workspaces")
+      .select("stripe_customer_id")
+      .eq("id", workspaceId)
+      .single()
+
+    if (error || !workspace?.stripe_customer_id) {
+      throw new Error("Workspace not found or no Stripe customer ID")
+    }
+
     const billingPortalSession = await stripe.billingPortal.sessions.create({
-      customer: customerId,
+      customer: workspace.stripe_customer_id,
       return_url: origin
     })
 
@@ -91,14 +107,23 @@ export async function createBillingPortalSession(customerId: string) {
   }
 }
 
-export async function redirectToBillingPortal() {
+export async function redirectToBillingPortal(workspaceId: string) {
   let redirectTo = headers().get("referer") || "/"
   try {
-    const profile = await getServerProfile()
-    if (!profile?.stripe_customer_id) {
-      throw new Error("User does not have a Stripe customer ID")
+    const supabase = createServiceRoleClient()
+
+    // Get the workspace details
+    const { data: workspace } = await supabase
+      .from("workspaces")
+      .select("stripe_customer_id, id")
+      .eq("id", workspaceId)
+      .single()
+
+    if (!workspace?.stripe_customer_id) {
+      throw new Error("Workspace does not have a Stripe customer ID")
     }
-    const { url } = await createBillingPortalSession(profile.stripe_customer_id)
+
+    const { url } = await createBillingPortalSession(workspace.id)
     if (!url) {
       throw new Error("Failed to create billing portal session")
     }

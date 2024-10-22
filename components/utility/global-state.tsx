@@ -262,7 +262,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }, [chatSettings, selectedWorkspace])
 
   const fetchStartingData = async (): Promise<
-    Tables<"profiles"> | undefined
+    (Tables<"profiles"> & { workspace: Tables<"workspaces"> }) | undefined
   > => {
     const session = (await supabase.auth.getSession()).data.session
 
@@ -323,7 +323,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
     setLoading(false)
 
-    return profile
+    return { ...profile, workspace: workspaceToFetch! }
   }
 
   const fetchWorkspaceData = async (workspaceId: string, userId: string) => {

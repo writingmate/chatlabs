@@ -389,7 +389,7 @@ export const Sidebar: FC = () => {
           </div>
 
           {/* Upgrade message for free plan users */}
-          {profile?.plan === "free" && (
+          {selectedWorkspace?.plan === "free" && (
             <div className="border-t p-2">
               <div className="flex flex-col items-center justify-between space-y-2 text-sm">
                 {!isCollapsed && (

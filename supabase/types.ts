@@ -1958,7 +1958,9 @@ export type Database = {
           instructions: string
           is_home: boolean
           name: string
+          plan: string | null
           sharing: string
+          stripe_customer_id: string | null
           updated_at: string | null
           user_id: string
         }
@@ -1977,7 +1979,9 @@ export type Database = {
           instructions: string
           is_home?: boolean
           name: string
+          plan?: string | null
           sharing?: string
+          stripe_customer_id?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -1996,7 +2000,9 @@ export type Database = {
           instructions?: string
           is_home?: boolean
           name?: string
+          plan?: string | null
           sharing?: string
+          stripe_customer_id?: string | null
           updated_at?: string | null
           user_id?: string
         }

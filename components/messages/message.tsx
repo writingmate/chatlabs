@@ -90,8 +90,14 @@ export const Message: FC<MessageProps> = ({
   showActions = true,
   showResponseTime = false
 }) => {
-  const { assistants, profile, allModels, selectedAssistant, files } =
-    useContext(ChatbotUIContext)
+  const {
+    assistants,
+    profile,
+    allModels,
+    selectedAssistant,
+    files,
+    selectedWorkspace
+  } = useContext(ChatbotUIContext)
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -151,7 +157,7 @@ export const Message: FC<MessageProps> = ({
       return
     }
 
-    if (profile?.plan !== "free") {
+    if (selectedWorkspace?.plan !== "free") {
       // PRO plan users can use OpenAI voice to text
       await handleOpenAISpeech(cleanupMessageForSpeech(message.content))
     } else if ("speechSynthesis" in window) {

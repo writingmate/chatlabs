@@ -115,7 +115,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 
         {/* TODO */}
         {/* <Alerts /> */}
-        {profile?.plan === PLAN_FREE && (
+        {selectedWorkspace?.plan === PLAN_FREE && (
           <WithTooltip
             display={
               <div>Upgrade to paid plans to get access to all features.</div>

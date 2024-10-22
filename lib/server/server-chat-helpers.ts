@@ -37,7 +37,9 @@ function createClient() {
   )
 }
 
-export async function getServerProfile() {
+export async function getServerProfile(
+  workspaceId?: string
+): Promise<Tables<"profiles"> & { workspace: Tables<"workspaces"> }> {
   const cookieStore = cookies()
   const supabase = createClient()
 
@@ -46,22 +48,42 @@ export async function getServerProfile() {
     throw new ApiError(401, "User not found")
   }
 
+  const selectedWorkspaceId =
+    workspaceId || cookieStore.get("selected_workspace")?.value
+
+  if (!selectedWorkspaceId) {
+    throw new ApiError(401, "Workspace not found")
+  }
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("*")
     .eq("user_id", user.id)
     .single()
 
+  const { data: workspace } = await supabase
+    .from("workspaces")
+    .select("*")
+    .eq("id", selectedWorkspaceId)
+    .single()
+
   if (!profile) {
     throw new ApiError(401, "Profile not found")
   }
 
-  const profileWithKeys = addApiKeysToProfile(profile)
+  if (!workspace) {
+    throw new ApiError(401, "Workspace not found")
+  }
 
-  return profileWithKeys
+  const profileWithKeys = addApiKeysToProfile(profile, workspace.plan || "")
+
+  return {
+    ...profileWithKeys,
+    workspace
+  }
 }
 
-function addApiKeysToProfile(profile: Tables<"profiles">) {
+function addApiKeysToProfile(profile: Tables<"profiles">, plan: string) {
   const apiKeys = {
     [VALID_ENV_KEYS.OPENAI_API_KEY]: "openai_api_key",
     [VALID_ENV_KEYS.ANTHROPIC_API_KEY]: "anthropic_api_key",
@@ -81,7 +103,7 @@ function addApiKeysToProfile(profile: Tables<"profiles">) {
     [VALID_ENV_KEYS.AZURE_EMBEDDINGS_NAME]: "azure_openai_embeddings_id"
   }
 
-  if (!profile.plan.startsWith("byok_")) {
+  if (!plan.startsWith("byok_")) {
     for (const [envKey, profileKey] of Object.entries(apiKeys)) {
       if (process.env[envKey] && !(profile as any)[profileKey]) {
         ;(profile as any)[profileKey] = process.env[envKey]
@@ -127,8 +149,11 @@ function isTierModel(model: LLMID, tier: keyof typeof TIER_MODELS) {
   return false
 }
 
-export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
-  if (!validatePlanForModel(profile, model)) {
+export async function validateModel(
+  profile: Tables<"profiles"> & { workspace: Tables<"workspaces"> },
+  model: LLMID
+) {
+  if (!validatePlanForModel(profile.workspace, model)) {
     const modelData = LLM_LIST.find(
       x => x.modelId === model || x.hostedId === model
     )
@@ -140,14 +165,14 @@ export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
 }
 
 export async function validateMessageCount(
-  profile: Tables<"profiles">,
+  profile: Tables<"profiles"> & { workspace: Tables<"workspaces"> },
   model: LLMID,
   date: Date,
   supabase: SupabaseClient
 ) {
-  const userPlan = profile.plan.split("_")[0]
+  const userPlan = profile?.workspace?.plan?.split("_")[0]
 
-  if (userPlan.startsWith("byok")) {
+  if (userPlan?.startsWith("byok")) {
     return
   }
 
@@ -179,7 +204,7 @@ export async function validateMessageCount(
   }
 
   if (
-    (userPlan === PLAN_FREE || userPlan.startsWith("premium")) &&
+    (userPlan === PLAN_FREE || userPlan?.startsWith("premium")) &&
     count >= FREE_MESSAGE_DAILY_LIMIT
   ) {
     throw new SubscriptionRequiredError(

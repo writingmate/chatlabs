@@ -36,8 +36,8 @@ interface SupabaseUser {
   email: string
 }
 
-interface ProfileData {
-  user_id: string
+interface WorkspaceData {
+  id: string
   plan: string
   stripe_customer_id: string
 }
@@ -122,25 +122,25 @@ async function getAllSupabaseUsers(): Promise<SupabaseUser[]> {
   return allUsers
 }
 
-async function getAllProfiles(): Promise<ProfileData[]> {
-  logger.info("Fetching all non-free profiles")
-  let allProfiles: ProfileData[] = []
+async function getAllWorkspaces(): Promise<WorkspaceData[]> {
+  logger.info("Fetching all non-free workspaces")
+  let allWorkspaces: WorkspaceData[] = []
   let page = 0
   const perPage = 1000
 
   while (true) {
     const { data, error, count } = await supabase
-      .from("profiles")
-      .select("user_id, plan, stripe_customer_id")
+      .from("workspaces")
+      .select("id, plan, stripe_customer_id")
       .neq("plan", "free")
       .range(page * perPage, (page + 1) * perPage - 1)
 
     if (error) {
-      logger.error({ err: error }, "Error fetching profiles")
-      throw new Error(`Error fetching profiles: ${error.message}`)
+      logger.error({ err: error }, "Error fetching workspaces")
+      throw new Error(`Error fetching workspaces: ${error.message}`)
     }
 
-    allProfiles = allProfiles.concat(data as ProfileData[])
+    allWorkspaces = allWorkspaces.concat(data as WorkspaceData[])
 
     if (!count || data.length < perPage) {
       break
@@ -149,8 +149,8 @@ async function getAllProfiles(): Promise<ProfileData[]> {
     page++
   }
 
-  logger.info(`Fetched ${allProfiles.length} non-free profiles`)
-  return allProfiles
+  logger.info(`Fetched ${allWorkspaces.length} non-free workspaces`)
+  return allWorkspaces
 }
 
 async function sendTelegramMessage(message: string) {
@@ -249,7 +249,7 @@ export async function GET(req: Request) {
       try {
         const stripeSubscriptions = await getAllStripeSubscriptions()
         const supabaseUsers = await getAllSupabaseUsers()
-        const profiles = await getAllProfiles()
+        const workspaces = await getAllWorkspaces()
 
         const stripeSubscriptionMap = new Map(
           stripeSubscriptions.map(sub => [sub.customer.id, sub])
@@ -290,14 +290,14 @@ export async function GET(req: Request) {
             continue
           }
 
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("user_id, plan, stripe_customer_id")
+          const { data: workspace } = await supabase
+            .from("workspaces")
+            .select("id, plan, stripe_customer_id")
             .eq("user_id", supabaseUser.id)
             .single()
 
-          if (!profile) {
-            logger.warn(`Profile for user ${email} not found in Supabase`)
+          if (!workspace) {
+            logger.warn(`Workspace for user ${email} not found in Supabase`)
             mismatchedUsers.push([
               email,
               "N/A in Supabase",
@@ -305,11 +305,11 @@ export async function GET(req: Request) {
               stripePlan,
               stripeCustomerId
             ])
-            controller.enqueue(`${email}: Profile not found in Supabase\n`)
+            controller.enqueue(`${email}: Workspace not found in Supabase\n`)
             continue
           }
 
-          if (profile.plan === "free" && stripePlan !== "free") {
+          if (workspace.plan === "free" && stripePlan !== "free") {
             logger.warn(
               `Mismatch found for user ${email}: Supabase plan (free) != Stripe plan (${stripePlan})`
             )
@@ -325,12 +325,12 @@ export async function GET(req: Request) {
             )
           }
 
-          if (profile.stripe_customer_id !== stripeCustomerId) {
+          if (workspace.stripe_customer_id !== stripeCustomerId) {
             logger.warn(`Stripe customer ID mismatch for user ${email}`)
             mismatchedUsers.push([
               email,
               "Stripe ID mismatch",
-              profile.plan,
+              workspace.plan,
               stripePlan,
               stripeCustomerId
             ])
@@ -344,30 +344,42 @@ export async function GET(req: Request) {
         controller.enqueue(
           "Checking for non-free plans in Supabase without active Stripe subscriptions\n"
         )
-        for (const profile of profiles) {
-          if (profile.plan !== "free" && profile.stripe_customer_id) {
+        for (const workspace of workspaces) {
+          if (workspace.plan !== "free" && workspace.stripe_customer_id) {
             const stripeSubscription = stripeSubscriptionMap.get(
-              profile.stripe_customer_id
+              workspace.stripe_customer_id
             )
             if (!stripeSubscription) {
+              const { data: workspaceUser } = await supabase
+                .from("workspace_users")
+                .select("user_id")
+                .eq("workspace_id", workspace.id)
+                .eq("role", "OWNER")
+                .single()
+
+              if (!workspaceUser) {
+                logger.warn(`No owner found for workspace ${workspace.id}`)
+                continue
+              }
+
               const supabaseUser = supabaseUsers.find(
-                u => u.id === profile.user_id
+                u => u.id === workspaceUser.user_id
               )
               const email = supabaseUser ? supabaseUser.email : "Unknown"
 
               if (!ignoredEmails.includes(email)) {
                 logger.warn(
-                  `No active Stripe subscription found for non-free plan user ${email}`
+                  `No active Stripe subscription found for non-free plan workspace ${workspace.id} (owner: ${email})`
                 )
                 mismatchedUsers.push([
                   email,
                   "No Stripe sub",
-                  profile.plan,
+                  workspace.plan,
                   "-",
-                  profile.stripe_customer_id
+                  workspace.stripe_customer_id
                 ])
                 controller.enqueue(
-                  `${email}: No active Stripe subscription found for non-free plan\n`
+                  `${email}: No active Stripe subscription found for non-free plan workspace\n`
                 )
               }
             }

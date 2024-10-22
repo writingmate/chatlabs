@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { logger } from "@/lib/logger"
 import { AuthError, SupabaseClient } from "@supabase/supabase-js"
+import { supabase } from "@/lib/supabase/browser-client"
 
 async function getUserByEmail(client: SupabaseClient, email: string) {
   const params = new URLSearchParams({
@@ -84,6 +85,10 @@ export async function POST(req: Request) {
 
     existingUser = invitedUser.user
   } else {
+    await supabase.auth.resend({
+      email: email,
+      type: "signup"
+    })
     logger.info(`User ${existingUser.id} already exists. Skipping creation.`)
   }
 

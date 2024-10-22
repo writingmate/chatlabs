@@ -39,8 +39,8 @@ interface SupabaseUser {
   email: string
 }
 
-interface ProfileData {
-  user_id: string
+interface WorkspaceData {
+  id: string
   plan: string
   stripe_customer_id: string
 }
@@ -102,22 +102,22 @@ async function getAllSupabaseUsers(): Promise<SupabaseUser[]> {
   return allUsers
 }
 
-async function getAllProfiles(): Promise<Tables<"profiles">[]> {
-  let allProfiles: Tables<"profiles">[] = []
+async function getAllWorkspaces(): Promise<WorkspaceData[]> {
+  let allWorkspaces: WorkspaceData[] = []
   let page = 0
   const perPage = 1000
 
   while (true) {
     const { data, error, count } = await supabase
-      .from("profiles")
-      .select("user_id, plan, stripe_customer_id")
+      .from("workspaces")
+      .select("id, plan, stripe_customer_id")
       .neq("plan", "free")
 
     if (error) {
-      throw new Error(`Error fetching profiles: ${error.message}`)
+      throw new Error(`Error fetching workspaces: ${error.message}`)
     }
 
-    allProfiles = allProfiles.concat(data)
+    allWorkspaces = allWorkspaces.concat(data)
 
     if (!count || data.length < perPage) {
       break
@@ -126,7 +126,7 @@ async function getAllProfiles(): Promise<Tables<"profiles">[]> {
     page++
   }
 
-  return allProfiles
+  return allWorkspaces
 }
 
 function askForPermission(question: string): Promise<boolean> {
@@ -137,16 +137,16 @@ function askForPermission(question: string): Promise<boolean> {
   })
 }
 
-async function updateProfile(userId: string, plan: string): Promise<void> {
+async function updateWorkspace(workspaceId: string, plan: string): Promise<void> {
   const { error } = await supabase
-    .from("profiles")
+    .from("workspaces")
     .update({ plan: plan })
-    .eq("user_id", userId)
+    .eq("id", workspaceId)
 
   if (error) {
-    console.error(`Error updating profile for user ${userId}: ${error.message}`)
+    console.error(`Error updating workspace ${workspaceId}: ${error.message}`)
   } else {
-    console.log(`Updated profile for user ${userId} to plan: ${plan}`)
+    console.log(`Updated workspace ${workspaceId} to plan: ${plan}`)
   }
 }
 
@@ -182,42 +182,42 @@ async function checkAndUpdateSubscriptions() {
         continue
       }
 
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("user_id, plan, stripe_customer_id")
+      const { data: workspace, error: workspaceError } = await supabase
+        .from("workspaces")
+        .select("id, plan, stripe_customer_id")
         .eq("user_id", supabaseUser.id)
         .single()
 
-      if (profileError) {
+      if (workspaceError) {
         console.log(
-          `Error fetching profile for user ${email}: ${profileError.message}`
+          `Error fetching workspace for user ${email}: ${workspaceError.message}`
         )
         continue
       }
 
-      if (!profile) {
-        console.log(`Profile for user ${email} not found in Supabase`)
+      if (!workspace) {
+        console.log(`Workspace for user ${email} not found in Supabase`)
         continue
       }
 
       let shouldUpdatePlan = false
       let shouldUpdateStripeCustomerId = false
 
-      if (profile.plan === "free" && stripePlan !== "free") {
+      if (workspace.plan === "free" && stripePlan !== "free") {
         console.log(`Plan mismatch found for user ${email}:`)
         console.log(`  Stripe plan: ${stripePlan}`)
-        console.log(`  Supabase plan: ${profile.plan}`)
+        console.log(`  Supabase plan: ${workspace.plan}`)
 
         shouldUpdatePlan = await askForPermission(
           `Do you want to update the plan for user ${email} from 'free' to '${stripePlan}'? (y/n): `
         )
       }
 
-      if (profile.stripe_customer_id !== stripeCustomerId) {
+      if (workspace.stripe_customer_id !== stripeCustomerId) {
         console.log(`Stripe customer ID mismatch found for user ${email}:`)
         console.log(`  Stripe customer ID: ${stripeCustomerId}`)
         console.log(
-          `  Supabase stripe_customer_id: ${profile.stripe_customer_id}`
+          `  Supabase stripe_customer_id: ${workspace.stripe_customer_id}`
         )
 
         shouldUpdateStripeCustomerId = await askForPermission(
@@ -232,16 +232,16 @@ async function checkAndUpdateSubscriptions() {
           updateData.stripe_customer_id = stripeCustomerId
 
         const { error } = await supabase
-          .from("profiles")
+          .from("workspaces")
           .update(updateData)
-          .eq("user_id", supabaseUser.id)
+          .eq("id", workspace.id)
 
         if (error) {
           console.error(
-            `Error updating profile for user ${email}: ${error.message}`
+            `Error updating workspace for user ${email}: ${error.message}`
           )
         } else {
-          console.log(`Updated profile for user ${email}:`, updateData)
+          console.log(`Updated workspace for user ${email}:`, updateData)
         }
       } else {
         console.log(`Skipped updating user ${email}`)
@@ -249,27 +249,39 @@ async function checkAndUpdateSubscriptions() {
     }
 
     // Check for non-free plans in Supabase without active Stripe subscriptions
-    const profiles = await getAllProfiles()
+    const workspaces = await getAllWorkspaces()
 
-    for (const profile of profiles) {
-      if (profile.plan !== "free" && profile.stripe_customer_id) {
+    for (const workspace of workspaces) {
+      if (workspace.plan !== "free" && workspace.stripe_customer_id) {
         const stripeSubscription = stripeSubscriptionMap.get(
-          profile.stripe_customer_id
+          workspace.stripe_customer_id
         )
         if (!stripeSubscription) {
-          const supabaseUser = supabaseUsers.find(u => u.id === profile.user_id)
+          const { data: workspaceUser } = await supabase
+            .from("workspace_users")
+            .select("user_id")
+            .eq("workspace_id", workspace.id)
+            .eq("role", "OWNER")
+            .single()
+
+          if (!workspaceUser) {
+            console.log(`No owner found for workspace ${workspace.id}`)
+            continue
+          }
+
+          const supabaseUser = supabaseUsers.find(u => u.id === workspaceUser.user_id)
           const email = supabaseUser ? supabaseUser.email : "Unknown"
 
           console.log(`Mismatch found for user ${email}:`)
-          console.log(`  Supabase plan: ${profile.plan}`)
+          console.log(`  Supabase plan: ${workspace.plan}`)
           console.log(`  No active Stripe subscription found`)
 
           const shouldUpdate = await askForPermission(
-            `Do you want to update the plan for user ${email} from '${profile.plan}' to 'free'? (y/n): `
+            `Do you want to update the plan for user ${email} from '${workspace.plan}' to 'free'? (y/n): `
           )
 
           if (shouldUpdate) {
-            await updateProfile(profile.user_id, "free")
+            await updateWorkspace(workspace.id, "free")
           } else {
             console.log(`Skipped updating user ${email}`)
           }

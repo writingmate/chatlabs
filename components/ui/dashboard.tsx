@@ -22,10 +22,8 @@ interface DashboardProps {
 export const Dashboard: FC<DashboardProps> = ({ children }) => {
   useHotkey("s", () => setShowSidebar(prevState => !prevState))
 
-  const pathname = usePathname()
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const tabValue = searchParams.get("tab") || "chats"
+  const tabValue = searchParams?.get("tab") || "chats"
   const { theme } = useTheme()
 
   const { handleSelectDeviceFile } = useSelectFileHandler()

@@ -28,6 +28,7 @@ import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "sonner"
+import { logger } from "@/lib/logger" // Add this import
 
 const BYOK_PLAN_PREFIX = "byok"
 const PRO_PLAN_PREFIX = "pro"
@@ -43,7 +44,7 @@ interface PlansProps {
 }
 
 export default function Plans({ onClose, showCloseIcon }: PlansProps) {
-  const { profile } = useContext(ChatbotUIContext)
+  const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
 
   const [billingCycle, setBillingCycle] =
     useState<BILLING_CYCLE>(BILLING_CYCLE_YEARLY)
@@ -60,18 +61,35 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
         return window.location.assign("/login")
       }
 
+      // Add workspaceId to form data
+      data.set("workspaceId", selectedWorkspace?.id || "") // Add workspace ID
       data.set("email", user?.email as string)
       data.set("userId", user?.id)
 
+      logger.debug(
+        {
+          email: user.email,
+          userId: user.id,
+          workspaceId: selectedWorkspace?.id,
+          plan: data.get("plan")
+        },
+        "Initiating checkout session"
+      )
+
       const { url } = await createCheckoutSession(data)
 
-      window.location.assign(url as string)
+      if (!url) {
+        throw new Error("No checkout URL returned")
+      }
+
+      logger.info({ url }, "Redirecting to checkout")
+      window.location.assign(url)
     } catch (error) {
       setLoading("")
       toast.error(
         "Failed to upgrade plan. Something went wrong. Please try again."
       )
-      console.error(error)
+      logger.error({ err: error }, "Failed to create checkout session")
     }
   }
 
@@ -146,9 +164,9 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
   }
 
   const getCurrentPlan = () => {
-    if (!profile?.plan) return "free"
-    if (profile.plan.startsWith("pro_")) return "pro"
-    if (profile.plan.startsWith("ultimate_")) return "ultimate"
+    if (!selectedWorkspace?.plan) return "free"
+    if (selectedWorkspace.plan.startsWith("pro_")) return "pro"
+    if (selectedWorkspace.plan.startsWith("ultimate_")) return "ultimate"
     return "free"
   }
 
