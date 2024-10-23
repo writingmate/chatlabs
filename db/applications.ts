@@ -2,27 +2,34 @@ import { Database, Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
 import { LLM, LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
 
+import { logger } from "@/lib/logger"
 import { supabase } from "@/lib/supabase/browser-client"
 
 import { getPlatformTools, platformToolDefinitionById } from "./platform-tools"
 
 export const getFileByAppSlug = async (appSlug: string) => {
-  const { data: application, error } = await supabase
-    .from("applications")
-    .select("*, files(*, file_items(*))")
-    .eq("subdomain", appSlug)
-    .order("created_at", { referencedTable: "files", ascending: false })
-    .single()
+  logger.debug({ appSlug }, "getFileByAppSlug")
+  const { data: files, error } = await supabase
+    .from("files")
+    .select("*, file_items(*), application_files(*, applications(*))")
+    .eq("application_files.applications.subdomain", appSlug)
+    .order("created_at", { ascending: false })
 
-  if (!application) {
+  if (!files) {
+    logger.debug({ err: error }, "getFileByAppSlug error")
     throw new Error(error.message)
   }
 
-  if (application.files.length === 0) {
+  logger.debug({ files }, "getFileByAppSlug files")
+
+  if (files.length === 0) {
+    logger.debug("getFileByAppSlug no files")
     return null
   }
 
-  return application.files?.[0]
+  logger.debug({ file: files?.[0] }, "getFileByAppSlug file")
+
+  return files?.[0]
 }
 
 export const getApplicationById = async (

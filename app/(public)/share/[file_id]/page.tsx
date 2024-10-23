@@ -12,6 +12,7 @@ import {
 import { DOMParser } from "xmldom"
 
 import { updateHtml } from "@/lib/code-viewer"
+import { logger } from "@/lib/logger"
 import { REGEX_FILENAME } from "@/lib/preview"
 import { getOgImageUrl } from "@/lib/utils/og"
 import { Button } from "@/components/ui/button"
@@ -77,18 +78,30 @@ function parseBoolean(value: string | boolean | undefined) {
 
 async function getFileByIdOrHashIdOrAppSlug(idOrHashIdOrAppSlug: string) {
   try {
+    logger.debug({ idOrHashIdOrAppSlug }, "getFileByIdOrHashIdOrAppSlug")
     const file = await getFileByHashId(idOrHashIdOrAppSlug)
     if (file) {
+      logger.debug({ file }, "getFileByHashId")
       return file
     }
   } catch (error) {
+    logger.debug({ err: error }, "getFileByHashId error")
     try {
       const file = await getFileById(idOrHashIdOrAppSlug)
       if (file) {
+        logger.debug({ file }, "getFileById")
         return file
       }
     } catch (error) {
-      return await getFileByAppSlug(idOrHashIdOrAppSlug)
+      logger.debug({ err: error }, "getFileById error")
+      try {
+        const file = await getFileByAppSlug(idOrHashIdOrAppSlug)
+        logger.debug({ file }, "getFileByAppSlug")
+        return file
+      } catch (error) {
+        logger.debug({ err: error }, "getFileByAppSlug error")
+        throw error
+      }
     }
   }
 }
