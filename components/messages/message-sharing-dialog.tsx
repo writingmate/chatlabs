@@ -139,6 +139,7 @@ export function MessageSharingDialog({
           user_id: user.id,
           workspace_id: selectedWorkspace.id,
           chat_id: chatId,
+          sharing: "public",
           application_type: "html",
           theme: "light"
         },
