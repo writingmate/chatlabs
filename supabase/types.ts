@@ -1996,6 +1996,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      create_word_arrays: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       delete_message_including_and_after: {
         Args: {
           p_user_id: string
@@ -2025,6 +2029,10 @@ export type Database = {
           object_path: string
         }
         Returns: Record<string, unknown>
+      }
+      generate_random_subdomain: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       get_assistants_for_user: {
         Args: {
