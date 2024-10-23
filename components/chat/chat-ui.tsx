@@ -188,7 +188,7 @@ export const ChatUI: React.FC<ChatUIProps> = ({
         message: {
           content: `\`\`\`html
 #filename=${filename}#
-${content}
+${content.replaceAll("```", "\\`\\`\\`")}
 \`\`\``,
           annotation: {},
           assistant_id: assistantId || null,
