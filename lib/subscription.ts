@@ -1,9 +1,8 @@
-import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types/llms"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { PLAN_FREE, PLAN_PRO, PLAN_ULTIMATE } from "@/lib/stripe/config"
 import { getEnvInt } from "@/lib/env"
-import { getServerProfile } from "@/lib/server/server-chat-helpers"
+import { Tables } from "@/supabase/types"
 
 export const FREE_MESSAGE_DAILY_LIMIT = getEnvInt(
   "FREE_MESSAGE_DAILY_LIMIT",
@@ -28,16 +27,24 @@ export const ALLOWED_USERS =
 export const ALLOWED_MODELS =
   process.env.NEXT_PUBLIC_ALLOWED_MODELS?.split(",") || []
 
-export function validatePlanForModel(
-  workspace: Tables<"workspaces"> | null,
-  model?: LLMID
-) {
+// Helper function to get effective plan
+export function getEffectivePlan(
+  profile: Tables<"profiles">,
+  workspace: Tables<"workspaces"> | null
+): string {
+  return (
+    (profile.workspace_migration_enabled ? workspace?.plan : profile.plan) ||
+    PLAN_FREE
+  )
+}
+
+export function validatePlanForModel(plan: string | null, model?: LLMID) {
   if (!model) return false
 
   // openrouter models are always allowed
   if (model.includes("/")) return true
 
-  if (workspace?.plan?.startsWith("byok")) return true
+  if (plan?.startsWith("byok")) return true
 
   const modelData = LLM_LIST.find(
     x => x.modelId === model || x.hostedId === model
@@ -52,44 +59,25 @@ export function validatePlanForModel(
 
   if (modelData.tier === "free" || modelData.tier === undefined) return true
 
-  if (!workspace) return false
-
-  const userPlan = workspace.plan?.split("_")[0] || "free"
-
+  const userPlan = plan?.split("_")[0] || "free"
   if (userPlan === PLAN_ULTIMATE || userPlan === PLAN_PRO) return true
 
   return false
 }
 
-// Helper function to get effective plan, considering both profile and workspace
-export function getEffectivePlan(
-  profile: Tables<"profiles"> | null,
-  workspace: Tables<"workspaces"> | null
-) {
-  if (!profile) return "free"
-
-  // If workspace feature is enabled, use workspace plan
-  if (profile.workspace_migration_enabled && workspace?.plan) {
-    return workspace.plan
-  }
-
-  // Otherwise fall back to profile plan
-  return profile.plan
-}
-
 export function validatePlanForAssistant(
-  workspace: Tables<"workspaces"> | null,
+  plan: string | null,
   assistant: Tables<"assistants">
 ) {
-  return validatePlanForModel(workspace, assistant.model as LLMID)
+  return validatePlanForModel(plan, assistant.model as LLMID)
 }
 
 export function validatePlanForTools(
-  workspace: Tables<"workspaces"> | null,
+  plan: string | null,
   tools: any[],
   model?: LLMID
 ) {
-  if (model && validatePlanForModel(workspace, model)) {
+  if (model && validatePlanForModel(plan, model)) {
     return true
   }
   return false

@@ -106,17 +106,6 @@ interface ProfileSettingsProps {
   isCollapsed: boolean
 }
 
-// Add this near the top of the file
-const getPlanDisplay = (
-  profile: Tables<"profiles">,
-  workspace: Tables<"workspaces"> | null
-) => {
-  if (profile.workspace_migration_enabled && workspace?.plan) {
-    return workspace.plan.split("_")[0]
-  }
-  return profile.plan.split("_")[0]
-}
-
 export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
   const {
     profile,
@@ -133,7 +122,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     selectedWorkspace,
     setSelectedWorkspace,
     workspaceImages,
-    setWorkspaceImages
+    setWorkspaceImages,
+    effectivePlan
   } = useContext(ChatbotUIContext)
 
   const [loadingBillingPortal, setLoadingBillingPortal] = useState(false)
@@ -1111,7 +1101,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 <div className="space-y-2">
                   <Label>Current Subscription Plan</Label>
                   <div className="text-xl font-semibold capitalize">
-                    {getPlanDisplay(profile, selectedWorkspace)}
+                    {effectivePlan.split("_")[0]}
                   </div>
                   <p className="text-sm">
                     {
@@ -1122,10 +1112,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                           "Upgrade to Ultimate to get access to OpenAI o1-preview and Claude 3 Opus",
                         [PLAN_ULTIMATE]:
                           "You're on the Ultimate plan! Enjoy your access to all models, plugins and image generation."
-                      }[getPlanDisplay(profile, selectedWorkspace)]
+                      }[effectivePlan.split("_")[0]]
                     }
                   </p>
-                  {getPlanDisplay(profile, selectedWorkspace) !== PLAN_FREE ? (
+                  {effectivePlan.split("_")[0] !== PLAN_FREE ? (
                     <Button
                       className="bg-violet-600"
                       loading={loadingBillingPortal}

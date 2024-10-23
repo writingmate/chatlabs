@@ -5,6 +5,8 @@ import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
 import { NextRequest } from "next/server"
+import { getWorkspaceById } from "@/db/workspaces"
+import { getEffectivePlan } from "@/lib/subscription"
 
 export const dynamic = "force-dynamic"
 
@@ -44,12 +46,22 @@ export async function GET(request: NextRequest) {
     return createResponse({ error: "Unauthorized" }, 401)
   }
 
+  if (!profile) {
+    return createResponse({ error: "Unauthorized" }, 401)
+  }
+
+  if (!profile?.workspace) {
+    return createResponse({ error: "Unauthorized" }, 401)
+  }
+
+  const plan = getEffectivePlan(profile, profile?.workspace)
+
   const isUsingEnvKeyMap = Object.keys(envKeyMap).reduce<
     Record<string, boolean>
   >((acc, provider) => {
     const key = envKeyMap[provider]
 
-    if (profile?.workspace?.plan?.startsWith("byok_")) {
+    if (plan.startsWith("byok_")) {
       return acc
     }
 

@@ -24,6 +24,7 @@ import { SIDEBAR_ITEM_ICON_SIZE } from "../sidebar/items/all/sidebar-display-ite
 import { SIDEBAR_ICON_STROKE } from "../sidebar/sidebar-switcher"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { setWorkspaceIdCookie } from "@/actions/workspace"
 
 interface WorkspaceSwitcherProps {}
 
@@ -110,7 +111,7 @@ export const WorkspaceSwitcher: FC<WorkspaceSwitcherProps> = ({}) => {
 
     setSelectedWorkspace(workspace)
     setOpen(false)
-
+    setWorkspaceIdCookie(workspace.id)
     return router.push(`/chat`)
   }
 

@@ -50,6 +50,7 @@ import {
   reconstructContentWithCodeBlocksInChatMessage
 } from "@/lib/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
+import { getEffectivePlan } from "@/lib/subscription"
 
 const ICON_SIZE = 32
 
@@ -157,7 +158,11 @@ export const Message: FC<MessageProps> = ({
       return
     }
 
-    if (selectedWorkspace?.plan !== "free") {
+    if (
+      profile &&
+      selectedWorkspace &&
+      getEffectivePlan(profile, selectedWorkspace) !== "free"
+    ) {
       // PRO plan users can use OpenAI voice to text
       await handleOpenAISpeech(cleanupMessageForSpeech(message.content))
     } else if ("speechSynthesis" in window) {

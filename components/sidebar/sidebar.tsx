@@ -49,6 +49,7 @@ export const Sidebar: FC = () => {
     folders,
     profile,
     selectedWorkspace,
+    effectivePlan,
     showSidebar,
     setShowSidebar,
     isPaywallOpen,
@@ -389,7 +390,7 @@ export const Sidebar: FC = () => {
           </div>
 
           {/* Upgrade message for free plan users */}
-          {selectedWorkspace?.plan === "free" && (
+          {effectivePlan === "free" && (
             <div className="border-t p-2">
               <div className="flex flex-col items-center justify-between space-y-2 text-sm">
                 {!isCollapsed && (
@@ -475,6 +476,7 @@ export const Sidebar: FC = () => {
       searchQueries,
       profile,
       selectedWorkspace,
+      effectivePlan,
       isPaywallOpen, // Use context's state
       loadMoreChats, // Add loadMoreChats to dependencies
       searchLoading // Add searchLoading to dependencies

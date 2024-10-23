@@ -43,6 +43,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     selectedAssistant,
     chatFiles,
     newMessageFiles,
+    effectivePlan,
     setIsPaywallOpen
   } = useContext(ChatbotUIContext)
 
@@ -102,8 +103,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     },
     collections: async (item: any) => {},
     assistants: async (assistant: Tables<"assistants">) => {
-      if (!selectedWorkspace) return
-      if (!validatePlanForAssistant(selectedWorkspace, assistant)) {
+      if (!validatePlanForAssistant(effectivePlan, assistant)) {
         setIsPaywallOpen(true)
         return
       }
@@ -112,9 +112,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       return router.push(`/chat`)
     },
     tools: async (item: any) => {
-      if (
-        !validatePlanForTools(selectedWorkspace, [item], chatSettings?.model)
-      ) {
+      if (!validatePlanForTools(effectivePlan, [item], chatSettings?.model)) {
         setIsPaywallOpen(true)
         return
       }

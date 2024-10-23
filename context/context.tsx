@@ -170,6 +170,8 @@ interface ChatbotUIContext {
   setShowSidebar: Dispatch<SetStateAction<boolean>>
 
   // SYSTEM PROMPTS
+  effectivePlan: string
+  setEffectivePlan: Dispatch<SetStateAction<string>>
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
@@ -315,5 +317,9 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
 
   // SIDEBAR
   showSidebar: false,
-  setShowSidebar: () => {}
+  setShowSidebar: () => {},
+
+  // EXTRA
+  effectivePlan: "free",
+  setEffectivePlan: () => {}
 })

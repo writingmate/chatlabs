@@ -22,7 +22,11 @@ import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { SubscriptionRequiredError } from "@/lib/errors"
-import { validatePlanForModel, validatePlanForTools } from "@/lib/subscription"
+import {
+  getEffectivePlan,
+  validatePlanForModel,
+  validatePlanForTools
+} from "@/lib/subscription"
 import { encode } from "gpt-tokenizer"
 import {
   parseChatMessageCodeBlocksAndContent,
@@ -53,16 +57,24 @@ export const validateChatSettings = (
     throw new Error("Message content not found")
   }
 
-  if (!validatePlanForModel(selectedWorkspace, modelData.modelId)) {
+  const effectivePlan = profile
+    ? getEffectivePlan(profile, selectedWorkspace)
+    : null
+
+  if (
+    !profile ||
+    !validatePlanForModel(
+      getEffectivePlan(profile, selectedWorkspace),
+      modelData.modelId
+    )
+  ) {
     const requiredPlan = modelData.tier === "ultimate" ? "Ultimate" : "Pro"
     throw new SubscriptionRequiredError(
       `${requiredPlan} plan required to use this model`
     )
   }
 
-  if (
-    !validatePlanForTools(selectedWorkspace, selectedTools, modelData.modelId)
-  ) {
+  if (!validatePlanForTools(effectivePlan, selectedTools, modelData.modelId)) {
     throw new SubscriptionRequiredError("Subscription required to use tools")
   }
 }

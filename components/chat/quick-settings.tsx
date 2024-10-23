@@ -41,7 +41,8 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
     assistantImages,
     setChatFiles,
     selectedWorkspace,
-    setIsPaywallOpen
+    setIsPaywallOpen,
+    effectivePlan
   } = useContext(ChatbotUIContext)
 
   const { chatSettings, setChatSettings, setSelectedTools } =
@@ -71,10 +72,7 @@ export const QuickSettings: FC<QuickSettingsProps> = ({}) => {
       // setSelectedAssistant(item as Tables<"assistants">)
 
       if (
-        !validatePlanForAssistant(
-          selectedWorkspace,
-          item as Tables<"assistants">
-        )
+        !validatePlanForAssistant(effectivePlan, item as Tables<"assistants">)
       ) {
         setIsPaywallOpen(true)
         return

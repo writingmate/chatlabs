@@ -8,14 +8,17 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { upsertUserQuestion } from "@/db/user_questions"
 import Image from "next/image"
+import { getEffectivePlan } from "@/lib/subscription"
 
 export default function SubscriptionSuccessPage() {
   const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
   const [response, setResponse] = useState("")
 
   useEffect(() => {
-    if (selectedWorkspace && selectedWorkspace.plan != "free") {
-      const event = `purchase_${selectedWorkspace.plan}`
+    if (!profile) return
+    const plan = getEffectivePlan(profile, selectedWorkspace)
+    if (plan != "free") {
+      const event = `purchase_${plan}`
       window.gtag?.("event", event)
       window.dataLayer?.push({ event })
     }

@@ -68,8 +68,8 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
     availableLocalModels,
     allModels,
     setIsPaywallOpen,
-    isProfileSettingsOpen,
-    setIsProfileSettingsOpen
+    setIsProfileSettingsOpen,
+    effectivePlan
   } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -108,7 +108,8 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
 
   const handleSelectModel = useCallback(
     (modelId: LLMID) => {
-      if (!validatePlanForModel(selectedWorkspace, modelId)) {
+      if (!selectedWorkspace) return
+      if (!validatePlanForModel(effectivePlan, modelId)) {
         setIsPaywallOpen(true)
         return
       }
@@ -192,7 +193,7 @@ export const ModelSelectChat: FC<ModelSelectProps> = ({
   const isFiltered =
     search || selectedTiers.length > 0 || selectedCategories.length > 0
 
-  if (allModels.length === 0 && selectedWorkspace?.plan?.startsWith("byok_")) {
+  if (allModels.length === 0 && effectivePlan?.startsWith("byok_")) {
     return (
       <Button
         className="text-md items-end"

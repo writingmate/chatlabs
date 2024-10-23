@@ -42,7 +42,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
   onSelectTools,
   className
 }) => {
-  const { selectedWorkspace, tools, setIsPaywallOpen } =
+  const { selectedWorkspace, tools, setIsPaywallOpen, effectivePlan } =
     useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -68,7 +68,7 @@ export const ToolSelect: FC<ToolSelectProps> = ({
     }
   }
   function handleSelectTool(tool: Tables<"tools">, selected: boolean) {
-    if (!validatePlanForTools(selectedWorkspace, [tool], selectedModelId)) {
+    if (!validatePlanForTools(effectivePlan, [tool], selectedModelId)) {
       setIsPaywallOpen(true)
       return
     }

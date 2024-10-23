@@ -26,10 +26,8 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   const {
     profile,
     selectedWorkspace,
-    models,
-    availableHostedModels,
+    effectivePlan,
     availableLocalModels,
-    availableOpenRouterModels,
     allModels,
     setIsPaywallOpen
   } = useContext(ChatbotUIContext)
@@ -50,7 +48,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   }, [isOpen])
 
   const handleSelectModel = (modelId: LLMID) => {
-    if (!validatePlanForModel(selectedWorkspace, modelId)) {
+    if (!validatePlanForModel(effectivePlan, modelId)) {
       setIsPaywallOpen(true)
     } else {
       onSelectModel(modelId)

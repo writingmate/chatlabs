@@ -2,6 +2,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { useContext, useEffect, useState } from "react"
 import {
   FREE_MESSAGE_DAILY_LIMIT,
+  getEffectivePlan,
   PRO_ULTIMATE_MESSAGE_DAILY_LIMIT,
   ULTIMATE_MESSAGE_DAILY_LIMIT
 } from "@/lib/subscription"
@@ -43,7 +44,7 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
     return null
   }
 
-  const userPlan = selectedWorkspace?.plan?.split("_")[0]
+  const userPlan = getEffectivePlan(profile, selectedWorkspace).split("_")[0]
   const modelData = LLM_LIST.find(
     x => x.modelId === chatSettings.model || x.hostedId === chatSettings.model
   )

@@ -9,6 +9,7 @@ import { SubscriptionRequiredError } from "@/lib/errors"
 import {
   CATCHALL_MESSAGE_DAILY_LIMIT,
   FREE_MESSAGE_DAILY_LIMIT,
+  getEffectivePlan,
   PRO_MESSAGE_DAILY_LIMIT,
   PRO_ULTIMATE_MESSAGE_DAILY_LIMIT,
   ULTIMATE_MESSAGE_DAILY_LIMIT,
@@ -43,16 +44,11 @@ export async function getServerProfile(
   const cookieStore = cookies()
   const supabase = createClient()
 
+  workspaceId = workspaceId || cookieStore.get("workspaceId")?.value
+
   const user = (await supabase.auth.getUser()).data.user
   if (!user) {
     throw new ApiError(401, "User not found")
-  }
-
-  const selectedWorkspaceId =
-    workspaceId || cookieStore.get("selected_workspace")?.value
-
-  if (!selectedWorkspaceId) {
-    throw new ApiError(401, "Workspace not found")
   }
 
   const { data: profile } = await supabase
@@ -61,21 +57,25 @@ export async function getServerProfile(
     .eq("user_id", user.id)
     .single()
 
-  const { data: workspace } = await supabase
-    .from("workspaces")
-    .select("*")
-    .eq("id", selectedWorkspaceId)
-    .single()
-
   if (!profile) {
     throw new ApiError(401, "Profile not found")
   }
+
+  // Get workspace either by ID or get user's workspace
+  const { data: workspace } = await supabase
+    .from("workspaces")
+    .select("*")
+    .eq(workspaceId ? "id" : "user_id", workspaceId || user.id)
+    .single()
 
   if (!workspace) {
     throw new ApiError(401, "Workspace not found")
   }
 
-  const profileWithKeys = addApiKeysToProfile(profile, workspace.plan || "")
+  const profileWithKeys = addApiKeysToProfile(
+    profile,
+    getEffectivePlan(profile, workspace) || ""
+  )
 
   return {
     ...profileWithKeys,
@@ -93,9 +93,7 @@ function addApiKeysToProfile(profile: Tables<"profiles">, plan: string) {
     [VALID_ENV_KEYS.PERPLEXITY_API_KEY]: "perplexity_api_key",
     [VALID_ENV_KEYS.AZURE_OPENAI_API_KEY]: "azure_openai_api_key",
     [VALID_ENV_KEYS.OPENROUTER_API_KEY]: "openrouter_api_key",
-
     [VALID_ENV_KEYS.OPENAI_ORGANIZATION_ID]: "openai_organization_id",
-
     [VALID_ENV_KEYS.AZURE_OPENAI_ENDPOINT]: "azure_openai_endpoint",
     [VALID_ENV_KEYS.AZURE_GPT_35_TURBO_NAME]: "azure_openai_35_turbo_id",
     [VALID_ENV_KEYS.AZURE_GPT_45_VISION_NAME]: "azure_openai_45vision_id",
@@ -103,6 +101,7 @@ function addApiKeysToProfile(profile: Tables<"profiles">, plan: string) {
     [VALID_ENV_KEYS.AZURE_EMBEDDINGS_NAME]: "azure_openai_embeddings_id"
   }
 
+  // Only add API keys if not using BYOK plan
   if (!plan.startsWith("byok_")) {
     for (const [envKey, profileKey] of Object.entries(apiKeys)) {
       if (process.env[envKey] && !(profile as any)[profileKey]) {
@@ -153,7 +152,9 @@ export async function validateModel(
   profile: Tables<"profiles"> & { workspace: Tables<"workspaces"> },
   model: LLMID
 ) {
-  if (!validatePlanForModel(profile.workspace, model)) {
+  const plan = getEffectivePlan(profile, profile.workspace)
+
+  if (!validatePlanForModel(plan, model)) {
     const modelData = LLM_LIST.find(
       x => x.modelId === model || x.hostedId === model
     )
@@ -170,7 +171,8 @@ export async function validateMessageCount(
   date: Date,
   supabase: SupabaseClient
 ) {
-  const userPlan = profile?.workspace?.plan?.split("_")[0]
+  const plan = getEffectivePlan(profile, profile.workspace)
+  const userPlan = plan?.split("_")[0]
 
   if (userPlan?.startsWith("byok")) {
     return

@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "sonner"
 import { logger } from "@/lib/logger" // Add this import
+import { getEffectivePlan } from "@/lib/subscription"
 
 const BYOK_PLAN_PREFIX = "byok"
 const PRO_PLAN_PREFIX = "pro"
@@ -164,10 +165,9 @@ export default function Plans({ onClose, showCloseIcon }: PlansProps) {
   }
 
   const getCurrentPlan = () => {
-    if (!selectedWorkspace?.plan) return "free"
-    if (selectedWorkspace.plan.startsWith("pro_")) return "pro"
-    if (selectedWorkspace.plan.startsWith("ultimate_")) return "ultimate"
-    return "free"
+    if (!profile || !selectedWorkspace) return "free"
+    const plan = getEffectivePlan(profile, selectedWorkspace)
+    return plan.split("_")[0] || "free"
   }
 
   const currentPlan = getCurrentPlan()

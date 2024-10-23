@@ -40,6 +40,7 @@ import { getPlatformTools } from "@/db/platform-tools"
 import { onlyUniqueById } from "@/lib/utils"
 import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
 import { Loading } from "@/components/ui/loading"
+import { getEffectivePlan } from "@/lib/subscription"
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -183,6 +184,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     () => !isMobileScreen()
   )
 
+  // EFFECTIVE PLAN
+  const [effectivePlan, setEffectivePlan] = useState<string>("free")
+
   const [fetchingStartingData, setFetchingStartingData] =
     useState<boolean>(false)
 
@@ -220,6 +224,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
           allModels.push(...localModels)
           setAvailableLocalModels(localModels)
         }
+
+        setEffectivePlan(
+          profile ? getEffectivePlan(profile, selectedWorkspace) : "free"
+        )
 
         setAllModels([
           ...models.map(model => ({
@@ -579,7 +587,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
         // PROFILE SETTINGS
         isProfileSettingsOpen,
-        setIsProfileSettingsOpen
+        setIsProfileSettingsOpen,
+
+        // EFFECTIVE PLAN
+        effectivePlan,
+        setEffectivePlan
       }}
     >
       {children}
