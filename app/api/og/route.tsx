@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       searchParams.get("description") || "All-in-one AI Platform"
     const baseUrl =
       process.env.NEXT_PUBLIC_APP_URL ||
-      process.env.VERCEL_URL ||
+      `https://${process.env.VERCEL_URL}` ||
       "https://labs.writingmate.ai"
 
     const logoUrl =
