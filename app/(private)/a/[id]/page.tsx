@@ -1,16 +1,17 @@
-import { ChatUI } from "@/components/chat/chat-ui"
-import { getAssistantByHashId } from "@/db/assistants"
-import { parseIdFromSlug } from "@/lib/slugify"
-import { ChatbotUIChatProvider } from "@/context/chat"
-import { createClient } from "@/lib/supabase/server"
+import { ApiError } from "next/dist/server/api-utils"
 import { cookies } from "next/headers"
-import LoginDialog from "@/components/login/login-dialog"
-import { PlanPicker } from "@/components/upgrade/plan-picker"
-import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { notFound } from "next/navigation"
+import { ChatbotUIChatProvider } from "@/context/chat"
+import { getAssistantByHashId } from "@/db/assistants"
 import { Tables } from "@/supabase/types"
 import { User } from "@sentry/nextjs"
-import { ApiError } from "next/dist/server/api-utils"
+
+import { getServerProfile } from "@/lib/server/server-chat-helpers"
+import { parseIdFromSlug } from "@/lib/slugify"
+import { createClient } from "@/lib/supabase/server"
+import { ChatUI } from "@/components/chat/chat-ui"
+import LoginDialog from "@/components/login/login-dialog"
+import { PlanPicker } from "@/components/upgrade/plan-picker"
 
 export default async function AssistantPage({
   params

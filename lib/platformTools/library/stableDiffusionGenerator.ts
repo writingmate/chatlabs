@@ -1,6 +1,6 @@
 import {
-  ImageGenerationUserSettings,
-  BaseImageGenerator
+  BaseImageGenerator,
+  ImageGenerationUserSettings
 } from "../common/BaseImageGenerator"
 
 class StableDiffusion3Generator extends BaseImageGenerator {

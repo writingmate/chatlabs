@@ -1,8 +1,9 @@
+import { FC, useContext } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { IconBooks, IconCircleCheckFilled } from "@tabler/icons-react"
 import { FileIcon } from "lucide-react"
-import { FC, useContext } from "react"
+
 import { MultiSelect } from "@/components/ui/multi-select"
 
 interface AssistantRetrievalSelectProps {

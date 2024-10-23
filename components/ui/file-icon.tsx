@@ -1,3 +1,4 @@
+import { FC } from "react"
 import {
   IconFile,
   IconFileText,
@@ -9,7 +10,6 @@ import {
   IconMarkdown,
   IconPhoto
 } from "@tabler/icons-react"
-import { FC } from "react"
 
 interface FileIconProps {
   type: string

@@ -1,5 +1,6 @@
-import { getFileByHashId, getFileById } from "@/db/files"
 import { notFound } from "next/navigation"
+import { getFileByAppSlug } from "@/db/applications"
+import { getFileByHashId, getFileById } from "@/db/files"
 import {
   IconExternalLink,
   IconInfoCircle,
@@ -9,12 +10,13 @@ import {
   IconWorld
 } from "@tabler/icons-react"
 import { DOMParser } from "xmldom"
-import RemixButton from "@/components/remix/remix-button"
-import { REGEX_FILENAME } from "@/lib/preview"
+
 import { updateHtml } from "@/lib/code-viewer"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { REGEX_FILENAME } from "@/lib/preview"
+import { getOgImageUrl } from "@/lib/utils/og"
 import { Button } from "@/components/ui/button"
-import { getFileByAppSlug } from "@/db/applications"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import RemixButton from "@/components/remix/remix-button"
 
 interface SharePageProps {
   params: {
@@ -30,9 +32,36 @@ export async function generateMetadata({
 }: SharePageProps) {
   const file = await getFileByIdOrHashIdOrAppSlug(file_id)
 
+  if (!file) {
+    return {
+      title: "ChatLabs",
+      description:
+        "AI Chat Platform: \n - Chat with best AI; \n - Build, Collaborate, Share and Deploy AI Apps in minutes."
+    }
+  }
+
   return {
-    title: `${file?.name} - Created with ChatLabs`,
-    description: file?.description
+    title: file.name,
+    description: file.description,
+    openGraph: {
+      title: file.name,
+      images: [
+        {
+          url: getOgImageUrl(file.name, file.description),
+          width: 1200,
+          height: 630,
+          alt: `${file.name} - ChatLabs`
+        }
+      ],
+      twitter: {
+        card: "summary_large_image",
+        title: file.name,
+        description:
+          file.description ||
+          "Created with ChatLabs.pro. \n Build, Collaborate, Share and Deploy AI Apps in minutes.",
+        images: [getOgImageUrl(file.name, file.description)]
+      }
+    }
   }
 }
 

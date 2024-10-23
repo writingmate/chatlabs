@@ -1,5 +1,3 @@
-import Loading from "@/components/ui/loading"
-import { useChatHandler } from "@/components/splitview/splitview-hooks/use-chat-handler"
 import {
   FC,
   forwardRef,
@@ -9,14 +7,9 @@ import {
   useRef,
   useState
 } from "react"
-import { ChatInput } from "@/components/splitview/chat-input"
-import { ChatMessages } from "@/components/splitview/chat-messages"
-import { useScroll } from "@/components/splitview/splitview-hooks/use-scroll"
-import { ChatSettings } from "@/components/splitview/chat-settings"
 import { ChatbotUIChatContext, ChatbotUIChatProvider } from "@/context/chat"
-import { ChatMessage, LLMID, ModelProvider } from "@/types"
 import { ChatbotUIContext } from "@/context/context"
-import { cn } from "@/lib/utils"
+import { ChatMessage, LLMID, ModelProvider } from "@/types"
 import {
   IconApps,
   IconDashboard,
@@ -24,15 +17,24 @@ import {
   IconGrid4x4,
   IconLayoutGrid
 } from "@tabler/icons-react"
-import { WithTooltip } from "@/components/ui/with-tooltip"
-import { ModelDetails } from "@/components/models/model-details"
-import { ResizableSplitView } from "./chat-resizable-split-view"
+
+import { cn } from "@/lib/utils"
+import Loading from "@/components/ui/loading"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger
 } from "@/components/ui/select"
+import { WithTooltip } from "@/components/ui/with-tooltip"
+import { ModelDetails } from "@/components/models/model-details"
+import { ChatInput } from "@/components/splitview/chat-input"
+import { ChatMessages } from "@/components/splitview/chat-messages"
+import { ChatSettings } from "@/components/splitview/chat-settings"
+import { useChatHandler } from "@/components/splitview/splitview-hooks/use-chat-handler"
+import { useScroll } from "@/components/splitview/splitview-hooks/use-scroll"
+
+import { ResizableSplitView } from "./chat-resizable-split-view"
 
 interface ChatUIProps {}
 

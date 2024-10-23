@@ -1,12 +1,14 @@
-import { LLM } from "@/types"
-import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
-import { ModelIcon } from "@/components/models/model-icon"
-import { IconCheck, IconX } from "@tabler/icons-react"
-import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
-import { Badge } from "@/components/ui/badge"
-import { CATEGORIES } from "@/lib/models/categories"
+import { LLM } from "@/types"
+import { IconCheck, IconX } from "@tabler/icons-react"
 import Markdown from "react-markdown"
+
+import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
+import { CATEGORIES } from "@/lib/models/categories"
+import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import { ModelIcon } from "@/components/models/model-icon"
+
 import { WithTooltip } from "../ui/with-tooltip"
 
 export function ModelDetails({

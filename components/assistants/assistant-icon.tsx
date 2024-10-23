@@ -1,11 +1,12 @@
-import Image from "next/image"
 import { useContext } from "react"
+import Image from "next/image"
 import { ChatbotUIContext } from "@/context/context"
+import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
 import { Tables } from "@/supabase/types"
+import { useTheme } from "next-themes"
+
 import { cn } from "@/lib/utils"
 import { ChatbotUISVG } from "@/components/icons/chatbotui-svg"
-import { useTheme } from "next-themes"
-import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
 
 export function AssistantIcon({
   assistant,

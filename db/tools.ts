@@ -1,7 +1,9 @@
-import { supabase } from "@/lib/supabase/browser-client"
 import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
-import { platformToolDefinitionById } from "./platform-tools"
 import { SupabaseClient } from "@supabase/supabase-js"
+
+import { supabase } from "@/lib/supabase/browser-client"
+
+import { platformToolDefinitionById } from "./platform-tools"
 
 export const getToolOrPlatformToolById = async (toolId: string) => {
   try {

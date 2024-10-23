@@ -1,24 +1,26 @@
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { TextareaAutosize } from "@/components/ui/textarea-autosize"
+import { FC, useState } from "react"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
-import { validateOpenAPI } from "@/lib/openapi-conversion"
 import { Tables } from "@/supabase/types"
 import { IconBolt, IconPuzzle } from "@tabler/icons-react"
-import { FC, useState } from "react"
+
+import { validateOpenAPI } from "@/lib/openapi-conversion"
+import { Description } from "@/components/ui/description"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import { TextareaAutosize } from "@/components/ui/textarea-autosize"
+
 import {
   SIDEBAR_ITEM_ICON_SIZE,
   SIDEBAR_ITEM_ICON_STROKE,
   SidebarItem
 } from "../all/sidebar-display-item"
-import {
-  SelectItem,
-  SelectValue,
-  Select,
-  SelectContent,
-  SelectTrigger
-} from "@/components/ui/select"
-import { Description } from "@/components/ui/description"
 
 interface ToolItemProps {
   tool: Tables<"tools">

@@ -1,16 +1,52 @@
 import React from "react"
-import { createClient } from "@/lib/supabase/server"
+import { Metadata } from "next"
 import { cookies } from "next/headers"
-import { Message } from "@/components/messages/message"
-import { Tables } from "@/supabase/types"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { notFound } from "next/navigation"
-import { parseDBMessageCodeBlocksAndContent } from "@/lib/messages"
+import { getChatById } from "@/db/chats"
+import { Tables } from "@/supabase/types"
 
-export function generateMetadata({ params }: { params: { share_id: string } }) {
+import { parseDBMessageCodeBlocksAndContent } from "@/lib/messages"
+import { createClient } from "@/lib/supabase/server"
+import { getOgImageUrl } from "@/lib/utils/og"
+import { Button } from "@/components/ui/button"
+import { Message } from "@/components/messages/message"
+
+export async function generateMetadata({
+  params
+}: {
+  params: { share_id: string }
+}): Promise<Metadata> {
+  // Fetch chat details here
+  const chat = await getChatById(params.share_id)
+
+  if (!chat) {
+    return {
+      title: "ChatLabs",
+      description: "AI Chat Platform"
+    }
+  }
+
   return {
-    title: "ChatLabs"
+    title: chat.name,
+    description: `Chat session: ${chat?.name}`,
+    openGraph: {
+      title: chat.name,
+      images: [
+        {
+          url: getOgImageUrl(chat.name, `Shared chat session: ${chat.name}`),
+          width: 1200,
+          height: 630,
+          alt: `${chat.name} - ChatLabs`
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: chat.name,
+      description: `Shared chat session: ${chat.name}`,
+      images: [getOgImageUrl(chat.name, `Shared chat session: ${chat.name}`)]
+    }
   }
 }
 

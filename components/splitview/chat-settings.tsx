@@ -1,14 +1,15 @@
+import React, { FC, useContext, useEffect, useRef } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
+import { LLMID, ModelProvider } from "@/types"
+import { cx } from "class-variance-authority"
+
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import useHotkey from "@/lib/hooks/use-hotkey"
-import { LLMID, ModelProvider } from "@/types"
-import React, { FC, useContext, useEffect, useRef } from "react"
-import { ModelSelectChat } from "@/components/models/model-select-chat"
-import { ToolSelect } from "@/components/tools/tool-select"
-import { ModelSettings } from "@/components/models/model-settings"
-import { cx } from "class-variance-authority"
 import { cn } from "@/lib/utils"
-import { ChatbotUIChatContext } from "@/context/chat"
+import { ModelSelectChat } from "@/components/models/model-select-chat"
+import { ModelSettings } from "@/components/models/model-settings"
+import { ToolSelect } from "@/components/tools/tool-select"
 
 interface ChatSettingsProps {
   className?: string

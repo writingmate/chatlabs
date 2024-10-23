@@ -1,6 +1,7 @@
 "use client"
 
 import { FC } from "react"
+
 import { ChatbotUISVG } from "../icons/chatbotui-svg"
 
 interface BrandProps {

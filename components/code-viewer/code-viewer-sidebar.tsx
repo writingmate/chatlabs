@@ -1,11 +1,11 @@
-import { FC, useContext, useState, useEffect } from "react"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger
-} from "@/components/ui/sheet"
+import { FC, useContext, useEffect, useState } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
+import { ChatbotUIContext } from "@/context/context"
+import { Tables } from "@/supabase/types"
+import { IconCircleCheckFilled } from "@tabler/icons-react"
+import { Schema } from "zod"
+
+import { MultiSelect } from "@/components/ui/multi-select"
 import {
   Select,
   SelectContent,
@@ -14,18 +14,20 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from "@/components/ui/sheet"
+import {
   ThemeConfigurator,
   UITheme
 } from "@/components/code-viewer/theme-configurator"
-import { ChatbotUIContext } from "@/context/context"
-import { ChatbotUIChatContext } from "@/context/chat"
-import { Tables } from "@/supabase/types"
-import { IconCircleCheckFilled } from "@tabler/icons-react"
-import { MultiSelect } from "@/components/ui/multi-select"
+
 import { Button } from "../ui/button"
 import { Label } from "../ui/label"
 import { Separator } from "../ui/separator"
-import { Schema } from "zod"
 
 type CodeViewerSidebarProps = {
   isOpen: boolean

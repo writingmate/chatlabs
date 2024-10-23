@@ -1,16 +1,17 @@
 "use client"
 
-import { FC, useState, useEffect, useContext } from "react"
-import { useRouter } from "nextjs-toploader/app"
+import { FC, useContext, useEffect, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
-import { Button } from "../ui/button"
 import {
-  getApplicationsByWorkspaceId,
-  deleteApplication
+  deleteApplication,
+  getApplicationsByWorkspaceId
 } from "@/db/applications"
-import { Loader } from "@/components/ui/loader"
 import { Tables } from "@/supabase/types"
+import { IconPlus } from "@tabler/icons-react"
+import { Trash2 } from "lucide-react"
+import { useRouter } from "nextjs-toploader/app"
 import { toast } from "sonner"
+
 import {
   Card,
   CardContent,
@@ -18,8 +19,9 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { Trash2 } from "lucide-react"
-import { IconPlus } from "@tabler/icons-react"
+import { Loader } from "@/components/ui/loader"
+
+import { Button } from "../ui/button"
 
 export const ApplicationView: FC = () => {
   const router = useRouter()

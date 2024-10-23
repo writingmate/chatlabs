@@ -1,11 +1,12 @@
 "use client"
 
-import { TooltipProvider } from "@/components/ui/tooltip"
+import { FC } from "react"
+import { AmplitudeProvider } from "@/context/AmplitudeProvider"
+import { AuthProvider } from "@/context/auth"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 import { ThemeProviderProps } from "next-themes/dist/types"
-import { FC } from "react"
-import { AuthProvider } from "@/context/auth"
-import { AmplitudeProvider } from "@/context/AmplitudeProvider"
+
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 export const Providers: FC<ThemeProviderProps> = ({ children, ...props }) => {
   return (

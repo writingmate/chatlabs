@@ -1,14 +1,21 @@
-import { ChatSettingsForm } from "@/components/ui/chat-settings-form"
-import ImagePicker from "@/components/ui/image-picker"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { FC, useContext, useEffect, useState } from "react"
+import Image from "next/image"
 import { ChatbotUIContext } from "@/context/context"
 import { ASSISTANT_DESCRIPTION_MAX, ASSISTANT_NAME_MAX } from "@/db/limits"
 import { Tables } from "@/supabase/types"
 import { IconRobotFace } from "@tabler/icons-react"
-import Image from "next/image"
-import { FC, useContext, useEffect, useState } from "react"
 import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
+import ReactTextareaAutosize from "react-textarea-autosize"
+
+import { ChatSettingsForm } from "@/components/ui/chat-settings-form"
+import ImagePicker from "@/components/ui/image-picker"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { TextareaAutosize } from "@/components/ui/textarea-autosize"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { SharingField } from "@/components/sidebar/items/all/sharing-field"
+import { AssistantConversationStarters } from "@/components/sidebar/items/assistants/assistant-conversation-starters"
+
 import {
   SIDEBAR_ITEM_ICON_SIZE,
   SIDEBAR_ITEM_ICON_STROKE,
@@ -16,11 +23,6 @@ import {
 } from "../all/sidebar-display-item"
 import { AssistantRetrievalSelect } from "./assistant-retrieval-select"
 import { AssistantToolSelect } from "./assistant-tool-select"
-import { AssistantConversationStarters } from "@/components/sidebar/items/assistants/assistant-conversation-starters"
-import { SharingField } from "@/components/sidebar/items/all/sharing-field"
-import { AssistantIcon } from "@/components/assistants/assistant-icon"
-import ReactTextareaAutosize from "react-textarea-autosize"
-import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 
 interface AssistantItemProps {
   assistant: Tables<"assistants">

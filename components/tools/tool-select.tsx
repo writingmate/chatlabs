@@ -1,4 +1,6 @@
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
+import { Tables } from "@/supabase/types"
 import { LLM, LLMID, ModelProvider } from "@/types"
 import {
   IconCheck,
@@ -6,7 +8,12 @@ import {
   IconPuzzle,
   IconSettings
 } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+
+import { validatePlanForTools } from "@/lib/subscription"
+import { cn } from "@/lib/utils"
+import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
+
 import { Button } from "../ui/button"
 import {
   DropdownMenu,
@@ -14,11 +21,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "../ui/dropdown-menu"
-import { Switch } from "@/components/ui/switch"
-import { Tables } from "@/supabase/types"
-import { Separator } from "@/components/ui/separator"
-import { validatePlanForTools } from "@/lib/subscription"
-import { cn } from "@/lib/utils"
 
 interface ToolSelectProps {
   className?: string

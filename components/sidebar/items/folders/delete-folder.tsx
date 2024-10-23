@@ -1,3 +1,12 @@
+import { FC, useContext, useRef, useState } from "react"
+import { ChatbotUIContext } from "@/context/context"
+import { deleteFolder } from "@/db/folders"
+import { Tables } from "@/supabase/types"
+import { ContentType } from "@/types"
+import { IconTrash } from "@tabler/icons-react"
+import { toast } from "sonner"
+
+import { supabase } from "@/lib/supabase/browser-client"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -8,14 +17,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { ChatbotUIContext } from "@/context/context"
-import { deleteFolder } from "@/db/folders"
-import { supabase } from "@/lib/supabase/browser-client"
-import { Tables } from "@/supabase/types"
-import { ContentType } from "@/types"
-import { IconTrash } from "@tabler/icons-react"
-import { FC, useContext, useRef, useState } from "react"
-import { toast } from "sonner"
 
 interface DeleteFolderProps {
   folder: Tables<"folders">

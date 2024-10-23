@@ -1,6 +1,7 @@
-import { Annotation, Annotation2 } from "@/types/annotation"
 import { forwardRef, useRef } from "react"
 import { IconFunction, IconPlayerPlay } from "@tabler/icons-react"
+
+import { Annotation, Annotation2 } from "@/types/annotation"
 
 type ToolCallsProps = {
   annotation: Annotation | Annotation2

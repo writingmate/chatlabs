@@ -1,44 +1,46 @@
 import {
   FC,
-  useState,
+  useCallback,
   useContext,
-  useRef,
   useEffect,
   useMemo,
-  useCallback
+  useRef,
+  useState
 } from "react"
-import { motion } from "framer-motion"
-import { SidebarItem } from "./sidebar-item"
-import { SlidingSubmenu } from "./sliding-submenu"
-import { SidebarCreateButtons } from "./sidebar-create-buttons"
-import {
-  IconPuzzle,
-  IconFolder,
-  IconChevronRight,
-  IconChevronLeft,
-  IconMessagePlus,
-  IconRobot,
-  IconLayoutColumns,
-  IconBulb,
-  IconLayoutSidebar,
-  IconSparkles,
-  IconApps
-} from "@tabler/icons-react"
+import Link from "next/link"
 import { ChatbotUIContext } from "@/context/context"
-import { Button } from "../ui/button"
+import { searchChatsByName } from "@/db/chats"
+import { Tables } from "@/supabase/types"
+import { ContentType } from "@/types"
+import {
+  IconApps,
+  IconBulb,
+  IconChevronLeft,
+  IconChevronRight,
+  IconFolder,
+  IconLayoutColumns,
+  IconLayoutSidebar,
+  IconMessagePlus,
+  IconPuzzle,
+  IconRobot,
+  IconSparkles
+} from "@tabler/icons-react"
+import { motion } from "framer-motion"
+
+import { useFeatureFlag } from "@/lib/amplitude"
+import { debounce } from "@/lib/debounce"
 import { cn, onlyUniqueById } from "@/lib/utils"
 import { SIDEBAR_ITEM_ICON_SIZE } from "@/components/sidebar/items/all/sidebar-display-item"
-import { SearchInput } from "../ui/search-input"
-import { ProfileSettings } from "../utility/profile-settings"
+
 import { useChatHandler } from "../chat/chat-hooks/use-chat-handler"
-import { SidebarDataList } from "./sidebar-data-list"
-import { ContentType } from "@/types"
-import Link from "next/link"
+import { Button } from "../ui/button"
+import { SearchInput } from "../ui/search-input"
 import { WithTooltip } from "../ui/with-tooltip"
-import { searchChatsByName } from "@/db/chats"
-import { debounce } from "@/lib/debounce"
-import { Tables } from "@/supabase/types"
-import { useFeatureFlag } from "@/lib/amplitude"
+import { ProfileSettings } from "../utility/profile-settings"
+import { SidebarCreateButtons } from "./sidebar-create-buttons"
+import { SidebarDataList } from "./sidebar-data-list"
+import { SidebarItem } from "./sidebar-item"
+import { SlidingSubmenu } from "./sliding-submenu"
 
 export const Sidebar: FC = () => {
   const {

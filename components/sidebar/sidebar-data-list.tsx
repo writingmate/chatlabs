@@ -1,3 +1,12 @@
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { updateAssistant } from "@/db/assistants"
 import { updateChat } from "@/db/chats"
@@ -7,19 +16,15 @@ import { updateModel } from "@/db/models"
 import { updatePreset } from "@/db/presets"
 import { updatePrompt } from "@/db/prompts"
 import { updateTool } from "@/db/tools"
-import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, DataListType } from "@/types"
-import {
-  FC,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useCallback
-} from "react"
+import { Virtualizer, VList, VListHandle } from "virtua"
+
+import { cn } from "@/lib/utils"
+
+import { useScrollBase } from "../chat/chat-hooks/use-scroll"
 import { Separator } from "../ui/separator"
+import { EmptyState } from "./empty-state"
 import { AssistantItem } from "./items/assistants/assistant-item"
 import { ChatItem } from "./items/chat/chat-item"
 import { CollectionItem } from "./items/collections/collection-item"
@@ -29,9 +34,6 @@ import { ModelItem } from "./items/models/model-item"
 import { PresetItem } from "./items/presets/preset-item"
 import { PromptItem } from "./items/prompts/prompt-item"
 import { ToolItem } from "./items/tools/tool-item"
-import { Virtualizer, VList, VListHandle } from "virtua"
-import { EmptyState } from "./empty-state"
-import { useScrollBase } from "../chat/chat-hooks/use-scroll"
 
 interface SidebarDataListProps {
   contentType: ContentType

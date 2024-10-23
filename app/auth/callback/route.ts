@@ -1,7 +1,8 @@
-import { createClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
+
 import { logger } from "@/lib/logger"
+import { createClient } from "@/lib/supabase/server"
 
 const POPUP_HTML = `
 <html>

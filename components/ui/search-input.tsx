@@ -1,4 +1,5 @@
 import { IconLoader, IconSearch } from "@tabler/icons-react"
+
 import { Input } from "./input"
 
 interface SearchInputProps {

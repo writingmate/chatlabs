@@ -1,14 +1,18 @@
-import { Toaster } from "@/components/ui/sonner"
-import { GlobalState } from "@/components/utility/global-state"
-import { Providers } from "@/components/utility/providers"
+import { ReactNode } from "react"
 import { Metadata, Viewport } from "next"
 import { DM_Sans } from "next/font/google"
-import { ReactNode } from "react"
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+
+import { Toaster } from "@/components/ui/sonner"
+import { GlobalState } from "@/components/utility/global-state"
+import { Providers } from "@/components/utility/providers"
+
 import "./globals.css"
+
 import NextTopLoader from "nextjs-toploader"
+
 import { URLMessagePopup } from "@/components/utility/url-message-popup"
 
 const font = DM_Sans({ subsets: ["latin"] })

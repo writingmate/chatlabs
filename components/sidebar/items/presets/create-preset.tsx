@@ -1,11 +1,12 @@
-import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
-import { ChatSettingsForm } from "@/components/ui/chat-settings-form"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { FC, useContext, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { PRESET_NAME_MAX } from "@/db/limits"
 import { TablesInsert } from "@/supabase/types"
-import { FC, useContext, useState } from "react"
+
+import { ChatSettingsForm } from "@/components/ui/chat-settings-form"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
 
 interface CreatePresetProps {
   isOpen: boolean

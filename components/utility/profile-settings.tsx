@@ -1,12 +1,14 @@
+import { FC, useCallback, useContext, useRef, useState } from "react"
+import Image from "next/image"
+import { redirect, useRouter } from "next/navigation"
+import {
+  createBillingPortalSession,
+  redirectToBillingPortal
+} from "@/actions/stripe"
 import { ChatbotUIContext } from "@/context/context"
 import { PROFILE_CONTEXT_MAX, PROFILE_DISPLAY_NAME_MAX } from "@/db/limits"
 import { updateProfile } from "@/db/profile"
 import { uploadProfileImage } from "@/db/storage/profile-images"
-import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
-import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
-import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
-import { supabase } from "@/lib/supabase/browser-client"
-import { cn } from "@/lib/utils"
 import { OpenRouterLLM } from "@/types"
 import {
   IconExternalLink,
@@ -17,16 +19,24 @@ import {
   IconSettings,
   IconUser
 } from "@tabler/icons-react"
-import Image from "next/image"
-import { useRouter, redirect } from "next/navigation"
-import { FC, useCallback, useContext, useRef, useState } from "react"
+import { Loader } from "lucide-react"
 import { toast } from "sonner"
+
+import { debounce } from "@/lib/debounce"
+import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
+import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
+import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
+import { PLAN_FREE, PLAN_PRO, PLAN_ULTIMATE } from "@/lib/stripe/config"
+import { supabase } from "@/lib/supabase/browser-client"
+import { cn } from "@/lib/utils"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
+
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 import { Button } from "../ui/button"
-import ImagePicker from "../ui/image-picker"
-import { Input } from "../ui/input"
-import { Label } from "../ui/label"
-import { LimitDisplay } from "../ui/limit-display"
+import { ButtonWithTooltip } from "../ui/button-with-tooltip"
+import { Callout, CalloutDescription, CalloutTitle } from "../ui/callout"
 import {
   Dialog,
   DialogContent,
@@ -35,22 +45,14 @@ import {
   DialogTitle,
   DialogTrigger
 } from "../ui/dialog"
+import ImagePicker from "../ui/image-picker"
+import { Input } from "../ui/input"
+import { Label } from "../ui/label"
+import { LimitDisplay } from "../ui/limit-display"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ThemeSwitcher } from "./theme-switcher"
-import {
-  createBillingPortalSession,
-  redirectToBillingPortal
-} from "@/actions/stripe"
-import { PLAN_FREE, PLAN_PRO, PLAN_ULTIMATE } from "@/lib/stripe/config"
-import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { debounce } from "@/lib/debounce"
-import { Callout, CalloutDescription, CalloutTitle } from "../ui/callout"
-import { Loader } from "lucide-react"
-import { ButtonWithTooltip } from "../ui/button-with-tooltip"
 
 interface ProfileSettingsProps {
   isCollapsed: boolean

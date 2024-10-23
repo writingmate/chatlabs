@@ -1,3 +1,10 @@
+import { FC, useContext, useRef, useState } from "react"
+import { ChatbotUIContext } from "@/context/context"
+import { updateChat } from "@/db/chats"
+import { Tables } from "@/supabase/types"
+import { IconEdit } from "@tabler/icons-react"
+
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -9,12 +16,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ChatbotUIContext } from "@/context/context"
-import { updateChat } from "@/db/chats"
-import { Tables } from "@/supabase/types"
-import { IconEdit } from "@tabler/icons-react"
-import { FC, useContext, useRef, useState } from "react"
-import { cn } from "@/lib/utils"
 
 interface UpdateChatProps {
   className?: string

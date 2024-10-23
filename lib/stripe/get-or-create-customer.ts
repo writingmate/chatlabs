@@ -1,7 +1,8 @@
-import { createClient } from "@supabase/supabase-js"
-import { Database } from "@/supabase/types"
-import { stripe } from "@/lib/stripe/stripe"
 import { updateProfileByUserId } from "@/db/profile"
+import { Database } from "@/supabase/types"
+import { createClient } from "@supabase/supabase-js"
+
+import { stripe } from "@/lib/stripe/stripe"
 
 export const getOrCreateCustomer = async ({
   email,

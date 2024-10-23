@@ -1,5 +1,6 @@
-import { supabase } from "@/lib/supabase/browser-client"
 import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
+
+import { supabase } from "@/lib/supabase/browser-client"
 
 export const getChatById = async (chatId: string, client = supabase) => {
   const { data: chat } = await client

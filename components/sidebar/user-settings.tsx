@@ -1,10 +1,11 @@
 import { FC, useState } from "react"
 import {
-  IconUser,
-  IconSettings,
+  IconChevronUp,
   IconLogout,
-  IconChevronUp
+  IconSettings,
+  IconUser
 } from "@tabler/icons-react"
+
 import { Button } from "../ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 

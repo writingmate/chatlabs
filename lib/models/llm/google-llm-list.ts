@@ -1,4 +1,5 @@
 import { LLM } from "@/types"
+
 import { CATEGORIES } from "../categories"
 
 const GOOGLE_PLATORM_LINK = "https://ai.google.dev/"

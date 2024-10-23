@@ -1,7 +1,7 @@
+import { FC, useContext, useEffect, useRef, useState } from "react"
+import Image from "next/image"
+import { userInputAtom } from "@/atoms/chatAtoms"
 import { ChatbotUIContext } from "@/context/context"
-import useHotkey from "@/lib/hooks/use-hotkey"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { cn } from "@/lib/utils"
 import {
   IconArrowUp,
   IconBrush,
@@ -13,19 +13,21 @@ import {
   IconSend,
   IconX
 } from "@tabler/icons-react"
-import Image from "next/image"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { useAtom } from "jotai"
 import { useTranslation } from "react-i18next"
-import { Input } from "../ui/input"
-import { TextareaAutosize } from "../ui/textarea-autosize"
 import { toast } from "sonner"
-import { useSelectFileHandler } from "@/components/splitview/splitview-hooks/use-select-file-handler"
-import { ToolSelect } from "@/components/tools/tool-select"
+
+import useHotkey from "@/lib/hooks/use-hotkey"
+import { reconstructContentWithCodeBlocks } from "@/lib/messages"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { cn } from "@/lib/utils"
 import { ChatFilesDisplay } from "@/components/chat/chat-files-display"
 import { PromptCatalog } from "@/components/splitview/prompt-catalog"
-import { reconstructContentWithCodeBlocks } from "@/lib/messages"
-import { useAtom } from "jotai"
-import { userInputAtom } from "@/atoms/chatAtoms"
+import { useSelectFileHandler } from "@/components/splitview/splitview-hooks/use-select-file-handler"
+import { ToolSelect } from "@/components/tools/tool-select"
+
+import { Input } from "../ui/input"
+import { TextareaAutosize } from "../ui/textarea-autosize"
 
 interface ChatInputProps {
   isGenerating: boolean

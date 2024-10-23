@@ -1,5 +1,6 @@
-import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
+
+import { supabase } from "@/lib/supabase/browser-client"
 
 export const getPromptById = async (promptId: string) => {
   const { data: prompt, error } = await supabase

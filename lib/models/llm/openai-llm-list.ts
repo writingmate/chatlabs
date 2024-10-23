@@ -1,4 +1,5 @@
 import { LLM } from "@/types"
+
 import { CATEGORIES } from "../categories"
 
 const OPENAI_PLATORM_LINK = "https://platform.openai.com/docs/overview"

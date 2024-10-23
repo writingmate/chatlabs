@@ -1,6 +1,7 @@
-import { supabase } from "@/lib/supabase/browser-client"
 import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
 import { SupabaseClient } from "@supabase/supabase-js"
+
+import { supabase } from "@/lib/supabase/browser-client"
 
 export const getAssistantById = async (
   assistantId: string,

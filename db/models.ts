@@ -1,5 +1,6 @@
-import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
+
+import { supabase } from "@/lib/supabase/browser-client"
 
 export const getModelById = async (modelId: string) => {
   const { data: model, error } = await supabase

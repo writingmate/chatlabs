@@ -1,12 +1,14 @@
+import { FC, useEffect, useState } from "react"
+import { IconExternalLink, IconSpeakerphone } from "@tabler/icons-react"
+
+import { Announcement } from "@/types/announcement"
 import { Button } from "@/components/ui/button"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover"
-import { Announcement } from "@/types/announcement"
-import { IconExternalLink, IconSpeakerphone } from "@tabler/icons-react"
-import { FC, useEffect, useState } from "react"
+
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 
 interface AnnouncementsProps {}

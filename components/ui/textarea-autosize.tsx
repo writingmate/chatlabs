@@ -1,6 +1,7 @@
-import { cn } from "@/lib/utils"
 import { FC } from "react"
 import ReactTextareaAutosize from "react-textarea-autosize"
+
+import { cn } from "@/lib/utils"
 
 interface TextareaAutosizeProps {
   value: string

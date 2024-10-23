@@ -1,11 +1,13 @@
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { FC } from "react"
+import Image from "next/image"
 import { Tables } from "@/supabase/types"
 import { IconCircleCheckFilled, IconRobotFace } from "@tabler/icons-react"
-import Image from "next/image"
-import { FC } from "react"
+
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
+
 import { ModelIcon } from "../models/model-icon"
 import { DropdownMenuItem } from "../ui/dropdown-menu"
-import { AssistantIcon } from "@/components/assistants/assistant-icon"
 
 interface QuickSettingOptionProps {
   contentType: "presets" | "assistants"

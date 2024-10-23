@@ -2,14 +2,16 @@ import { FC, ReactNode, useState } from "react"
 import {
   IconDotsVertical,
   IconPencil,
-  IconTrash,
   IconPin,
-  IconPinnedOff
+  IconPinnedOff,
+  IconTrash
 } from "@tabler/icons-react"
-import { Button } from "../ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+
 import { cn } from "@/lib/utils"
 import { SIDEBAR_ITEM_ICON_SIZE } from "@/components/sidebar/items/all/sidebar-display-item"
+
+import { Button } from "../ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 
 interface Action {
   icon: ReactNode

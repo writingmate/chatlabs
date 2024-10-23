@@ -1,8 +1,9 @@
 import { Tables } from "@/supabase/types"
+
 import { LLMID } from "@/types/llms"
+import { getEnvInt } from "@/lib/env"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { PLAN_FREE, PLAN_PRO, PLAN_ULTIMATE } from "@/lib/stripe/config"
-import { getEnvInt } from "@/lib/env"
 
 export const FREE_MESSAGE_DAILY_LIMIT = getEnvInt(
   "FREE_MESSAGE_DAILY_LIMIT",

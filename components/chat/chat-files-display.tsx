@@ -1,7 +1,8 @@
+import { FC, useContext, useState } from "react"
+import Image from "next/image"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { getFileFromStorage } from "@/db/storage/files"
-import useHotkey from "@/lib/hooks/use-hotkey"
-import { cn } from "@/lib/utils"
 import { ChatFile, MessageImage } from "@/types"
 import {
   IconCircleFilled,
@@ -15,15 +16,16 @@ import {
   IconMarkdown,
   IconX
 } from "@tabler/icons-react"
-import Image from "next/image"
-import { FC, useContext, useState } from "react"
+
+import { guessFileExtensionByContentType } from "@/lib/content-type"
+import useHotkey from "@/lib/hooks/use-hotkey"
+import { cn } from "@/lib/utils"
+import { XIcon } from "@/components/ui/x-icon"
+
 import { Button } from "../ui/button"
 import { FilePreview } from "../ui/file-preview"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ChatRetrievalSettings } from "./chat-retrieval-settings"
-import { XIcon } from "@/components/ui/x-icon"
-import { ChatbotUIChatContext } from "@/context/chat"
-import { guessFileExtensionByContentType } from "@/lib/content-type"
 
 interface ChatFilesDisplayProps {}
 

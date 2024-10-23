@@ -1,15 +1,23 @@
+import { ServerRuntime } from "next"
+import { ChatSettings } from "@/types"
+import { OpenAIStream, StreamingTextResponse } from "ai"
+import OpenAI from "openai"
+import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
+
+import { logger } from "@/lib/logger"
+import { createErrorResponse } from "@/lib/response"
 import {
   checkApiKey,
   getServerProfile,
   validateModelAndMessageCount
 } from "@/lib/server/server-chat-helpers"
-import { ChatSettings } from "@/types"
-import { OpenAIStream, StreamingTextResponse } from "ai"
-import { ServerRuntime } from "next"
-import OpenAI from "openai"
-import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 
 export const runtime: ServerRuntime = "edge"
+
+interface OpenRouterError extends Error {
+  status?: number
+  code?: string
+}
 
 export async function POST(request: Request) {
   const json = await request.json()
@@ -46,17 +54,55 @@ export async function POST(request: Request) {
     const stream = OpenAIStream(response)
 
     return new StreamingTextResponse(stream)
-  } catch (error: any) {
-    let errorMessage = error.message || "An unexpected error occurred"
-    const errorCode = error.status || 500
+  } catch (error: unknown) {
+    const err = error as OpenRouterError
 
-    if (errorMessage.toLowerCase().includes("api key not found")) {
-      errorMessage =
-        "OpenRouter API Key not found. Please set it in your profile settings."
+    logger.error(
+      {
+        err: err,
+        model: chatSettings.model,
+        statusCode: err.status
+      },
+      "OpenRouter API error"
+    )
+
+    // Handle specific error cases
+    if (err.code === "insufficient_quota" || err.status === 429) {
+      return createErrorResponse(
+        "Rate limit exceeded. Please try again later.",
+        429
+      )
     }
 
-    return new Response(JSON.stringify({ message: errorMessage }), {
-      status: errorCode
-    })
+    if (err.status === 401 || err.status === 403) {
+      return createErrorResponse(
+        "Invalid API key or unauthorized access. Please check your OpenRouter API key.",
+        err.status
+      )
+    }
+
+    if (err.status === 404) {
+      return createErrorResponse(
+        "The requested model is currently unavailable.",
+        404
+      )
+    }
+
+    // For network or connection errors
+    if (
+      err.message?.toLowerCase().includes("network") ||
+      err.message?.toLowerCase().includes("connection")
+    ) {
+      return createErrorResponse(
+        "Failed to connect to OpenRouter. Please try again.",
+        503
+      )
+    }
+
+    // Preserve original error status if available, otherwise use 500
+    const statusCode = err.status || 500
+    const message = err.message || "An unexpected error occurred"
+
+    return createErrorResponse(message, statusCode)
   }
 }

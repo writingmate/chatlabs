@@ -1,9 +1,10 @@
 "use client"
 
-import { ChangePassword } from "@/components/utility/change-password"
-import { supabase } from "@/lib/supabase/browser-client"
-import { useRouter } from "nextjs-toploader/app"
 import { useEffect, useState } from "react"
+import { useRouter } from "nextjs-toploader/app"
+
+import { supabase } from "@/lib/supabase/browser-client"
+import { ChangePassword } from "@/components/utility/change-password"
 
 export default function ChangePasswordPage() {
   const [loading, setLoading] = useState(true)

@@ -1,9 +1,10 @@
-import { isUsingEnvironmentKey } from "@/lib/envs"
-import { createResponse } from "@/lib/server/server-utils"
+import { Tables } from "@/supabase/types"
+
 import { EnvKey } from "@/types/key-type"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
+import { isUsingEnvironmentKey } from "@/lib/envs"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
-import { Tables } from "@/supabase/types"
+import { createResponse } from "@/lib/server/server-utils"
 
 export const dynamic = "force-dynamic"
 

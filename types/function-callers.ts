@@ -1,10 +1,11 @@
-import OpenAI from "openai"
 import {
   CreateMessage,
   experimental_StreamData,
   FunctionCallPayload,
   JSONValue
 } from "ai"
+import OpenAI from "openai"
+
 import ChatCompletionMessage = OpenAI.Chat.ChatCompletionMessage
 
 export interface FindFunctionCallsStreamParams {

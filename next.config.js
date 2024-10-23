@@ -2,27 +2,16 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true"
 })
 
-const nrExternals = require("newrelic/load-externals")
-
 const withPWA = require("next-pwa")({
   dest: "public"
 })
 
-const newrelicConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ["sharp", "onnxruntime-node", "newrelic"]
-  },
-  webpack: (config, { isServer }) => {
-    nrExternals(config)
-    if (isServer) {
-      config.externals.push('replicate');
-    }
-    return config
-  }
-}
-
 const nextConfig = {
   reactStrictMode: true,
+  experimental: {
+    optimizePackageImports: ['icon-library'],
+    serverComponentsExternalPackages: ["sharp", "onnxruntime-node"]
+  },
   images: {
     remotePatterns: [
       {
@@ -45,7 +34,6 @@ const config = {
   ...withBundleAnalyzer(
     process.env.NODE_ENV === "production" ? withPWA(nextConfig) : nextConfig
   ),
-  ...newrelicConfig
 }
 // Injected content via Sentry wizard below
 

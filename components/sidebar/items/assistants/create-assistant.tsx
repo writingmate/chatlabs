@@ -1,19 +1,21 @@
-import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
+import { FC, useContext, useEffect, useState } from "react"
+import { ChatbotUIContext } from "@/context/context"
+import { ASSISTANT_DESCRIPTION_MAX, ASSISTANT_NAME_MAX } from "@/db/limits"
+import { Tables, TablesInsert } from "@/supabase/types"
+import { LLMID } from "@/types"
+
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { ChatSettingsForm } from "@/components/ui/chat-settings-form"
 import ImagePicker from "@/components/ui/image-picker"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ChatbotUIContext } from "@/context/context"
-import { ASSISTANT_DESCRIPTION_MAX, ASSISTANT_NAME_MAX } from "@/db/limits"
-import { Tables, TablesInsert } from "@/supabase/types"
-import { FC, useContext, useEffect, useState } from "react"
+import { TextareaAutosize } from "@/components/ui/textarea-autosize"
+import { SharingField } from "@/components/sidebar/items/all/sharing-field"
+import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
+import { AssistantConversationStarters } from "@/components/sidebar/items/assistants/assistant-conversation-starters"
+
 import { AssistantRetrievalSelect } from "./assistant-retrieval-select"
 import { AssistantToolSelect } from "./assistant-tool-select"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { LLMID } from "@/types"
-import { SharingField } from "@/components/sidebar/items/all/sharing-field"
-import { AssistantConversationStarters } from "@/components/sidebar/items/assistants/assistant-conversation-starters"
-import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 
 interface CreateAssistantProps {
   isOpen: boolean

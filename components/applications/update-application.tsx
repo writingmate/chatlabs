@@ -2,12 +2,33 @@
 
 import {
   FC,
-  useState,
+  useCallback,
   useContext,
   useEffect,
-  useCallback,
-  useMemo
+  useMemo,
+  useState
 } from "react"
+import { ChatbotUIContext } from "@/context/context"
+import { Tables, TablesInsert } from "@/supabase/types"
+import { LLMID } from "@/types"
+import { IconAlertTriangle, IconPlus, IconRefresh } from "@tabler/icons-react"
+
+import { APPLICATION_TYPES } from "@/types/application-types"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+
+import { CreateTool } from "../sidebar/items/tools/create-tool"
+import {
+  Callout,
+  CalloutDescription,
+  CalloutIcon,
+  CalloutTitle
+} from "../ui/callout"
+import { Description } from "../ui/description"
+import { Input } from "../ui/input"
+import { MultiSelect } from "../ui/multi-select"
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
 import {
   Select,
   SelectContent,
@@ -15,27 +36,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "../ui/select"
-import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
-import { ChatbotUIContext } from "@/context/context"
-import { LLMID } from "@/types"
-import { Tables, TablesInsert } from "@/supabase/types"
-import { MultiSelect } from "../ui/multi-select"
-import { APPLICATION_TYPES } from "@/types/application-types"
-import { Label } from "@/components/ui/label"
-import { Description } from "../ui/description"
-import { RadioGroupItem, RadioGroup } from "../ui/radio-group"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { IconPlus, IconRefresh } from "@tabler/icons-react"
-import {
-  Callout,
-  CalloutIcon,
-  CalloutTitle,
-  CalloutDescription
-} from "../ui/callout"
-import { IconAlertTriangle } from "@tabler/icons-react"
-import { CreateTool } from "../sidebar/items/tools/create-tool"
 import { ApplicationThemeSelect } from "./application-theme-select"
 
 interface UpdateApplicationProps {

@@ -1,25 +1,27 @@
 import React, {
-  useEffect,
-  useRef,
-  useState,
+  useCallback,
   useContext,
+  useEffect,
   useMemo,
-  useCallback
+  useRef,
+  useState
 } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
+import { CodeBlock } from "@/types"
 import {
+  IconAlertTriangle,
   IconClick,
-  IconX,
   IconTerminal2,
-  IconAlertTriangle
+  IconX
 } from "@tabler/icons-react"
+
+import { MessageHtmlElement } from "@/types/html"
+import { updateHtml } from "@/lib/code-viewer"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { MessageHtmlElement } from "@/types/html"
-import { UITheme } from "./theme-configurator"
-import { updateHtml } from "@/lib/code-viewer"
-import { CodeBlock } from "@/types"
-import { ChatbotUIChatContext } from "@/context/chat"
+
 import { ButtonWithTooltip } from "../ui/button-with-tooltip"
+import { UITheme } from "./theme-configurator"
 
 interface PreviewProps2 {
   codeBlock: CodeBlock

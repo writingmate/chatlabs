@@ -1,13 +1,15 @@
-import { BaseTool } from "../common/BaseTool"
-import { ToolFunction } from "@/types/platformTools"
+import html2md from "html-to-md"
+
 import {
   GetYoutubeCaptionsResult,
   GoogleSearchResult,
-  PlatformTool
+  PlatformTool,
+  ToolFunction
 } from "@/types/platformTools"
-import html2md from "html-to-md"
-import { getSubtitles } from "@/lib/youtube"
 import { logger } from "@/lib/logger"
+import { getSubtitles } from "@/lib/youtube"
+
+import { BaseTool } from "../common/BaseTool"
 
 // This is a helper function that fetches data from a URL and returns it.
 const fetchAndReturn = async (url: string) => {

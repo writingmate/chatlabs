@@ -1,11 +1,12 @@
-import { Annotation, Annotation2 } from "@/types/annotation"
-import Image from "next/image"
-import { FilePreview } from "@/components/ui/file-preview"
 import { useState } from "react"
-import { cn } from "@/lib/utils"
+import Image from "next/image"
 import { IconDownload } from "@tabler/icons-react"
-import Loading from "@/components/ui/loading"
+
+import { Annotation, Annotation2 } from "@/types/annotation"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { FilePreview } from "@/components/ui/file-preview"
+import Loading from "@/components/ui/loading"
 
 export default function AnnotationImage({
   annotation

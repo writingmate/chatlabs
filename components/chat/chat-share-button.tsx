@@ -1,18 +1,24 @@
-import React, { useState, useEffect, useContext } from "react"
-import { Button } from "@/components/ui/button"
+import React, { useContext, useEffect, useState } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
+import { ChatbotUIContext } from "@/context/context"
+import { updateChat } from "@/db/chats"
+import { getMessagesByChatId } from "@/db/messages"
 import {
-  IconShare,
-  IconX,
-  IconCopy,
-  IconLink,
-  IconBrandLinkedin,
   IconBrandFacebook,
+  IconBrandLinkedin,
   IconBrandReddit,
   IconBrandX,
-  IconShare2
+  IconCopy,
+  IconLink,
+  IconShare,
+  IconShare2,
+  IconX
 } from "@tabler/icons-react"
+import { toast } from "sonner"
+
 import { supabase } from "@/lib/supabase/browser-client"
-import { ChatbotUIContext } from "@/context/context"
+import { Button } from "@/components/ui/button"
+import { CopyButton } from "@/components/ui/copy-button"
 import {
   Dialog,
   DialogContent,
@@ -21,11 +27,6 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { ChatbotUIChatContext } from "@/context/chat"
-import { updateChat } from "@/db/chats"
-import { CopyButton } from "@/components/ui/copy-button"
-import { toast } from "sonner"
-import { getMessagesByChatId } from "@/db/messages"
 
 export const ShareChatButton: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)

@@ -1,10 +1,14 @@
 "use client"
-import { ChatbotUIContext } from "@/context/context"
-import { IconCheck, IconCircleCheck } from "@tabler/icons-react"
+
 import { FC, ReactNode, useContext } from "react"
-import { Dialog, DialogContent, DialogTitle } from "../ui/dialog"
-import Plans from "@/components/upgrade/plans"
+import { ChatbotUIContext } from "@/context/context"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+import { IconCheck, IconCircleCheck } from "@tabler/icons-react"
+
+import Plans from "@/components/upgrade/plans"
+
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog"
+
 interface PlanPickerProps {}
 
 export function PlanFeature({

@@ -1,17 +1,19 @@
+import { FC, useContext, useEffect, useRef, useState } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { createChat } from "@/db/chats"
-import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, LLMID } from "@/types"
 import { useRouter } from "nextjs-toploader/app"
-import { FC, useContext, useEffect, useRef, useState } from "react"
-import { SidebarUpdateItem } from "./sidebar-update-item"
-import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
+
 import {
   validatePlanForAssistant,
   validatePlanForTools
 } from "@/lib/subscription"
-import { ChatbotUIChatContext } from "@/context/chat"
+import { cn } from "@/lib/utils"
+import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
+
+import { SidebarUpdateItem } from "./sidebar-update-item"
 
 interface SidebarItemProps {
   item: DataItemType

@@ -1,13 +1,15 @@
-import OpenAI from "openai"
-import { AnthropicStream, experimental_StreamData, OpenAIStream } from "ai"
 import Anthropic from "@anthropic-ai/sdk"
-import ChatCompletionMessage = OpenAI.Chat.Completions.ChatCompletionMessage
+// @ts-ignore
+import { TextBlock, ToolUseBlock } from "@anthropic-ai/sdk/resources"
+import { AnthropicStream, experimental_StreamData, OpenAIStream } from "ai"
+import OpenAI from "openai"
+
 import {
   FindFunctionCallsStreamParams,
   FunctionCaller
 } from "@/types/function-callers"
-// @ts-ignore
-import { TextBlock, ToolUseBlock } from "@anthropic-ai/sdk/resources"
+
+import ChatCompletionMessage = OpenAI.Chat.Completions.ChatCompletionMessage
 
 export class OpenAIFunctionCaller implements FunctionCaller {
   constructor(

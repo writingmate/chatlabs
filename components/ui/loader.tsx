@@ -1,8 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { IconLoader2 } from "@tabler/icons-react"
-import { FC } from "react"
 
 const messages = [
   "Training my neural networks...",

@@ -1,15 +1,16 @@
 "use client"
 
-import React, { useState, useContext, useCallback } from "react"
-import { Tables, TablesInsert } from "@/supabase/types"
-import { LLMID } from "@/types"
+import React, { useCallback, useContext, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { createApplication } from "@/db/applications"
-import { UpdateApplication } from "./update-application"
-import { toast } from "sonner"
-import { Button } from "../ui/button"
-import { useRouter } from "nextjs-toploader/app"
+import { Tables, TablesInsert } from "@/supabase/types"
+import { LLMID } from "@/types"
 import { IconPlus } from "@tabler/icons-react"
+import { useRouter } from "nextjs-toploader/app"
+import { toast } from "sonner"
+
+import { Button } from "../ui/button"
+import { UpdateApplication } from "./update-application"
 
 export const CreateApplicationPage: React.FC = () => {
   const { profile, selectedWorkspace } = useContext(ChatbotUIContext)

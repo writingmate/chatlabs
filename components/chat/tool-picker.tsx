@@ -1,12 +1,14 @@
+import { FC, useContext, useEffect, useRef } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { IconBolt, IconPuzzle } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef } from "react"
-import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
-import { validatePlanForTools } from "@/lib/subscription"
 import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
+
 import { LLM_LIST, LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
-import { ChatbotUIChatContext } from "@/context/chat"
+import { validatePlanForTools } from "@/lib/subscription"
+
+import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 
 interface ToolPickerProps {}
 

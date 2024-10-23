@@ -1,9 +1,11 @@
-import { cn } from "@/lib/utils"
+import { FC } from "react"
+import Image from "next/image"
 import { Tables } from "@/supabase/types"
 import { ChatFile, MessageImage } from "@/types"
 import { IconFileFilled } from "@tabler/icons-react"
-import Image from "next/image"
-import { FC } from "react"
+
+import { cn } from "@/lib/utils"
+
 import { DrawingCanvas } from "../utility/drawing-canvas"
 import { Dialog, DialogContent } from "./dialog"
 

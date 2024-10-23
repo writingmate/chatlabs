@@ -1,4 +1,5 @@
 import { FC } from "react"
+
 import { ApplicationView } from "@/components/applications/application-view"
 
 const ApplicationsPage: FC = () => {

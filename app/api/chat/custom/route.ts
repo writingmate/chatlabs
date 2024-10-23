@@ -1,10 +1,11 @@
+import { ServerRuntime } from "next"
 import { Database } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import { createClient } from "@supabase/supabase-js"
 import { OpenAIStream, StreamingTextResponse } from "ai"
-import { ServerRuntime } from "next"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
+
 import { validateModelAndMessageCount } from "@/lib/server/server-chat-helpers"
 
 export const runtime: ServerRuntime = "edge"

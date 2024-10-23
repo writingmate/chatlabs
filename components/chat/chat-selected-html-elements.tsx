@@ -1,7 +1,8 @@
-import { ChatbotUIChatContext } from "@/context/chat"
 import { useContext } from "react"
-import { Badge } from "@/components/ui/badge"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { IconX } from "@tabler/icons-react"
+
+import { Badge } from "@/components/ui/badge"
 
 export function ChatSelectedHtmlElements() {
   const { selectedHtmlElements, setSelectedHtmlElements } =

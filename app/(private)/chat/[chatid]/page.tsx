@@ -1,12 +1,13 @@
 "use client"
 
-import { ChatUI } from "@/components/chat/chat-ui"
-import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
 import { useContext, useEffect } from "react"
-import { ChatbotUIChatContext } from "@/context/chat"
 import { notFound, useParams } from "next/navigation"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
+
 import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
+import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
+import { ChatUI } from "@/components/chat/chat-ui"
 
 export default function ChatIDPage() {
   const { chatMessages, isGenerating } = useContext(ChatbotUIChatContext)

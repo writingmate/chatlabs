@@ -1,6 +1,7 @@
+import { FC, useContext, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { IconAdjustmentsHorizontal } from "@tabler/icons-react"
-import { FC, useContext, useState } from "react"
+
 import { Button } from "../ui/button"
 import {
   Dialog,

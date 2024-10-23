@@ -1,8 +1,9 @@
-import { Label } from "@/components/ui/label"
+import { useEffect, useState } from "react"
 import { IconTrash } from "@tabler/icons-react"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState, useEffect } from "react"
+import { Label } from "@/components/ui/label"
 
 const MAX_CONVERSATION_STARTERS = 10
 

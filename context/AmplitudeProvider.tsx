@@ -1,15 +1,15 @@
 "use client"
 
-import * as amplitude from "@amplitude/analytics-browser"
-import { Experiment, ExperimentClient } from "@amplitude/experiment-js-client"
 import {
   createContext,
+  ReactNode,
   useContext,
   useEffect,
-  useState,
-  ReactNode
+  useState
 } from "react"
 import { useAuth } from "@/context/auth"
+import * as amplitude from "@amplitude/analytics-browser"
+import { Experiment, ExperimentClient } from "@amplitude/experiment-js-client"
 
 interface AmplitudeContextType {
   amplitude: typeof amplitude

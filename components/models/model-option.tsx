@@ -1,6 +1,5 @@
-import { LLM, OpenRouterLLM } from "@/types"
 import { FC } from "react"
-import { ModelIcon } from "./model-icon"
+import { LLM, OpenRouterLLM } from "@/types"
 import {
   IconBrain,
   IconCheck,
@@ -10,12 +9,15 @@ import {
   IconPuzzle,
   IconTools
 } from "@tabler/icons-react"
-import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
-import { WithTooltip } from "@/components/ui/with-tooltip"
-import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
-import { Badge } from "@/components/ui/badge"
+
+import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { PLAN_FREE } from "@/lib/stripe/config"
+import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import { WithTooltip } from "@/components/ui/with-tooltip"
+
+import { ModelIcon } from "./model-icon"
 
 interface ModelOptionProps {
   model: LLM | OpenRouterLLM

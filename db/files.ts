@@ -1,6 +1,8 @@
-import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
 import mammoth from "mammoth"
+
+import { supabase } from "@/lib/supabase/browser-client"
+
 import { uploadFile } from "./storage/files"
 
 export const getFileById = async (fileId: string, client = supabase) => {

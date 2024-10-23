@@ -1,7 +1,8 @@
-import { Card } from "@/components/ui/card"
-import Image from "next/image"
-import { Annotation, Annotation2 } from "@/types/annotation"
 import { useState } from "react"
+import Image from "next/image"
+
+import { Annotation, Annotation2 } from "@/types/annotation"
+import { Card } from "@/components/ui/card"
 
 export function WebSearch({
   annotation

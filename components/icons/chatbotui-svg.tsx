@@ -1,5 +1,6 @@
 import { FC } from "react"
 import Image from "next/image"
+
 interface ChatbotUISVGProps {
   theme?: "dark" | "light"
   size: number

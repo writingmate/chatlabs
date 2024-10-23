@@ -1,4 +1,12 @@
+import { NextResponse } from "next/server"
+import { Database } from "@/supabase/types"
+import { FileItemChunk } from "@/types"
+import { createClient } from "@supabase/supabase-js"
+import OpenAI from "openai"
+
+import { guessFileExtensionByContentType } from "@/lib/content-type"
 import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
+import { createErrorResponse } from "@/lib/response"
 import {
   processCSV,
   processJSON,
@@ -7,13 +15,6 @@ import {
   processTxt
 } from "@/lib/retrieval/processing"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
-import { Database } from "@/supabase/types"
-import { FileItemChunk } from "@/types"
-import { createClient } from "@supabase/supabase-js"
-import { NextResponse } from "next/server"
-import OpenAI from "openai"
-import { createErrorResponse } from "@/lib/response"
-import { guessFileExtensionByContentType } from "@/lib/content-type"
 
 const maxDuration = 300
 export async function POST(req: Request) {

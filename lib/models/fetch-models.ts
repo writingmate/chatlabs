@@ -1,11 +1,11 @@
 import { Tables } from "@/supabase/types"
 import { LLM, LLMID, ModelProvider, OpenRouterLLM } from "@/types"
 import { toast } from "sonner"
-import { LLM_LIST_MAP } from "./llm/llm-list"
-import { CATEGORIES } from "./categories"
-import { PLAN_FREE } from "../stripe/config"
-import { PLAN_PRO, PLAN_ULTIMATE } from "../stripe/config"
 import { number } from "zod"
+
+import { PLAN_FREE, PLAN_PRO, PLAN_ULTIMATE } from "../stripe/config"
+import { CATEGORIES } from "./categories"
+import { LLM_LIST_MAP } from "./llm/llm-list"
 
 const KNOWN_MODEL_NAMES: {
   [key: string]: Partial<LLM>

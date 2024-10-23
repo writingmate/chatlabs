@@ -1,3 +1,13 @@
+import { useEffect, useState } from "react"
+import Link from "next/link"
+import { createApplicationFiles } from "@/db/applications"
+import { createFile } from "@/db/files"
+import { CodeBlock } from "@/types"
+import { IconExternalLink, IconShare3, IconWorld } from "@tabler/icons-react"
+import { toast } from "sonner"
+
+import { Button } from "@/components/ui/button"
+import { CopyButton } from "@/components/ui/copy-button"
 import {
   Dialog,
   DialogContent,
@@ -6,16 +16,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
-import { createFile } from "@/db/files"
-import { IconExternalLink, IconShare3, IconWorld } from "@tabler/icons-react"
-import Link from "next/link"
-
-import { CopyButton } from "@/components/ui/copy-button"
-import { CodeBlock } from "@/types"
-import { createApplicationFiles } from "@/db/applications"
 
 interface MessageSharingDialogProps {
   user: any

@@ -1,53 +1,55 @@
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react"
 import { ChatbotUIContext } from "@/context/context"
+import { getMostRecentModels } from "@/db/models"
+import { Tables } from "@/supabase/types"
 import { LLM, LLMID, ModelProvider } from "@/types"
 import {
   IconCheck,
   IconChevronDown,
+  IconFilter,
+  IconFilterOff,
   IconKey,
   IconSquarePlus,
-  IconX,
-  IconFilter,
-  IconFilterOff
+  IconX
 } from "@tabler/icons-react"
-import {
-  FC,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-  useCallback
-} from "react"
+import ReactMarkdown from "react-markdown"
+
+import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
+import { CATEGORIES } from "@/lib/models/categories"
+import { validatePlanForModel } from "@/lib/subscription"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuSubContent2,
-  DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuItem,
   DropdownMenuCheckboxItem,
-  DropdownMenuSeparator
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubContent2,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
-import { ModelIcon } from "./model-icon"
-import { ModelOption } from "./model-option"
-import { getMostRecentModels } from "@/db/models"
-import { Tables } from "@/supabase/types"
 import { Separator } from "@/components/ui/separator"
+import { ModelDetails } from "@/components/models/model-details"
 import {
   DEFAULT_MODEL_VISIBILITY,
   ModelSettings
 } from "@/components/models/model-settings"
-import { validatePlanForModel } from "@/lib/subscription"
-import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
-import { cn } from "@/lib/utils"
-import ReactMarkdown from "react-markdown"
-import { ModelDetails } from "@/components/models/model-details"
-import { CATEGORIES } from "@/lib/models/categories"
+
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
+import { ModelIcon } from "./model-icon"
+import { ModelOption } from "./model-option"
 
 interface ModelSelectProps {
   selectedModelId: string

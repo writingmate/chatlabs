@@ -1,22 +1,24 @@
 "use client"
 
-import { Brand } from "@/components/ui/brand"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import { useRouter } from "nextjs-toploader/app"
-import { supabase } from "@/lib/supabase/browser-client"
-import { GoogleSVG } from "@/components/icons/google-svg"
-import { useState, useEffect } from "react"
-import { useTheme } from "next-themes"
-import { Input } from "@/components/ui/input"
 import { IconMail } from "@tabler/icons-react"
-import { Separator } from "@/components/ui/separator"
-import { toast } from "sonner"
-import { Description } from "../ui/description"
-import { cn } from "@/lib/utils"
 // @ts-ignore
 import disposableEmail from "disposable-email"
+import { useTheme } from "next-themes"
+import { useRouter } from "nextjs-toploader/app"
+import { toast } from "sonner"
+
 import { DISPOSABLE_EMAILS } from "@/lib/disposable-emails"
+import { supabase } from "@/lib/supabase/browser-client"
+import { cn } from "@/lib/utils"
+import { Brand } from "@/components/ui/brand"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
+import { GoogleSVG } from "@/components/icons/google-svg"
+
+import { Description } from "../ui/description"
 
 export default function LoginForm({
   redirectTo,

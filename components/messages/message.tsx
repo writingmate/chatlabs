@@ -1,20 +1,5 @@
 "use client"
-import { ChatbotUIContext } from "@/context/context"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { cn } from "@/lib/utils"
-import { Tables } from "@/supabase/types"
-import { CodeBlock, LLM, LLMID, MessageImage, ModelProvider } from "@/types"
-import {
-  IconApi,
-  IconCaretDownFilled,
-  IconCaretRightFilled,
-  IconCircleFilled,
-  IconFileText,
-  IconMoodSmile,
-  IconPuzzle,
-  IconBulb
-} from "@tabler/icons-react"
-import Image from "next/image"
+
 import {
   FC,
   useCallback,
@@ -24,6 +9,42 @@ import {
   useRef,
   useState
 } from "react"
+import Image from "next/image"
+import { ChatbotUIContext } from "@/context/context"
+import { getMessageImageFromStorage } from "@/db/storage/message-images"
+import { Tables } from "@/supabase/types"
+import { CodeBlock, LLM, LLMID, MessageImage, ModelProvider } from "@/types"
+import {
+  IconApi,
+  IconBulb,
+  IconCaretDownFilled,
+  IconCaretRightFilled,
+  IconCircleFilled,
+  IconFileText,
+  IconMoodSmile,
+  IconPuzzle
+} from "@tabler/icons-react"
+import { toast } from "sonner"
+
+import { Annotation, Annotation2 } from "@/types/annotation"
+import { CodeBlock as ChatMessageCodeBlock } from "@/types/chat-message"
+import {
+  reconstructContentWithCodeBlocks,
+  reconstructContentWithCodeBlocksInChatMessage
+} from "@/lib/messages"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { cn } from "@/lib/utils"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import AnnotationImage from "@/components/messages/annotations/image"
+import { SelectedHtmlElements } from "@/components/messages/annotations/selectedHtmlElements"
+import {
+  ResponseTime,
+  ToolCalls
+} from "@/components/messages/annotations/toolCalls"
+import { WebSearch } from "@/components/messages/annotations/websearch"
+import { YouTube } from "@/components/messages/annotations/youtube"
+import { LoadingMessage } from "@/components/messages/message-loading"
+
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
 import { FileIcon } from "../ui/file-icon"
@@ -32,24 +53,6 @@ import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { MessageActions } from "./message-actions"
 import { MessageMarkdown } from "./message-markdown"
-import { YouTube } from "@/components/messages/annotations/youtube"
-import { WebSearch } from "@/components/messages/annotations/websearch"
-import AnnotationImage from "@/components/messages/annotations/image"
-import { Annotation, Annotation2 } from "@/types/annotation"
-import { AssistantIcon } from "@/components/assistants/assistant-icon"
-import { toast } from "sonner"
-import { LoadingMessage } from "@/components/messages/message-loading"
-import { CodeBlock as ChatMessageCodeBlock } from "@/types/chat-message"
-import {
-  ResponseTime,
-  ToolCalls
-} from "@/components/messages/annotations/toolCalls"
-import { SelectedHtmlElements } from "@/components/messages/annotations/selectedHtmlElements"
-import {
-  reconstructContentWithCodeBlocks,
-  reconstructContentWithCodeBlocksInChatMessage
-} from "@/lib/messages"
-import { getMessageImageFromStorage } from "@/db/storage/message-images"
 
 const ICON_SIZE = 32
 

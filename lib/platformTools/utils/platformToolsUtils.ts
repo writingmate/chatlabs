@@ -1,6 +1,9 @@
-import { PlatformTool } from "@/types/platformTools"
-import { platformToolList } from "../platformToolsList"
 import { Tables } from "@/supabase/types"
+
+import { PlatformTool } from "@/types/platformTools"
+
+import { platformToolList } from "../platformToolsList"
+
 const generateToolSchema = (tool: any) => {
   const paths = tool.toolsFunctions.reduce((acc: any, toolFunction: any) => {
     let responses = {}

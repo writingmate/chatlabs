@@ -1,4 +1,5 @@
 import { LLM } from "@/types"
+
 import { CATEGORIES } from "../categories"
 
 const MISTRAL_PLATORM_LINK = "https://docs.mistral.ai/"

@@ -1,14 +1,4 @@
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger
-} from "@/components/ui/sheet"
-import { AssignWorkspaces } from "@/components/workspace/assign-workspaces"
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import {
   createAssistantCollection,
@@ -77,15 +67,27 @@ import {
   getToolWorkspacesByToolId,
   updateTool
 } from "@/db/tools"
-import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { Tables, TablesUpdate } from "@/supabase/types"
 import { CollectionFile, ContentType, DataItemType } from "@/types"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { IconEdit, IconTrash } from "@tabler/icons-react"
 import profile from "react-syntax-highlighter/dist/esm/languages/hljs/profile"
 import { toast } from "sonner"
-import { SidebarDeleteItem } from "./sidebar-delete-item"
+
+import { convertBlobToBase64 } from "@/lib/blob-to-b64"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from "@/components/ui/sheet"
 import { WithTooltip } from "@/components/ui/with-tooltip"
-import { IconEdit, IconTrash } from "@tabler/icons-react"
+import { AssignWorkspaces } from "@/components/workspace/assign-workspaces"
+
+import { SidebarDeleteItem } from "./sidebar-delete-item"
 
 interface SidebarUpdateItemProps {
   isTyping: boolean

@@ -1,11 +1,12 @@
+import { ChatSettings } from "@/types"
+import { OpenAIStream, StreamingTextResponse } from "ai"
+import OpenAI from "openai"
+
 import {
   checkApiKey,
   getServerProfile,
   validateModelAndMessageCount
 } from "@/lib/server/server-chat-helpers"
-import { ChatSettings } from "@/types"
-import { OpenAIStream, StreamingTextResponse } from "ai"
-import OpenAI from "openai"
 
 export const runtime = "edge"
 

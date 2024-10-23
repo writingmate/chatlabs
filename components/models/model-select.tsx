@@ -1,7 +1,10 @@
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { LLM, LLMID, ModelProvider } from "@/types"
 import { IconCheck, IconChevronDown } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+
+import { validatePlanForModel } from "@/lib/subscription"
+
 import { Button } from "../ui/button"
 import {
   DropdownMenu,
@@ -12,7 +15,6 @@ import { Input } from "../ui/input"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { ModelIcon } from "./model-icon"
 import { ModelOption } from "./model-option"
-import { validatePlanForModel } from "@/lib/subscription"
 
 interface ModelSelectProps {
   selectedModelId: string

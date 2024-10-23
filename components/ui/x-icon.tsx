@@ -1,7 +1,8 @@
-import { IconX } from "@tabler/icons-react"
 import { forwardRef } from "react"
-import { Table } from "@/components/ui/table"
+import { IconX } from "@tabler/icons-react"
+
 import { cn } from "@/lib/utils"
+import { Table } from "@/components/ui/table"
 
 const XIcon = forwardRef<SVGSVGElement, React.HTMLAttributes<SVGSVGElement>>(
   ({ className, ...props }, ref) => (

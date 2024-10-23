@@ -1,33 +1,34 @@
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import {
-  IconX,
-  IconSparkles,
-  IconKey,
-  IconRobot,
-  IconLayout2,
-  IconBooks,
-  IconFileDescription,
-  IconCircleDashed,
-  IconGlobe,
-  IconPhoto,
-  IconShield
-} from "@tabler/icons-react"
-import { Button } from "@/components/ui/button"
-import { PlanFeature } from "@/components/upgrade/plan-picker"
-import { useContext, useState, useRef, useEffect, useCallback } from "react"
-import { ChatbotUIContext } from "@/context/context"
-import { supabase } from "@/lib/supabase/browser-client"
+import { useCallback, useContext, useEffect, useRef, useState } from "react"
 import { createCheckoutSession } from "@/actions/stripe"
+import { ChatbotUIContext } from "@/context/context"
+import {
+  IconBooks,
+  IconCircleDashed,
+  IconFileDescription,
+  IconGlobe,
+  IconKey,
+  IconLayout2,
+  IconPhoto,
+  IconRobot,
+  IconShield,
+  IconSparkles,
+  IconX
+} from "@tabler/icons-react"
+import { AnimatePresence, motion } from "framer-motion"
+import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react"
+import { toast } from "sonner"
+
+import { supabase } from "@/lib/supabase/browser-client"
+import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger
 } from "@/components/ui/collapsible"
-import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { motion, AnimatePresence } from "framer-motion"
-import { toast } from "sonner"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { PlanFeature } from "@/components/upgrade/plan-picker"
 
 const BYOK_PLAN_PREFIX = "byok"
 const PRO_PLAN_PREFIX = "pro"

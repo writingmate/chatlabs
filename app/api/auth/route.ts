@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
 
 export const runtime = "edge"

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { LLM, LLMID, ModelProvider, OpenRouterLLM } from "@/types"
+
+import { logger } from "@/lib/logger"
 import { CATEGORIES } from "@/lib/models/categories"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { logger } from "@/lib/logger"
 
 const KNOWN_MODEL_NAMES: {
   [key: string]: Partial<LLM>

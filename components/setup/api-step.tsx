@@ -1,6 +1,8 @@
+import { FC } from "react"
+
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FC } from "react"
+
 import { Button } from "../ui/button"
 
 interface APIStepProps {

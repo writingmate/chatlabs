@@ -1,7 +1,8 @@
+import { FC, useContext } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
-import { IconPuzzle, IconCircleCheckFilled } from "@tabler/icons-react"
-import { FC, useContext } from "react"
+import { IconCircleCheckFilled, IconPuzzle } from "@tabler/icons-react"
+
 import { MultiSelect } from "@/components/ui/multi-select"
 
 interface AssistantToolSelectProps {

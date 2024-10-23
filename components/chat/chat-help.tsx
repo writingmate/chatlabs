@@ -1,12 +1,14 @@
-import useHotkey from "@/lib/hooks/use-hotkey"
+import { FC, useState } from "react"
+import Link from "next/link"
 import {
   IconBrandGithub,
   IconBrandX,
   IconHelpCircle,
   IconQuestionMark
 } from "@tabler/icons-react"
-import Link from "next/link"
-import { FC, useState } from "react"
+
+import useHotkey from "@/lib/hooks/use-hotkey"
+
 import {
   DropdownMenu,
   DropdownMenuContent,

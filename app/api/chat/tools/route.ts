@@ -1,3 +1,11 @@
+import { Tables } from "@/supabase/types"
+import { ChatSettings } from "@/types"
+import Anthropic from "@anthropic-ai/sdk"
+import { experimental_StreamData, StreamingTextResponse } from "ai"
+import OpenAI from "openai"
+import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
+
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { openapiToFunctions } from "@/lib/openapi-conversion"
 import {
   platformToolDefinitions,
@@ -8,13 +16,6 @@ import {
   getServerProfile,
   validateModelAndMessageCount
 } from "@/lib/server/server-chat-helpers"
-import { Tables } from "@/supabase/types"
-import { ChatSettings } from "@/types"
-import { experimental_StreamData, StreamingTextResponse } from "ai"
-import OpenAI from "openai"
-import Anthropic from "@anthropic-ai/sdk"
-import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import {
   AnthropicFunctionCaller,
   GroqFunctionCaller,

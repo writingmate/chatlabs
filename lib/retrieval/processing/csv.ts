@@ -2,6 +2,7 @@ import { FileItemChunk } from "@/types"
 import { encode } from "gpt-tokenizer"
 import { CSVLoader } from "langchain/document_loaders/fs/csv"
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
+
 import { CHUNK_OVERLAP, CHUNK_SIZE } from "."
 
 export const processCSV = async (csv: Blob): Promise<FileItemChunk[]> => {

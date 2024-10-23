@@ -1,3 +1,4 @@
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { WORKSPACE_INSTRUCTIONS_MAX } from "@/db/limits"
 import {
@@ -5,11 +6,12 @@ import {
   uploadWorkspaceImage
 } from "@/db/storage/workspace-images"
 import { updateWorkspace } from "@/db/workspaces"
-import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { LLMID } from "@/types"
 import { IconHome, IconSettings } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
+
+import { convertBlobToBase64 } from "@/lib/blob-to-b64"
+
 import { Button } from "../ui/button"
 import { ChatSettingsForm } from "../ui/chat-settings-form"
 import ImagePicker from "../ui/image-picker"

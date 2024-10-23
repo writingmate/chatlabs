@@ -1,6 +1,6 @@
 import {
-  ImageGenerationUserSettings,
-  BaseImageGenerator
+  BaseImageGenerator,
+  ImageGenerationUserSettings
 } from "../common/BaseImageGenerator"
 
 class Flux1ProGenerator extends BaseImageGenerator {

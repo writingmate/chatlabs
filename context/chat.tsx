@@ -1,16 +1,18 @@
 "use client"
+
+import {
+  createContext,
+  Dispatch,
+  FC,
+  SetStateAction,
+  useEffect,
+  useState
+} from "react"
+import { userInputAtom } from "@/atoms/chatAtoms"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatSettings } from "@/types"
-import {
-  Dispatch,
-  SetStateAction,
-  createContext,
-  FC,
-  useState,
-  useEffect
-} from "react"
+
 import { MessageHtmlElement } from "@/types/html"
-import { userInputAtom } from "@/atoms/chatAtoms"
 
 interface ChatbotUIChatContext {
   // PASSIVE CHAT STORE
