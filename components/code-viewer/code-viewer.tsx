@@ -51,7 +51,7 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   onCodeChange
 }) => {
   const { user } = useAuth()
-  const { selectedWorkspace, profile, selectedAssistant } =
+  const { selectedWorkspace, profile, selectedAssistant, selectedChat } =
     useContext(ChatbotUIContext)
   const { setSelectedHtmlElements, chatSettings, chatMessages } =
     useContext(ChatbotUIChatContext)
@@ -200,6 +200,7 @@ Please fix the error`,
           )}
         </div>
         <MessageSharingDialog
+          chatId={selectedChat?.id}
           open={sharing}
           setOpen={setSharing}
           user={user}

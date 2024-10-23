@@ -204,6 +204,7 @@ export type Database = {
           id: string
           name: string
           sharing: string
+          subdomain: string | null
           theme: string
           updated_at: string | null
           user_id: string
@@ -218,6 +219,7 @@ export type Database = {
           id?: string
           name: string
           sharing?: string
+          subdomain?: string | null
           theme: string
           updated_at?: string | null
           user_id: string
@@ -232,6 +234,7 @@ export type Database = {
           id?: string
           name?: string
           sharing?: string
+          subdomain?: string | null
           theme?: string
           updated_at?: string | null
           user_id?: string
