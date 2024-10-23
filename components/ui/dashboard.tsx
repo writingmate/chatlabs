@@ -1,16 +1,18 @@
 "use client"
 
-import { Sidebar } from "@/components/sidebar/sidebar"
-import useHotkey from "@/lib/hooks/use-hotkey"
-import { ContentType } from "@/types"
+import { FC, useContext, useEffect, useMemo, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
+import { ChatbotUIContext } from "@/context/context"
+import { ContentType } from "@/types"
+import { useTheme } from "next-themes"
 import { useRouter } from "nextjs-toploader/app"
-import { FC, useState, useContext, useMemo, useEffect } from "react"
+
+import useHotkey from "@/lib/hooks/use-hotkey"
+import { Sidebar } from "@/components/sidebar/sidebar"
+import { PlanPicker } from "@/components/upgrade/plan-picker"
+
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
 import { CommandK } from "../utility/command-k"
-import { PlanPicker } from "@/components/upgrade/plan-picker"
-import { useTheme } from "next-themes"
-import { ChatbotUIContext } from "@/context/context"
 
 export const SIDEBAR_WIDTH = 350
 

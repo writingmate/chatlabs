@@ -1,9 +1,12 @@
-import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { FC, useContext, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { createFolder } from "@/db/folders"
 import { ContentType } from "@/types"
 import { IconFolderPlus, IconPlus } from "@tabler/icons-react"
-import { FC, useContext, useState } from "react"
+
+import { isMobileScreen } from "@/lib/mobile"
+import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+
 import { Button } from "../ui/button"
 import { CreateAssistant } from "./items/assistants/create-assistant"
 import { CreateCollection } from "./items/collections/create-collection"
@@ -12,7 +15,6 @@ import { CreateModel } from "./items/models/create-model"
 import { CreatePreset } from "./items/presets/create-preset"
 import { CreatePrompt } from "./items/prompts/create-prompt"
 import { CreateTool } from "./items/tools/create-tool"
-import { isMobileScreen } from "@/lib/mobile"
 
 interface SidebarCreateButtonsProps {
   contentType: ContentType

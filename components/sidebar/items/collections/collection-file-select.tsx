@@ -1,3 +1,8 @@
+import { FC, useContext, useEffect, useRef, useState } from "react"
+import { ChatbotUIContext } from "@/context/context"
+import { CollectionFile } from "@/types"
+import { IconChevronDown, IconCircleCheckFilled } from "@tabler/icons-react"
+
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -6,10 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { FileIcon } from "@/components/ui/file-icon"
 import { Input } from "@/components/ui/input"
-import { ChatbotUIContext } from "@/context/context"
-import { CollectionFile } from "@/types"
-import { IconChevronDown, IconCircleCheckFilled } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
 
 interface CollectionFileSelectProps {
   selectedCollectionFiles: CollectionFile[]

@@ -1,19 +1,21 @@
 "use client"
 
-import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { FC, useContext, useEffect, useState } from "react"
+import Image from "next/image"
+import { ChatbotUIContext } from "@/context/context"
+import { createWorkspace } from "@/db/workspaces"
+import { IconBuilding, IconHome, IconPlus } from "@tabler/icons-react"
+import { ChevronsUpDown } from "lucide-react"
+import { useRouter } from "nextjs-toploader/app"
+
+import useHotkey from "@/lib/hooks/use-hotkey"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover"
-import { ChatbotUIContext } from "@/context/context"
-import { createWorkspace } from "@/db/workspaces"
-import useHotkey from "@/lib/hooks/use-hotkey"
-import { IconBuilding, IconHome, IconPlus } from "@tabler/icons-react"
-import { ChevronsUpDown } from "lucide-react"
-import Image from "next/image"
-import { useRouter } from "nextjs-toploader/app"
-import { FC, useContext, useEffect, useState } from "react"
+import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 

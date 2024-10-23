@@ -1,8 +1,9 @@
 "use client"
 
-import { Dashboard } from "@/components/ui/dashboard"
 import { ReactNode, useContext, useEffect, useState } from "react"
 import { ChatbotUIChatProvider } from "@/context/chat"
+
+import { Dashboard } from "@/components/ui/dashboard"
 
 interface ChatLayoutProps {
   children: ReactNode

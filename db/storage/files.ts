@@ -1,5 +1,6 @@
-import { supabase } from "@/lib/supabase/browser-client"
 import { toast } from "sonner"
+
+import { supabase } from "@/lib/supabase/browser-client"
 
 export const uploadFile = async (
   file: any,

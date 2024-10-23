@@ -1,3 +1,9 @@
+import { FC, useContext, useRef, useState } from "react"
+import { ChatbotUIContext } from "@/context/context"
+import { updateFolder } from "@/db/folders"
+import { Tables } from "@/supabase/types"
+import { IconEdit } from "@tabler/icons-react"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -9,11 +15,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ChatbotUIContext } from "@/context/context"
-import { updateFolder } from "@/db/folders"
-import { Tables } from "@/supabase/types"
-import { IconEdit } from "@tabler/icons-react"
-import { FC, useContext, useRef, useState } from "react"
 
 interface UpdateFolderProps {
   folder: Tables<"folders">

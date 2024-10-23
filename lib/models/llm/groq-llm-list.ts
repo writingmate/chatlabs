@@ -1,4 +1,5 @@
 import { LLM } from "@/types"
+
 import { CATEGORIES } from "../categories"
 
 const GROQ_PLATORM_LINK = "https://groq.com/"

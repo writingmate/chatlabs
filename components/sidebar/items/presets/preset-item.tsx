@@ -1,11 +1,13 @@
-import { ModelIcon } from "@/components/models/model-icon"
+import { FC, useState } from "react"
+import { PRESET_NAME_MAX } from "@/db/limits"
+import { Tables } from "@/supabase/types"
+
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { ChatSettingsForm } from "@/components/ui/chat-settings-form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { PRESET_NAME_MAX } from "@/db/limits"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { Tables } from "@/supabase/types"
-import { FC, useState } from "react"
+import { ModelIcon } from "@/components/models/model-icon"
+
 import { SidebarItem } from "../all/sidebar-display-item"
 
 interface PresetItemProps {

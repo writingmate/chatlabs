@@ -1,4 +1,9 @@
-import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { FC, useContext, useRef, useState } from "react"
+import { ChatbotUIContext } from "@/context/context"
+import { deleteWorkspace } from "@/db/workspaces"
+import { Tables } from "@/supabase/types"
+import { useRouter } from "nextjs-toploader/app"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -9,12 +14,9 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { ChatbotUIContext } from "@/context/context"
-import { deleteWorkspace } from "@/db/workspaces"
-import { Tables } from "@/supabase/types"
-import { FC, useContext, useRef, useState } from "react"
+import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+
 import { Input } from "../ui/input"
-import { useRouter } from "nextjs-toploader/app"
 
 interface DeleteWorkspaceProps {
   workspace: Tables<"workspaces">

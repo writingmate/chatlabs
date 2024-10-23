@@ -1,13 +1,15 @@
 "use client"
-import { Button } from "@/components/ui/button"
-import { useRouter } from "nextjs-toploader/app"
+
 import { useContext, useEffect, useState } from "react"
-import { ChatbotUIContext } from "@/context/context"
-import confetti from "canvas-confetti"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { upsertUserQuestion } from "@/db/user_questions"
 import Image from "next/image"
+import { ChatbotUIContext } from "@/context/context"
+import { upsertUserQuestion } from "@/db/user_questions"
+import confetti from "canvas-confetti"
+import { useRouter } from "nextjs-toploader/app"
+
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 
 export default function SubscriptionSuccessPage() {
   const { profile } = useContext(ChatbotUIContext)

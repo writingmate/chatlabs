@@ -1,8 +1,9 @@
-import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 import OpenAI from "openai"
+
+import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
+import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 
 export async function POST(request: Request) {
   const json = await request.json()

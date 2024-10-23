@@ -1,4 +1,5 @@
 import { LLM } from "@/types"
+
 import { CATEGORIES } from "../categories"
 
 const ANTHROPIC_PLATFORM_LINK =

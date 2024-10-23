@@ -1,7 +1,9 @@
-import { supabase } from "@/lib/supabase/browser-client"
 import { Database, Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
 import { LLM, LLMID } from "@/types"
 import { SupabaseClient } from "@supabase/supabase-js"
+
+import { supabase } from "@/lib/supabase/browser-client"
+
 import { getPlatformTools, platformToolDefinitionById } from "./platform-tools"
 
 export const getFileByAppSlug = async (appSlug: string) => {

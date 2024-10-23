@@ -1,9 +1,11 @@
-import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { FC, useContext } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { IconInfoCircle, IconMessagePlus } from "@tabler/icons-react"
-import { FC, useContext } from "react"
+
+import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+
 import { WithTooltip } from "../ui/with-tooltip"
-import { ChatbotUIChatContext } from "@/context/chat"
 
 interface ChatSecondaryButtonsProps {}
 

@@ -1,11 +1,12 @@
-import { NextRequest, NextResponse } from "next/server"
-import { copyFileAndFileItems, getFileByHashId } from "@/db/files"
-import { createChat } from "@/db/chats"
-import { getServerProfile } from "@/lib/server/server-chat-helpers"
-import { getHomeWorkspaceByUserId, getWorkspaceById } from "@/db/workspaces"
 import { cookies } from "next/headers"
-import { createClient } from "@/lib/supabase/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createChatFiles } from "@/db/chat-files"
+import { createChat } from "@/db/chats"
+import { copyFileAndFileItems, getFileByHashId } from "@/db/files"
+import { getHomeWorkspaceByUserId, getWorkspaceById } from "@/db/workspaces"
+
+import { getServerProfile } from "@/lib/server/server-chat-helpers"
+import { createClient } from "@/lib/supabase/server"
 
 export async function POST(
   request: NextRequest,

@@ -1,5 +1,5 @@
-import { ChatMessage, CodeBlock } from "@/types"
 import { Tables } from "@/supabase/types"
+import { ChatMessage, CodeBlock } from "@/types"
 
 export const parseCodeBlocksAndContent = (
   content: string,

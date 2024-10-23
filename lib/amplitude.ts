@@ -1,7 +1,7 @@
 "use client"
 
-import { useAmplitude } from "@/context/AmplitudeProvider"
 import { useEffect, useState } from "react"
+import { useAmplitude } from "@/context/AmplitudeProvider"
 
 export function useFeatureFlag(
   flagName: string,

@@ -1,8 +1,11 @@
+import { FC, useContext } from "react"
+import { ChatbotUIContext } from "@/context/context"
 import { ContentType } from "@/types"
 import {
   IconAdjustmentsHorizontal,
   IconBolt,
   IconBooks,
+  IconBulb,
   IconDiamond,
   IconDiamondFilled,
   IconFile,
@@ -12,18 +15,17 @@ import {
   IconPencil,
   IconPuzzle,
   IconRobotFace,
-  IconSparkles,
-  IconBulb
+  IconSparkles
 } from "@tabler/icons-react"
-import { FC, useContext } from "react"
+import { useRouter } from "nextjs-toploader/app"
+
+import { PLAN_FREE } from "@/lib/stripe/config"
+import { Button } from "@/components/ui/button"
+
 import { TabsList, TabsTrigger } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "../utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
-import { ChatbotUIContext } from "@/context/context"
-import { Button } from "@/components/ui/button"
-import { useRouter } from "nextjs-toploader/app"
-import { PLAN_FREE } from "@/lib/stripe/config"
 
 export const SIDEBAR_ICON_SIZE = 28
 export const SIDEBAR_ICON_STROKE = 1.5

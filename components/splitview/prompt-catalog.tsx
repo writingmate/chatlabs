@@ -1,12 +1,13 @@
+import { useState } from "react"
+import questions from "@/data/mt-bench/questions.json"
 import { IconPencil } from "@tabler/icons-react"
+
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import questions from "@/data/mt-bench/questions.json"
-import { useState } from "react"
 
 export function PromptCatalog({
   onSelect

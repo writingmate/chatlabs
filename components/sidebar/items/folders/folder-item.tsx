@@ -1,8 +1,10 @@
-import { cn } from "@/lib/utils"
+import { FC, useRef, useState } from "react"
 import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
 import { IconChevronDown, IconChevronRight } from "@tabler/icons-react"
-import { FC, useRef, useState } from "react"
+
+import { cn } from "@/lib/utils"
+
 import { DeleteFolder } from "./delete-folder"
 import { UpdateFolder } from "./update-folder"
 

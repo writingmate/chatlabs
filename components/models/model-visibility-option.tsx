@@ -1,9 +1,11 @@
-import { LLM } from "@/types"
 import { FC } from "react"
-import { ModelIcon } from "./model-icon"
+import { LLM } from "@/types"
 import { useTheme } from "next-themes"
-import { Switch } from "@/components/ui/switch"
+
 import { Badge } from "@/components/ui/badge"
+import { Switch } from "@/components/ui/switch"
+
+import { ModelIcon } from "./model-icon"
 
 interface ModelVisibilityOption {
   model: LLM

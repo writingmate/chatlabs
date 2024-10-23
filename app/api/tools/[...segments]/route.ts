@@ -1,14 +1,15 @@
-import { NextRequest, NextResponse } from "next/server"
-import { matchRoute, RouteMatch } from "@/utils/matchRoute"
-import { createClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
-import { logger } from "@/lib/logger"
+import { NextRequest, NextResponse } from "next/server"
 import { getToolById } from "@/db/tools"
 import { Tables } from "@/supabase/types"
+import { matchRoute, RouteMatch } from "@/utils/matchRoute"
+
+import { logger } from "@/lib/logger"
 import {
   platformToolDefinitions,
   platformToolFunctionSpec
 } from "@/lib/platformTools/utils/platformToolsUtils"
+import { createClient } from "@/lib/supabase/server"
 
 export async function GET(
   request: NextRequest,

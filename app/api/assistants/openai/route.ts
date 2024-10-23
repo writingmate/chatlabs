@@ -1,5 +1,6 @@
-import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import OpenAI from "openai"
+
+import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 
 // export const runtime: ServerRuntime = "edge"
 

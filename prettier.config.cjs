@@ -7,6 +7,7 @@ module.exports = {
   arrowParens: "avoid",
   tabWidth: 2,
   trailingComma: "none",
+  plugins: ['@ianvs/prettier-plugin-sort-imports'],
   importOrder: [
     "^.+\\.scss$",
     "^.+\\.css$",

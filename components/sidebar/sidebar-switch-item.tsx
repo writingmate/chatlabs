@@ -1,5 +1,6 @@
-import { ContentType } from "@/types"
 import { FC } from "react"
+import { ContentType } from "@/types"
+
 import { TabsTrigger } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 

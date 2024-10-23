@@ -1,17 +1,19 @@
+import React, { FC, useState } from "react"
+import { PROMPT_NAME_MAX } from "@/db/limits"
+import { Tables } from "@/supabase/types"
+import { IconBulb, IconPencil } from "@tabler/icons-react"
+
+import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
-import { PROMPT_NAME_MAX } from "@/db/limits"
-import { Tables } from "@/supabase/types"
-import { IconPencil, IconBulb } from "@tabler/icons-react"
-import React, { FC, useState } from "react"
+import { PinPrompt } from "@/components/sidebar/items/prompts/pin-prompt"
+
 import {
   SIDEBAR_ITEM_ICON_SIZE,
   SIDEBAR_ITEM_ICON_STROKE,
   SidebarItem
 } from "../all/sidebar-display-item"
-import { PinPrompt } from "@/components/sidebar/items/prompts/pin-prompt"
-import { cn } from "@/lib/utils"
 
 interface PromptItemProps {
   prompt: Tables<"prompts">

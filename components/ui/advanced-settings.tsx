@@ -1,10 +1,11 @@
+import { FC, useState } from "react"
+import { IconChevronDown, IconChevronRight } from "@tabler/icons-react"
+
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger
 } from "@/components/ui/collapsible"
-import { IconChevronDown, IconChevronRight } from "@tabler/icons-react"
-import { FC, useState } from "react"
 
 interface AdvancedSettingsProps {
   children: React.ReactNode

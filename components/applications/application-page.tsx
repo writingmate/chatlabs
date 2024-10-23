@@ -1,26 +1,27 @@
 "use client"
 
 import React, {
-  useState,
-  useContext,
   useCallback,
+  useContext,
+  useEffect,
   useMemo,
-  useEffect
+  useState
 } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ChatUI } from "@/components/chat/chat-ui"
-import { UpdateApplication } from "@/components/applications/update-application"
-import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
-import { Tables } from "@/supabase/types"
 import { ChatbotUIChatContext } from "@/context/chat"
-import { updateApplication, updateApplicationChatId } from "@/db/applications"
-import { CodeBlock, LLMID } from "@/types"
 import { ChatbotUIContext } from "@/context/context"
-import { toast } from "sonner"
+import { updateApplication, updateApplicationChatId } from "@/db/applications"
 import { updateChat } from "@/db/chats"
+import { Tables } from "@/supabase/types"
+import { CodeBlock, LLMID } from "@/types"
+import { el } from "date-fns/locale"
+import { toast } from "sonner"
+
 import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
 import { Button } from "@/components/ui/button"
-import { el } from "date-fns/locale"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { UpdateApplication } from "@/components/applications/update-application"
+import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
+import { ChatUI } from "@/components/chat/chat-ui"
 
 interface ApplicationPageProps {
   application: Tables<"applications"> & {

@@ -1,21 +1,22 @@
 "use client"
 
+import { ReactNode, useContext, useEffect, useState } from "react"
+import { useAuth } from "@/context/auth"
 import { ChatbotUIContext } from "@/context/context"
 import { getProfileByUserId, updateProfile } from "@/db/profile"
+import { upsertUserQuestion } from "@/db/user_questions"
 import { getWorkspacesByUserId } from "@/db/workspaces"
-import { supabase } from "@/lib/supabase/browser-client"
 import { Tables, TablesInsert, TablesUpdate } from "@/supabase/types"
+import { AnimatePresence, motion } from "framer-motion"
 import { useRouter } from "nextjs-toploader/app"
-import { ReactNode, useContext, useEffect, useState } from "react"
+import { toast } from "sonner"
+
+import { useFeatureFlag } from "@/lib/amplitude" // Add this import
+import { supabase } from "@/lib/supabase/browser-client"
 import { FinishStep } from "@/components/setup/finish-step"
 import { ProfileStep } from "@/components/setup/profile-step"
 import { StepContainer } from "@/components/setup/step-container"
 import Plans from "@/components/upgrade/plans"
-import { useAuth } from "@/context/auth"
-import { upsertUserQuestion } from "@/db/user_questions"
-import { motion, AnimatePresence } from "framer-motion"
-import { useFeatureFlag } from "@/lib/amplitude" // Add this import
-import { toast } from "sonner"
 
 export default function SetupPage() {
   const {

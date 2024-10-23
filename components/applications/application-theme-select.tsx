@@ -1,12 +1,13 @@
-import { Tables } from "@/supabase/types"
-
-import { Select, SelectContent, SelectTrigger, SelectValue } from "../ui/select"
-import { SelectItem } from "@radix-ui/react-select"
 import { forwardRef, useEffect, useRef, useState } from "react"
-import { cn } from "@/lib/utils"
-import daisyuiThemes from "daisyui/src/theming/themes"
+import { Tables } from "@/supabase/types"
+import { SelectItem } from "@radix-ui/react-select"
 // @ts-ignore
 import functions from "daisyui/src/theming/functions"
+import daisyuiThemes from "daisyui/src/theming/themes"
+
+import { cn } from "@/lib/utils"
+
+import { Select, SelectContent, SelectTrigger, SelectValue } from "../ui/select"
 
 const themes = [
   "light",

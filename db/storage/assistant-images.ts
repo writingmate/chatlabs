@@ -1,5 +1,6 @@
-import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
+
+import { supabase } from "@/lib/supabase/browser-client"
 
 export const uploadAssistantImage = async (
   assistant: Tables<"assistants">,

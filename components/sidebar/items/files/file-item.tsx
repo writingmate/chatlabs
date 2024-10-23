@@ -1,10 +1,12 @@
-import { FileIcon } from "@/components/ui/file-icon"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { FC, useState } from "react"
 import { FILE_DESCRIPTION_MAX, FILE_NAME_MAX } from "@/db/limits"
 import { getFileFromStorage } from "@/db/storage/files"
 import { Tables } from "@/supabase/types"
-import { FC, useState } from "react"
+
+import { FileIcon } from "@/components/ui/file-icon"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
 import {
   SIDEBAR_ITEM_ICON_SIZE,
   SIDEBAR_ITEM_ICON_STROKE,

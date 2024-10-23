@@ -1,11 +1,13 @@
-import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { FC, useCallback, useContext, useMemo, useState } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
-import { FC, useCallback, useContext, useMemo, useState } from "react"
-import { Message } from "../messages/message"
-import { ChatbotUIChatContext } from "@/context/chat"
+
 import { CodeBlock } from "@/types/chat-message"
 import { isMobileScreen } from "@/lib/mobile"
+import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+
+import { Message } from "../messages/message"
 
 interface ChatMessagesProps {
   onSelectCodeBlock?: (codeBlock: CodeBlock | null) => void

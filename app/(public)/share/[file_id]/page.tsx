@@ -1,5 +1,6 @@
-import { getFileByHashId, getFileById } from "@/db/files"
 import { notFound } from "next/navigation"
+import { getFileByAppSlug } from "@/db/applications"
+import { getFileByHashId, getFileById } from "@/db/files"
 import {
   IconExternalLink,
   IconInfoCircle,
@@ -9,13 +10,13 @@ import {
   IconWorld
 } from "@tabler/icons-react"
 import { DOMParser } from "xmldom"
-import RemixButton from "@/components/remix/remix-button"
-import { REGEX_FILENAME } from "@/lib/preview"
+
 import { updateHtml } from "@/lib/code-viewer"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { getFileByAppSlug } from "@/db/applications"
+import { REGEX_FILENAME } from "@/lib/preview"
 import { getOgImageUrl } from "@/lib/utils/og"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import RemixButton from "@/components/remix/remix-button"
 
 interface SharePageProps {
   params: {

@@ -1,11 +1,12 @@
 "use client"
 
-import { ChatUI } from "@/components/chat/chat-ui"
-import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
 import { useContext } from "react"
-import { ChatbotUIContext } from "@/context/context"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { ChatbotUIContext } from "@/context/context"
+
 import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
+import { ChatPreviewContent } from "@/components/chat/chat-preview-content"
+import { ChatUI } from "@/components/chat/chat-ui"
 
 export default function ChatPage() {
   const { profile } = useContext(ChatbotUIContext)

@@ -1,12 +1,13 @@
+import { FC, useContext, useEffect, useState } from "react"
 import {
   IconCheck,
+  IconClipboard,
   IconEdit,
-  IconRepeat,
   IconPlayerPlay,
   IconPlayerStop,
-  IconClipboard
+  IconRepeat
 } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useState } from "react"
+
 import { WithTooltip } from "../ui/with-tooltip"
 
 export const MESSAGE_ICON_SIZE = 18

@@ -1,24 +1,25 @@
 import React, { FC, useRef } from "react"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { Tables } from "@/supabase/types"
 import {
+  IconArrowFork,
   IconCode,
-  IconWorld,
-  IconX,
   IconDownload,
   IconEye,
-  IconArrowFork,
   IconLayoutSidebar,
-  IconLockAccess,
   IconLock,
+  IconLockAccess,
+  IconMaximize,
   IconMinimize,
-  IconMaximize
+  IconWorld,
+  IconX
 } from "@tabler/icons-react"
 
 import { CopyButton } from "@/components/ui/copy-button"
 import Loading from "@/components/ui/loading"
-import { UITheme } from "@/components/code-viewer/theme-configurator"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import NavbarButton from "@/components/code-viewer/code-navbar-button"
-import { Tables } from "@/supabase/types"
+import { UITheme } from "@/components/code-viewer/theme-configurator"
+
 import { Badge } from "../ui/badge"
 import { WithTooltip } from "../ui/with-tooltip"
 

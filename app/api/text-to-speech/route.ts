@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
+
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 
 export async function POST(req: NextRequest) {

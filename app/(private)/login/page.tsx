@@ -1,6 +1,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
+
 import LoginForm from "@/components/login/login-form"
 
 export default function Login() {

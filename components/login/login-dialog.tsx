@@ -1,5 +1,8 @@
 "use client"
 
+import React, { ReactPortal, useState } from "react"
+
+import { isMobileScreen } from "@/lib/mobile"
 import {
   Dialog,
   DialogContent,
@@ -7,8 +10,6 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog"
 import LoginForm from "@/components/login/login-form"
-import React, { ReactPortal, useState } from "react"
-import { isMobileScreen } from "@/lib/mobile"
 
 export default function LoginDialog({ redirectTo }: { redirectTo?: string }) {
   const [dialogOpen, setOpen] = useState(false)

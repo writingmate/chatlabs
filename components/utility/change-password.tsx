@@ -1,8 +1,10 @@
 "use client"
 
-import { supabase } from "@/lib/supabase/browser-client"
-import { useRouter } from "nextjs-toploader/app"
 import { FC, useState } from "react"
+import { useRouter } from "nextjs-toploader/app"
+
+import { supabase } from "@/lib/supabase/browser-client"
+
 import { Button } from "../ui/button"
 import {
   Dialog,

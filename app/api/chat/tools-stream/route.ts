@@ -1,3 +1,16 @@
+import { Tables } from "@/supabase/types"
+import { ChatSettings } from "@/types"
+import {
+  experimental_StreamData,
+  OpenAIStream,
+  OpenAIStreamCallbacks,
+  StreamingTextResponse
+} from "ai"
+import OpenAI from "openai"
+import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
+
+import { logger } from "@/lib/logger"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { openapiToFunctions } from "@/lib/openapi-conversion"
 import {
   platformToolDefinitions,
@@ -8,23 +21,11 @@ import {
   getServerProfile,
   validateModelAndMessageCount
 } from "@/lib/server/server-chat-helpers"
-import { Tables } from "@/supabase/types"
-import { ChatSettings } from "@/types"
-import {
-  experimental_StreamData,
-  OpenAIStream,
-  StreamingTextResponse,
-  OpenAIStreamCallbacks
-} from "ai"
-import OpenAI from "openai"
-import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import {
   buildSchemaDetails,
   executeTool,
   prependSystemPrompt
 } from "@/lib/tools/utils"
-import { logger } from "@/lib/logger"
 
 export const maxDuration = 300
 

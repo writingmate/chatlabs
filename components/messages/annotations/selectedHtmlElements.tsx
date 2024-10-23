@@ -1,9 +1,10 @@
-import { Card } from "@/components/ui/card"
-import Image from "next/image"
-import { Annotation, Annotation2 } from "@/types/annotation"
 import { useState } from "react"
-import { ChatSelectedHtmlElements } from "@/components/chat/chat-selected-html-elements"
+import Image from "next/image"
+
+import { Annotation, Annotation2 } from "@/types/annotation"
 import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
+import { ChatSelectedHtmlElements } from "@/components/chat/chat-selected-html-elements"
 
 export function SelectedHtmlElements({
   annotation

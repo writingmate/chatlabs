@@ -1,3 +1,6 @@
+import { useContext, useEffect, useRef } from "react"
+import { userInputAtom } from "@/atoms/chatAtoms"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
 import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
@@ -7,8 +10,16 @@ import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID } from "@/types"
+import { t } from "i18next"
+import { useAtom } from "jotai"
 import { useRouter } from "nextjs-toploader/app"
-import { useContext, useEffect, useRef } from "react"
+import { toast } from "sonner"
+
+import { SubscriptionRequiredError } from "@/lib/errors"
+import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
+import { isMobileScreen } from "@/lib/mobile"
+import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
+
 import {
   createTempMessages,
   handleCreateChat,
@@ -19,15 +30,6 @@ import {
   handleToolsChat,
   validateChatSettings
 } from "../chat-helpers"
-import { isMobileScreen } from "@/lib/mobile"
-import { SubscriptionRequiredError } from "@/lib/errors"
-import { ChatbotUIChatContext } from "@/context/chat"
-import { reconstructContentWithCodeBlocksInChatMessage } from "@/lib/messages"
-import { toast } from "sonner"
-import { t } from "i18next"
-import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
-import { userInputAtom } from "@/atoms/chatAtoms"
-import { useAtom } from "jotai"
 
 interface UseChatHandlerProps {
   onChatCreate?: (chat: Tables<"chats">) => void

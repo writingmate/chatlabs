@@ -6,6 +6,7 @@ import {
   ToolsCallResult,
   WebScraperResult
 } from "@/types/platformTools"
+
 import { MessageHtmlElement } from "./html"
 
 export type Annotation = {

@@ -1,9 +1,11 @@
-import { FilePreview } from "@/components/ui/file-preview"
 import { forwardRef, HTMLAttributes, ImgHTMLAttributes, useState } from "react"
 import Image, { ImageProps } from "next/image"
-import { Button } from "../ui/button"
-import { cn } from "@/lib/utils"
 import { IconDownload } from "@tabler/icons-react"
+
+import { cn } from "@/lib/utils"
+import { FilePreview } from "@/components/ui/file-preview"
+
+import { Button } from "../ui/button"
 
 const ImageWithPreview = forwardRef<
   HTMLImageElement,

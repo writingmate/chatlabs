@@ -1,8 +1,8 @@
+import { FC } from "react"
 import {
   IconCircleArrowDownFilled,
   IconCircleArrowUpFilled
 } from "@tabler/icons-react"
-import { FC } from "react"
 
 interface ChatScrollButtonsProps {
   isAtTop: boolean

@@ -1,10 +1,11 @@
+import { ChatSettings } from "@/types"
+import { GoogleGenerativeAI } from "@google/generative-ai"
+
 import {
   checkApiKey,
   getServerProfile,
   validateModelAndMessageCount
 } from "@/lib/server/server-chat-helpers"
-import { ChatSettings } from "@/types"
-import { GoogleGenerativeAI } from "@google/generative-ai"
 
 export const runtime = "edge"
 

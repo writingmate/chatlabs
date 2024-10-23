@@ -1,14 +1,3 @@
-import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
-import { CodeViewerCode } from "@/components/code-viewer/code-viewer-code"
-import { CodeViewerNavbar } from "@/components/code-viewer/code-viewer-navbar"
-import CodeViewerPreview2 from "@/components/code-viewer/code-viewer-preview-2"
-import { UITheme } from "@/components/code-viewer/theme-configurator"
-import { MessageSharingDialog } from "@/components/messages/message-sharing-dialog"
-import { useAuth } from "@/context/auth"
-import { ChatbotUIChatContext } from "@/context/chat"
-import { ChatbotUIContext } from "@/context/context"
-import { cn, generateRandomString, programmingLanguages } from "@/lib/utils"
-import { CodeBlock } from "@/types"
 import {
   FC,
   useCallback,
@@ -18,8 +7,21 @@ import {
   useRef,
   useState
 } from "react"
-import { ChatMessages } from "../chat/chat-messages"
+import { useAuth } from "@/context/auth"
+import { ChatbotUIChatContext } from "@/context/chat"
+import { ChatbotUIContext } from "@/context/context"
+import { CodeBlock } from "@/types"
 import { IconMaximize, IconMinimize } from "@tabler/icons-react" // Import icons for fullscreen
+
+import { cn, generateRandomString, programmingLanguages } from "@/lib/utils"
+import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { CodeViewerCode } from "@/components/code-viewer/code-viewer-code"
+import { CodeViewerNavbar } from "@/components/code-viewer/code-viewer-navbar"
+import CodeViewerPreview2 from "@/components/code-viewer/code-viewer-preview-2"
+import { UITheme } from "@/components/code-viewer/theme-configurator"
+import { MessageSharingDialog } from "@/components/messages/message-sharing-dialog"
+
+import { ChatMessages } from "../chat/chat-messages"
 
 interface CodeViewerProps {
   theme?: string

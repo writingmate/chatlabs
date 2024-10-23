@@ -1,8 +1,9 @@
 import { Tables } from "@/supabase/types"
 import { ChatPayload, MessageImage } from "@/types"
 import { encode } from "gpt-tokenizer"
-import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
+
 import { MessageHtmlElement } from "@/types/html"
+import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 
 export const DEFAULT_SYSTEM_PROMPT = `Today is {local_date}.
 User info: "{profile_context}"

@@ -1,15 +1,22 @@
+import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
+import Image from "next/image"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
 import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
-import useHotkey from "@/lib/hooks/use-hotkey"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
 import { IconChevronDown, IconRobotFace } from "@tabler/icons-react"
-import Image from "next/image"
-import { FC, useContext, useEffect, useMemo, useRef, useState } from "react"
+import { set } from "date-fns"
+
+import useHotkey from "@/lib/hooks/use-hotkey"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { validatePlanForAssistant } from "@/lib/subscription"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
+
 import { ModelIcon } from "../models/model-icon"
 import { Button } from "../ui/button"
 import {
@@ -19,11 +26,6 @@ import {
 } from "../ui/dropdown-menu"
 import { Input } from "../ui/input"
 import { QuickSettingOption } from "./quick-setting-option"
-import { set } from "date-fns"
-import { usePromptAndCommand } from "@/components/chat/chat-hooks/use-prompt-and-command"
-import { validatePlanForAssistant } from "@/lib/subscription"
-import { ChatbotUIChatContext } from "@/context/chat"
-import { AssistantIcon } from "@/components/assistants/assistant-icon"
 
 interface QuickSettingsProps {}
 

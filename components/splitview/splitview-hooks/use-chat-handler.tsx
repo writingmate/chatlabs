@@ -1,3 +1,6 @@
+import React, { useContext, useEffect, useRef } from "react"
+import { userInputAtom } from "@/atoms/chatAtoms"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
 import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
@@ -7,8 +10,12 @@ import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { deleteMessagesIncludingAndAfter } from "@/db/messages"
 import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID, ModelProvider } from "@/types"
+import { encode } from "gpt-tokenizer"
+import { useAtom } from "jotai"
 import { useRouter } from "nextjs-toploader/app"
-import React, { useContext, useEffect, useRef } from "react"
+
+import { SubscriptionRequiredError } from "@/lib/errors"
+import { isMobileScreen } from "@/lib/mobile"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import {
   createTempMessages,
@@ -22,12 +29,6 @@ import {
   processResponse,
   validateChatSettings
 } from "@/components/chat/chat-helpers"
-import { isMobileScreen } from "@/lib/mobile"
-import { SubscriptionRequiredError } from "@/lib/errors"
-import { ChatbotUIChatContext } from "@/context/chat"
-import { encode } from "gpt-tokenizer"
-import { useAtom } from "jotai"
-import { userInputAtom } from "@/atoms/chatAtoms"
 
 export const useChatHandler = () => {
   const router = useRouter()

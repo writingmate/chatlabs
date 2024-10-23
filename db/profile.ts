@@ -1,6 +1,7 @@
-import { supabase } from "@/lib/supabase/browser-client"
 import { Database, TablesInsert, TablesUpdate } from "@/supabase/types"
 import { SupabaseClient } from "@supabase/supabase-js"
+
+import { supabase } from "@/lib/supabase/browser-client"
 
 export const getProfileByUserId = async (
   userId: string,

@@ -1,19 +1,21 @@
 "use client"
 
+import { FC, useContext, useEffect, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
-import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
 import { ChatSettings } from "@/types"
 import { IconInfoCircle } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useState } from "react"
+
+import { buildBasePrompt, DEFAULT_SYSTEM_PROMPT } from "@/lib/build-prompt"
+import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+
 import { ModelSelect } from "../models/model-select"
 import { AdvancedSettings } from "./advanced-settings"
 import { Label } from "./label"
 import { Slider } from "./slider"
 import { TextareaAutosize } from "./textarea-autosize"
 import { WithTooltip } from "./with-tooltip"
-import { buildBasePrompt, DEFAULT_SYSTEM_PROMPT } from "@/lib/build-prompt"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 
 const TEMPERATURE_DESCRIPTION = `
 Temperature affects the randomness of the AI model's responses. A higher temperature increases the randomness, while a lower temperature makes the responses more deterministic.

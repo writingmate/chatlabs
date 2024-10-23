@@ -1,11 +1,12 @@
-import { FunctionCallPayload } from "ai"
-import { platformToolFunctionSpec } from "@/lib/platformTools/utils/platformToolsUtils"
-import { Tables } from "@/supabase/types"
-import OpenAI from "openai"
-import { openapiToFunctions } from "@/lib/openapi-conversion"
 import { getApplicationTools } from "@/db/applications"
-import { logger } from "@/lib/logger"
+import { Tables } from "@/supabase/types"
 import { LogitsProcessor } from "@xenova/transformers/types/utils/generation"
+import { FunctionCallPayload } from "ai"
+import OpenAI from "openai"
+
+import { logger } from "@/lib/logger"
+import { openapiToFunctions } from "@/lib/openapi-conversion"
+import { platformToolFunctionSpec } from "@/lib/platformTools/utils/platformToolsUtils"
 
 export const TOOLS_SYSTEM_PROMPT = `
 Today is ${new Date().toLocaleDateString()}.

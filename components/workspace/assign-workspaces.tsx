@@ -1,7 +1,8 @@
+import { FC, useContext, useEffect, useRef, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { IconChevronDown, IconCircleCheckFilled } from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+
 import { Button } from "../ui/button"
 import {
   DropdownMenu,

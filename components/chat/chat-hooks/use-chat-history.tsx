@@ -1,7 +1,7 @@
-import { ChatbotUIContext } from "@/context/context"
 import { useContext, useEffect, useState } from "react"
-import { ChatbotUIChatContext } from "@/context/chat"
 import { userInputAtom } from "@/atoms/chatAtoms"
+import { ChatbotUIChatContext } from "@/context/chat"
+import { ChatbotUIContext } from "@/context/context"
 import { useAtom } from "jotai"
 
 /**

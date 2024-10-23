@@ -1,6 +1,6 @@
 import { FC, ReactNode } from "react"
-import { motion, AnimatePresence } from "framer-motion"
 import { ContentType } from "@/types"
+import { AnimatePresence, motion } from "framer-motion"
 
 interface SlidingSubmenuProps {
   children: ReactNode

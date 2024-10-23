@@ -1,21 +1,23 @@
-import { cn } from "@/lib/utils"
+import { FC, HTMLAttributes } from "react"
+import Image from "next/image"
 import cohere from "@/public/providers/cohere.png"
-import mistral from "@/public/providers/mistral.png"
+import databricks from "@/public/providers/databricks.png"
 import groq from "@/public/providers/groq.png"
 import meta from "@/public/providers/meta.png"
+import mistral from "@/public/providers/mistral.png"
 import perplexity from "@/public/providers/perplexity.png"
-import databricks from "@/public/providers/databricks.png"
 import { ModelProvider } from "@/types"
 import { IconSparkles } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
-import Image from "next/image"
-import { FC, HTMLAttributes } from "react"
+import { Chat } from "openai/resources/index.mjs"
+
+import { cn } from "@/lib/utils"
+import { MicrosoftSVG } from "@/components/icons/microsoft-svg"
+
 import { AnthropicSVG } from "../icons/anthropic-svg"
+import { ChatbotUISVG } from "../icons/chatbotui-svg"
 import { GoogleSVG } from "../icons/google-svg"
 import { OpenAISVG } from "../icons/openai-svg"
-import { MicrosoftSVG } from "@/components/icons/microsoft-svg"
-import { Chat } from "openai/resources/index.mjs"
-import { ChatbotUISVG } from "../icons/chatbotui-svg"
 
 interface ModelIconProps extends HTMLAttributes<HTMLDivElement> {
   provider: ModelProvider

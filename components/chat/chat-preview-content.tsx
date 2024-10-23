@@ -1,7 +1,8 @@
 import React, { FC, memo, useMemo } from "react"
+
+import { CodeBlock } from "@/types/chat-message"
 import { cn } from "@/lib/utils"
 import { CodeViewer } from "@/components/code-viewer/code-viewer"
-import { CodeBlock } from "@/types/chat-message"
 
 interface ChatPreviewContentProps {
   open: boolean

@@ -1,13 +1,13 @@
-import { ChatbotUIContext } from "@/context/context"
 import {
-  type UIEventHandler,
   useCallback,
   useContext,
   useEffect,
   useRef,
-  useState
+  useState,
+  type UIEventHandler
 } from "react"
 import { ChatbotUIChatContext } from "@/context/chat"
+import { ChatbotUIContext } from "@/context/context"
 
 // Base hook for scroll management, without any chat-specific logic
 export const useScrollBase = (

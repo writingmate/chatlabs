@@ -1,5 +1,6 @@
-import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert } from "@/supabase/types"
+
+import { supabase } from "@/lib/supabase/browser-client"
 
 export const getMessageFileItemsByMessageId = async (messageId: string) => {
   const { data: messageFileItems, error } = await supabase

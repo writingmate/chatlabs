@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react"
+import { userInputAtom } from "@/atoms/chatAtoms"
 import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { useAtom } from "jotai"
-import { userInputAtom } from "@/atoms/chatAtoms"
 
 /**
  * Custom hook for handling chat history in the chat component.

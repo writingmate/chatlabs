@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
-import Stripe from "stripe"
-import { createClient } from "@supabase/supabase-js"
 import { Database } from "@/supabase/types"
+import { createClient } from "@supabase/supabase-js"
 import axios from "axios"
+import Stripe from "stripe"
+
 import { logger } from "@/lib/logger"
 
 const stripeApiKey = process.env.STRIPE_API_KEY!

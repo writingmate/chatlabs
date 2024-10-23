@@ -1,9 +1,10 @@
 "use client"
 
 import { FC, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { IconArrowFork } from "@tabler/icons-react"
 import { AuthProvider, useAuth } from "@/context/auth"
+import { IconArrowFork } from "@tabler/icons-react"
+
+import { Button } from "@/components/ui/button"
 
 interface RemixButtonProps {
   fileId: string

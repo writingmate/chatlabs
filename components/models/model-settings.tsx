@@ -1,3 +1,23 @@
+import { useCallback, useContext, useEffect, useMemo, useState } from "react"
+import { ChatbotUIContext } from "@/context/context"
+import { updateProfile } from "@/db/profile"
+import { updateWorkspace } from "@/db/workspaces"
+import { LLM, LLMID } from "@/types"
+import { HoverCardPortal } from "@radix-ui/react-hover-card"
+import { IconFilterOff, IconSettings } from "@tabler/icons-react"
+import debounce from "lodash/debounce"
+import { VList } from "virtua"
+
+import {
+  DEFAULT_SYSTEM_PROMPT,
+  validateSystemPromptTemplate
+} from "@/lib/build-prompt"
+import { CATEGORIES } from "@/lib/models/categories"
+import { Button } from "@/components/ui/button"
+import {
+  AdvancedContent,
+  InfoIconTooltip
+} from "@/components/ui/chat-settings-form"
 import {
   Dialog,
   DialogContent,
@@ -5,29 +25,8 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { LLM, LLMID } from "@/types"
-import { ModelVisibilityOption } from "@/components/models/model-visibility-option"
-import { IconSettings, IconFilterOff } from "@tabler/icons-react"
-import { useContext, useEffect, useState, useMemo, useCallback } from "react"
-import { ChatbotUIContext } from "@/context/context"
-import { Button } from "@/components/ui/button"
-import { updateProfile } from "@/db/profile"
-import {
-  AdvancedContent,
-  InfoIconTooltip
-} from "@/components/ui/chat-settings-form"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
-import { TextareaAutosize } from "@/components/ui/textarea-autosize"
-import {
-  DEFAULT_SYSTEM_PROMPT,
-  validateSystemPromptTemplate
-} from "@/lib/build-prompt"
-import { WithTooltip } from "@/components/ui/with-tooltip"
-import { updateWorkspace } from "@/db/workspaces"
 import { SearchInput } from "@/components/ui/search-input"
-import { ModelDetails } from "@/components/models/model-details"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card"
 import {
   Select,
   SelectContent,
@@ -35,10 +34,13 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { CATEGORIES } from "@/lib/models/categories"
-import debounce from "lodash/debounce"
-import { VList } from "virtua"
-import { HoverCardPortal } from "@radix-ui/react-hover-card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TextareaAutosize } from "@/components/ui/textarea-autosize"
+import { WithTooltip } from "@/components/ui/with-tooltip"
+import { ModelDetails } from "@/components/models/model-details"
+import { ModelVisibilityOption } from "@/components/models/model-visibility-option"
+
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card"
 
 export const DEFAULT_MODEL_VISIBILITY: Record<LLMID, boolean> = {
   "gpt-3.5-turbo-0125": false,

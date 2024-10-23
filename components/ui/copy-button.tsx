@@ -1,7 +1,9 @@
-import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 import { IconCheck, IconClipboard } from "@tabler/icons-react"
+
+import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+
 import { ButtonWithTooltip } from "./button-with-tooltip"
 
 export function CopyButton({

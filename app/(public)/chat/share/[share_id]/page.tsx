@@ -1,15 +1,16 @@
 import React from "react"
-import { createClient } from "@/lib/supabase/server"
-import { cookies } from "next/headers"
-import { Message } from "@/components/messages/message"
-import { Tables } from "@/supabase/types"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { notFound } from "next/navigation"
-import { parseDBMessageCodeBlocksAndContent } from "@/lib/messages"
-import { getOgImageUrl } from "@/lib/utils/og"
-import { getChatById } from "@/db/chats"
 import { Metadata } from "next"
+import { cookies } from "next/headers"
+import Link from "next/link"
+import { notFound } from "next/navigation"
+import { getChatById } from "@/db/chats"
+import { Tables } from "@/supabase/types"
+
+import { parseDBMessageCodeBlocksAndContent } from "@/lib/messages"
+import { createClient } from "@/lib/supabase/server"
+import { getOgImageUrl } from "@/lib/utils/og"
+import { Button } from "@/components/ui/button"
+import { Message } from "@/components/messages/message"
 
 export async function generateMetadata({
   params

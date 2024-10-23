@@ -1,11 +1,12 @@
+import { useContext, useEffect, useState } from "react"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
 import { createDocXFile, createFile } from "@/db/files"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import mammoth from "mammoth"
-import { useContext, useEffect, useState } from "react"
 import { toast } from "sonner"
-import { ChatbotUIChatContext } from "@/context/chat"
+
 import { guessFileExtensionByContentType } from "@/lib/content-type"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 
 export const ACCEPTED_FILE_TYPES = [
   "text/csv",

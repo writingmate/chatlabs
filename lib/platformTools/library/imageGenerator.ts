@@ -1,8 +1,10 @@
 import OpenAI from "openai"
+
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
+
 import {
-  ImageGenerationUserSettings,
-  BaseImageGenerator
+  BaseImageGenerator,
+  ImageGenerationUserSettings
 } from "../common/BaseImageGenerator"
 
 class DallE3Generator extends BaseImageGenerator {

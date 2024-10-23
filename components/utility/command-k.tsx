@@ -1,7 +1,9 @@
-import { ChatbotUIContext } from "@/context/context"
-import useHotkey from "@/lib/hooks/use-hotkey"
-import { IconLoader2, IconSend } from "@tabler/icons-react"
 import { FC, useContext, useState } from "react"
+import { ChatbotUIContext } from "@/context/context"
+import { IconLoader2, IconSend } from "@tabler/icons-react"
+
+import useHotkey from "@/lib/hooks/use-hotkey"
+
 import { Dialog, DialogContent } from "../ui/dialog"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 

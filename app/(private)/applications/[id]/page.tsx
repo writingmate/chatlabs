@@ -1,11 +1,12 @@
 "use client"
 
-import { ApplicationPage } from "@/components/applications/application-page"
+import React, { useEffect, useState } from "react"
 import { getApplicationById } from "@/db/applications"
 import { Tables } from "@/supabase/types"
 import { LLMID } from "@/types"
-import React, { useEffect, useState } from "react"
+
 import { Loader } from "@/components/ui/loader"
+import { ApplicationPage } from "@/components/applications/application-page"
 
 export default function ApplicationDetailPage({
   params

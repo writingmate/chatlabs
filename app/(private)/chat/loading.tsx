@@ -1,5 +1,6 @@
-import { Loader } from "@/components/ui/loader"
 import { IconLoader2 } from "@tabler/icons-react"
+
+import { Loader } from "@/components/ui/loader"
 
 export default function Loading() {
   return (

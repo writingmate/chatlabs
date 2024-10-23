@@ -1,22 +1,24 @@
-import { ModelIcon } from "@/components/models/model-icon"
+import { FC, useCallback, useContext, useMemo, useRef } from "react"
+import { useParams } from "next/navigation"
 import { ChatbotUIContext } from "@/context/context"
-import { LLM_LIST } from "@/lib/models/llm/llm-list"
-import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { LLM } from "@/types"
+import { IconApps } from "@tabler/icons-react"
 import { useRouter } from "nextjs-toploader/app"
-import { useParams } from "next/navigation"
-import { FC, useCallback, useContext, useMemo, useRef } from "react"
-import { DeleteChat } from "./delete-chat"
-import { UpdateChat } from "./update-chat"
+
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { cn } from "@/lib/utils"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { ModelIcon } from "@/components/models/model-icon"
 import {
   SIDEBAR_ITEM_ICON_SIZE,
   SIDEBAR_ITEM_ICON_STROKE
 } from "@/components/sidebar/items/all/sidebar-display-item"
 import { PinChat } from "@/components/sidebar/items/chat/pin-chat"
-import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
-import { AssistantIcon } from "@/components/assistants/assistant-icon"
-import { IconApps } from "@tabler/icons-react"
+
+import { DeleteChat } from "./delete-chat"
+import { UpdateChat } from "./update-chat"
 
 interface ChatItemProps {
   chat: Tables<"chats">

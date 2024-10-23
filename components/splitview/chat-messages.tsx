@@ -1,9 +1,10 @@
-import { useChatHandler } from "@/components/splitview/splitview-hooks/use-chat-handler"
-import { Tables } from "@/supabase/types"
 import { forwardRef, useContext, useMemo, useState } from "react"
 import { ChatbotUIChatContext } from "@/context/chat"
-import { Message } from "@/components/messages/message"
+import { Tables } from "@/supabase/types"
+
 import { parseChatMessageCodeBlocksAndContent } from "@/lib/messages"
+import { Message } from "@/components/messages/message"
+import { useChatHandler } from "@/components/splitview/splitview-hooks/use-chat-handler"
 
 interface ChatMessagesProps {}
 

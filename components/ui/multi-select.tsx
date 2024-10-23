@@ -1,4 +1,11 @@
-import { FC, useState, useRef, useEffect } from "react"
+import React, { FC, useEffect, useRef, useState } from "react"
+import {
+  IconCheck,
+  IconChevronDown,
+  IconCircleCheck,
+  IconCircleCheckFilled
+} from "@tabler/icons-react"
+
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -6,13 +13,6 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import {
-  IconCheck,
-  IconChevronDown,
-  IconCircleCheckFilled
-} from "@tabler/icons-react"
-import React from "react"
-import { IconCircleCheck } from "@tabler/icons-react"
 
 interface MultiSelectProps<T> {
   options: T[]

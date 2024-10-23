@@ -1,19 +1,28 @@
+import { FC, useContext, useEffect, useRef, useState } from "react"
+import { userInputAtom } from "@/atoms/chatAtoms"
+import { ChatbotUIChatContext } from "@/context/chat"
 import { ChatbotUIContext } from "@/context/context"
+import { ChatMessage } from "@/types"
+import {
+  IconArrowUp,
+  IconBulb,
+  IconMicrophone,
+  IconPaperclip,
+  IconPlayerRecordFilled,
+  IconPlayerStopFilled,
+  IconPlus,
+  IconPrompt,
+  IconX
+} from "@tabler/icons-react"
+import { useAtom } from "jotai"
+import { toast } from "sonner"
+
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { cn } from "@/lib/utils"
-import {
-  IconPaperclip,
-  IconPlayerStopFilled,
-  IconX,
-  IconMicrophone,
-  IconPlayerRecordFilled,
-  IconArrowUp,
-  IconPrompt,
-  IconPlus,
-  IconBulb
-} from "@tabler/icons-react"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { ChatSelectedHtmlElements } from "@/components/chat/chat-selected-html-elements"
+
 import { Input } from "../ui/input"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { ChatCommandInput } from "./chat-command-input"
@@ -22,13 +31,6 @@ import { useChatHandler } from "./chat-hooks/use-chat-handler"
 import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useSelectFileHandler } from "./chat-hooks/use-select-file-handler"
-import { toast } from "sonner"
-import { AssistantIcon } from "@/components/assistants/assistant-icon"
-import { ChatbotUIChatContext } from "@/context/chat"
-import { ChatSelectedHtmlElements } from "@/components/chat/chat-selected-html-elements"
-import { ChatMessage } from "@/types"
-import { useAtom } from "jotai"
-import { userInputAtom } from "@/atoms/chatAtoms"
 
 interface ChatInputProps {
   showAssistant: boolean

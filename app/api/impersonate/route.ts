@@ -1,9 +1,10 @@
-import { createSigner } from "fast-jwt"
 import crypto from "crypto"
-import { createClient as baseCreateClient } from "@supabase/supabase-js"
-import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
 import { cookies } from "next/headers"
+import { NextResponse } from "next/server"
+import { createClient as baseCreateClient } from "@supabase/supabase-js"
+import { createSigner } from "fast-jwt"
+
+import { createClient } from "@/lib/supabase/server"
 
 const IMPERSONATION_JWT_KEY = crypto.randomBytes(32)
 const impersonationJwtSigner = createSigner({ key: IMPERSONATION_JWT_KEY })

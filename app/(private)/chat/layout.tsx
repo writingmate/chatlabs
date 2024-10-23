@@ -1,10 +1,11 @@
 "use client"
 
-import { Dashboard } from "@/components/ui/dashboard"
 import { ReactNode, useContext, useEffect, useState } from "react"
-import { ChatbotUIChatProvider } from "@/context/chat"
 import { usePathname } from "next/navigation"
+import { ChatbotUIChatProvider } from "@/context/chat"
 import { AnimatePresence, motion } from "framer-motion"
+
+import { Dashboard } from "@/components/ui/dashboard"
 import Transition from "@/components/ui/transition"
 
 interface ChatLayoutProps {

@@ -1,10 +1,10 @@
 import {
-  type UIEventHandler,
   useCallback,
   useContext,
   useEffect,
   useRef,
-  useState
+  useState,
+  type UIEventHandler
 } from "react"
 import { ChatbotUIChatContext } from "@/context/chat"
 

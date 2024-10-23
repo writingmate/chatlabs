@@ -1,8 +1,9 @@
+import { FC } from "react"
+import { updatePrompt } from "@/db/prompts"
 import { Tables } from "@/supabase/types"
 import { IconPin } from "@tabler/icons-react"
-import { FC } from "react"
+
 import { cn } from "@/lib/utils"
-import { updatePrompt } from "@/db/prompts"
 
 interface UpdatePromptProps {
   prompt: Tables<"prompts">

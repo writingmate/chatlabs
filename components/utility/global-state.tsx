@@ -2,17 +2,15 @@
 
 "use client"
 
+import { FC, useEffect, useState } from "react"
 import { ChatbotUIContext } from "@/context/context"
+import { getPopularAssistants } from "@/db/assistants"
+import { getPlatformTools } from "@/db/platform-tools"
 import { getProfileByUserId } from "@/db/profile"
+import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
 import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
+import { getPublicTools } from "@/db/tools"
 import { getWorkspaceById, getWorkspacesByUserId } from "@/db/workspaces"
-import { convertBlobToBase64 } from "@/lib/blob-to-b64"
-import {
-  fetchHostedModels,
-  fetchOllamaModels,
-  fetchOpenRouterModels
-} from "@/lib/models/fetch-models"
-import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
 import {
   ChatFile,
@@ -25,16 +23,19 @@ import {
   OpenRouterLLM,
   WorkspaceImage
 } from "@/types"
+import { useRouter } from "nextjs-toploader/app"
+
 import { AssistantImage } from "@/types/images/assistant-image"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
-import { useRouter } from "nextjs-toploader/app"
-import { FC, useEffect, useState } from "react"
+import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { isMobileScreen } from "@/lib/mobile"
-import { getPopularAssistants } from "@/db/assistants"
-import { getPublicTools } from "@/db/tools"
-import { getPlatformTools } from "@/db/platform-tools"
+import {
+  fetchHostedModels,
+  fetchOllamaModels,
+  fetchOpenRouterModels
+} from "@/lib/models/fetch-models"
+import { supabase } from "@/lib/supabase/browser-client"
 import { onlyUniqueById } from "@/lib/utils"
-import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
 import { Loading } from "@/components/ui/loading"
 
 interface GlobalStateProps {
