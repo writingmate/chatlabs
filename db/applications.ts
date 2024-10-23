@@ -10,7 +10,7 @@ export const getFileByAppSlug = async (appSlug: string) => {
   const { data: application, error } = await supabase
     .from("applications")
     .select("*, files(*, file_items(*))")
-    .eq("slug", appSlug)
+    .eq("subdomain", appSlug)
     .order("created_at", { referencedTable: "files", ascending: false })
     .single()
 
@@ -354,6 +354,31 @@ export async function updateApplicationChatId(
   if (error) {
     console.error("Error updating application chat_id:", error)
     throw error
+  }
+
+  return data
+}
+
+export const getApplicationByChatId = async (chatId: string) => {
+  const { data, error } = await supabase
+    .from("applications")
+    .select("*")
+    .eq("chat_id", chatId)
+    .single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data
+}
+
+// Generates random subdomain for new applications in words of 4 characters
+export const generateRandomSubdomain = async () => {
+  const { data, error } = await supabase.rpc("generate_random_subdomain")
+
+  if (error) {
+    throw new Error(error.message)
   }
 
   return data

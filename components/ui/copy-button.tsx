@@ -22,7 +22,7 @@ export function CopyButton({
     <ButtonWithTooltip
       tooltip={title}
       size={"icon"}
-      className={cn("size-4 text-red-800 hover:opacity-50", className)}
+      className={cn("size-4 hover:opacity-50", className)}
       variant={variant}
       onClick={() => {
         if (isCopied) return

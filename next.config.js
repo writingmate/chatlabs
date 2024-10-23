@@ -10,7 +10,7 @@ const nextConfig = {
   reactStrictMode: true,
   experimental: {
     optimizePackageImports: ['icon-library'],
-    serverComponentsExternalPackages: ["sharp", "onnxruntime-node"]
+    serverComponentsExternalPackages: ["sharp", "onnxruntime-node", 'pino']
   },
   images: {
     remotePatterns: [

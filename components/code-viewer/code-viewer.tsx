@@ -51,9 +51,9 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   onCodeChange
 }) => {
   const { user } = useAuth()
-  const { selectedWorkspace, profile, selectedAssistant, selectedChat } =
+  const { selectedWorkspace, profile, selectedAssistant } =
     useContext(ChatbotUIContext)
-  const { setSelectedHtmlElements, chatSettings, chatMessages } =
+  const { setSelectedHtmlElements, chatSettings, chatMessages, selectedChat } =
     useContext(ChatbotUIChatContext)
   const { handleSendMessage } = useChatHandler()
   const [sharing, setSharing] = useState(false)
@@ -221,6 +221,7 @@ Please fix the error`,
       isGenerating,
       isSidebarOpen,
       theme,
+      selectedChat,
       isEditable,
       chatSettings?.model,
       selectedAssistant,
