@@ -7,7 +7,7 @@ module.exports = {
   arrowParens: "avoid",
   tabWidth: 2,
   trailingComma: "none",
-  plugins: [require.resolve("@ianvs/prettier-plugin-sort-imports")],
+  plugins: [require('@ianvs/prettier-plugin-sort-imports')],
   importOrder: [
     "^.+\\.scss$",
     "^.+\\.css$",
@@ -28,10 +28,6 @@ module.exports = {
     "",
     "^[./]"
   ],
-  importOrderSeparation: false,
-  importOrderSortSpecifiers: true,
-  importOrderBuiltinModulesToTop: true,
   importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
-  importOrderMergeDuplicateImports: true,
-  importOrderCombineTypeAndValueImports: true
+  importOrderTypeScriptVersion: "5.0.0"
 }
