@@ -14,15 +14,16 @@ export const getFileByAppSlug = async (appSlug: string) => {
     .select("*, file_items(*), application_files(*, applications(*))")
     .eq("application_files.applications.subdomain", appSlug)
     .order("created_at", { ascending: false })
+    .limit(1)
 
-  if (!files) {
+  if (error) {
     logger.debug({ err: error }, "getFileByAppSlug error")
     throw new Error(error.message)
   }
 
   logger.debug({ files }, "getFileByAppSlug files")
 
-  if (files.length === 0) {
+  if (files?.length === 0) {
     logger.debug("getFileByAppSlug no files")
     return null
   }
