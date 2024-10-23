@@ -4,10 +4,13 @@ import { EnvKey } from "@/types/key-type"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Tables } from "@/supabase/types"
+import { NextRequest } from "next/server"
+import { getWorkspaceById } from "@/db/workspaces"
+import { getEffectivePlan } from "@/lib/subscription"
 
 export const dynamic = "force-dynamic"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const envKeyMap: Record<string, VALID_ENV_KEYS> = {
     azure: VALID_ENV_KEYS.AZURE_OPENAI_API_KEY,
     openai: VALID_ENV_KEYS.OPENAI_API_KEY,
@@ -27,18 +30,38 @@ export async function GET() {
     azure_embeddings_name: VALID_ENV_KEYS.AZURE_EMBEDDINGS_NAME
   }
 
-  let profile: Tables<"profiles"> | null = null
+  const workspaceId = request.nextUrl.searchParams.get("workspaceId")
+
+  if (!workspaceId) {
+    return createResponse({ error: "Workspace ID is required" }, 400)
+  }
+
+  let profile:
+    | (Tables<"profiles"> & { workspace: Tables<"workspaces"> })
+    | null = null
 
   try {
-    profile = await getServerProfile()
-  } catch (error) {}
+    profile = await getServerProfile(workspaceId)
+  } catch (error) {
+    return createResponse({ error: "Unauthorized" }, 401)
+  }
+
+  if (!profile) {
+    return createResponse({ error: "Unauthorized" }, 401)
+  }
+
+  if (!profile?.workspace) {
+    return createResponse({ error: "Unauthorized" }, 401)
+  }
+
+  const plan = getEffectivePlan(profile, profile?.workspace)
 
   const isUsingEnvKeyMap = Object.keys(envKeyMap).reduce<
     Record<string, boolean>
   >((acc, provider) => {
     const key = envKeyMap[provider]
 
-    if (profile?.plan.startsWith("byok_")) {
+    if (plan.startsWith("byok_")) {
       return acc
     }
 

@@ -8,14 +8,17 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { upsertUserQuestion } from "@/db/user_questions"
 import Image from "next/image"
+import { getEffectivePlan } from "@/lib/subscription"
 
 export default function SubscriptionSuccessPage() {
-  const { profile } = useContext(ChatbotUIContext)
+  const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
   const [response, setResponse] = useState("")
 
   useEffect(() => {
-    if (profile && profile.plan != "free") {
-      const event = `purchase_${profile.plan}`
+    if (!profile) return
+    const plan = getEffectivePlan(profile, selectedWorkspace)
+    if (plan != "free") {
+      const event = `purchase_${plan}`
       window.gtag?.("event", event)
       window.dataLayer?.push({ event })
     }
@@ -46,7 +49,7 @@ export default function SubscriptionSuccessPage() {
   return (
     <div className="size-screen flex size-full flex-col items-center justify-center">
       <Image
-        src="https://media.licdn.com/dms/image/D5603AQF7L8gHvNGeNQ/profile-displayphoto-shrink_400_400/0/1699576720025?e=1728518400&v=beta&t=KsJYhiJqBFSn5vf0YERo4aDO8ZU1IJZgqljPtDkV3SQ"
+        src="/artem-photo.png"
         alt="Artem"
         width={100}
         height={100}

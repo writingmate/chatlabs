@@ -1494,6 +1494,7 @@ export type Database = {
           use_azure_openai: boolean
           user_id: string
           username: string
+          workspace_migration_enabled: boolean | null
         }
         Insert: {
           anthropic_api_key?: string | null
@@ -1532,6 +1533,7 @@ export type Database = {
           use_azure_openai: boolean
           user_id: string
           username: string
+          workspace_migration_enabled?: boolean | null
         }
         Update: {
           anthropic_api_key?: string | null
@@ -1570,6 +1572,7 @@ export type Database = {
           use_azure_openai?: boolean
           user_id?: string
           username?: string
+          workspace_migration_enabled?: boolean | null
         }
         Relationships: [
           {
@@ -1897,6 +1900,51 @@ export type Database = {
           },
         ]
       }
+      workspace_users: {
+        Row: {
+          created_at: string
+          email: string
+          role: string
+          status: string
+          updated_at: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          role: string
+          status: string
+          updated_at?: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          role?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_users_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspaces: {
         Row: {
           created_at: string
@@ -1913,7 +1961,9 @@ export type Database = {
           instructions: string
           is_home: boolean
           name: string
+          plan: string | null
           sharing: string
+          stripe_customer_id: string | null
           updated_at: string | null
           user_id: string
         }
@@ -1932,7 +1982,9 @@ export type Database = {
           instructions: string
           is_home?: boolean
           name: string
+          plan?: string | null
           sharing?: string
+          stripe_customer_id?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -1951,7 +2003,9 @@ export type Database = {
           instructions?: string
           is_home?: boolean
           name?: string
+          plan?: string | null
           sharing?: string
+          stripe_customer_id?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -2023,6 +2077,12 @@ export type Database = {
         }
         Returns: Record<string, unknown>
       }
+      enable_workspace_feature: {
+        Args: {
+          target_user_id: string
+        }
+        Returns: undefined
+      }
       get_assistants_for_user: {
         Args: {
           p_user_id: string
@@ -2048,6 +2108,12 @@ export type Database = {
           updated_at: string | null
           user_id: string
         }[]
+      }
+      has_workspace_feature_enabled: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
       }
       hash_encode: {
         Args: {
@@ -2080,6 +2146,14 @@ export type Database = {
             }
             Returns: string
           }
+      is_workspace_member: {
+        Args: {
+          workspace_id: string
+          user_id: string
+          check_role?: string
+        }
+        Returns: boolean
+      }
       match_file_items_local: {
         Args: {
           query_embedding: string

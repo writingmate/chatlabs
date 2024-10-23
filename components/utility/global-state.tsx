@@ -5,7 +5,11 @@
 import { ChatbotUIContext } from "@/context/context"
 import { getProfileByUserId } from "@/db/profile"
 import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
-import { getWorkspaceById, getWorkspacesByUserId } from "@/db/workspaces"
+import {
+  getWorkspaceById,
+  getWorkspaces,
+  getWorkspacesByUserId
+} from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import {
   fetchHostedModels,
@@ -36,6 +40,7 @@ import { getPlatformTools } from "@/db/platform-tools"
 import { onlyUniqueById } from "@/lib/utils"
 import { getAssistantPublicImageUrl } from "@/db/storage/assistant-images"
 import { Loading } from "@/components/ui/loading"
+import { getEffectivePlan } from "@/lib/subscription"
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -72,7 +77,16 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
   // WORKSPACE STORE
   const [selectedWorkspace, setSelectedWorkspace] =
-    useState<Tables<"workspaces"> | null>(null)
+    useState<Tables<"workspaces"> | null>(() => {
+      if (typeof window !== "undefined") {
+        const storedWorkspace =
+          window?.localStorage?.getItem("selectedWorkspace")
+        if (storedWorkspace) {
+          return JSON.parse(storedWorkspace)
+        }
+      }
+      return null
+    })
   const [workspaceImages, setWorkspaceImages] = useState<WorkspaceImage[]>([])
 
   // PRESET STORE
@@ -170,7 +184,15 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     () => !isMobileScreen()
   )
 
+  // EFFECTIVE PLAN
+  const [effectivePlan, setEffectivePlan] = useState<string>("free")
+
+  const [fetchingStartingData, setFetchingStartingData] =
+    useState<boolean>(false)
+
   useEffect(() => {
+    if (fetchingStartingData) return
+    setFetchingStartingData(true)
     ;(async () => {
       try {
         const profile = await fetchStartingData()
@@ -203,6 +225,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
           setAvailableLocalModels(localModels)
         }
 
+        setEffectivePlan(
+          profile ? getEffectivePlan(profile, selectedWorkspace) : "free"
+        )
+
         setAllModels([
           ...models.map(model => ({
             modelId: model.model_id as LLMID,
@@ -216,12 +242,15 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
           })),
           ...allModels
         ])
+
+        setFetchingStartingData(false)
       } catch (error) {
+        setFetchingStartingData(false)
         setLoading(false)
         console.error("Error fetching models:", error)
       }
     })()
-  }, [])
+  }, [selectedWorkspace])
 
   useEffect(() => {
     if (chatSettings) {
@@ -231,10 +260,17 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         console.error("Error setting chat settings:", error)
       }
     }
-  }, [chatSettings])
+
+    if (selectedWorkspace) {
+      localStorage.setItem(
+        "selectedWorkspace",
+        JSON.stringify(selectedWorkspace)
+      )
+    }
+  }, [chatSettings, selectedWorkspace])
 
   const fetchStartingData = async (): Promise<
-    Tables<"profiles"> | undefined
+    (Tables<"profiles"> & { workspace: Tables<"workspaces"> }) | undefined
   > => {
     const session = (await supabase.auth.getSession()).data.session
 
@@ -245,40 +281,45 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     const user = session.user
 
     const profile = await getProfileByUserId(user.id)
-
     setProfile(profile)
 
-    const workspaces = await getWorkspacesByUserId(user.id)
-    setWorkspaces(workspaces)
-    setSelectedWorkspace(workspaces?.[0])
+    if (profile.workspace_migration_enabled) {
+      const workspaces = await getWorkspaces()
+      setWorkspaces(workspaces)
+      setSelectedWorkspace(workspaces?.[0])
 
-    for (const workspace of workspaces) {
-      let workspaceImageUrl = ""
+      // Fetch workspace images only if feature is enabled
+      for (const workspace of workspaces) {
+        let workspaceImageUrl: string | undefined = undefined
+        // Add null check and default to empty string if undefined
+        const imagePath = workspace.image_path || ""
+        if (imagePath) {
+          workspaceImageUrl = await getWorkspaceImageFromStorage(imagePath)
+        }
 
-      if (workspace.image_path) {
-        workspaceImageUrl =
-          (await getWorkspaceImageFromStorage(workspace.image_path)) || ""
-      }
+        if (workspaceImageUrl) {
+          const response = await fetch(workspaceImageUrl)
+          const blob = await response.blob()
+          const base64 = await convertBlobToBase64(blob)
 
-      if (workspaceImageUrl) {
-        const response = await fetch(workspaceImageUrl)
-        const blob = await response.blob()
-        const base64 = await convertBlobToBase64(blob)
-
-        setWorkspaceImages(prev => [
-          ...prev,
-          {
-            workspaceId: workspace.id,
-            path: workspace.image_path,
-            base64: base64,
-            url: workspaceImageUrl
-          }
-        ])
+          setWorkspaceImages(prev => [
+            ...prev,
+            {
+              workspaceId: workspace.id,
+              path: imagePath, // Use the safe imagePath here
+              base64,
+              url: workspaceImageUrl
+            }
+          ])
+        }
       }
     }
 
+    const workspaceToFetch =
+      selectedWorkspace || workspaces.find(w => w.is_home)
+
     await fetchWorkspaceData(
-      workspaces.find(w => w.is_home)?.id as string,
+      workspaceToFetch?.id as string,
       profile?.user_id as string
     )
     setChatMessages([])
@@ -293,7 +334,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
     setLoading(false)
 
-    return profile
+    return { ...profile, workspace: workspaceToFetch! }
   }
 
   const fetchWorkspaceData = async (workspaceId: string, userId: string) => {
@@ -546,7 +587,11 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
         // PROFILE SETTINGS
         isProfileSettingsOpen,
-        setIsProfileSettingsOpen
+        setIsProfileSettingsOpen,
+
+        // EFFECTIVE PLAN
+        effectivePlan,
+        setEffectivePlan
       }}
     >
       {children}

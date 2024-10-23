@@ -9,6 +9,7 @@ import { SubscriptionRequiredError } from "@/lib/errors"
 import {
   CATCHALL_MESSAGE_DAILY_LIMIT,
   FREE_MESSAGE_DAILY_LIMIT,
+  getEffectivePlan,
   PRO_MESSAGE_DAILY_LIMIT,
   PRO_ULTIMATE_MESSAGE_DAILY_LIMIT,
   ULTIMATE_MESSAGE_DAILY_LIMIT,
@@ -37,9 +38,13 @@ function createClient() {
   )
 }
 
-export async function getServerProfile() {
+export async function getServerProfile(
+  workspaceId?: string
+): Promise<Tables<"profiles"> & { workspace: Tables<"workspaces"> }> {
   const cookieStore = cookies()
   const supabase = createClient()
+
+  workspaceId = workspaceId || cookieStore.get("workspaceId")?.value
 
   const user = (await supabase.auth.getUser()).data.user
   if (!user) {
@@ -56,12 +61,29 @@ export async function getServerProfile() {
     throw new ApiError(401, "Profile not found")
   }
 
-  const profileWithKeys = addApiKeysToProfile(profile)
+  // Get workspace either by ID or get user's workspace
+  const { data: workspace } = await supabase
+    .from("workspaces")
+    .select("*")
+    .eq(workspaceId ? "id" : "user_id", workspaceId || user.id)
+    .single()
 
-  return profileWithKeys
+  if (!workspace) {
+    throw new ApiError(401, "Workspace not found")
+  }
+
+  const profileWithKeys = addApiKeysToProfile(
+    profile,
+    getEffectivePlan(profile, workspace) || ""
+  )
+
+  return {
+    ...profileWithKeys,
+    workspace
+  }
 }
 
-function addApiKeysToProfile(profile: Tables<"profiles">) {
+function addApiKeysToProfile(profile: Tables<"profiles">, plan: string) {
   const apiKeys = {
     [VALID_ENV_KEYS.OPENAI_API_KEY]: "openai_api_key",
     [VALID_ENV_KEYS.ANTHROPIC_API_KEY]: "anthropic_api_key",
@@ -71,9 +93,7 @@ function addApiKeysToProfile(profile: Tables<"profiles">) {
     [VALID_ENV_KEYS.PERPLEXITY_API_KEY]: "perplexity_api_key",
     [VALID_ENV_KEYS.AZURE_OPENAI_API_KEY]: "azure_openai_api_key",
     [VALID_ENV_KEYS.OPENROUTER_API_KEY]: "openrouter_api_key",
-
     [VALID_ENV_KEYS.OPENAI_ORGANIZATION_ID]: "openai_organization_id",
-
     [VALID_ENV_KEYS.AZURE_OPENAI_ENDPOINT]: "azure_openai_endpoint",
     [VALID_ENV_KEYS.AZURE_GPT_35_TURBO_NAME]: "azure_openai_35_turbo_id",
     [VALID_ENV_KEYS.AZURE_GPT_45_VISION_NAME]: "azure_openai_45vision_id",
@@ -81,7 +101,8 @@ function addApiKeysToProfile(profile: Tables<"profiles">) {
     [VALID_ENV_KEYS.AZURE_EMBEDDINGS_NAME]: "azure_openai_embeddings_id"
   }
 
-  if (!profile.plan.startsWith("byok_")) {
+  // Only add API keys if not using BYOK plan
+  if (!plan.startsWith("byok_")) {
     for (const [envKey, profileKey] of Object.entries(apiKeys)) {
       if (process.env[envKey] && !(profile as any)[profileKey]) {
         ;(profile as any)[profileKey] = process.env[envKey]
@@ -127,8 +148,13 @@ function isTierModel(model: LLMID, tier: keyof typeof TIER_MODELS) {
   return false
 }
 
-export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
-  if (!validatePlanForModel(profile, model)) {
+export async function validateModel(
+  profile: Tables<"profiles"> & { workspace: Tables<"workspaces"> },
+  model: LLMID
+) {
+  const plan = getEffectivePlan(profile, profile.workspace)
+
+  if (!validatePlanForModel(plan, model)) {
     const modelData = LLM_LIST.find(
       x => x.modelId === model || x.hostedId === model
     )
@@ -140,14 +166,15 @@ export async function validateModel(profile: Tables<"profiles">, model: LLMID) {
 }
 
 export async function validateMessageCount(
-  profile: Tables<"profiles">,
+  profile: Tables<"profiles"> & { workspace: Tables<"workspaces"> },
   model: LLMID,
   date: Date,
   supabase: SupabaseClient
 ) {
-  const userPlan = profile.plan.split("_")[0]
+  const plan = getEffectivePlan(profile, profile.workspace)
+  const userPlan = plan?.split("_")[0]
 
-  if (userPlan.startsWith("byok")) {
+  if (userPlan?.startsWith("byok")) {
     return
   }
 
@@ -179,7 +206,7 @@ export async function validateMessageCount(
   }
 
   if (
-    (userPlan === PLAN_FREE || userPlan.startsWith("premium")) &&
+    (userPlan === PLAN_FREE || userPlan?.startsWith("premium")) &&
     count >= FREE_MESSAGE_DAILY_LIMIT
   ) {
     throw new SubscriptionRequiredError(

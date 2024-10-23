@@ -25,10 +25,9 @@ export const ModelSelect: FC<ModelSelectProps> = ({
 }) => {
   const {
     profile,
-    models,
-    availableHostedModels,
+    selectedWorkspace,
+    effectivePlan,
     availableLocalModels,
-    availableOpenRouterModels,
     allModels,
     setIsPaywallOpen
   } = useContext(ChatbotUIContext)
@@ -49,7 +48,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   }, [isOpen])
 
   const handleSelectModel = (modelId: LLMID) => {
-    if (!validatePlanForModel(profile, modelId)) {
+    if (!validatePlanForModel(effectivePlan, modelId)) {
       setIsPaywallOpen(true)
     } else {
       onSelectModel(modelId)
@@ -73,7 +72,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     model => model.modelId === selectedModelId
   )
 
-  if (!profile) return null
+  if (!selectedWorkspace) return null
 
   return (
     <DropdownMenu
@@ -162,7 +161,7 @@ export const ModelSelect: FC<ModelSelectProps> = ({
             return (
               <div key={provider}>
                 <div className="mb-1 ml-2 text-xs font-bold tracking-wide opacity-50">
-                  {provider === "openai" && profile.use_azure_openai
+                  {provider === "openai" && profile?.use_azure_openai
                     ? "AZURE OPENAI"
                     : provider.toLocaleUpperCase()}
                 </div>

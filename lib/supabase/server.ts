@@ -1,5 +1,13 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import { createClient as createClientBase } from "@supabase/supabase-js"
+
+export const createServiceRoleClient = () => {
+  return createClientBase(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 export const createClient = (cookieStore?: ReturnType<typeof cookies>) => {
   if (!cookieStore) {
@@ -31,6 +39,20 @@ export const createClient = (cookieStore?: ReturnType<typeof cookies>) => {
             // user sessions.
           }
         }
+      }
+    }
+  )
+}
+
+// Add this new function for server-side Supabase client
+export const createServerSupabaseClient = () => {
+  return createClientBase(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
       }
     }
   )

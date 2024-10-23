@@ -5,14 +5,16 @@ import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 import { useClickOutside } from "@/components/chat/picker-hooks/use-click-outside"
 import { validatePlanForAssistant } from "@/lib/subscription"
 import { AssistantIcon } from "@/components/assistants/assistant-icon"
+import { LLMID } from "@/types"
 
 interface AssistantPickerProps {}
 
 export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
   const {
-    profile,
+    selectedWorkspace,
     assistants,
     focusAssistant,
+    effectivePlan,
     atCommand,
     isAssistantPickerOpen,
     setIsAssistantPickerOpen,
@@ -40,7 +42,7 @@ export const AssistantPicker: FC<AssistantPickerProps> = ({}) => {
   }
 
   const callSelectAssistant = (assistant: Tables<"assistants">) => {
-    if (!validatePlanForAssistant(profile, assistant)) {
+    if (!validatePlanForAssistant(effectivePlan, assistant)) {
       setIsPaywallOpen(true)
       return
     }

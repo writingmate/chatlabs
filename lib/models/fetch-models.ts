@@ -43,7 +43,10 @@ const KNOWN_MODEL_NAMES: {
 }
 
 export const fetchHostedModels = async (
-  profile: Tables<"profiles"> | null | undefined
+  profile:
+    | (Tables<"profiles"> & { workspace: Tables<"workspaces"> })
+    | null
+    | undefined
 ) => {
   try {
     const providers = ["google", "anthropic", "mistral", "groq", "perplexity"]
@@ -54,7 +57,9 @@ export const fetchHostedModels = async (
       providers.push("openai")
     }
 
-    const response = await fetch("/api/keys")
+    const response = await fetch(
+      `/api/keys?workspaceId=${profile?.workspace?.id}`
+    )
 
     if (!response.ok) {
       throw new Error(`Server is not responding.`)

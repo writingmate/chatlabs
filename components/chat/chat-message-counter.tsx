@@ -2,6 +2,7 @@ import { ChatbotUIContext } from "@/context/context"
 import { useContext, useEffect, useState } from "react"
 import {
   FREE_MESSAGE_DAILY_LIMIT,
+  getEffectivePlan,
   PRO_ULTIMATE_MESSAGE_DAILY_LIMIT,
   ULTIMATE_MESSAGE_DAILY_LIMIT
 } from "@/lib/subscription"
@@ -13,7 +14,8 @@ import { LLM_LIST } from "@/lib/models/llm/llm-list"
 interface ChatMessageCounterProps {}
 
 const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
-  const { profile, setIsPaywallOpen } = useContext(ChatbotUIContext)
+  const { profile, selectedWorkspace, setIsPaywallOpen } =
+    useContext(ChatbotUIContext)
   const { isGenerating, chatSettings } = useContext(ChatbotUIChatContext)
   const [messageCount, setMessageCount] = useState(0)
 
@@ -42,7 +44,7 @@ const ChatMessageCounter: React.FC<ChatMessageCounterProps> = () => {
     return null
   }
 
-  const userPlan = profile.plan.split("_")[0]
+  const userPlan = getEffectivePlan(profile, selectedWorkspace).split("_")[0]
   const modelData = LLM_LIST.find(
     x => x.modelId === chatSettings.model || x.hostedId === chatSettings.model
   )

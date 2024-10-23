@@ -185,8 +185,7 @@ export async function GET() {
         parseOpenRouterModel({
           modelId: model.slug,
           modelName: model.name,
-          provider:
-            model.endpoint?.provider_name?.toLowerCase() as ModelProvider,
+          provider: "openrouter",
           isBYOKRequired: model.endpoint?.is_byok_required,
           pricing: {
             inputCost: model.endpoint?.pricing?.prompt,

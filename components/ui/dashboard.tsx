@@ -11,6 +11,7 @@ import { CommandK } from "../utility/command-k"
 import { PlanPicker } from "@/components/upgrade/plan-picker"
 import { useTheme } from "next-themes"
 import { ChatbotUIContext } from "@/context/context"
+import { InviteHandler } from "../utility/InviteHandler"
 
 export const SIDEBAR_WIDTH = 350
 
@@ -21,10 +22,8 @@ interface DashboardProps {
 export const Dashboard: FC<DashboardProps> = ({ children }) => {
   useHotkey("s", () => setShowSidebar(prevState => !prevState))
 
-  const pathname = usePathname()
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const tabValue = searchParams.get("tab") || "chats"
+  const tabValue = searchParams?.get("tab") || "chats"
   const { theme } = useTheme()
 
   const { handleSelectDeviceFile } = useSelectFileHandler()
@@ -67,6 +66,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
       <div className="flex size-full overflow-x-hidden">
         <CommandK />
         <PlanPicker />
+        <InviteHandler />
 
         <Sidebar />
 

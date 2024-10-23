@@ -1,18 +1,11 @@
 import { ContentType } from "@/types"
 import {
-  IconAdjustmentsHorizontal,
-  IconBolt,
-  IconBooks,
-  IconDiamond,
   IconDiamondFilled,
   IconFile,
-  IconLayoutBoardSplit,
   IconLayoutColumns,
   IconMessage,
-  IconPencil,
   IconPuzzle,
   IconRobotFace,
-  IconSparkles,
   IconBulb
 } from "@tabler/icons-react"
 import { FC, useContext } from "react"
@@ -35,8 +28,7 @@ interface SidebarSwitcherProps {
 export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   onContentTypeChange
 }) => {
-  const { profile, selectedWorkspace, setIsPaywallOpen } =
-    useContext(ChatbotUIContext)
+  const { effectivePlan, setIsPaywallOpen } = useContext(ChatbotUIContext)
 
   const router = useRouter()
   return (
@@ -115,7 +107,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 
         {/* TODO */}
         {/* <Alerts /> */}
-        {profile?.plan === PLAN_FREE && (
+        {effectivePlan === PLAN_FREE && (
           <WithTooltip
             display={
               <div>Upgrade to paid plans to get access to all features.</div>
