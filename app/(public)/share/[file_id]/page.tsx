@@ -35,7 +35,8 @@ export async function generateMetadata({
   if (!file) {
     return {
       title: "ChatLabs",
-      description: "AI Chat Platform"
+      description:
+        "AI Chat Platform: \n - Chat with best AI; \n - Build, Collaborate, Share and Deploy AI Apps in minutes."
     }
   }
 
@@ -55,7 +56,9 @@ export async function generateMetadata({
       twitter: {
         card: "summary_large_image",
         title: file.name,
-        description: file.description,
+        description:
+          file.description ||
+          "Created with ChatLabs.pro. \n Build, Collaborate, Share and Deploy AI Apps in minutes.",
         images: [getOgImageUrl(file.name, file.description)]
       }
     }
