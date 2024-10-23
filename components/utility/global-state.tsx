@@ -273,34 +273,37 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     const user = session.user
 
     const profile = await getProfileByUserId(user.id)
-
     setProfile(profile)
 
-    const workspaces = await getWorkspaces()
-    setWorkspaces(workspaces)
+    if (profile.workspace_migration_enabled) {
+      const workspaces = await getWorkspaces()
+      setWorkspaces(workspaces)
+      setSelectedWorkspace(workspaces?.[0])
 
-    for (const workspace of workspaces) {
-      let workspaceImageUrl = ""
+      // Fetch workspace images only if feature is enabled
+      for (const workspace of workspaces) {
+        let workspaceImageUrl: string | undefined = undefined
+        // Add null check and default to empty string if undefined
+        const imagePath = workspace.image_path || ""
+        if (imagePath) {
+          workspaceImageUrl = await getWorkspaceImageFromStorage(imagePath)
+        }
 
-      if (workspace.image_path) {
-        workspaceImageUrl =
-          (await getWorkspaceImageFromStorage(workspace.image_path)) || ""
-      }
+        if (workspaceImageUrl) {
+          const response = await fetch(workspaceImageUrl)
+          const blob = await response.blob()
+          const base64 = await convertBlobToBase64(blob)
 
-      if (workspaceImageUrl) {
-        const response = await fetch(workspaceImageUrl)
-        const blob = await response.blob()
-        const base64 = await convertBlobToBase64(blob)
-
-        setWorkspaceImages(prev => [
-          ...prev,
-          {
-            workspaceId: workspace.id,
-            path: workspace.image_path,
-            base64: base64,
-            url: workspaceImageUrl
-          }
-        ])
+          setWorkspaceImages(prev => [
+            ...prev,
+            {
+              workspaceId: workspace.id,
+              path: imagePath, // Use the safe imagePath here
+              base64,
+              url: workspaceImageUrl
+            }
+          ])
+        }
       }
     }
 

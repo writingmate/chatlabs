@@ -7,6 +7,8 @@ import { getOrCreateCustomer } from "@/lib/stripe/get-or-create-customer"
 import { PLANS } from "@/lib/stripe/config"
 import { redirect } from "next/navigation"
 import { createServiceRoleClient } from "@/lib/supabase/server"
+import { logger } from "@/lib/logger"
+import { createCheckoutSession as createStripeCheckoutSession } from "@/lib/stripe/create-checkout"
 
 export async function createCheckoutSession(
   data: FormData
@@ -17,7 +19,7 @@ export async function createCheckoutSession(
     const email = data.get("email") as string
     const workspaceId = data.get("workspaceId") as string
 
-    if (!userId || !email || !plan || !workspaceId) {
+    if (!userId || !email || !plan) {
       throw new Error("Missing required fields")
     }
 
@@ -26,56 +28,54 @@ export async function createCheckoutSession(
       throw new Error("Origin header is missing")
     }
 
-    if (!PLANS.includes(plan)) {
-      throw new Error(`Invalid plan: ${plan}`)
-    }
-
     const prices = await stripe.prices.list({
       lookup_keys: [plan],
-      active: true
+      expand: ["data.product"]
     })
 
-    if (prices.data.length === 0) {
-      throw new Error(`No active price found for plan: ${plan}`)
+    if (!prices.data.length) {
+      throw new Error("Price not found")
     }
 
     const customerId = await getOrCreateCustomer({
       email,
       userId,
-      workspaceId
+      workspaceId // Optional - only passed for workspace-based billing
     })
 
     const price = prices.data[0].id
 
-    const checkoutSession: Stripe.Checkout.Session =
-      await stripe.checkout.sessions.create({
-        mode: "subscription",
-        customer: customerId,
-        allow_promotion_codes: true,
-        line_items: [
-          {
-            price: price,
-            quantity: 1
-          }
-        ],
-        metadata: {
-          workspaceId // Add workspaceId to metadata for webhook handling
-        },
-        success_url: `${origin}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/subscription/cancel`
+    try {
+      const session = await createStripeCheckoutSession({
+        customerId,
+        priceId: price,
+        origin,
+        metadata: workspaceId ? { workspaceId } : undefined
       })
 
-    return {
-      client_secret: checkoutSession.client_secret,
-      url: checkoutSession.url
+      if (!session.url) {
+        throw new Error("No checkout URL returned")
+      }
+
+      logger.info({ url: session.url }, "Redirecting to checkout")
+      return {
+        url: session.url,
+        client_secret: session.client_secret || null // Add this line
+      }
+    } catch (error) {
+      logger.error({ err: error }, "Failed to create checkout session")
+      throw error
     }
   } catch (error) {
-    console.error("Error in createCheckoutSession:", error)
+    logger.error({ err: error }, "Error in createCheckoutSession")
     throw error
   }
 }
 
-export async function createBillingPortalSession(workspaceId: string) {
+export async function createBillingPortalSession(workspaceId?: string): Promise<{
+  client_secret: string | null
+  url: string | null
+}> {
   try {
     const origin = headers().get("origin")
     if (!origin) {
@@ -83,26 +83,53 @@ export async function createBillingPortalSession(workspaceId: string) {
     }
 
     const supabase = createServiceRoleClient()
-    const { data: workspace, error } = await supabase
-      .from("workspaces")
-      .select("stripe_customer_id")
-      .eq("id", workspaceId)
-      .single()
 
-    if (error || !workspace?.stripe_customer_id) {
-      throw new Error("Workspace not found or no Stripe customer ID")
+    let customerId: string
+
+    if (workspaceId) {
+      // Workspace-based billing
+      const { data: workspace } = await supabase
+        .from("workspaces")
+        .select("stripe_customer_id")
+        .eq("id", workspaceId)
+        .single()
+
+      if (!workspace?.stripe_customer_id) {
+        throw new Error("No Stripe customer ID found for workspace")
+      }
+
+      customerId = workspace.stripe_customer_id
+    } else {
+      // Legacy profile-based billing - we need user_id from auth
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user?.id) {
+        throw new Error("No authenticated user found")
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("stripe_customer_id")
+        .eq("user_id", user.id)
+        .single()
+
+      if (!profile?.stripe_customer_id) {
+        throw new Error("No Stripe customer ID found for profile")
+      }
+
+      customerId = profile.stripe_customer_id
     }
 
-    const billingPortalSession = await stripe.billingPortal.sessions.create({
-      customer: workspace.stripe_customer_id,
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: customerId,
       return_url: origin
     })
 
     return {
-      url: billingPortalSession.url
+      client_secret: null,
+      url: portalSession.url
     }
   } catch (error) {
-    console.error("Error in createBillingPortalSession:", error)
+    logger.error({ err: error }, "Error creating billing portal session")
     throw error
   }
 }

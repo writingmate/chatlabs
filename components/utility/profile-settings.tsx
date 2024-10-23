@@ -106,6 +106,17 @@ interface ProfileSettingsProps {
   isCollapsed: boolean
 }
 
+// Add this near the top of the file
+const getPlanDisplay = (
+  profile: Tables<"profiles">,
+  workspace: Tables<"workspaces"> | null
+) => {
+  if (profile.workspace_migration_enabled && workspace?.plan) {
+    return workspace.plan.split("_")[0]
+  }
+  return profile.plan.split("_")[0]
+}
+
 export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
   const {
     profile,
@@ -542,27 +553,25 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
     }
   }
 
-  const handleRedirectToBillingPortal = async (
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    e.stopPropagation()
+  const handleRedirectToBillingPortal = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoadingBillingPortal(true)
     try {
-      if (!selectedWorkspace) {
-        throw new Error("No workspace selected")
+      if (!profile) {
+        throw new Error("No profile found")
       }
 
-      if (!selectedWorkspace.stripe_customer_id) {
-        throw new Error("No Stripe customer ID associated with this workspace")
+      if (profile.workspace_migration_enabled) {
+        if (!selectedWorkspace) {
+          throw new Error("No workspace selected")
+        }
+        await redirectToBillingPortal(selectedWorkspace.id)
+      } else {
+        // Legacy billing portal redirect - pass empty string to indicate legacy mode
+        await redirectToBillingPortal("")
       }
-
-      await redirectToBillingPortal(selectedWorkspace.id)
     } catch (error) {
-      console.error("Error redirecting to billing portal:", error)
-      toast.error(
-        "Failed to redirect to billing portal. Please try again or contact support."
-      )
+      toast.error("Failed to redirect to billing portal")
     } finally {
       setLoadingBillingPortal(false)
     }
@@ -651,8 +660,12 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="mb-1 w-[290px] cursor-pointer text-sm">
-          <WorkspaceSwitcher />
-          <DropdownMenuSeparator />
+          {profile.workspace_migration_enabled && (
+            <>
+              <WorkspaceSwitcher />
+              <DropdownMenuSeparator />
+            </>
+          )}
           <DropdownMenuItem
             onClick={() => setIsProfileSettingsOpen("profile")}
             className="px-1"
@@ -721,27 +734,31 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
               <TabsTrigger value="profile" className="w-full justify-start">
                 Profile
               </TabsTrigger>
-              <TabsTrigger value="team" className="w-full justify-start">
-                Team
-              </TabsTrigger>
-              <TabsTrigger value="shortcuts" className="w-full  justify-start">
-                Shortcuts
-              </TabsTrigger>
-              <TabsTrigger value="keys" className="w-full justify-start">
-                API Keys
-              </TabsTrigger>
               <TabsTrigger
                 value="subscription"
                 className="w-full justify-start"
               >
                 Subscription
               </TabsTrigger>
+              {profile.workspace_migration_enabled && (
+                <TabsTrigger value="team" className="w-full justify-start">
+                  Team
+                </TabsTrigger>
+              )}
+              <TabsTrigger value="shortcuts" className="w-full  justify-start">
+                Shortcuts
+              </TabsTrigger>
+              <TabsTrigger value="keys" className="w-full justify-start">
+                API Keys
+              </TabsTrigger>
               <TabsTrigger value="plugins" className="w-full justify-start">
                 Plugins
               </TabsTrigger>
-              <TabsTrigger value="workspace" className="w-full justify-start">
-                Workspace
-              </TabsTrigger>
+              {profile.workspace_migration_enabled && (
+                <TabsTrigger value="workspace" className="w-full justify-start">
+                  Workspace
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <div className="flex-1 overflow-y-auto p-6">
@@ -1094,7 +1111,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                 <div className="space-y-2">
                   <Label>Current Subscription Plan</Label>
                   <div className="text-xl font-semibold capitalize">
-                    {selectedWorkspace?.plan?.split("_")[0]}
+                    {getPlanDisplay(profile, selectedWorkspace)}
                   </div>
                   <p className="text-sm">
                     {
@@ -1105,10 +1122,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({ isCollapsed }) => {
                           "Upgrade to Ultimate to get access to OpenAI o1-preview and Claude 3 Opus",
                         [PLAN_ULTIMATE]:
                           "You're on the Ultimate plan! Enjoy your access to all models, plugins and image generation."
-                      }[selectedWorkspace?.plan?.split("_")[0] || PLAN_FREE]
+                      }[getPlanDisplay(profile, selectedWorkspace)]
                     }
                   </p>
-                  {selectedWorkspace?.plan !== PLAN_FREE ? (
+                  {getPlanDisplay(profile, selectedWorkspace) !== PLAN_FREE ? (
                     <Button
                       className="bg-violet-600"
                       loading={loadingBillingPortal}

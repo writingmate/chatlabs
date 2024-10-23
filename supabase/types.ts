@@ -1494,6 +1494,7 @@ export type Database = {
           use_azure_openai: boolean
           user_id: string
           username: string
+          workspace_migration_enabled: boolean | null
         }
         Insert: {
           anthropic_api_key?: string | null
@@ -1532,6 +1533,7 @@ export type Database = {
           use_azure_openai: boolean
           user_id: string
           username: string
+          workspace_migration_enabled?: boolean | null
         }
         Update: {
           anthropic_api_key?: string | null
@@ -1570,6 +1572,7 @@ export type Database = {
           use_azure_openai?: boolean
           user_id?: string
           username?: string
+          workspace_migration_enabled?: boolean | null
         }
         Relationships: [
           {
@@ -2074,6 +2077,12 @@ export type Database = {
         }
         Returns: Record<string, unknown>
       }
+      enable_workspace_feature: {
+        Args: {
+          target_user_id: string
+        }
+        Returns: undefined
+      }
       get_assistants_for_user: {
         Args: {
           p_user_id: string
@@ -2099,6 +2108,12 @@ export type Database = {
           updated_at: string | null
           user_id: string
         }[]
+      }
+      has_workspace_feature_enabled: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
       }
       hash_encode: {
         Args: {
@@ -2136,13 +2151,6 @@ export type Database = {
           workspace_id: string
           user_id: string
           check_role?: string
-        }
-        Returns: boolean
-      }
-      is_workspace_owner: {
-        Args: {
-          workspace_id: string
-          user_id: string
         }
         Returns: boolean
       }
