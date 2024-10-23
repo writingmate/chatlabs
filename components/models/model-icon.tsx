@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import cohere from "@/public/providers/cohere.png"
 import mistral from "@/public/providers/mistral.png"
 import groq from "@/public/providers/groq.png"
 import meta from "@/public/providers/meta.png"
@@ -46,6 +47,22 @@ export const ModelIcon: FC<ModelIconProps> = ({
           height={height}
         />
       )
+    case "cohere":
+      return (
+        <Image
+          className={cn(
+            "rounded-sm p-1",
+            theme === "dark" ? "bg-white" : "border-foreground/10 border",
+            className
+          )}
+          src={cohere.src}
+          alt="Cohere"
+          width={width}
+          height={height}
+        />
+      )
+    // @ts-ignore
+    case "mistralai":
     case "mistral":
       return (
         <Image
@@ -142,6 +159,8 @@ export const ModelIcon: FC<ModelIconProps> = ({
           height={height}
         />
       )
+    // @ts-ignore
+    case "meta-llama":
     case "meta":
       return (
         <Image
@@ -156,16 +175,18 @@ export const ModelIcon: FC<ModelIconProps> = ({
           height={height}
         />
       )
-    // case "openrouter":
-    //   const { provider } = parseOpenRouterModelName(modelId!)
-    //   return (
-    //     <ModelIcon
-    //       className={className}
-    //       provider={provider as ModelProvider}
-    //       height={height}
-    //       width={width}
-    //     />
-    //   )
+    case "openrouter":
+      console.log("modelId", modelId)
+      const newProvider = modelId?.split("/")[0]
+      console.log("newProvider", newProvider)
+      return (
+        <ModelIcon
+          className={className}
+          provider={newProvider as ModelProvider}
+          height={height}
+          width={width}
+        />
+      )
     default:
       return (
         <ChatbotUISVG
