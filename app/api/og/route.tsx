@@ -1,13 +1,22 @@
 import { ImageResponse } from "next/og"
 import { NextRequest } from "next/server"
 
+import { logger } from "@/lib/logger"
+import { createErrorResponse } from "@/lib/response"
+
 export const runtime = "edge"
+export const fetchCache = "force-cache"
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const title = searchParams.get("title") || "ChatLabs"
-    const description = searchParams.get("description") || "AI Chat Platform"
+    const description =
+      searchParams.get("description") || "All-in-one AI Platform"
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.NEXT_PUBLIC_VERCEL_URL ||
+      "https://labs.writingmate.ai"
 
     return new ImageResponse(
       (
@@ -19,48 +28,93 @@ export async function GET(req: NextRequest) {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: "#000",
-            padding: "40px 80px"
+            background: "linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%)",
+            padding: "40px 80px",
+            position: "relative"
           }}
         >
-          {/* Logo */}
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <img
-              src={`${process.env.NEXT_PUBLIC_APP_URL}/chatlabs.png`}
-              alt="ChatLabs Logo"
-              width="80"
-              height="80"
-            />
+          {/* Subtle Gradient Overlay */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.02) 0%, transparent 70%)",
+              zIndex: 0
+            }}
+          />
+
+          {/* Content Container */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 2,
+              gap: "32px"
+            }}
+          >
+            {/* Logo */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                background: "rgba(0, 0, 0, 0.03)",
+                borderRadius: "9999px"
+              }}
+            >
+              <img
+                src={`${baseUrl}/chatlabs.png`}
+                alt="ChatLabs Logo"
+                width="100"
+                height="100"
+              />
+            </div>
+
+            {/* Title */}
+            <div
+              style={{
+                fontSize: 72,
+                fontWeight: 800,
+                color: "#111111",
+                textAlign: "center",
+                lineHeight: 1.2,
+                padding: "0 20px",
+                maxWidth: "900px"
+              }}
+            >
+              {title}
+            </div>
+
+            {/* Description */}
+            <div
+              style={{
+                fontSize: 32,
+                color: "#666666",
+                textAlign: "center",
+                margin: 0,
+                maxWidth: "700px",
+                lineHeight: 1.4
+              }}
+            >
+              {description}
+            </div>
           </div>
 
-          {/* Title */}
-          <h1
+          {/* Bottom Border */}
+          <div
             style={{
-              fontSize: 60,
-              fontWeight: 800,
-              background: "linear-gradient(to bottom right, #FFFFFF, #9089FC)",
-              backgroundClip: "text",
-              color: "transparent",
-              margin: "20px 0",
-              textAlign: "center",
-              letterSpacing: "-0.05em"
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "6px",
+              background: "rgba(0, 0, 0, 0.05)"
             }}
-          >
-            {title}
-          </h1>
-
-          {/* Description */}
-          <p
-            style={{
-              fontSize: 30,
-              color: "#888",
-              textAlign: "center",
-              margin: 0,
-              marginTop: 10
-            }}
-          >
-            {description}
-          </p>
+          />
         </div>
       ),
       {
@@ -68,7 +122,8 @@ export async function GET(req: NextRequest) {
         height: 630
       }
     )
-  } catch (e) {
-    return new Response("Failed to generate OG image", { status: 500 })
+  } catch (error) {
+    logger.error({ error }, "Failed to generate OG image")
+    return createErrorResponse("Failed to generate OG image", 500)
   }
 }
