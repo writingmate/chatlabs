@@ -112,8 +112,8 @@ function parseOpenRouterModel({
   const normalizedModelName = normalizeModelName(parsedModelName)
   if (existingModelNames.has(normalizedModelName)) {
     logger.debug(
-      "Skipping model as it already exists in LLM_LIST",
-      normalizedModelName
+      { normalizedModelName },
+      "Skipping model as it already exists in LLM_LIST"
     )
     return null // Skip this model as it already exists in LLM_LIST
   }

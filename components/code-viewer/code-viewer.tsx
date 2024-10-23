@@ -53,7 +53,7 @@ export const CodeViewer: FC<CodeViewerProps> = ({
   const { user } = useAuth()
   const { selectedWorkspace, profile, selectedAssistant } =
     useContext(ChatbotUIContext)
-  const { setSelectedHtmlElements, chatSettings, chatMessages } =
+  const { setSelectedHtmlElements, chatSettings, chatMessages, selectedChat } =
     useContext(ChatbotUIChatContext)
   const { handleSendMessage } = useChatHandler()
   const [sharing, setSharing] = useState(false)
@@ -200,6 +200,7 @@ Please fix the error`,
           )}
         </div>
         <MessageSharingDialog
+          chatId={selectedChat?.id}
           open={sharing}
           setOpen={setSharing}
           user={user}
@@ -220,6 +221,7 @@ Please fix the error`,
       isGenerating,
       isSidebarOpen,
       theme,
+      selectedChat,
       isEditable,
       chatSettings?.model,
       selectedAssistant,
