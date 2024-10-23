@@ -7,10 +7,45 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { notFound } from "next/navigation"
 import { parseDBMessageCodeBlocksAndContent } from "@/lib/messages"
+import { getOgImageUrl } from "@/lib/utils/og"
+import { getChatById } from "@/db/chats"
+import { Metadata } from "next"
 
-export function generateMetadata({ params }: { params: { share_id: string } }) {
+export async function generateMetadata({
+  params
+}: {
+  params: { share_id: string }
+}): Promise<Metadata> {
+  // Fetch chat details here
+  const chat = await getChatById(params.share_id)
+
+  if (!chat) {
+    return {
+      title: "ChatLabs",
+      description: "AI Chat Platform"
+    }
+  }
+
   return {
-    title: "ChatLabs"
+    title: chat.name,
+    description: `Chat session: ${chat?.name}`,
+    openGraph: {
+      title: chat.name,
+      images: [
+        {
+          url: getOgImageUrl(chat.name, `Shared chat session: ${chat.name}`),
+          width: 1200,
+          height: 630,
+          alt: `${chat.name} - ChatLabs`
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: chat.name,
+      description: `Shared chat session: ${chat.name}`,
+      images: [getOgImageUrl(chat.name, `Shared chat session: ${chat.name}`)]
+    }
   }
 }
 

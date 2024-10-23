@@ -15,6 +15,7 @@ import { updateHtml } from "@/lib/code-viewer"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { getFileByAppSlug } from "@/db/applications"
+import { getOgImageUrl } from "@/lib/utils/og"
 
 interface SharePageProps {
   params: {
@@ -30,9 +31,33 @@ export async function generateMetadata({
 }: SharePageProps) {
   const file = await getFileByIdOrHashIdOrAppSlug(file_id)
 
+  if (!file) {
+    return {
+      title: "ChatLabs",
+      description: "AI Chat Platform"
+    }
+  }
+
   return {
-    title: `${file?.name} - Created with ChatLabs`,
-    description: file?.description
+    title: file.name,
+    description: file.description,
+    openGraph: {
+      title: file.name,
+      images: [
+        {
+          url: getOgImageUrl(file.name, file.description),
+          width: 1200,
+          height: 630,
+          alt: `${file.name} - ChatLabs`
+        }
+      ],
+      twitter: {
+        card: "summary_large_image",
+        title: file.name,
+        description: file.description,
+        images: [getOgImageUrl(file.name, file.description)]
+      }
+    }
   }
 }
 

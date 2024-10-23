@@ -171,7 +171,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   )
 
   useEffect(() => {
-    ; (async () => {
+    ;(async () => {
       try {
         const profile = await fetchStartingData()
         const hostedModelRes = await fetchHostedModels(profile)

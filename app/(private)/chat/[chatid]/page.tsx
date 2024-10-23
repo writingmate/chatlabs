@@ -7,6 +7,46 @@ import { ChatbotUIChatContext } from "@/context/chat"
 import { notFound, useParams } from "next/navigation"
 import { ChatbotUIContext } from "@/context/context"
 import { useCodeBlockManager } from "@/hooks/useCodeBlockManager"
+import { getOgImageUrl } from "@/lib/utils/og"
+import { getChatById } from "@/db/chats"
+
+export async function generateMetadata({
+  params
+}: {
+  params: { chatId: string }
+}): Promise<Metadata> {
+  // Fetch chat details here
+  const chat = await getChatById(params.chatId)
+
+  if (!chat) {
+    return {
+      title: "ChatLabs",
+      description: "AI Chat Platform"
+    }
+  }
+
+  return {
+    title: chat.name,
+    description: `Chat session: ${chat?.name}`,
+    openGraph: {
+      title: chat.name,
+      images: [
+        {
+          url: getOgImageUrl(chat.name, `Chat session: ${chat.name}`),
+          width: 1200,
+          height: 630,
+          alt: `${chat.name} - ChatLabs`
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: chat.name,
+      description: `Chat session: ${chat.name}`,
+      images: [getOgImageUrl(chat.name, `Chat session: ${chat.name}`)]
+    }
+  }
+}
 
 export default function ChatIDPage() {
   const { chatMessages, isGenerating } = useContext(ChatbotUIChatContext)
