@@ -18,6 +18,11 @@ export async function GET(req: NextRequest) {
       process.env.VERCEL_URL ||
       "https://labs.writingmate.ai"
 
+    const logoUrl =
+      searchParams.get("logo") ||
+      process.env.OG_LOGO_URL ||
+      `${baseUrl}/chatlabs.png`
+
     return new ImageResponse(
       (
         <div
@@ -66,12 +71,7 @@ export async function GET(req: NextRequest) {
                 borderRadius: "9999px"
               }}
             >
-              <img
-                src={`${baseUrl}/chatlabs.png`}
-                alt="ChatLabs Logo"
-                width="100"
-                height="100"
-              />
+              <img src={logoUrl} alt="ChatLabs Logo" width="100" height="100" />
             </div>
 
             {/* Title */}
