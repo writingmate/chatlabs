@@ -201,6 +201,7 @@ export type Database = {
           created_at: string
           description: string
           folder_id: string | null
+          icon: string | null
           id: string
           name: string
           sharing: string
@@ -216,6 +217,7 @@ export type Database = {
           created_at?: string
           description: string
           folder_id?: string | null
+          icon?: string | null
           id?: string
           name: string
           sharing?: string
@@ -231,6 +233,7 @@ export type Database = {
           created_at?: string
           description?: string
           folder_id?: string | null
+          icon?: string | null
           id?: string
           name?: string
           sharing?: string
