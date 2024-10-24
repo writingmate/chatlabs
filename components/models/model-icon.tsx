@@ -178,9 +178,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
         />
       )
     case "openrouter":
-      console.log("modelId", modelId)
       const newProvider = modelId?.split("/")[0]
-      console.log("newProvider", newProvider)
       return (
         <ModelIcon
           className={className}

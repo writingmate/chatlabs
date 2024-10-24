@@ -33,17 +33,24 @@ export async function generateMetadata({
 }: SharePageProps) {
   const { file, application } = await getFileAndApplicationData(file_id)
 
+  const defaultTitle = "ChatLabs"
+  const defaultDescription =
+    "AI Chat Platform: \n - Chat with best AI; \n - Build, Collaborate, Share and Deploy AI Apps in minutes."
+
   if (!file) {
     return {
-      title: "ChatLabs",
-      description:
-        "AI Chat Platform: \n - Chat with best AI; \n - Build, Collaborate, Share and Deploy AI Apps in minutes."
+      title: defaultTitle,
+      description: defaultDescription
     }
   }
 
-  const title = application?.name || file.name
-  const description = application?.description || file.description
+  const title = application?.name || file.name || defaultTitle
+  const description =
+    application?.description || file.description || defaultDescription
   const icon = application?.icon || ""
+  const url = application?.subdomain
+    ? `https://${application?.subdomain}.toolzflow.app`
+    : `https://labs.writingmate.ai/share/${file.hashid}`
 
   return {
     title,
@@ -51,20 +58,22 @@ export async function generateMetadata({
     icon,
     openGraph: {
       title,
+      type: "website",
+      url,
+      description,
       images: [
         {
           url: getOgImageUrl(title, description, icon),
           width: 1200,
           height: 630,
-          alt: `${title} - ChatLabs`
+          alt: `${title}`
         }
       ],
+      logo: icon,
       twitter: {
         card: "summary_large_image",
         title,
-        description:
-          description ||
-          "Created with ChatLabs.pro. \n Build, Collaborate, Share and Deploy AI Apps in minutes.",
+        description: description,
         images: [getOgImageUrl(title, description, icon)]
       }
     }
