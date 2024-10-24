@@ -1,3 +1,4 @@
+import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getApplicationByFileId, getFileByAppSlug } from "@/db/applications"
 import { getFileByHashId, getFileById } from "@/db/files"
@@ -30,7 +31,7 @@ interface SharePageProps {
 
 export async function generateMetadata({
   params: { file_id }
-}: SharePageProps) {
+}: SharePageProps): Promise<Metadata> {
   const { file, application } = await getFileAndApplicationData(file_id)
 
   const defaultTitle = "ChatLabs"
@@ -55,7 +56,9 @@ export async function generateMetadata({
   return {
     title,
     description,
-    icon,
+    icons: {
+      icon: icon
+    },
     openGraph: {
       title,
       type: "website",
