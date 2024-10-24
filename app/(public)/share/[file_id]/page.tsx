@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { getFileByAppSlug } from "@/db/applications"
+import { getApplicationByFileId, getFileByAppSlug } from "@/db/applications"
 import { getFileByHashId, getFileById } from "@/db/files"
 import {
   IconExternalLink,
@@ -31,7 +31,7 @@ interface SharePageProps {
 export async function generateMetadata({
   params: { file_id }
 }: SharePageProps) {
-  const file = await getFileByIdOrHashIdOrAppSlug(file_id)
+  const { file, application } = await getFileAndApplicationData(file_id)
 
   if (!file) {
     return {
@@ -41,26 +41,31 @@ export async function generateMetadata({
     }
   }
 
+  const title = application?.name || file.name
+  const description = application?.description || file.description
+  const icon = application?.icon || ""
+
   return {
-    title: file.name,
-    description: file.description,
+    title,
+    description,
+    icon,
     openGraph: {
-      title: file.name,
+      title,
       images: [
         {
-          url: getOgImageUrl(file.name, file.description),
+          url: getOgImageUrl(title, description, icon),
           width: 1200,
           height: 630,
-          alt: `${file.name} - ChatLabs`
+          alt: `${title} - ChatLabs`
         }
       ],
       twitter: {
         card: "summary_large_image",
-        title: file.name,
+        title,
         description:
-          file.description ||
+          description ||
           "Created with ChatLabs.pro. \n Build, Collaborate, Share and Deploy AI Apps in minutes.",
-        images: [getOgImageUrl(file.name, file.description)]
+        images: [getOgImageUrl(title, description, icon)]
       }
     }
   }
@@ -76,13 +81,14 @@ function parseBoolean(value: string | boolean | undefined) {
   return !!value
 }
 
-async function getFileByIdOrHashIdOrAppSlug(idOrHashIdOrAppSlug: string) {
+async function getFileAndApplicationData(idOrHashIdOrAppSlug: string) {
   try {
-    logger.debug({ idOrHashIdOrAppSlug }, "getFileByIdOrHashIdOrAppSlug")
+    logger.debug({ idOrHashIdOrAppSlug }, "getFileAndApplicationData")
     const file = await getFileByHashId(idOrHashIdOrAppSlug)
     if (file) {
       logger.debug({ file }, "getFileByHashId")
-      return file
+      const application = await getApplicationByFileId(file.id)
+      return { file, application }
     }
   } catch (error) {
     logger.debug({ err: error }, "getFileByHashId error")
@@ -90,20 +96,23 @@ async function getFileByIdOrHashIdOrAppSlug(idOrHashIdOrAppSlug: string) {
       const file = await getFileById(idOrHashIdOrAppSlug)
       if (file) {
         logger.debug({ file }, "getFileById")
-        return file
+        const application = await getApplicationByFileId(file.id)
+        return { file, application }
       }
     } catch (error) {
       logger.debug({ err: error }, "getFileById error")
       try {
         const file = await getFileByAppSlug(idOrHashIdOrAppSlug)
         logger.debug({ file }, "getFileByAppSlug")
-        return file
+        const application = await getApplicationByFileId(file.id)
+        return { file, application }
       } catch (error) {
         logger.debug({ err: error }, "getFileByAppSlug error")
         throw error
       }
     }
   }
+  return { file: null, application: null }
 }
 
 const SharePage = async ({
@@ -111,9 +120,11 @@ const SharePage = async ({
   searchParams: { __show_banner = true }
 }: SharePageProps) => {
   const showBanner = parseBoolean(__show_banner)
-  let file
+  let file, application
   try {
-    file = await getFileByIdOrHashIdOrAppSlug(file_id)
+    const result = await getFileAndApplicationData(file_id)
+    file = result.file
+    application = result.application
 
     if (
       !file ||
