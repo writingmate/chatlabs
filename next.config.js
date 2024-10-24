@@ -2,8 +2,26 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true"
 })
 
+const isDev = process.env.NODE_ENV === "development"
+
 const withPWA = require("next-pwa")({
-  dest: "public"
+  dest: "public",
+  disable: isDev,
+  exclude: [
+    // add buildExcludes here
+    ({ asset, compilation }) => {
+      if (
+        asset.name.startsWith("server/") ||
+        asset.name.match(/^((app-|^)build-manifest\.json|react-loadable-manifest\.json)$/)
+      ) {
+        return true;
+      }
+      if (isDev && !asset.name.startsWith("static/runtime/")) {
+        return true;
+      }
+      return false;
+    }
+  ],
 })
 
 const nextConfig = {
@@ -31,9 +49,7 @@ const nextConfig = {
 }
 
 const config = {
-  ...withBundleAnalyzer(
-    process.env.NODE_ENV === "production" ? withPWA(nextConfig) : nextConfig
-  ),
+  ...withBundleAnalyzer(withPWA(nextConfig)),
 }
 // Injected content via Sentry wizard below
 
