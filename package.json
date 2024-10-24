@@ -11,7 +11,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --log-level silent",
+    "lint": "next lint",
     "lint:fix": "next lint --fix",
     "analyze": "ANALYZE=true npm run build",
     "preview": "next build && next start",
