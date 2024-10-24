@@ -402,3 +402,18 @@ export const generateRandomSubdomain = async () => {
 
   return data
 }
+
+export const getApplicationByFileId = async (fileId: string) => {
+  const { data, error } = await supabase
+    .from("application_files")
+    .select("applications(*)")
+    .eq("file_id", fileId)
+    .single()
+
+  if (error) {
+    logger.error({ error }, "Error fetching application by file ID")
+    return null
+  }
+
+  return data?.applications
+}

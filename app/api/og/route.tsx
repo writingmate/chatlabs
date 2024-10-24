@@ -3,6 +3,7 @@ import { NextRequest } from "next/server"
 
 import { logger } from "@/lib/logger"
 import { createErrorResponse } from "@/lib/response"
+import { getBaseUrl } from "@/lib/utils/og"
 
 export const runtime = "edge"
 export const fetchCache = "force-cache"
@@ -13,15 +14,8 @@ export async function GET(req: NextRequest) {
     const title = searchParams.get("title") || "ChatLabs"
     const description =
       searchParams.get("description") || "All-in-one AI Platform"
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL ||
-      `https://${process.env.VERCEL_URL}` ||
-      "https://labs.writingmate.ai"
-
-    const logoUrl =
-      searchParams.get("logo") ||
-      process.env.OG_LOGO_URL ||
-      `${baseUrl}/chatlabs.png`
+    const baseUrl = getBaseUrl()
+    const logoUrl = searchParams.get("logo") || `${baseUrl}/chatlabs.png`
 
     return new ImageResponse(
       (
