@@ -169,17 +169,13 @@ export function MessageSharingDialog({
       )
 
       const appData = {
-        ...existingApp,
         name: filename,
         description,
         icon,
         subdomain,
         user_id: user.id,
         workspace_id: selectedWorkspace.id,
-        chat_id: chatId,
-        sharing: "public",
-        theme: "light",
-        application_type: "web_app"
+        chat_id: chatId
       }
 
       let application
@@ -196,7 +192,17 @@ export function MessageSharingDialog({
           "Updated existing application"
         )
       } else {
-        application = await createApplication(appData, [], [], [])
+        application = await createApplication(
+          {
+            ...appData,
+            sharing: "public",
+            theme: "light",
+            application_type: "web_app"
+          },
+          [],
+          [],
+          []
+        )
         logger.info(
           { applicationId: application.id },
           "Created new application"
