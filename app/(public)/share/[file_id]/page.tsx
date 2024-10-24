@@ -205,7 +205,7 @@ const SharePage = async ({
               </div>
             </DialogContent>
           </Dialog>
-          <RemixButton fileId={file_id} />
+          <RemixButton fileId={file.hashid} />
         </div>
       )}
     </div>
