@@ -1747,6 +1747,30 @@ export type Database = {
           },
         ]
       }
+      subdomain_adjectives: {
+        Row: {
+          word: string
+        }
+        Insert: {
+          word: string
+        }
+        Update: {
+          word?: string
+        }
+        Relationships: []
+      }
+      subdomain_nouns: {
+        Row: {
+          word: string
+        }
+        Insert: {
+          word: string
+        }
+        Update: {
+          word?: string
+        }
+        Relationships: []
+      }
       tool_workspaces: {
         Row: {
           created_at: string

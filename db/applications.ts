@@ -9,28 +9,26 @@ import { getPlatformTools, platformToolDefinitionById } from "./platform-tools"
 
 export const getFileByAppSlug = async (appSlug: string) => {
   logger.debug({ appSlug }, "getFileByAppSlug")
-  const { data: files, error } = await supabase
-    .from("files")
-    .select("*, file_items(*), application_files(*, applications(*))")
-    .eq("application_files.applications.subdomain", appSlug)
+
+  const { data: application, error } = await supabase
+    .from("applications")
+    .select(
+      `
+      *,
+      files!inner(*, file_items!inner(*))
+    `
+    )
+    .eq("subdomain", appSlug)
     .order("created_at", { ascending: false })
-    .limit(1)
+    .single()
 
-  if (error) {
-    logger.debug({ err: error }, "getFileByAppSlug error")
-    throw new Error(error.message)
+  if (!application || !application.files || application.files.length === 0) {
+    throw new Error("No application files found")
   }
 
-  logger.debug({ files }, "getFileByAppSlug files")
+  logger.debug({ application }, "getFileByAppSlug application")
 
-  if (files?.length === 0) {
-    logger.debug("getFileByAppSlug no files")
-    return null
-  }
-
-  logger.debug({ file: files?.[0] }, "getFileByAppSlug file")
-
-  return files?.[0]
+  return application.files[0]
 }
 
 export const getApplicationById = async (
