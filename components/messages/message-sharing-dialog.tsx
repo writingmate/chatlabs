@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import {
+  checkAppSlugAvailability,
   createApplication,
   createApplicationFiles,
   generateRandomSubdomain,
@@ -10,7 +11,13 @@ import {
 } from "@/db/applications"
 import { createFile } from "@/db/files"
 import { CodeBlock } from "@/types"
-import { IconExternalLink, IconRefresh, IconWorld } from "@tabler/icons-react"
+import {
+  IconChevronDown,
+  IconChevronUp,
+  IconEdit,
+  IconRefresh,
+  IconWorld
+} from "@tabler/icons-react"
 import { toast } from "sonner"
 
 import { logger } from "@/lib/logger"
@@ -25,8 +32,10 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import { ExternalLink } from "@/components/ui/external-link"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 
 interface MessageSharingDialogProps {
   user: any
@@ -52,9 +61,12 @@ export function MessageSharingDialog({
   const [filename, setFilename] = useState<string>(defaultFilename)
   const [subdomain, setSubdomain] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
-  const [isValidatingSubdomain, setIsValidatingSubdomain] = useState(false)
   const [subdomainError, setSubdomainError] = useState<string>("")
   const [existingApp, setExistingApp] = useState<any>(null)
+  const [showAdvanced, setShowAdvanced] = useState(false)
+  const [description, setDescription] = useState<string>("")
+  const [icon, setIcon] = useState<string>("")
+  const [isEditingSubdomain, setIsEditingSubdomain] = useState(false)
 
   useEffect(() => {
     setFilename(defaultFilename)
@@ -100,22 +112,20 @@ export function MessageSharingDialog({
       return false
     }
 
-    setIsValidatingSubdomain(true)
     try {
       if (existingApp && existingApp.subdomain === value) return true
 
-      const existingAppBySlug = await getFileByAppSlug(value)
-      if (existingAppBySlug) {
+      const isAvailable = await checkAppSlugAvailability(value)
+      if (!isAvailable) {
         setSubdomainError("This subdomain is already taken")
         return false
       }
       setSubdomainError("")
       return true
     } catch (error) {
+      setSubdomainError("Error validating subdomain")
       logger.error({ error }, "Error validating subdomain")
       return true
-    } finally {
-      setIsValidatingSubdomain(false)
     }
   }
 
@@ -157,15 +167,17 @@ export function MessageSharingDialog({
       )
 
       const appData = {
+        ...existingApp,
         name: filename,
-        description: "",
+        description,
+        icon,
         subdomain,
         user_id: user.id,
         workspace_id: selectedWorkspace.id,
         chat_id: chatId,
         sharing: "public",
-        application_type: "html",
-        theme: "light"
+        theme: "light",
+        application_type: "web_app"
       }
 
       let application
@@ -214,6 +226,19 @@ export function MessageSharingDialog({
     : ""
   const newAppUrl = `https://${subdomain}.toolzflow.app`
 
+  const handleEditSubdomain = () => {
+    setIsEditingSubdomain(true)
+  }
+
+  const handleSubdomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSubdomain(e.target.value.toLowerCase())
+    setSubdomainError("")
+  }
+
+  const handleSubdomainBlur = () => {
+    validateSubdomain(subdomain).then(isValid => setIsEditingSubdomain(isValid))
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
@@ -241,62 +266,103 @@ export function MessageSharingDialog({
           </div>
 
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="subdomain">Choose your subdomain</Label>
+            <Label htmlFor="subdomain">Your subdomain</Label>
             <div className="flex items-center space-x-2">
               <Input
                 id="subdomain"
                 value={subdomain}
-                onChange={e => {
-                  setSubdomain(e.target.value.toLowerCase())
-                  setSubdomainError("")
-                }}
-                onBlur={() => validateSubdomain(subdomain)}
+                onChange={handleSubdomainChange}
+                onBlur={handleSubdomainBlur}
                 placeholder="your-app"
+                readOnly={!isEditingSubdomain}
+                className={isEditingSubdomain ? "" : "bg-gray-100"}
               />
               <span className="text-muted-foreground text-sm">
                 .toolzflow.app
               </span>
-              <Button
-                size="icon"
-                variant="outline"
-                onClick={() => generateRandomSubdomain().then(setSubdomain)}
-                title="Generate random subdomain"
-              >
-                <IconRefresh className="size-4" />
-              </Button>
+              {isEditingSubdomain ? (
+                <Button
+                  size="icon"
+                  className="shrink-0"
+                  variant="outline"
+                  onClick={() => generateRandomSubdomain().then(setSubdomain)}
+                  title="Generate random subdomain"
+                >
+                  <IconRefresh className="size-4" />
+                </Button>
+              ) : (
+                <Button
+                  size="icon"
+                  className="shrink-0"
+                  variant="outline"
+                  onClick={handleEditSubdomain}
+                  title="Edit subdomain"
+                >
+                  <IconEdit className="size-4" />
+                </Button>
+              )}
             </div>
             {subdomainError && (
               <span className="text-destructive text-sm">{subdomainError}</span>
             )}
-            <Description>
-              Your app will be accessible at this URL. You can use the generated
-              subdomain or create your own.
-            </Description>
+            <Description>Your app will be accessible at this URL.</Description>
           </div>
 
-          {existingApp && (
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary">Public</Badge>
-              <Link
-                href={currentAppUrl}
-                target="_blank"
-                className="text-sm text-blue-500 hover:underline"
-              >
-                {currentAppUrl}
-              </Link>
-              <CopyButton value={currentAppUrl} />
-            </div>
-          )}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Advanced settings</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+            >
+              {showAdvanced ? (
+                <IconChevronUp className="size-4" />
+              ) : (
+                <IconChevronDown className="size-4" />
+              )}
+            </Button>
+          </div>
 
-          {existingApp && subdomain !== existingApp.subdomain && (
-            <Description>New URL after update: {newAppUrl}</Description>
+          {showAdvanced && (
+            <>
+              <div className="flex flex-col space-y-2">
+                <Textarea
+                  id="description"
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
+                  placeholder="Enter a description for your app"
+                  rows={3}
+                />
+                <Description>
+                  This description will be used in the webpage metadata and
+                  generated{" "}
+                  <ExternalLink href="https://en.wikipedia.org/wiki/Facebook_Platform#Open_Graph_protocol">
+                    Open Graph
+                  </ExternalLink>{" "}
+                  image.
+                </Description>
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="icon">Icon URL</Label>
+                <Input
+                  id="icon"
+                  value={icon}
+                  onChange={e => setIcon(e.target.value)}
+                  placeholder="Enter URL for app icon/favicon"
+                />
+                <Description>
+                  Provide a URL for your app{"'"}s icon or favicon.
+                </Description>
+              </div>
+            </>
           )}
 
           <Button
             className="w-full"
             onClick={handleShare}
-            loading={loading || isValidatingSubdomain}
-            disabled={loading || isValidatingSubdomain || !!subdomainError}
+            loading={loading}
+            disabled={loading || !!subdomainError}
           >
             <IconWorld className="mr-2 size-4" />
             {existingApp ? "Update App" : "Create and Share"}

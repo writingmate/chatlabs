@@ -7,6 +7,15 @@ import { supabase } from "@/lib/supabase/browser-client"
 
 import { getPlatformTools, platformToolDefinitionById } from "./platform-tools"
 
+export const checkAppSlugAvailability = async (appSlug: string) => {
+  const { count } = await supabase
+    .from("applications")
+    .select("id", { count: "exact" })
+    .eq("subdomain", appSlug)
+
+  return count === 0
+}
+
 export const getFileByAppSlug = async (appSlug: string) => {
   logger.debug({ appSlug }, "getFileByAppSlug")
 
