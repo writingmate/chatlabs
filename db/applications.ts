@@ -25,7 +25,7 @@ export const getFileByAppSlug = async (appSlug: string) => {
       .from("application_files")
       .select("files!inner(*, file_items!inner(*))")
       .eq("application_id", application.id)
-      .order("created_at", { foreignTable: "files", ascending: false })
+      .order("created_at", { ascending: false })
       .limit(1)
 
   if (!applicationFiles || applicationFiles.length === 0) {
