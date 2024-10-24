@@ -104,7 +104,9 @@ export function MessageSharingDialog({
       return false
     }
 
-    const subdomainRegex = /^[a-z0-9-]+$/
+    // should start with a letter and only contain lowercase letters, numbers, and hyphens
+    // and end with a letter or number
+    const subdomainRegex = /^[a-z][a-z0-9-]*[a-z0-9]$/
     if (!subdomainRegex.test(value)) {
       setSubdomainError(
         "Subdomain can only contain lowercase letters, numbers, and hyphens"
@@ -125,7 +127,7 @@ export function MessageSharingDialog({
     } catch (error) {
       setSubdomainError("Error validating subdomain")
       logger.error({ error }, "Error validating subdomain")
-      return true
+      return false
     }
   }
 
@@ -236,8 +238,12 @@ export function MessageSharingDialog({
   }
 
   const handleSubdomainBlur = () => {
-    validateSubdomain(subdomain).then(isValid => setIsEditingSubdomain(isValid))
+    validateSubdomain(subdomain).then(isValid =>
+      setIsEditingSubdomain(!isValid)
+    )
   }
+
+  const appUrl = `https://${subdomain}.toolzflow.app`
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -266,41 +272,55 @@ export function MessageSharingDialog({
           </div>
 
           <div className="flex flex-col space-y-2">
-            <Label htmlFor="subdomain">Your subdomain</Label>
+            <Label htmlFor="subdomain">Your app URL</Label>
             <div className="flex items-center space-x-2">
-              <Input
-                id="subdomain"
-                value={subdomain}
-                onChange={handleSubdomainChange}
-                onBlur={handleSubdomainBlur}
-                placeholder="your-app"
-                readOnly={!isEditingSubdomain}
-                className={isEditingSubdomain ? "" : "bg-gray-100"}
-              />
-              <span className="text-muted-foreground text-sm">
-                .toolzflow.app
-              </span>
               {isEditingSubdomain ? (
-                <Button
-                  size="icon"
-                  className="shrink-0"
-                  variant="outline"
-                  onClick={() => generateRandomSubdomain().then(setSubdomain)}
-                  title="Generate random subdomain"
-                >
-                  <IconRefresh className="size-4" />
-                </Button>
+                <div className="flex grow items-center rounded-md border bg-white">
+                  <span className="text-muted-foreground px-3 pr-0.5 text-sm">
+                    https://
+                  </span>
+                  <Input
+                    id="subdomain"
+                    value={subdomain}
+                    onChange={handleSubdomainChange}
+                    onBlur={handleSubdomainBlur}
+                    placeholder="your-app"
+                    className="mx-0 border-0 px-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  />
+                  <span className="text-muted-foreground px-3 pl-0.5 text-sm">
+                    .toolzflow.app
+                  </span>
+                </div>
               ) : (
-                <Button
-                  size="icon"
-                  className="shrink-0"
-                  variant="outline"
-                  onClick={handleEditSubdomain}
-                  title="Edit subdomain"
+                <Link
+                  target="_blank"
+                  href={appUrl}
+                  className="grow rounded-md bg-gray-100 px-3 py-2 text-sm"
                 >
-                  <IconEdit className="size-4" />
-                </Button>
+                  {appUrl}
+                </Link>
               )}
+              <Button
+                size="icon"
+                className="shrink-0"
+                variant="outline"
+                onClick={
+                  isEditingSubdomain
+                    ? () => generateRandomSubdomain().then(setSubdomain)
+                    : handleEditSubdomain
+                }
+                title={
+                  isEditingSubdomain
+                    ? "Generate random subdomain"
+                    : "Edit subdomain"
+                }
+              >
+                {isEditingSubdomain ? (
+                  <IconRefresh className="size-4" />
+                ) : (
+                  <IconEdit className="size-4" />
+                )}
+              </Button>
             </div>
             {subdomainError && (
               <span className="text-destructive text-sm">{subdomainError}</span>
