@@ -14,10 +14,17 @@ function InnerRemixButton({ fileId }: RemixButtonProps) {
   const [isRemixing, setIsRemixing] = useState(false)
   const { user } = useAuth()
 
+  const getBaseUrl = () => {
+    if (window.location.href.indexOf("toolzflow.app") !== -1) {
+      return "https://labs.writingmate.ai"
+    }
+    return window.location.href
+  }
+
   const handleRemix = async () => {
     window.location.href = !user
-      ? `/login?next=/chat?remix=${fileId}`
-      : `/chat?remix=${fileId}`
+      ? `${getBaseUrl()}/login?next=/chat?remix=${fileId}`
+      : `${getBaseUrl()}/chat?remix=${fileId}`
   }
 
   return (
