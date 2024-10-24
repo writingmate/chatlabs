@@ -12,23 +12,27 @@ export const getFileByAppSlug = async (appSlug: string) => {
 
   const { data: application, error } = await supabase
     .from("applications")
-    .select(
-      `
-      *,
-      files!inner(*, file_items!inner(*))
-    `
-    )
+    .select("id")
     .eq("subdomain", appSlug)
-    .order("created_at", { foreignTable: "files", ascending: false })
     .single()
 
-  if (!application || !application.files || application.files.length === 0) {
+  if (!application) {
+    throw new Error(error?.message)
+  }
+
+  const { data: applicationFiles, error: applicationFilesError } =
+    await supabase
+      .from("application_files")
+      .select("files!inner(*, file_items!inner(*))")
+      .eq("application_id", application.id)
+      .order("created_at", { foreignTable: "files", ascending: false })
+      .limit(1)
+
+  if (!applicationFiles || applicationFiles.length === 0) {
     throw new Error("No application files found")
   }
 
-  logger.debug({ application }, "getFileByAppSlug application")
-
-  return application.files[0]
+  return applicationFiles[0].files
 }
 
 export const getApplicationById = async (
