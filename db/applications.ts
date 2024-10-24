@@ -19,7 +19,7 @@ export const getFileByAppSlug = async (appSlug: string) => {
     `
     )
     .eq("subdomain", appSlug)
-    .order("created_at", { ascending: false })
+    .order("created_at", { foreignTable: "files", ascending: false })
     .single()
 
   if (!application || !application.files || application.files.length === 0) {
