@@ -9,28 +9,30 @@ import { getPlatformTools, platformToolDefinitionById } from "./platform-tools"
 
 export const getFileByAppSlug = async (appSlug: string) => {
   logger.debug({ appSlug }, "getFileByAppSlug")
-  const { data: files, error } = await supabase
-    .from("files")
-    .select("*, file_items(*), application_files(*, applications(*))")
-    .eq("application_files.applications.subdomain", appSlug)
-    .order("created_at", { ascending: false })
-    .limit(1)
 
-  if (error) {
-    logger.debug({ err: error }, "getFileByAppSlug error")
-    throw new Error(error.message)
+  const { data: application, error } = await supabase
+    .from("applications")
+    .select("id")
+    .eq("subdomain", appSlug)
+    .single()
+
+  if (!application) {
+    throw new Error(error?.message)
   }
 
-  logger.debug({ files }, "getFileByAppSlug files")
+  const { data: applicationFiles, error: applicationFilesError } =
+    await supabase
+      .from("application_files")
+      .select("files!inner(*, file_items!inner(*))")
+      .eq("application_id", application.id)
+      .order("created_at", { foreignTable: "files", ascending: false })
+      .limit(1)
 
-  if (files?.length === 0) {
-    logger.debug("getFileByAppSlug no files")
-    return null
+  if (!applicationFiles || applicationFiles.length === 0) {
+    throw new Error("No application files found")
   }
 
-  logger.debug({ file: files?.[0] }, "getFileByAppSlug file")
-
-  return files?.[0]
+  return applicationFiles[0].files
 }
 
 export const getApplicationById = async (
